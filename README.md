@@ -5,8 +5,6 @@ Dotfiles are the customization files that are used to personalize your Linux or 
 # Who Am I?
 <img align="left" border="0" padding="4" src="https://git.rogs.me/me/dotfiles/raw/branch/master/.me-small.png">
 
-I am Roger Gonzalez, a Backend developer from Valencia, Venezuela, living in Montevideo, Uruguay. 
-
 * My website: https://rogs.me
 * My blog: https://blog.rogs.me
 * My wiki: https://wiki.rogs.me
