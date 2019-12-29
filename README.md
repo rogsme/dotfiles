@@ -9,6 +9,7 @@ Dotfiles are the customization files that are used to personalize your Linux or 
 * My blog: https://blog.rogs.me
 * My wiki: https://wiki.rogs.me
 * My git repos: https://git.rogs.me/me
+* My gitlab: https://gitlab.com/rogs
 
 # How To Manage Your Own Dotfiles
 
