@@ -1,0 +1,216 @@
+[colors]
+accent = #fba922
+
+[bar/top]
+enable-ipc = true
+width = 100%
+height = 40
+
+;background = #222
+background = #1f1f1f
+foreground = #eee
+
+border-bottom = 1
+border-bottom-color = #333
+
+overline-size = 10
+overline-color = ${self.background}
+underline-size = 10
+underline-color = ${self.background}
+
+padding-left = 0
+padding-right = 0
+module-margin-left = 3
+module-margin-right = 3
+
+font-0 = NotoSans-Regular:size=20;0
+font-1 = MaterialIcons:size=20;2
+font-2 = Termsynu:size=20;0
+font-3 = Siji:pixelsize=20;1
+font-4 = FontAwesome:size=20;0
+modules-left = mpd
+modules-center = xwindow
+modules-right = wireless-network battery 
+
+
+tray-position = right
+
+[bar/bottom]
+;monitor = eDP-1
+bottom = true
+width = 100%
+height = 40
+
+background = #1c1c1c
+foreground = #eefafafa
+
+overline-size = 3
+overline-color = ${colors.accent}
+underline-size = 3
+underline-color = ${colors.accent}
+
+;border-color = #ff0000
+border-top-size = 3
+border-top-color = #3d3d3d
+;border-bottom = 0
+;border-bottom-color = #333333
+
+spacing = 2
+;padding-right = 4
+padding-left = 0
+padding-right = 0
+module-margin-left = 0
+module-margin-right = 4
+
+font-0 = NotoSans-Regular:size=20;0
+font-1 = Unifont:size=20;0
+font-2 = FontAwesome:size=20;0
+font-3 = NotoSans-Regular:size=20;-1
+font-4 = Unifont:size=20;0
+font-5 = Termsynu:size=20;0
+
+modules-left = i3
+;modules-center =
+modules-right = pulseaudio xkeyboard xbacklight cpu memory clock
+;modules-right = memory
+
+[module/fs-root]
+type = internal/fs
+mount-0 = /
+label-mounted = %{F#e60053}%percentage_used%%%{F-} used of %mountpoint%
+
+
+[module/xbacklight]
+type = internal/xbacklight
+format-prefix = "BL: "
+label = %percentage:2%%
+
+[module/i3]
+type = internal/i3
+format = <label-state> <label-mode>
+pin-workspaces = true
+
+ws-icon-0 = term;
+ws-icon-1 = web;
+ws-icon-2 = code;
+ws-icon-3 = music;
+ws-icon-4 = irssi;
+
+label-dimmed-underline = ${root.background}
+
+label-focused = %icon%  %name%
+label-focused-foreground = #f3f3f3
+label-focused-background = #3f3f3f
+label-focused-underline = #75d85a
+label-focused-font = 4
+label-focused-padding = 4
+
+label-unfocused = %icon%  %name%
+label-unfocused-underline = #555555
+label-unfocused-font = 4
+label-unfocused-padding = 4
+
+label-urgent = %icon%  %name%
+label-urgent-foreground = #000000
+label-urgent-background = #bd2c40
+label-urgent-underline = #9b0a20
+label-urgent-font = 4
+label-urgent-padding = 4
+
+label-visible = %icon%  %name%
+label-visible-foreground = #55ffffff
+label-visible-font = 4
+label-visible-padding = 4
+
+[module/cpu]
+type = internal/cpu
+interval = 2
+format-prefix = " "
+format-underline = #f90000
+label = %percentage:2%%
+
+[module/memory]
+type = internal/memory
+interval = 2
+format-prefix = "  "
+format-underline = #4bffdc
+label = %percentage_used%%
+
+[module/wireless-network]
+type = internal/network
+interface = wlp2s0
+interval = 2.0
+ping-interval = 10
+
+label-connected =  %essid%
+label-disconnected =    not connected
+label-disconnected-foreground = #66
+
+
+[module/mpd]
+type = internal/mpd
+format-online = <bar-progress>  <icon-prev> <icon-stop> <toggle> <icon-next>  <label-song>
+format-online-overline = ${root.background}
+format-online-underline = ${root.background}
+format-offline = <label-offline>
+label-offline = mpd is off
+
+icon-play = 
+icon-pause = 
+icon-stop = 
+icon-prev = 
+icon-next = 
+icon-random = 
+icon-repeat = 
+
+toggle-on-foreground =
+toggle-off-foreground = #55
+
+bar-progress-width = 45
+bar-progress-format = %{+o +u}%fill%%{-o -u}%indicator%%{+o +u}%empty%%{-u -o}
+; bar-progress-indicator = |
+bar-progress-indicator = █
+bar-progress-indicator-foreground = #ff
+bar-progress-indicator-font = 3
+; bar-progress-fill = ─
+bar-progress-fill = █
+bar-progress-fill-foreground = #bb
+bar-progress-fill-font = 3
+; bar-progress-empty = ─
+bar-progress-empty = ▒
+bar-progress-empty-font = 3
+bar-progress-empty-foreground = #44
+
+[module/clock]
+type = internal/date
+interval = 5
+format-padding = 5
+format-foreground = #fff
+date = %%{F#bb} %d-%m-%Y%%{F-}  %%{F#ee} %H:%M%%{F-}
+
+[module/battery]
+type = internal/battery
+full-at = 100
+format-charging = %{T3}  <label-charging> %{T-}
+format-discharging = %{T3}  <label-discharging> %{T-}
+format-full = %{T3}  <label-full>
+label-charging-font = 3
+label-discharging-font = 3
+label-full = '100%'
+;label-full-font = 3
+
+[module/xwindow]
+type = internal/xwindow
+label-maxlen = 75
+label-foreground = #bbb
+
+[module/xkeyboard]
+type = internal/xkeyboard
+format-prefix = "layout: "
+label-layout = %layout%
+
+[module/pulseaudio]
+type = internal/pulseaudio
+label-volume =  %percentage%%
+label-muted = 
+label-muted-foreground = #666

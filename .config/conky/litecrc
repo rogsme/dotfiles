@@ -1,0 +1,116 @@
+#Text Color
+color1 D9D9D9
+#Icons Color
+color2 75D85A
+#Graph Color
+color3 75D85A
+
+own_window_argb_visual yes
+update_interval 1
+double_buffer yes
+imlib_cache_size 10
+own_window true
+own_window_type override
+own_window_class Conky
+own_window_hints undecorated,sticky,skip_taskbar,skip_pager,below
+own_window_transparent no
+own_window_argb_value 192
+own_window_transparent yes
+double_buffer yes
+minimum_size 330 1000
+border_inner_margin 0
+border_outer_margin 0
+alignment top_right
+gap_x 0
+gap_y 0
+background yes
+use_xft yes
+font Noto Sans:size=9
+text_buffer_size 256
+draw_shades bo
+override_utf8_locale yes
+draw_graph_borders no
+default_color FFFFFF
+
+TEXT
+
+
+
+${alignc}${color3}${font Monospace:style=Bold:pixelsize=90}${time %H:%M:%S}${font}${color}
+
+${alignc}${font Monospace:style=Bold:pixelsize=32}${time %A},${time %e} de ${time %B}, ${time %G}${font}
+${voffset 10}$color1
+${goto 20}$color2${font LineAwesomeMod :size=12}M $font$color1 ${sysname} ${kernel} - ${machine}
+${goto 20}$color2${font LineAwesomeMod :size=12}G $font$color1 Uptime: ${uptime}
+${goto 20}$color2${font LineAwesomeMod :size=12}Q $font$color1 Running Processes: ${running_processes} / ${processes} 
+${goto 20}$color2${font LineAwesomeMod :size=12}D $font$color1 Desktop: ${if_match "$desktop"!="Not running in X"}(${desktop}/${desktop_number})${endif}: ${desktop_name}
+${goto 20}$color2${font LineAwesomeMod :size=12}7 $font$color1 Threads: ${running_threads}
+${goto 20}$color2${font LineAwesomeMod :size=12}y $font$color1 Battery: ${battery BAT0} ${alignr 30}Charge: ${battery_percent BAT0}% 
+${hr 2}
+\
+
+# Usage
+Usage
+${voffset 20}
+${goto 40}${cpugraph 26,190 FFFFFF FFFFFF -l}
+${goto 40}CPU:${alignr 39}${cpu}%
+
+${goto 40}${memgraph 26,190 FFFFFF FFFFFF -l}
+${goto 40}Mem:${alignr 39}${memperc}%
+${alignr 39}${mem}
+
+${goto 40}${diskiograph 26,190 FFFFFF FFFFFF -l}
+${goto 40}Disk I/O:${alignr 39}${diskio}
+
+${hr 2}
+\
+
+# Network
+\
+Network
+
+${goto 40}${upspeedgraph wlp2s0 26,80 FFFFFF FFFFFF}${goto 275}${downspeedgraph wlp2s0 26,80 FFFFFF FFFFFF}
+${goto 40}${color5}Up: ${color2}${upspeed wlp2s0}${color5}${goto 275}Down: ${color2}${downspeed wlp2s0}
+${goto 40}${color5}Sent: ${color2}${totalup wlp2s0}${color5}${goto 275}Received: ${color2}${totaldown wlp2s0}
+
+${goto 40}$color2${font LineAwesomeMod :size=12}= $font$color1 Local IP ${alignr 30}${addr wlp2s0}
+${goto 40}$color2${font LineAwesomeMod :size=12}= $font$color1 Public IP ${alignr 30}${execi 60 curl  ipinfo.io/ip}
+${goto 40}$color2${font LineAwesomeMod :size=12}T $font$color1 Upload Speed${alignr 30}${upspeed wlp2s0}
+${goto 40}$color2${font LineAwesomeMod :size=12}8 $font$color1 Download Speed${alignr 30}${downspeed wlp2s0}
+${goto 40}$color2${font LineAwesomeMod :size=12}f $font$color1 Ping: ${color1}${execi 1 sh -c 'ping 1.1.1.1 -c 1 | grep -Po "(?<=time=)(.*?)s"'}\
+
+
+${hr 2}
+\
+
+# Proceses
+\
+Proceses
+
+${goto 40}${color1}Process${color}${alignr 39}${color1}${color1}Mem${color}
+${goto 40}${color2}${top_mem name 1}${color}${alignr 39}${top_mem mem_res 1}
+${goto 40}${color2}${top_mem name 2}${color}${alignr 39}${top_mem mem_res 2}
+${goto 40}${color2}${top_mem name 3}${color}${alignr 39}${top_mem mem_res 3}
+${goto 40}${color2}${top_mem name 4}${color}${alignr 39}${top_mem mem_res 4}
+${goto 40}${color2}${top_mem name 5}${color}${alignr 39}${top_mem mem_res 5}
+
+${goto 40}${color1}Process${color}${alignr 39}${color1}Cpu %${color}
+${goto 40}${color2}${top_mem name 1}${color}${alignr 39}${top cpu 1} %
+${goto 40}${color2}${top_mem name 2}${color}${alignr 39}${top cpu 2} %
+${goto 40}${color2}${top_mem name 3}${color}${alignr 39}${top cpu 3} %
+${goto 40}${color2}${top_mem name 4}${color}${alignr 39}${top cpu 4} %
+${goto 40}${color2}${top_mem name 5}${color}${alignr 39}${top cpu 5} %
+${hr 2}
+
+\
+Weather
+
+$color1${execi 3600 ~/.conky/weather.py}
+${goto 20}${color2}${font LineAwesomeMod :size=12}V $color1$font ${execi 60 cat ~/.cache/weather.txt | grep city | cut -d">" -f2} - ${execi 60 cat ~/.cache/weather.txt | grep country | cut -d">" -f2}
+${goto 20}${color2}${font LineAwesomeMod :size=12}O $color1$font ${execi 60 cat ~/.cache/weather.txt | grep description | cut -d">" -f2} ${alignr 30}${execi 60 cat ~/.cache/weather.txt | grep temp | cut -d">" -f2}ºC
+
+
+
+
+
+o
