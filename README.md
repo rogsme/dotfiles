@@ -6,12 +6,11 @@ Dotfiles are the customization files that are used to personalize your Linux or 
 <img align="left" border="0" padding="4" src="https://git.rogs.me/me/dotfiles/raw/branch/master/.me-small.png">
 
 I am Roger Gonzalez, a Backend developer from Valencia, Venezuela, living in Montevideo, Uruguay. 
-I like to work with Python and Javascript (NodeJS). I also have some server knowledge.
-You can find me online here: 
-- My website: https://rogs.me
-- My blog: https://blog.rogs.me
-- My wiki: https://wiki.rogs.me
-- My git repos: https://git.rogs.me
+
+    * My website: https://rogs.me
+    * My blog: https://blog.rogs.me
+    * My wiki: https://wiki.rogs.me
+    * My git repos: https://git.rogs.me
 
 # How To Manage Your Own Dotfiles
 
