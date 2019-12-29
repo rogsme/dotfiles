@@ -212,7 +212,7 @@ bindsym $aux+t exec ./.telegram/Telegram
 bindsym $aux+Shift+e exec setxkbmap es
 bindsym $aux+Shift+u exec setxkbmap us
 ## Screnshots
-bindsym Print escrotum "~/Imágenes/%Y-%m-%d-%H%M%S.png"
+bindsym Print exec escrotum "~/Imágenes/%Y-%m-%d-%H%M%S.png"
 bindsym Ctrl+Print exec escrotum -s "~/Imágenes/%Y-%m-%d-%H%M%S.png"
 bindsym Ctrl+Shift+Print exec escrotum -s -C
 
