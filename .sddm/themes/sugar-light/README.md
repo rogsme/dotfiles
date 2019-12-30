@@ -1,4 +1,4 @@
-![Screenshot of the interface of the Sugar Light theme for SDDM](Previews/Mockup.jpg "The default interface of the Sugar Light theme for SDDM")
+![Screenshot of the interface of the Sugar Light theme for SDDM](https://git.rogs.me/me/dotfiles/raw/branch/master/.sddm/themes/sugar-light/Preview.png)
 
 # Sugar Light login theme for SDDM
 
