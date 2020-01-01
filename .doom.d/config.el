@@ -130,3 +130,14 @@
      (add-hook 'js2-mode-hook #'prettier-js-mode)))
 
 (add-hook 'web-mode-hook 'rainbow-mode)
+
+;; Indent
+(setq web-mode-markup-indent-offset 2)
+(setq web-mode-css-indent-offset 2)
+(setq web-mode-code-indent-offset 2)
+(setq js-indent-level 2)
+(setq-default tab-width 2)
+(setq js-highlight-level 3)
+(setq auto-indent-indent-style 'aggressive)
+(require 'aggressive-indent)
+(global-aggressive-indent-mode 1)
