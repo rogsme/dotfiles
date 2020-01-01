@@ -208,6 +208,7 @@ exec_always --no-startup-id .config/polybar/launch.sh
 # Hotkeys for opening programs
 bindsym $aux+f exec termite -e ~/.config/vifm/scripts/vifmrun
 bindsym $aux+t exec ./.telegram/Telegram
+bindsym $aux+v exec feh ~/.vim-cheatsheet.gif --auto-zoom
 ## Languages
 bindsym $aux+Shift+e exec setxkbmap es
 bindsym $aux+Shift+u exec setxkbmap us
