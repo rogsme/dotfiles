@@ -141,3 +141,6 @@
 (setq auto-indent-indent-style 'aggressive)
 (require 'aggressive-indent)
 (global-aggressive-indent-mode 1)
+
+;; Relative line mode
+(setq display-line-numbers-type 'relative)
