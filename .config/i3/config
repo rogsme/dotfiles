@@ -63,7 +63,9 @@ bindsym $mod+Shift+z		gaps outer current minus 5
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec terminator
+set $terminal terminator
+set $auxTerminal termite
+bindsym $mod+Return exec $terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -187,9 +189,10 @@ bindsym $mod+Shift+e mode "$mode_system"
 exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
-bindsym $aux+f exec termite -e ~/.config/vifm/scripts/vifmrun
+bindsym $aux+f exec $auxTerminal -e ~/.config/vifm/scripts/vifmrun
 bindsym $aux+t exec ./.telegram/Telegram
 bindsym $aux+v exec feh ~/.vim-cheatsheet.gif --auto-zoom
+bindsym $mod+Ctrl+b exec $auxTerminal -e 'bmenu'
 
 # Languages
 bindsym $aux+Shift+e exec setxkbmap es
@@ -197,7 +200,7 @@ bindsym $aux+Shift+u exec setxkbmap us
 
 # Screnshots
 bindsym Print exec escrotum "~/Imágenes/%Y-%m-%d-%H%M%S.png"
-bindsym Ctrl+Print exec escrotum -s "~/Imágenes/%Y-%m-%d-%H%M%S.png"
+bindsym Shift+Print exec escrotum -s "~/Imágenes/%Y-%m-%d-%H%M%S.png"
 bindsym Ctrl+Shift+Print exec escrotum -s -C
 
 # Disable focus follows
@@ -216,12 +219,18 @@ assign [class="Franz"] $ws4
 assign [class="Mailspring"] $ws5
 assign [class="MineTime"] $ws5
 for_window [class = "Spotify"] move to workspace $ws6
+assign [class="Pcmanfm"] $ws7
 
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
 for_window [class="Galculator"] floating enable border pixel 1
 for_window [class="GParted"] floating enable border normal
 for_window [class="Nitrogen"] floating enable sticky enable border normal
+for_window [class="(?i)virtualbox"] floating enable border normal
+for_window [class="(?i)virtualbox"] fullscreen enable
+
+# switch to workspace with urgent window automatically
+for_window [urgent=latest] focus
 
 # Autostarts
 exec --no-startup-id i3-msg 'exec /usr/bin/minetime'
