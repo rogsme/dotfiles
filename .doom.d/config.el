@@ -28,7 +28,7 @@
 (setq doom-theme 'doom-one)
 
 ;; If you intend to use org, it is recommended you change this!
-  (setq org-directory "~/Dropbox/org")
+  (setq org-directory "~/org")
 
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:
