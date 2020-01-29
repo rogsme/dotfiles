@@ -9,3 +9,7 @@ alias rm='rm -i'
 
 source "$HOME/.config/fish/abbreviations.fish"
 source "$HOME/.config/fish/personal_abbr.fish"
+
+# tabtab source for packages
+# uninstall by removing these lines
+[ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
