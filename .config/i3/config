@@ -63,8 +63,8 @@ bindsym $mod+Shift+z		gaps outer current minus 5
 floating_modifier $mod
 
 # start a terminal
-set $terminal sakura
-set $auxTerminal termite
+set $terminal alacritty
+set $auxTerminal sakura
 bindsym $mod+Return exec $terminal
 
 # kill focused window
@@ -210,7 +210,7 @@ focus_follows_mouse no
 assign [class="Brave"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
-assign [class="Sakura"] $ws3
+assign [class="Alacritty"] $ws3
 for_window [class = "DBeaver"] move to workspace $ws2
 assign [class="Slack"] $ws4
 assign [class="Telegram"] $ws4
