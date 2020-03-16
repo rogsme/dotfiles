@@ -122,9 +122,6 @@ bindsym $mod+space focus mode_toggle
 # focus the parent container
 bindsym $mod+a focus parent
 
-# focus the child container
-#bindsym $mod+d focus child
-
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
 set $ws1 "1: "
@@ -189,10 +186,12 @@ bindsym $mod+Shift+e mode "$mode_system"
 exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
-bindsym $aux+f exec $auxTerminal -e ~/.config/vifm/scripts/vifmrun
+bindsym $aux+f exec /usr/bin/pcmanfm
+bindsym $aux+v exec $auxTerminal -e ~/.config/vifm/scripts/vifmrun
 bindsym $aux+t exec ./.telegram/Telegram
-bindsym $aux+v exec xviewer ~/.vim-cheatsheet.gif
-bindsym $mod+Ctrl+b exec $auxTerminal -e 'bmenu'
+bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
+bindsym $aux+a exec /usr/bin/lxappearance
+bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 
 # Languages
 bindsym $aux+Shift+e exec setxkbmap es
@@ -216,6 +215,7 @@ assign [class="Slack"] $ws4
 assign [class="Telegram"] $ws4
 assign [class="Keybase"] $ws4
 assign [class="Franz"] $ws4
+assign [class="Signal"] $ws4
 assign [class="Evolution"] $ws5
 assign [class="Pcmanfm"] $ws7
 
