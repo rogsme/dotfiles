@@ -1,6 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+#
+# | '__/ _ \ / _` / __|    Roger González
+# | | | (_) | (_| \__ \    https://rogs.me
+# |_|  \___/ \__, |___/    https://git.rogs.me
+#            |___/
+#
 import urllib.request
 import json
 import datetime

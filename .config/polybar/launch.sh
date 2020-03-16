@@ -1,5 +1,10 @@
 #!/bin/bash
-
+#
+# | '__/ _ \ / _` / __|    Roger González
+# | | | (_) | (_| \__ \    https://rogs.me
+# |_|  \___/ \__, |___/    https://git.rogs.me
+#            |___/
+#
 # Terminate already running bar instances
 killall -q polybar
 

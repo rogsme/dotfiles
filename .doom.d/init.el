@@ -1,3 +1,10 @@
+;;
+;;  | '__/ _ \ / _` / __|    Roger González
+;;  | | | (_) | (_| \__ \    https://rogs.me
+;;  |_|  \___/ \__, |___/    https://git.rogs.me
+;;             |___/
+;;
+;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 ;;; init.el -*- lexical-binding: t; -*-
 
 ;; Copy this file to ~/.doom.d/init.el or ~/.config/doom/init.el ('doom install'

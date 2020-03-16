@@ -1,3 +1,9 @@
+#
+# | '__/ _ \ / _` / __|    Roger González
+# | | | (_) | (_| \__ \    https://rogs.me
+# |_|  \___/ \__, |___/    https://git.rogs.me
+#            |___/
+#
 set fish_greeting ""
 set -gx PATH /home/roger/.gem/ruby/2.6.0/bin $PATH
 set -g theme_powerline_fonts yes
