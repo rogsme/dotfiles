@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #
 # | '__/ _ \ / _` / __|    Roger González
 # | | | (_) | (_| \__ \    https://rogs.me
