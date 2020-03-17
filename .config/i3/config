@@ -222,6 +222,7 @@ assign [class="Keybase"] $ws4
 assign [class="Franz"] $ws4
 assign [class="Signal"] $ws4
 assign [class="Evolution"] $ws5
+assign [class="Liferea"] $ws5
 assign [class="Pcmanfm"] $ws7
 
 # Open specific applications in floating mode
