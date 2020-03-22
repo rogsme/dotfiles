@@ -6,7 +6,7 @@
 #
 configuration {
   modi: "window,drun,ssh,combi";
-  theme: DarkBlue;
+  theme: gruvbox-dark-hard;
   font: "hack 22";
   combi-modi: "window,drun,ssh";
 }
