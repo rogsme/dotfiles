@@ -13,7 +13,7 @@ width = 100%
 height = 40
 
 ;background = #222
-background = #1f1f1f
+background = #000
 foreground = #eee
 
 border-bottom = 1
@@ -45,9 +45,9 @@ tray-position = right
 ;monitor = eDP-1
 bottom = true
 width = 100%
-height = 40
+height = 43
 
-background = #1c1c1c
+background = #000
 foreground = #eefafafa
 
 overline-size = 3
@@ -56,8 +56,8 @@ underline-size = 3
 underline-color = ${colors.accent}
 
 ;border-color = #ff0000
-border-top-size = 3
-border-top-color = #3d3d3d
+;border-top-size = 3
+;border-top-color = #3d3d3d
 ;border-bottom = 0
 ;border-bottom-color = #333333
 
