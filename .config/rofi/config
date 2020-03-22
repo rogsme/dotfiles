@@ -4,9 +4,6 @@
 # |_|  \___/ \__, |___/    https://git.rogs.me
 #            |___/
 #
-configuration {
-  modi: "window,drun,ssh,combi";
-  theme: gruvbox-dark-hard;
-  font: "hack 22";
-  combi-modi: "window,drun,ssh";
-}
+rofi.modi: window,drun,combi
+rofi.theme: ~/.config/rofi/theme/rogs.rasi
+rofi.font : hack 22

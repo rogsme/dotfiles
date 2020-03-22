@@ -76,7 +76,7 @@ bindsym $mod+Return exec $terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun,ssh,comby -theme ~/.config/rofi/theme/rogs.rasi -font \\"hack 22\\" -show combi"
+bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
 
 # change focus
 bindsym $mod+h focus left
