@@ -16,8 +16,8 @@ height = 40
 background = #000
 foreground = #eefafa
 
-border-bottom = 1
-border-bottom-color = #333
+; border-bottom = 1
+; border-bottom-color = #333
 
 overline-size = 10
 overline-color = ${self.background}
