@@ -1,6 +1,5 @@
 appimagelauncher-git
 art-sharp
-bluejeans
 bullshit
 epub-thumbnailer-git
 escrotum-git
@@ -8,6 +7,7 @@ ff-theme-util
 flattr-icon-theme
 franz
 gconf-sharp-peditors
+gdm3setup
 gitflow-avh
 gksu
 gnome-sharp
@@ -16,12 +16,10 @@ google-chrome
 heroku-cli
 keybase-bin
 libgnome-sharp
-mailspring
 mongodb-compass
 mongodb-tools
 mullvad-vpn-bin
 ngrok
-npapi-vlc
 pcmciautils
 phantomjs-bin
 postman-bin
@@ -30,7 +28,6 @@ pydflatex
 s3cmd-git
 slack-desktop
 spotify
-sublime-text-dev
 teamviewer
 texlive-latexindent-meta
 toilet

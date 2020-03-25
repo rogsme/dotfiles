@@ -13,7 +13,9 @@ aws-cli
 b43-fwcutter
 baobab
 bash
+bchunk
 beets
+bin2iso
 bind-tools
 binutils
 bison
@@ -49,7 +51,6 @@ dhcpcd
 diffutils
 discord
 discount
-dmenu
 dmidecode
 dmraid
 dnsmasq
@@ -82,6 +83,7 @@ gawk
 gcc
 gcc-libs
 gcolor2
+gdm
 geckodriver
 gettext
 git
@@ -152,9 +154,9 @@ lolcat
 lsb-release
 lvm2
 lxappearance
+lynx
 m4
 maia-icon-theme
-mailnag
 make
 man-db
 man-pages
@@ -220,7 +222,6 @@ playerctl
 polybar
 poppler-data
 powertop
-pragha
 procps-ng
 psmisc
 pulseaudio-bluetooth
@@ -243,7 +244,6 @@ sakura
 screenfetch
 scrot
 scummvm
-sddm
 sed
 shadow
 signal-desktop
