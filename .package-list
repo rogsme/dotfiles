@@ -154,6 +154,7 @@ lolcat
 lsb-release
 lvm2
 lxappearance
+lxsession
 lynx
 m4
 maia-icon-theme
@@ -178,6 +179,7 @@ mesa-demos
 mhwd
 mhwd-db
 mkinitcpio-openswap
+mlocate
 mobile-broadband-provider-info
 modemmanager
 mousetweaks
