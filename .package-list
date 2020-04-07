@@ -204,6 +204,7 @@ ntfs-3g
 ntp
 numlockx
 nvidia-430xx-utils
+obs-studio
 openresolv
 openssh
 openvpn
@@ -249,7 +250,6 @@ scummvm
 sed
 shadow
 signal-desktop
-simplescreenrecorder
 sl
 sox
 speedtest-cli
