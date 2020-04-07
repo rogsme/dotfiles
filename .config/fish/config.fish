@@ -12,6 +12,7 @@ set -g theme_color_scheme dark
 set -g theme_display_date no
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rm='rm -i'
+alias doom='./.emacs.d/bin/doom'
 
 source "$HOME/.config/fish/abbreviations.fish"
 source "$HOME/.config/fish/personal_abbr.fish"
