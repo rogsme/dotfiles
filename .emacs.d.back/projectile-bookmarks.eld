@@ -1,0 +1,1 @@
+("~/.emacs.d/" "~/code/massive/cocacola/new-backend/" "~/code/massive/cocacola/frontend/" "~/code/personal/pedidos-ya/" "~/.conky/Thinkpad/" "~/code/personal/dotfiles/" "~/code/personal/identidadMisional/backend/" "~/code/personal/webpage/web/" "~/code/personal/deryssevilla.design/")

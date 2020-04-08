@@ -1,0 +1,5 @@
+** Meeting <%<%a %d>>
+   :LOGBOOK:
+   - Added: %U
+   :END:
+   %?

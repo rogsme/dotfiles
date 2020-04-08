@@ -1,0 +1,175 @@
+;; -*- mode: emacs-lisp; coding: emacs-mule; -*-
+;; --------------------------------------------------------------------------
+;; Desktop File for Emacs
+;; --------------------------------------------------------------------------
+;; Created Mon Jul 29 17:44:15 2019
+;; Desktop file format version 208
+;; Emacs version 26.2
+
+;; Global section:
+(setq desktop-saved-frameset [frameset 1 (23871 26799 185565 460000) (desktop . "208") "roger@roger-pc" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font-backend xft x) (font . "-ADBO-Source Code Pro-normal-normal-normal-*-15-*-*-*-m-0-iso10646-1") (font-parameter . "Source Code Pro Medium 11") (border-width . 0) (internal-border-width . 0) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#EEEEEE") (background-color . "#000000") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 0) (scroll-bar-height . 0) (alpha) (no-focus-on-map) (no-accept-focus) (fullscreen . maximized) (visibility . t) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#BBFFAA") (sticky) (environment) (powerline-cache) (frameset--id . "44D6-602D-82FB-000C") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (user-size . t) (height . 52) (width . 211) (left . 1920) (top . 0)) ((min-height . 4) (min-width . 20) (min-height-ignore . 2) (min-width-ignore . 13) (min-height-safe . 1) (min-width-safe . 4) (min-pixel-height . 80) (min-pixel-width . 180) (min-pixel-height-ignore . 40) (min-pixel-width-ignore . 117) (min-pixel-height-safe . 20) (min-pixel-width-safe . 36)) hc (pixel-width . 1920) (pixel-height . 1035) (total-width . 213) (total-height . 52) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 957) (pixel-height . 1035) (total-width . 106) (total-height . 52) (normal-height . 1.0) (normal-width . 0.5) (buffer "init.el" (selected . t) (hscroll . 0) (fringes 8 8 nil) (margins 3) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 29) (start . 1))) (leaf (last . t) (pixel-width . 963) (pixel-height . 1035) (total-width . 107) (total-height . 52) (normal-height . 1.0) (normal-width . 0.5) (buffer "rogs-packages.el" (selected) (hscroll . 0) (fringes 8 8 nil) (margins 2) (scroll-bars nil 0 t nil 0 t) (vscroll . 0) (dedicated) (point . 1731) (start . 1)))))])
+(setq desktop-missing-file-warning nil)
+(setq tags-file-name nil)
+(setq tags-table-list nil)
+(setq search-ring '("neo" "magit" "dj_data" "token" "response" "default_ba" "load-path" "jwt" "init" "page-break" "fullNam" "post" "fullName" "get a" "user" "fish_abbr"))
+(setq regexp-search-ring '("promociones"))
+(setq register-alist nil)
+(setq file-name-history '("~/.emacs.d/core/rogs-ui.el" "~/.emacs.d/core/rogs-keybinding.el" "~/.emacs.d/README.md" "~/.config/fish/abbreviations.fish" "~/code/vascar/jobrobin/jobRobinBackEnd/README.md" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin_app/local_settings.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/apps.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin_app/settings.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/middlewares/subscription.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/views/CitiesView.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/tests/helper_functions.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/tests/test_vacancies.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/views/CandidatesResumeView.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/permissions.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/models/__init__.py" "~/code/vascar/jobrobin/jobRobinBackEnd/jobrobin/models/TechTestAnswers.py" "~/code/massive/cocacola/backend/app/app/urls.py" "~/code/massive/cocacola/backend/app/zappa_settings.json" "~/code/massive/cocacola/backend/app/web/serializers.py" "~/code/massive/cocacola/backend/app/web/urls.py" "~/code/massive/cocacola/backend/app/web/views.py" "~/code/massive/cocacola/backend/app/web/apps.py" "~/code/massive/cocacola/backend/app/users/urls.py" "~/code/massive/cocacola/backend/app/users/views.py" "~/code/massive/cocacola/backend/app/users/serializers.py" "~/code/massive/cocacola/backend/app/users/apps.py" "~/code/massive/cocacola/backend/app/pincodes/apps.py" "~/code/massive/cocacola/backend/requirements.txt" "~/code/massive/cocacola/backend/app/requirements.txt" "~/code/massive/cocacola/backend/app/pincodes/views.py" "~/code/massive/cocacola/backend/app/pincodes/user.py" "~/code/massive/cocacola/backend/app/pincodes/urls.py" "~/code/massive/cocacola/backend/app/pincodes/tools/filenames.py" "~/code/massive/cocacola/backend/app/pincodes/tools/cupon_uploader.py" "~/code/massive/cocacola/backend/app/pincodes/tests.py" "~/code/massive/cocacola/backend/app/pincodes/serializers.py" "~/code/massive/cocacola/backend/app/pincodes/models.py" "~/code/massive/cocacola/backend/app/pincodes/management/commands/wait_for_db.py" "~/code/massive/cocacola/backend/app/pincodes/admin.py" "~/code/massive/cocacola/backend/app/customAdmin/views.py" "~/code/massive/cocacola/backend/app/customAdmin/apps.py" "~/code/massive/cocacola/backend/app/customAdmin/admin.py" "~/code/massive/cocacola/backend/app/authentication/urls.py" "~/code/massive/cocacola/backend/app/authentication/views.py" "~/code/massive/cocacola/backend/app/authentication/manager.py" "~/code/massive/cocacola/backend/app/authentication/decorator/profile_validation.py" "~/code/massive/cocacola/backend/app/authentication/costom_authentications/authentication.py" "~/code/massive/cocacola/backend/app/authentication/config.py" "~/code/massive/cocacola/backend/app/authentication/apps.py" "~/code/massive/cocacola/backend/app/assets/views.py" "~/code/massive/cocacola/backend/app/assets/urls.py" "~/code/massive/cocacola/backend/app/assets/apps.py" "~/code/massive/cocacola/backend/docker-compose.yml" "~/code/massive/cocacola/backend/app/app/settings.py" "~/code/massive/cocacola/frontend/app/components/Walkthrough.js" "~/app.py" "~/code/massive/cocacola/frontend/app/containers/Notifications/index.js" "~/.emacs.d/init.el" "~/code/personal/identidadMisional/backend/src/docs/speaker.yaml" "~/code/personal/identidadMisional/backend/src/app.js" "~/code/personal/identidadMisional/backend/test/speaker.test.js" "~/code/personal/identidadMisional/backend/src/routes/lodging.js" "~/code/personal/identidadMisional/backend/src/utils/common.js" "~/code/personal/identidadMisional/backend/src/controllers/speaker.js" "~/code/personal/identidadMisional/backend/src/routes/speaker.js" "~/code/personal/identidadMisional/backend/src/start.js" "~/code/personal/identidadMisional/backend/src/models/Speaker.js" "~/.config/fish/config.fish" "~/.config/fish/conf.d/omf.fish" "~/.config/fish/README.md" "~/.config/fish/.gitignore" "~/.config/fish/functions/fish_prompt.fish" "~/.config/fish/fishfile" "~/.config/fish/fishd.roger-pc" "~/.config/fish/fish_variables" "~/.config/fish/completions/fisher.fish" "~/.config/fish/functions/fish_prompt.1564151365.copy" "~/.config/fish/functions/fish_mode_prompt.fish" "~/.config/fish/functions/fish_right_prompt.fish" "~/.config/fish/functions/__sf_lib_section.fish" "~/.config/fish/functions/run-android.fish" "~/.hyper.js" "~/code/personal/identidadMisional/backend/.env.example" "~/code/personal/identidadMisional/backend/.env" "~/code/personal/identidadMisional/backend/src/docs/conference.yaml" "~/code/personal/identidadMisional/backend/src/models/Conference.js" "~/code/personal/identidadMisional/backend/.nycrc" "~/code/personal/identidadMisional/backend/src/docs/auth.yaml" "~/code/personal/identidadMisional/backend/src/docs/user.yaml" "~/code/personal/identidadMisional/backend/src/routes/conference.js" "~/code/vascar/knac/knacBackEnd/test/professionalProfile.test.js" "~/code/vascar/knac/knacBackEnd/handlers/common.js" "~/code/vascar/knac/knacBackEnd/routes/professionalsRoutes.js" "~/code/vascar/knac/knacBackEnd/controllers/professionalController.js" "~/code/vascar/knac/knacBackEnd/handlers/s3.js" "~/code/personal/identidadMisional/backend/test/conference.test.js" "~/code/personal/identidadMisional/backend/src/routes/unprotected.js" "~/code/personal/identidadMisional/backend/src/controllers/conference.js" "~/code/personal/cocacola/app/epics/PincodeEpic.js"))
+
+;; Buffer section -- buffers listed in same order as in buffer list:
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/init.el"
+  "init.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  29
+  '(917 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 26774 174176 487000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (917 917 917 917 917 905 889 862 831 806 780 183 176 67 17 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/core/rogs-packages.el"
+  "rogs-packages.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1731
+  '(1399 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 26774 174176 772000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (649 643 641 1688 1743 135 21 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/setup/setup-python-mode.el"
+  "setup-python-mode.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  194
+  '(148 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 26621 217583 405000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (148 223 234 11 147 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/setup/setup-yaml-mode.el"
+  "setup-yaml-mode.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1
+  '(455 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 26265 953369 368000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (143 11 141 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/setup/setup-flycheck-mode.el"
+  "setup-flycheck-mode.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1943
+  '(422 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 26212 24133 296000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (155 11 154 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/setup/setup-js-mode.el"
+  "setup-js-mode.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1
+  '(1971 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 25653 340148 502000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (137 115 39 11 135 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/setup/setup-web-mode.el"
+  "setup-web-mode.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1
+  '(2478 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 25564 492543 517000) (buffer-file-coding-system . prefer-utf-8-unix) (overwrite-mode))
+  '((mark-ring (2450 919 1482 1783 916 140 139 117 40 2430 5 1))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/core/rogs-ui.el"
+  "rogs-ui.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1
+  '(1536 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 25340 37448 248000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (1441 1389 1332 1535 1 1212 1262 1151 1025 950 819 774 674 116 672 244))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/core/rogs-core.el"
+  "rogs-core.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  4246
+  '(4246 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 25340 37448 116000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (4246 4187 4155 426 4153 4114 4112 4060 1618 1575 1537 740 658 1411 1079 961))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/core/rogs-keybindings.el"
+  "rogs-keybindings.el"
+  'emacs-lisp-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1385
+  '(1181 nil)
+  nil
+  nil
+  '((buffer-display-time 23871 25015 146466 289000) (buffer-file-coding-system . prefer-utf-8-unix))
+  '((mark-ring (1163 899 875 780 764 384 369 315 275 265 143 142 37 5 1360 1349))))
+
+(desktop-create-buffer 208
+  "/home/roger/.emacs.d/README.md"
+  "README.md"
+  'markdown-mode
+  '(eldoc-mode global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode projectile-mode)
+  1613
+  '(1569 nil)
+  nil
+  nil
+  '((tab-width . 4) (buffer-display-time 23871 22743 128855 535000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (1569 1561 1453 1447 1443 1392 1375 1444 1372 1308))))
+
+(desktop-create-buffer 208
+  "/home/roger/.config/fish/abbreviations.fish"
+  "abbreviations.fish"
+  'fundamental-mode
+  '(global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode linum-mode projectile-mode)
+  1883
+  '(nil nil)
+  nil
+  nil
+  '((buffer-display-time 23871 22205 208390 173000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/roger/code/massive/cocacola/frontend/app/components/Walkthrough.js"
+  "Walkthrough.js"
+  'rjsx-mode
+  '(global-auto-revert-mode magit-file-mode whitespace-cleanup-mode yas-minor-mode flycheck-mode linum-mode js2-refactor-mode company-mode tern-mode projectile-mode indium-interaction-mode prettier-js-mode emmet-mode)
+  1
+  '(nil nil)
+  nil
+  nil
+  '((buffer-display-time 23871 24789 846121 337000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+

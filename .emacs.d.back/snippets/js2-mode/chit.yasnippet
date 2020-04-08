@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# name: Chai unit testing
+# key: chit
+# --
+
+  it('$1', (done) => {
+    chai.request(app).$2('$3')$4.end((err, res) => {
+      $5
+      done();
+    });
+  });

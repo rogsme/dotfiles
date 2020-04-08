@@ -1,0 +1,6 @@
+** TODO %^{Description}
+   SCHEDULED: <%<2019-%^{Month}-%^{Day} %a>>
+   :LOGBOOK:
+   - Added: %U
+   :END:
+   %?
