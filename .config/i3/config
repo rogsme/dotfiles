@@ -192,7 +192,7 @@ bindsym $mod+Shift+e mode "$mode_system"
 exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
-bindsym $aux+f exec /usr/bin/pcmanfm
+bindsym $aux+f exec /usr/bin/thunar
 bindsym $aux+v exec $auxTerminal -e ~/.config/vifm/scripts/vifmrun
 bindsym $aux+t exec ./.telegram/Telegram
 bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
