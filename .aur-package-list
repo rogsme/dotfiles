@@ -2,13 +2,10 @@ appimagelauncher-git
 art-sharp
 bullshit
 epub-thumbnailer-git
-escrotum-git
-flattr-icon-theme
 franz
 gconf-sharp-peditors
 gdm3setup
 gitflow-avh
-gksu
 gnome-sharp
 gnome-vfs-sharp
 google-chrome
@@ -16,7 +13,7 @@ heroku-cli
 keybase-bin
 libgnome-sharp
 mongodb-compass
-mongodb-tools
+mongodb-tools-bin
 mullvad-vpn-bin
 ngrok
 phantomjs-bin

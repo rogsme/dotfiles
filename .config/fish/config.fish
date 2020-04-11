@@ -15,7 +15,6 @@ alias rm='rm -i'
 alias doom='$HOME/.emacs.d/bin/doom'
 
 source "$HOME/.config/fish/abbreviations.fish"
-source "$HOME/.config/fish/personal_abbr.fish"
 
 # tabtab source for packages
 # uninstall by removing these lines
