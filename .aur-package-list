@@ -3,7 +3,6 @@ art-sharp
 bullshit
 epub-thumbnailer-git
 escrotum-git
-ff-theme-util
 flattr-icon-theme
 franz
 gconf-sharp-peditors
@@ -20,7 +19,6 @@ mongodb-compass
 mongodb-tools
 mullvad-vpn-bin
 ngrok
-pcmciautils
 phantomjs-bin
 postman-bin
 powerline-fonts-git
@@ -33,8 +31,5 @@ texlive-latexindent-meta
 toilet
 usb-creator
 woeusb
-xf86-input-keyboard
-xf86-input-mouse
 xwobf-git
-yaourt
 zd1211-firmware

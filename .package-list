@@ -30,8 +30,6 @@ cadaver
 calibre
 cheese
 chromium
-cinnamon-sounds
-cinnamon-wallpapers
 clementine
 cmatrix
 composer
@@ -132,7 +130,6 @@ jre8-openjdk
 jre8-openjdk-headless
 less
 lib32-mesa-demos
-lib32-nvidia-430xx-utils
 lib32-primus
 lib32-virtualgl
 libdvdcss
@@ -146,7 +143,7 @@ linux-firmware
 linux49
 linux49-bbswitch
 linux49-headers
-linux49-nvidia-430xx
+
 logrotate
 lolcat
 lsb-release
@@ -161,7 +158,6 @@ man-db
 man-pages
 manjaro-alsa
 manjaro-browser-settings
-manjaro-cinnamon-settings
 manjaro-documentation-en
 manjaro-firmware
 manjaro-hello
@@ -201,7 +197,6 @@ nss-mdns
 ntfs-3g
 ntp
 numlockx
-nvidia-430xx-utils
 obs-studio
 openresolv
 openssh
