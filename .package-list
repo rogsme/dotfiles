@@ -234,6 +234,7 @@ nemo-fileroller
 nemo-preview
 nemo-python
 nemo-share
+neofetch
 netctl
 network-manager-applet
 networkmanager
@@ -298,7 +299,6 @@ rsync
 s-nail
 sakura
 samba
-screenfetch
 scrot
 scummvm
 sed
