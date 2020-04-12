@@ -250,6 +250,7 @@ exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id /usr/bin/unclutter
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
+exec --no-startup-id /usr/bin/mullvad connect
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
