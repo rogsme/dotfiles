@@ -54,9 +54,9 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 20 # decrease screen brightne
 for_window [class=".*"] border pixel 0
 
 # Use gaps
-smart_gaps on
-gaps inner 5
-gaps outer 5
+# smart_gaps on
+gaps inner 2
+gaps outer 2
 
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+s gaps inner current plus 5
@@ -238,7 +238,7 @@ for_window [urgent=latest] focus
 # Autostarts
 exec --no-startup-id sleep 10; exec /usr/bin/evolution
 exec --no-startup-id exec /usr/bin/nextcloud
-exec_always --no-startup-id .config/conky/start.sh
+# exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
 exec --no-startup-id exec /usr/bin/brave
 exec --no-startup-id exec $terminal
