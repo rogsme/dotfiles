@@ -55,8 +55,8 @@ for_window [class=".*"] border pixel 0
 
 # Use gaps
 smart_gaps on
-gaps inner 15
-gaps outer 15
+gaps inner 5
+gaps outer 5
 
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+s gaps inner current plus 5
@@ -194,7 +194,6 @@ exec_always --no-startup-id .config/polybar/launch.sh
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
 bindsym $aux+v exec $auxTerminal -e ~/.config/vifm/scripts/vifmrun
-bindsym $aux+t exec ./.telegram/Telegram
 bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
 bindsym $aux+a exec /usr/bin/lxappearance
 bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
@@ -237,16 +236,20 @@ for_window [class="Nitrogen"] floating enable sticky enable border normal
 for_window [urgent=latest] focus
 
 # Autostarts
-exec --no-startup-id i3-msg 'exec /usr/bin/evolution'
-exec --no-startup-id i3-msg 'exec /usr/bin/nextcloud'
+exec --no-startup-id sleep 10; exec /usr/bin/evolution
+exec --no-startup-id exec /usr/bin/nextcloud
 exec_always --no-startup-id .config/conky/start.sh
-exec --no-startup-id i3-msg 'exec /usr/bin/emacs'
-exec --no-startup-id i3-msg 'exec /usr/bin/brave'
-exec --no-startup-id i3-msg exec $terminal
-exec --no-startup-id i3-msg '~/.telegram/Telegram'
-exec --no-startup-id i3-msg '/usr/bin/pasystray'
-exec --no-startup-id i3-msg 'exec /opt/Mullvad\ VPN/mullvad-gui --no-sandbox'
+exec --no-startup-id exec /usr/bin/emacs
+exec --no-startup-id exec /usr/bin/brave
+exec --no-startup-id exec $terminal
+exec --no-startup-id exec /usr/bin/pasystray
 exec --no-startup-id nitrogen --restore
+exec --no-startup-id clipit
+exec --no-startup-id blueman-applet
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id /usr/bin/unclutter
+exec --no-startup-id xfce4-power-manager
+exec --no-startup-id pamac-tray
 
 # Window colors
 # class                 border  backgr. text    indicator child_border

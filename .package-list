@@ -39,6 +39,7 @@ catfish
 cheese
 chromium
 clementine
+clipit
 cmatrix
 composer
 conky
@@ -71,6 +72,7 @@ efibootmgr
 emacs
 engrampa
 evolution
+exa
 exfat-utils
 exo
 f2fs-tools
@@ -188,7 +190,6 @@ lsb-release
 luv-icon-theme
 lvm2
 lxappearance
-lxsession
 lynx
 m4
 maia-icon-theme
@@ -353,6 +354,7 @@ tumbler
 udiskie
 udisks2
 unace
+unclutter
 unrar
 usb_modeswitch
 usbutils
