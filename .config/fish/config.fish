@@ -18,6 +18,7 @@ alias mv='mv -i'
 alias ..='cd ..'
 alias doom='$HOME/.emacs.d/bin/doom'
 alias ls='exa'
+alias pr='ping rogs.me'
 
 source "$HOME/.config/fish/abbreviations.fish"
 

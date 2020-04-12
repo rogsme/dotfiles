@@ -9,6 +9,9 @@ SETUVAR __fish_initialized:3100
 SETUVAR _fish_abbr_cdccb:cd\x20\x7e/code/massive/cocacola/new\x2dbackend
 SETUVAR _fish_abbr_cdccf:cd\x20\x7e/code/massive/cocacola/frontend
 SETUVAR _fish_abbr_cdimb:cd\x20\x7e/code/personal/identidadMisional/backend
+SETUVAR _fish_abbr_cloud:ssh\x20root\x40cloud\x2erogs\x2eme
+SETUVAR _fish_abbr_coca_2D_dev:ssh\x20\x2di\x20\x7e/\x2essh/keys/pincodes\x2dapi\x2epem\x20ubuntu\x40dev\x2dapi\x2dpincodes\x2edestapp\x2ecom
+SETUVAR _fish_abbr_coca_2D_prod:ssh\x20\x2di\x20\x7e/\x2essh/keys/pincodes\x2dapi\x2epem\x20ubuntu\x40api\x2dpincodes\x2edestapp\x2ecom
 SETUVAR _fish_abbr_g:git
 SETUVAR _fish_abbr_ga:git\x20add
 SETUVAR _fish_abbr_ga_2E_:git\x20add\x20\x2e
@@ -68,7 +71,6 @@ SETUVAR _fish_abbr_nr:npm\x20remove
 SETUVAR _fish_abbr_ns:npm\x20start
 SETUVAR _fish_abbr_nt:npm\x20test
 SETUVAR _fish_abbr_nu:npm\x20update
-SETUVAR _fish_abbr_pr:ping\x20rogs\x2eme
 SETUVAR _fish_abbr_r:sudo\x20pacman\x20\x2dR
 SETUVAR _fish_abbr_rmr:rm\x20\x2dr
 SETUVAR _fish_abbr_rmrf:rm\x20\x2drf

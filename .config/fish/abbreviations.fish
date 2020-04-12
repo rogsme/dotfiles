@@ -81,5 +81,7 @@ abbr rmrf 'rm -rf'
 abbr tc 'tar czvf'
 abbr tx 'tar xzvf'
 
-# Other
-abbr pr 'ping rogs.me'
+# SSH
+abbr cloud 'ssh root@cloud.rogs.me'
+abbr coca-prod 'ssh -i ~/.ssh/keys/pincodes-api.pem ubuntu@api-pincodes.destapp.com'
+abbr coca-dev 'ssh -i ~/.ssh/keys/pincodes-api.pem ubuntu@dev-api-pincodes.destapp.com'
