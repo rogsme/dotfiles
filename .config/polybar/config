@@ -21,8 +21,8 @@ overline-color = ${self.background}
 underline-size = 10
 underline-color = ${self.background}
 
-padding-left = 0
-padding-right = 0
+padding-left = 1
+padding-right = 1
 module-margin-left = 1
 module-margin-right = 1
 
@@ -46,34 +46,28 @@ type = internal/i3
 format = <label-state> <label-mode>
 pin-workspaces = true
 
-ws-icon-0 = term;
-ws-icon-1 = web;
-ws-icon-2 = code;
-ws-icon-3 = music;
-ws-icon-4 = irssi;
-
 label-dimmed-underline = ${root.background}
 
-label-focused = %icon%  %name%
+label-focused = %name%
 label-focused-foreground = #f3f3f3
-label-focused-background = #3f3f3f
+label-focused-background = ${root.background}
 label-focused-underline = #75d85a
 label-focused-font = 4
-label-focused-padding = 4
+label-focused-padding = 3
 
-label-unfocused = %icon%  %name%
+label-unfocused = %name%
 label-unfocused-underline = #000
 label-unfocused-font = 4
-label-unfocused-padding = 4
+label-unfocused-padding = 3
 
-label-urgent = %icon%  %name%
+label-urgent = %name%
 label-urgent-foreground = #000000
 label-urgent-background = #bd2c40
 label-urgent-underline = #9b0a20
 label-urgent-font = 4
 label-urgent-padding = 4
 
-label-visible = %icon%  %name%
+label-visible = %name%
 label-visible-foreground = #55ffffff
 label-visible-font = 4
 label-visible-padding = 4
@@ -114,16 +108,15 @@ type = internal/battery
 full-at = 100
 format-charging = %{T3}  <label-charging> %{T-}
 format-discharging = %{T3}  <label-discharging> %{T-}
-format-full = %{T3}  <label-full>
+format-full = %{T3}  <label-full> %{T-}
 label-charging-font = 3
 label-discharging-font = 3
 label-full = '100%'
-;label-full-font = 3
 
 [module/xwindow]
 type = internal/xwindow
 label-maxlen = 75
-label-foreground = #eefafa
+label-foreground = #FFF
 
 [module/xkeyboard]
 type = internal/xkeyboard
