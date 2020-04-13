@@ -55,8 +55,8 @@ for_window [class=".*"] border pixel 2
 
 # Use gaps
 # smart_gaps on
-gaps inner 1
-gaps outer 1
+gaps inner 2
+gaps outer 2
 
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+s gaps inner current plus 5
