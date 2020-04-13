@@ -55,8 +55,8 @@ for_window [class=".*"] border pixel 2
 
 # Use gaps
 # smart_gaps on
-gaps inner 2
-gaps outer 2
+gaps inner 1
+gaps outer 1
 
 bindsym $mod+Shift+t gaps inner current set 15; gaps outer current set 15
 bindsym $mod+s gaps inner current plus 5
@@ -254,7 +254,7 @@ exec --no-startup-id /usr/bin/mullvad connect
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #75D85A #75D85A #424242 #2e9ef4   #75D85A
+client.focused          #75D85A #75D85A #424242 #75D85A   #75D85A
 client.focused_inactive #75D85A #5f676a #ffffff #484e50   #75D85A
 client.unfocused        #75D85A #204D14 #424242 #292d2e   #75D85A
 client.urgent           #75D85A #900000 #ffffff #900000   #75D85A
