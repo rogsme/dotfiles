@@ -224,7 +224,7 @@ assign [class="Signal"] $ws4
 assign [class="Evolution"] $ws5
 assign [class="Liferea"] $ws5
 for_window [class = "Spotify"] move to workspace $ws6
-assign [class="Pcmanfm"] $ws7
+assign [class="Thunar"] $ws7
 
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
@@ -251,6 +251,7 @@ exec --no-startup-id /usr/bin/unclutter
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 exec --no-startup-id /usr/bin/mullvad connect
+exec --no-startup-id exec /opt/Mullvad\ VPN/mullvad-gui --no-sandbox
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
