@@ -288,7 +288,6 @@ python-numpy
 python-virtualenv
 python2-ptyprocess
 python2-xcffib
-qpdfview
 qt5-graphicaleffects
 qt5-quickcontrols2
 reiserfsprogs
@@ -359,7 +358,6 @@ usbutils
 util-linux
 vagrant
 vi
-viewnior
 vifm
 virtualbox
 virtualgl
