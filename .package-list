@@ -9,6 +9,7 @@ android-udev
 apparmor
 arc-gtk-theme
 asciiquarium
+atomicparsley
 audacious
 autoconf
 automake
@@ -271,6 +272,7 @@ pciutils
 pcmanfm
 perl
 perl-file-mimeinfo
+picom
 pidgin
 pidgin-libnotify
 pkgconf
