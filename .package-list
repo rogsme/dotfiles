@@ -76,6 +76,7 @@ exfat-utils
 exo
 f2fs-tools
 fakeroot
+fd
 ffmpeg
 ffmpegthumbnailer
 figlet
@@ -134,6 +135,7 @@ haveged
 hexchat
 htop
 httpie
+hugo
 i3-gaps
 i3blocks
 i3lock
@@ -189,6 +191,7 @@ lsb-release
 luv-icon-theme
 lvm2
 lxappearance
+lxinput
 lynx
 m4
 maia-icon-theme
@@ -292,6 +295,7 @@ python2-ptyprocess
 python2-xcffib
 qt5-graphicaleffects
 qt5-quickcontrols2
+ranger
 reiserfsprogs
 rofi
 rsync
@@ -302,6 +306,7 @@ scrot
 scummvm
 sed
 shadow
+shellcheck
 signal-desktop
 sl
 snapd
