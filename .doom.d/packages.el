@@ -53,3 +53,4 @@
 (package! whitespace-cleanup-mode)
 (package! prettier-js)
 (package! aggressive-indent)
+(package! yaml-mode)
