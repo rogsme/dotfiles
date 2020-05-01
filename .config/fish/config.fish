@@ -11,13 +11,13 @@ set -x VIRTUAL_ENV_DISABLE_PROMPT 1
 set -g theme_color_scheme dark
 set -g theme_display_date no
 set -x TERM alacritty
-set -x EDITOR emacs
+set -x EDITOR vim
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rm='rm -i'
 alias mv='mv -i'
 alias ..='cd ..'
 alias doom='$HOME/.emacs.d/bin/doom'
-alias ls='exa'
+alias ls='exa -la'
 alias pr='ping rogs.me'
 
 source "$HOME/.config/fish/abbreviations.fish"
