@@ -77,7 +77,7 @@ SETUVAR _fish_abbr_rmr:rm\x20\x2dr
 SETUVAR _fish_abbr_rmrf:rm\x20\x2drf
 SETUVAR _fish_abbr_tc:tar\x20czvf
 SETUVAR _fish_abbr_tx:tar\x20xzvf
-SETUVAR _fish_abbr_u:sudo\x20pacman\x20\x2dSyu
+SETUVAR _fish_abbr_u:update_all
 SETUVAR fish_color_autosuggestion:555\x1ebrblack
 SETUVAR fish_color_cancel:\x2dr
 SETUVAR fish_color_command:005fd7

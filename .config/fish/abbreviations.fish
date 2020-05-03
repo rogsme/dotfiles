@@ -1,7 +1,7 @@
 # Update Arch
 abbr i 'sudo pacman -S'
 abbr r 'sudo pacman -R'
-abbr u 'sudo pacman -Syu'
+abbr u 'update_all'
 
 # Git
 abbr g 'git'
