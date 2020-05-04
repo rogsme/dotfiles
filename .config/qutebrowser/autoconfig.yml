@@ -23,6 +23,8 @@ settings:
         xb: config-cycle statusbar.hide
         xt: config-cycle tabs.show always switching
         xx: config-cycle statusbar.hide ;; config-cycle tabs.show always switching
+  content.notifications:
+    https://cloud.rogs.me: true
   downloads.location.directory:
     global: /home/roger/Downloads
   qt.highdpi:
