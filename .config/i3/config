@@ -79,6 +79,9 @@ bindsym $mod+Shift+q kill
 # start rofi (a program launcher)
 bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
 
+# start bw-rofi (a rofi frontend for bitwarden)
+bindsym $mod+p exec --no-startup-id "bwpyro -c -1"
+
 # change focus
 bindsym $mod+h focus left
 bindsym $mod+j focus down
@@ -211,6 +214,7 @@ focus_follows_mouse no
 
 # Asign workspaces
 assign [class="Brave"] $ws1
+assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
 assign [class="Alacritty"] $ws3
@@ -239,7 +243,7 @@ exec --no-startup-id sleep 10; exec /usr/bin/evolution
 exec --no-startup-id exec /usr/bin/nextcloud
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
-exec --no-startup-id exec /usr/bin/brave
+exec --no-startup-id exec /usr/bin/qutebrowser
 exec --no-startup-id exec $terminal
 exec --no-startup-id exec /usr/bin/pasystray
 exec --no-startup-id nitrogen --restore
@@ -251,6 +255,11 @@ exec --no-startup-id pamac-tray
 exec --no-startup-id exec /opt/Mullvad\ VPN/mullvad-gui --no-sandbox
 exec --no-startup-id picom
 exec_always --no-startup-id /home/roger/.config/i3/autotiling.py
+
+# Random scripts
+## Generate a random password and copy it to the clipboard
+bindsym $aux+p exec --no-startup-id bw generate -ulns --length 25 | xclip -selection clipboard && notify-send "Copied a random password to the clipboard"
+
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
