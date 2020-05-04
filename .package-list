@@ -287,6 +287,7 @@ powertop
 procps-ng
 psmisc
 pulseaudio-bluetooth
+pulseaudio-bluetooth-a2dp-gdm-fix
 pulseaudio-ctl
 pulseaudio-zeroconf
 python-numpy
