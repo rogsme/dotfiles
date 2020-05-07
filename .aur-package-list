@@ -4,9 +4,9 @@ bitwarden-pyro-git
 bluez-git
 bullshit
 epub-thumbnailer-git
+fix-bt-a2dp
 franz
 gconf-sharp-peditors
-gdm3setup
 gitflow-avh
 gnome-sharp
 gnome-vfs-sharp
@@ -21,6 +21,8 @@ ngrok
 phantomjs-bin
 postman-bin
 powerline-fonts-git
+pulseaudio-bt-auto-enable-a2dp
+pulseaudio-modules-bt-git
 pydflatex
 s3cmd-git
 slack-desktop

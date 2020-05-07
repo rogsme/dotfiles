@@ -98,7 +98,6 @@ gawk
 gcc
 gcc-libs
 gcolor2
-gdm
 geckodriver
 gettext
 gimp
@@ -286,8 +285,6 @@ poppler-glib
 powertop
 procps-ng
 psmisc
-pulseaudio-bluetooth
-pulseaudio-bluetooth-a2dp-gdm-fix
 pulseaudio-ctl
 pulseaudio-zeroconf
 python-numpy
