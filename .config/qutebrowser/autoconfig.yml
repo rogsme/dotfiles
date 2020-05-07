@@ -6,36 +6,15 @@
 
 config_version: 2
 settings:
-  aliases:
-    global:
-      q: quit
-      w: session-save
-      wq: quit --save
-  auto_save.session:
-    global: true
-  backend:
-    global: webengine
   bindings.commands:
     global:
       normal:
-        cc: open https://coca-cola.com.mx
-        gh: open https://github.com
         xb: config-cycle statusbar.hide
         xt: config-cycle tabs.show always switching
         xx: config-cycle statusbar.hide ;; config-cycle tabs.show always switching
   content.notifications:
     https://cloud.rogs.me: true
-  downloads.location.directory:
-    global: /home/roger/Downloads
-  qt.highdpi:
-    global: true
   statusbar.hide:
-    global: true
+    global: false
   tabs.show:
-    global: switching
-  url.searchengines:
-    global:
-      DEFAULT: https://duckduckgo.com/?q={}
-      aw: https://wiki.archlinux.org/?search={}
-      lib: https://libgen.lc/search.php?req={}&lg_topic=libgen&open=0&view=simple&res=25&phrase=1&column=def
-      re: https://reddit.com/r/{}
+    global: always
