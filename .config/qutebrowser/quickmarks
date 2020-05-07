@@ -1,10 +1,11 @@
 rg https://rogs.me
-bw https://vault.bitwarden.com/#/
+blog https://blog.rogs.me/
+mail https://mail.rogs.me
+analytics https://analytics.rogs.me
 cc https://coca-cola.com.mx/
 ccb https://github.com/MassiveHub/pincodes-api
 ccf https://github.com/MassiveHub/pincodes-react
-mail https://mail.rogs.me
-ay https://analytics.rogs.me
+cca https://admin-pincodes.destapp.com/admin/login/?next=/admin/
+ccp https://api-pincodes.destapp.com/admin/login/?next=/admin/
+bw https://vault.bitwarden.com/#/
 qbc https://raw.githubusercontent.com/qutebrowser/qutebrowser/master/doc/img/cheatsheet-big.png
-cca https://api-pincodes.destapp.com/admin/login/?next=/admin/
-blog https://blog.rogs.me/
