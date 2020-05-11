@@ -36,6 +36,7 @@ cadaver
 calibre
 cantarell-fonts
 catfish
+celluloid
 cheese
 chromium
 clementine
@@ -226,6 +227,7 @@ modemmanager
 mousepad
 mousetweaks
 mpd
+mpv
 mtpfs
 mugshot
 mysql-workbench
@@ -366,7 +368,6 @@ vagrant
 vi
 virtualbox
 virtualgl
-vlc
 wallpapers-2018
 wallpapers-juhraya
 wget
@@ -433,7 +434,6 @@ xorg-twm
 xorg-xbacklight
 xorg-xinit
 xorg-xkill
-xplayer
 xreader
 xterm
 xviewer-plugins
