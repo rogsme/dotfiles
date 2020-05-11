@@ -72,7 +72,7 @@ SETUVAR _fish_abbr_nr:npm\x20remove
 SETUVAR _fish_abbr_ns:npm\x20start
 SETUVAR _fish_abbr_nt:npm\x20test
 SETUVAR _fish_abbr_nu:npm\x20update
-SETUVAR _fish_abbr_r:sudo\x20pacman\x20\x2dR
+SETUVAR _fish_abbr_r:sudo\x20pacman\x20\x2dRsu
 SETUVAR _fish_abbr_rmr:rm\x20\x2dr
 SETUVAR _fish_abbr_rmrf:rm\x20\x2drf
 SETUVAR _fish_abbr_tc:tar\x20czvf
