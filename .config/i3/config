@@ -80,7 +80,7 @@ bindsym $mod+Shift+q kill
 bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
 
 # start bw-rofi (a rofi frontend for bitwarden)
-bindsym $mod+p exec --no-startup-id "bwpyro -c -1"
+bindsym $mod+p exec --no-startup-id "bwpyro -c -1 -w logins"
 
 # change focus
 bindsym $mod+h focus left
