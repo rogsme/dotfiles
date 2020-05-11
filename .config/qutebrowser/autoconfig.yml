@@ -12,8 +12,11 @@ settings:
         xb: config-cycle statusbar.hide
         xt: config-cycle tabs.show always switching
         xx: config-cycle statusbar.hide ;; config-cycle tabs.show always switching
+  content.media_capture:
+    https://meet.google.com: true
   content.notifications:
     https://cloud.rogs.me: true
+    https://meet.google.com: false
   statusbar.hide:
     global: false
   tabs.show:

@@ -1656,7 +1656,9 @@ c.url.searchengines = {
     'aw': 'https://wiki.archlinux.org/?search={}',
     'lib': ' https://libgen.lc/search.php?req={}&lg_topic=libgen&open=0&view=simple&res=25&phrase=1&column=def',
     're': 'https://reddit.com/r/{}',
-    'gh': 'https://github.com/search?q={}'
+    'gh': 'https://github.com/search?q={}',
+    'aur': 'https://aur.archlinux.org/packages/?K={}&SB=p',
+    'sub': 'http://www.subdivx.com/index.php?q={}&accion=5&masdesc=&subtitulos=1&realiza_b=1'
 }
 
 ## Page(s) to open at the start.
