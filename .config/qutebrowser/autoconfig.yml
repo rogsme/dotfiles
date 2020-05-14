@@ -15,6 +15,7 @@ settings:
   content.media_capture:
     https://meet.google.com: true
   content.notifications:
+    https://1337x.to: false
     https://cloud.rogs.me: true
     https://meet.google.com: false
   statusbar.hide:
