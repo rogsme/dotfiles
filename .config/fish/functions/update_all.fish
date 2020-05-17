@@ -1,6 +1,6 @@
 function update_all
     yay
-    doom upgrade
+    doom -d upgrade
     paccache -r
     sudo pacman -Rns (pacman -Qtdq)
 end
