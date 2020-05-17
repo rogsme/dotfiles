@@ -1323,7 +1323,7 @@ c.qt.highdpi = True
 
 ## Load a restored tab as soon as it takes focus.
 ## Type: Bool
-# c.session.lazy_restore = False
+c.session.lazy_restore = True
 
 ## Languages to use for spell checking. You can check for available
 ## languages and install dictionaries using scripts/dictcli.py. Run the
