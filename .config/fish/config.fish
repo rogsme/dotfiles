@@ -10,7 +10,7 @@ set -g theme_powerline_fonts yes
 set -x VIRTUAL_ENV_DISABLE_PROMPT 1
 set -g theme_color_scheme dark
 set -g theme_display_date no
-set -x TERM alacritty
+set -x TERM xterm-256color
 set -x EDITOR vim
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rm='rm -i'
