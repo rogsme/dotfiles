@@ -17,7 +17,7 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias ..='cd ..'
 alias doom='$HOME/.emacs.d/bin/doom'
-alias ls='exa -la'
+alias ls='exa -la --color=always --group-directories-first'
 alias pr='ping rogs.me'
 
 source "$HOME/.config/fish/abbreviations.fish"
