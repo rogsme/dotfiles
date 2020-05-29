@@ -245,7 +245,7 @@ exec --no-startup-id exec /usr/bin/nextcloud
 exec --no-startup-id exec /usr/bin/thunderbird
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
-exec --no-startup-id exec /usr/bin/qutebrowser
+exec --no-startup-id exec /usr/bin/brave
 exec --no-startup-id exec $terminal
 exec --no-startup-id exec /usr/bin/pasystray
 exec --no-startup-id nitrogen --restore
