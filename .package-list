@@ -278,8 +278,6 @@ pcmanfm
 perl
 perl-file-mimeinfo
 picom
-pidgin
-pidgin-libnotify
 pkgconf
 playerctl
 polybar
@@ -293,7 +291,6 @@ pulseaudio-zeroconf
 python-numpy
 python-virtualenv
 python2-ptyprocess
-python2-xcffib
 qt5-graphicaleffects
 qt5-quickcontrols2
 qutebrowser
@@ -381,7 +378,6 @@ xclip
 xcursor-chameleon-pearl-deepin
 xcursor-simpleandsoft
 xcursor-vanilla-dmz-aa
-xdg-su
 xdg-user-dirs
 xdg-user-dirs-gtk
 xdg-utils
