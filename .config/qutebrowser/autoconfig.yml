@@ -19,6 +19,6 @@ settings:
     https://cloud.rogs.me: true
     https://meet.google.com: false
   statusbar.hide:
-    global: true
+    global: false
   tabs.show:
-    global: switching
+    global: always
