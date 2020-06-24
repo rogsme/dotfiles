@@ -19,6 +19,7 @@ alias ..='cd ..'
 alias doom='$HOME/.emacs.d/bin/doom'
 alias ls='exa -la --color=always --group-directories-first'
 alias pr='ping rogs.me'
+alias my-ip="curl ifconfig.me"
 
 source "$HOME/.config/fish/abbreviations.fish"
 
