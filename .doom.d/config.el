@@ -150,3 +150,37 @@
 
 ;; Relative line mode
 (setq display-line-numbers-type 'relative)
+
+;; Org Mode
+
+;; Capture templates
+(after! org
+  (setq org-capture-templates
+        (quote
+         (
+          ;; Personal templates
+          ("p" "Templates for personal")
+          ("pr" "Non-scheduled" entry
+           (file+headline "~/org/personal.org" "Captured")
+           (file "~/org/templates/basic-task.txt"))
+          ("ps" "Scheduled" entry
+           (file+headline "~/org/personal.org" "Captured")
+           (file "~/org/templates/scheduled-task.txt"))
+          ("pl" "Logbook entry for Personal" entry (file+datetree "logbook-personal.org") "** %U - %^{Activity}  :LOG:")
+          ;; Massive templates
+          ("m" "Templates for Massive")
+          ("mc" "Templates for CocaCola")
+          ("mcr" "Non-scheduled" entry
+           (file+headline "~/org/Massive/CocaCola/cocacola.org" "Captured")
+           (file "~/org/templates/basic-task.txt"))
+          ("mcs" "Scheduled" entry
+           (file+headline "~/org/Massive/CocaCola/cocacola.org" "Captured")
+           (file "~/org/templates/scheduled-task.txt"))
+          ("mcm" "New daily meeting" entry
+           (file+datetree "~/org/Massive/CocaCola/coca-dailies.org")
+           (file "~/org/templates/meeting.txt"))
+          ("mck" "New Kafein mistake" entry
+           (file+datetree "~/org/Massive/CocaCola/kafein-errors.org")
+           (file "~/org/templates/kafein-errors.txt"))
+          ("ml" "Logbook entry for Massive" entry (file+datetree "logbook-work.org") "** %U - %^{Activity}  :LOG:")
+          ))))
