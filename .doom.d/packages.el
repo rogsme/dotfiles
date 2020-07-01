@@ -54,3 +54,4 @@
 (package! prettier-js)
 (package! aggressive-indent)
 (package! yaml-mode)
+(package! emojify)

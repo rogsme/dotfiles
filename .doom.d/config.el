@@ -184,3 +184,6 @@
            (file "~/org/templates/kafein-errors.txt"))
           ("ml" "Logbook entry for Massive" entry (file+datetree "logbook-work.org") "** %U - %^{Activity}  :LOG:")
           ))))
+
+;; Emojify mode
+(add-hook 'after-init-hook #'global-emojify-mode)
