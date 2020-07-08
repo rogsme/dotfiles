@@ -55,3 +55,4 @@
 (package! aggressive-indent)
 (package! yaml-mode)
 (package! emojify)
+(package! ghub+)
