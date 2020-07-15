@@ -183,6 +183,22 @@
            (file+datetree "~/org/Massive/CocaCola/kafein-errors.org")
            (file "~/org/templates/kafein-errors.txt"))
           ("ml" "Logbook entry for Massive" entry (file+datetree "logbook-work.org") "** %U - %^{Activity}  :LOG:")
+          ;; Tarmac templates
+          ("t" "Templates for Tarmac")
+          ("tv" "Templates for Volition")
+          ("tvr" "Non-scheduled" entry
+           (file+headline "~/org/Tarmac/Volition/volition.org" "Captured")
+           (file "~/org/templates/basic-task.txt"))
+          ("tvs" "Scheduled" entry
+           (file+headline "~/org/Tarmac/Volition/volition.org" "Captured")
+           (file "~/org/templates/scheduled-task.txt"))
+          ("tvt" "New standup" entry
+           (file+datetree "~/org/Tarmac/Volition/standups.org")
+           (file "~/org/templates/standup.txt"))
+          ("tve" "New EOD email" entry
+           (file+datetree "~/org/Tarmac/Volition/eod-emails.org")
+           (file "~/org/templates/tarmac-eod-email-template.txt"))
+          ("tl" "Logbook entry for Tarmac" entry (file+datetree "~/org/Tarmac/logbook-tarmac.org") "** %U - %^{Activity}  :LOG:")
           ))))
 
 ;; Emojify mode
