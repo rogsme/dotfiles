@@ -22,7 +22,6 @@ bash-completion
 bauh
 bchunk
 beets
-bin2iso
 bind-tools
 binutils
 bison
@@ -243,7 +242,6 @@ neofetch
 netctl
 network-manager-applet
 networkmanager
-networkmanager-dispatcher-ntpd
 networkmanager-openconnect
 networkmanager-openvpn
 networkmanager-pptp
@@ -261,6 +259,7 @@ ntp
 numlockx
 nvidia-440xx-utils
 nvidia-prime
+nvm
 obs-studio
 openresolv
 openssh
@@ -298,6 +297,7 @@ qt5-quickcontrols2
 qutebrowser
 ranger
 reiserfsprogs
+ripgrep
 rofi
 rsync
 ruby-bundler
@@ -375,6 +375,7 @@ wget
 which
 whois
 wireshark-qt
+woeusb
 wpa_supplicant
 xclip
 xcursor-chameleon-pearl-deepin
