@@ -203,3 +203,10 @@
 
 ;; Emojify mode
 (add-hook 'after-init-hook #'global-emojify-mode)
+
+;; My own menu
+(map! :leader
+      (:prefix-map ("a" . "applications")
+       ;; ispell
+       :desc "ispell" "i" #'ispell
+       :desc "http_status" "h" #'helm-httpstatus))
