@@ -284,6 +284,7 @@ playerctl
 polybar
 poppler-data
 poppler-glib
+postgresql
 powertop
 procps-ng
 psmisc
