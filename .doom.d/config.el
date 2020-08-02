@@ -208,5 +208,11 @@
 (map! :leader
       (:prefix-map ("a" . "applications")
        ;; ispell
-       :desc "ispell" "i" #'ispell
-       :desc "http_status" "h" #'helm-httpstatus))
+       :desc "Open eshell" "e" #'eshell
+       :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus
+       :desc "Run ispell" "i" #'ispell
+       ))
+
+;; Autofill mode
+(add-hook 'text-mode-hook 'auto-fill-mode)
+(setq-default fill-column 80)
