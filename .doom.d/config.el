@@ -135,6 +135,9 @@
      (add-hook 'js2-mode-hook #'add-node-modules-path)
      (add-hook 'js2-mode-hook #'prettier-js-mode)))
 
+(after! typescript-mode
+  (add-hook 'typescript-mode-hook #'prettier-js-mode))
+
 (add-hook 'web-mode-hook 'rainbow-mode)
 
 ;; Indent
