@@ -25,7 +25,7 @@
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 ;; test
-(setq doom-font (font-spec :family "monospace" :size 28)
+(setq doom-font (font-spec :family "mononoki Nerd Font Mono" :size 30)
       doom-variable-pitch-font (font-spec :family "sans"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
@@ -38,7 +38,7 @@
 
 ;; If you want to change the style of line numbers, change this to `relative' or
 ;; `nil' to disable it:
-(setq display-line-numbers-type t)
+(setq display-line-numbers-type 'relative)
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
@@ -148,12 +148,21 @@
 (require 'aggressive-indent)
 (global-aggressive-indent-mode 1)
 
-;; Relative line mode
-(setq display-line-numbers-type 'relative)
-
 ;; Org Mode
 
-;; Capture templates
+;;;; Logs
+
+(after! org (setq org-log-state-notes-insert-after-drawers nil
+                  org-log-into-drawer t
+                  org-log-done 'time
+                  org-log-repeat 'time
+                  org-log-redeadline 'note
+                  org-log-reschedule 'note))
+
+(setq-default org-todo-keywords
+              '((sequence "TODO(t!)" "IN_PROGRESS(i!)" "WAIT(w@/!)" "SOMEDAY(s!)" "|" "DONE(d@/!)" "CANCELLED(c@/!)")))
+
+;;;; Capture templates
 (after! org
   (setq org-capture-templates
         (quote
@@ -201,6 +210,11 @@
           ("tl" "Logbook entry for Tarmac" entry (file+datetree "~/org/Tarmac/logbook-tarmac.org") "** %U - %^{Activity}  :LOG:")
           ))))
 
+
+;;;; Enforce ordered tasks
+(setq org-enforce-todo-dependencies t)
+(setq org-enforce-todo-checkbox-dependencies t)
+
 ;; Emojify mode
 (add-hook 'after-init-hook #'global-emojify-mode)
 
@@ -208,7 +222,7 @@
 (map! :leader
       (:prefix-map ("a" . "applications")
        ;; ispell
-       :desc "Open eshell" "e" #'eshell
+       :desc "Open vterm" "v" #'vterm
        :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus
        :desc "Run ispell" "i" #'ispell
        ))
