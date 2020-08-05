@@ -40,6 +40,7 @@ celluloid
 cheese
 chromium
 clementine
+cmake
 cmatrix
 composer
 conky
@@ -153,6 +154,7 @@ ipw2200-fw
 isousb
 jdk8-openjdk
 jfsutils
+jq
 jre8-openjdk
 jre8-openjdk-headless
 kernel-alive
