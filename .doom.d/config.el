@@ -149,21 +149,36 @@
 (global-aggressive-indent-mode 1)
 
 ;; Org Mode
-
-;;;; Logs
-
-(after! org (setq org-log-state-notes-insert-after-drawers nil
-                  org-log-into-drawer t
-                  org-log-done 'time
-                  org-log-repeat 'time
-                  org-log-redeadline 'note
-                  org-log-reschedule 'note))
-
-(setq-default org-todo-keywords
-              '((sequence "TODO(t!)" "IN_PROGRESS(i!)" "WAIT(w@/!)" "SOMEDAY(s!)" "|" "DONE(d@/!)" "CANCELLED(c@/!)")))
-
-;;;; Capture templates
 (after! org
+  ;; Logs
+  (setq org-log-state-notes-insert-after-drawers nil
+        org-log-into-drawer t
+        org-log-done 'time
+        org-log-repeat 'time
+        org-log-redeadline 'note
+        org-log-reschedule 'note)
+  ;; Keyword and faces
+  (setq-default org-todo-keywords
+                '((sequence "TODO(t!)" "IN_PROGRESS(i!)" "WAIT(w@/!)" "SOMEDAY(s!)" "|" "DONE(d@/!)" "CANCELLED(c@/!)")))
+  (setq-default org-todo-keyword-faces
+                '(( "TODO" . (:foreground "white" :background "darkorchid4" :weight bold))
+                  ( "IN_PROGRESS" . (:background "deeppink3" :weight bold))
+                  ( "WAIT" (:background "red" :weight bold))
+                  ( "SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
+                  ( "DONE" . (:foreground "white" :background "forest green" :weight bold))
+                  ( "CANCELLED" . (:foreground "light gray" :slant italic))));; Priorities
+  ;; A: Do it now
+  ;; B: Decide when to do it
+  ;; C: Delegate it
+  ;; D: Just an idea
+  (setq org-highest-priority ?A)
+  (setq org-lowest-priority  ?D)
+  (setq org-default-priority ?B)
+  (setq org-priority-faces '((?A . (:foreground "white" :background "dark red" :weight bold))
+                             (?B . (:foreground "white" :background "dark green" :weight bold))
+                             (?C . (:foreground "yellow"))
+                             (?D . (:foreground "gray"))))
+  ;; Capture templates
   (setq org-capture-templates
         (quote
          (
@@ -208,12 +223,10 @@
            (file+datetree "~/org/Tarmac/Volition/eod-emails.org")
            (file "~/org/templates/tarmac-eod-email-template.txt"))
           ("tl" "Logbook entry for Tarmac" entry (file+datetree "~/org/Tarmac/logbook-tarmac.org") "** %U - %^{Activity}  :LOG:")
-          ))))
-
-
-;;;; Enforce ordered tasks
-(setq org-enforce-todo-dependencies t)
-(setq org-enforce-todo-checkbox-dependencies t)
+          )))
+  ;; Enforce ordered tasks
+  (setq org-enforce-todo-dependencies t)
+  (setq org-enforce-todo-checkbox-dependencies t))
 
 ;; Emojify mode
 (add-hook 'after-init-hook #'global-emojify-mode)
