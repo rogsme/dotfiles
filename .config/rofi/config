@@ -6,4 +6,4 @@
 #
 rofi.modi: window,drun,combi
 rofi.theme: ~/.config/rofi/theme/rogs.rasi
-rofi.font : hack 22
+rofi.font : hack 12

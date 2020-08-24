@@ -35,6 +35,11 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
+# Screen resolution
+# exec --no-startup-id xrandr --output eDP-1 --off --output HDMI-1 --primary --auto --dpi 96 --left-of DP-2-1 --output DP-2-1 --auto --dpi 96
+exec --no-startup-id sleep 2; autorandr --change
+exec --no-startup-id xsetroot -xcf /usr/share/icons/Adwaita/cursors/left_ptr 24
+
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -138,7 +143,7 @@ set $ws2 "2: "
 set $ws3 "3: "
 set $ws4 "4: "
 set $ws5 "5: "
-set $ws6 "6: "
+set $ws6 "6: "
 set $ws7 "7: all"
 set $ws8 "8"
 set $ws9 "9"
@@ -168,6 +173,16 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 
+workspace $ws1 output primary
+workspace $ws3 output primary
+workspace $ws5 output primary
+workspace $ws7 output primary
+workspace $ws9 output primary
+workspace $ws2 output DP-2-1
+workspace $ws4 output DP-2-1
+workspace $ws6 output DP-2-1
+workspace $ws8 output DP-2-1
+workspace $ws10 output DP-2-1
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
@@ -249,7 +264,7 @@ exec --no-startup-id exec /usr/bin/emacs
 exec --no-startup-id exec /usr/bin/brave
 exec --no-startup-id exec $terminal
 exec --no-startup-id exec /usr/bin/pasystray
-exec --no-startup-id nitrogen --restore
+exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 exec --no-startup-id /usr/bin/unclutter
