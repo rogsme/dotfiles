@@ -25,13 +25,13 @@
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 ;; test
-(setq doom-font (font-spec :family "mononoki Nerd Font Mono" :size 30)
+(setq doom-font (font-spec :family "Source Code Pro Medium" :size 15)
       doom-variable-pitch-font (font-spec :family "sans"))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. These are the defaults.
-(setq doom-theme 'doom-oceanic-next)
+(setq doom-theme 'doom-material) 4
 
 ;; If you intend to use org, it is recommended you change this!
 (setq org-directory "~/org")
@@ -148,8 +148,8 @@
 (setq-default tab-width 2)
 (setq js-highlight-level 3)
 (setq auto-indent-indent-style 'aggressive)
-(require 'aggressive-indent)
-(global-aggressive-indent-mode 1)
+;; (require 'aggressive-indent)
+;; (global-aggressive-indent-mode 1)
 
 ;; Org Mode
 (after! org
@@ -246,3 +246,11 @@
 ;; Autofill mode
 (add-hook 'text-mode-hook 'auto-fill-mode)
 (setq-default fill-column 80)
+
+;; LSP eslint config
+(setq lsp-eslint-server-command
+      '("node"
+        "/home/roger/.vscode-oss/extensions/vscode-eslint-release-2.1.5/server/out/eslintServer.js"
+        "--stdio"))
+;; For some reason, eslint disables document hightlight so I'm reenabling it
+(add-hook 'lsp-on-idle-hook 'lsp-document-highlight)
