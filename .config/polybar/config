@@ -8,17 +8,18 @@
 accent = #fba922
 
 [bar/top]
+monitor = ${env:MONITOR:}
 enable-ipc = true
 width = 100%
-height = 40
+height = 17
 
 ;background = #222
-background = #000
+background = #33000000
 foreground = #fff
 
-overline-size = 10
+overline-size = 1
 overline-color = ${self.background}
-underline-size = 10
+underline-size = 1
 underline-color = ${self.background}
 
 padding-left = 1
@@ -26,20 +27,15 @@ padding-right = 1
 module-margin-left = 1
 module-margin-right = 1
 
-font-0 = NotoSans-Regular:size=20;0
-font-1 = MaterialIcons:size=20;2
-font-2 = Termsynu:size=20;0
-font-3 = Siji:pixelsize=20;1
-font-4 = FontAwesome:size=20;0
-modules-left = i3
+font-0 = NotoSans-Regular:size=10;0
+font-1 = MaterialIcons:size=10;2
+font-2 = Termsynu:size=10;0
+font-3 = Siji:pixelsize=10;1
+font-4 = FontAwesome:size=10;0
+font-5 = Noto Color Emoji:scale=12;0
+modules-left = i3 spotify
 modules-center = xwindow
-modules-right = pulseaudio xkeyboard xbacklight cpu memory wireless-network battery clock
-; tray-position = right
-
-[module/xbacklight]
-type = internal/xbacklight
-format-prefix = "BL: "
-label = %percentage:2%%
+modules-right = pulseaudio xkeyboard cpu memory wireless-network mullvad-status battery clock
 
 [module/i3]
 type = internal/i3
@@ -56,7 +52,6 @@ label-focused-font = 4
 label-focused-padding = 3
 
 label-unfocused = %name%
-label-unfocused-underline = #000
 label-unfocused-font = 4
 label-unfocused-padding = 3
 
@@ -75,14 +70,15 @@ label-visible-padding = 4
 [module/cpu]
 type = internal/cpu
 interval = 2
-format-prefix = " "
+format-prefix = "🎛 "
 format-underline = #f90000
 label = %percentage:2%%
 
 [module/memory]
 type = internal/memory
 interval = 2
-format-prefix = "  "
+; format-prefix = "  "
+format-prefix = " 📊 "
 format-underline = #4bffdc
 label = %percentage_used%%
 
@@ -91,27 +87,27 @@ type = internal/network
 interface = wlp2s0
 interval = 2.0
 ping-interval = 10
-
-label-connected =  %essid%
-label-disconnected =    not connected
+label-connected = 📶 %essid%
+label-disconnected = 🚫 not connected
 label-disconnected-foreground = #66
 
 [module/clock]
 type = internal/date
 interval = 5
 format-padding = 5
-format-foreground = #fff
-date = %%{F#bb} %d-%m-%Y%%{F-}  %%{F#ee} %H:%M%%{F-}
+date = 📅 %d-%m-%Y% 🕜 %H:%M%
 
 [module/battery]
 type = internal/battery
-full-at = 100
-format-charging = %{T3}  <label-charging> %{T-}
-format-discharging = %{T3}  <label-discharging> %{T-}
-format-full = %{T3}  <label-full> %{T-}
+full-at = 99
+battery = BAT0
+adapter = AC
+format-charging = %{T4} 🔌 <label-charging> %{T-}
+format-discharging = %{T4}🔋  <label-discharging> %{T-}
+format-full = %{T4}🔌  <label-full> %{T-}
 label-charging-font = 3
 label-discharging-font = 3
-label-full = '100%'
+label-full = 100%
 
 [module/xwindow]
 type = internal/xwindow
@@ -119,12 +115,22 @@ label-maxlen = 75
 label-foreground = #FFF
 
 [module/xkeyboard]
-type = internal/xkeyboard
-format-prefix = "layout: "
-label-layout = %layout%
+type = custom/script
+exec = /home/roger/.config/polybar/keyboard_lang.sh
+interval = 1
 
 [module/pulseaudio]
 type = internal/pulseaudio
-label-volume =  %percentage%%
-label-muted = 
+label-volume = 🔊 %percentage%%
+label-muted = 🔈
 label-muted-foreground = #666
+
+[module/spotify]
+type = custom/script
+interval = 1
+exec = python /home/roger/.config/polybar/spotify_status.py -t 80 --playpause-font=5 -p '⏯,⏸️' -f ' {play_pause} {song} - {artist} - {album}'
+
+[module/mullvad-status]
+type = custom/script
+exec = /home/roger/.config/polybar/mullvad_status.sh
+interval = 1
