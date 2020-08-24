@@ -5,9 +5,9 @@ bitwarden-pyro-git
 bluez-git
 bullshit
 clockify-desktop
+emacs27-git
 epub-thumbnailer-git
 fix-bt-a2dp
-font-manager
 franz-bin
 gconf-sharp-peditors
 gitflow-avh
@@ -23,6 +23,7 @@ mullvad-vpn-bin
 nerd-fonts-mononoki
 networkmanager-dispatcher-ntpd
 ngrok
+noto-fonts-emoji-flags
 phantomjs-bin
 postman-bin
 powerline-fonts-git
@@ -32,6 +33,7 @@ purple-hangouts-hg
 pydflatex
 python2-xcffib
 s3cmd-git
+simple-scan-git
 slack-desktop
 spotify
 teamviewer

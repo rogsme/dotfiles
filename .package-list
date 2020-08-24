@@ -14,6 +14,7 @@ atomicparsley
 audacious
 autoconf
 automake
+autorandr
 avahi
 aws-cli
 b43-fwcutter
@@ -22,7 +23,7 @@ bash-completion
 bauh
 bchunk
 beets
-bind-tools
+bind
 binutils
 bison
 blueberry
@@ -42,6 +43,7 @@ chromium
 clementine
 cmake
 cmatrix
+code
 composer
 conky
 coreutils
@@ -70,7 +72,6 @@ dosfstools
 e2fsprogs
 ecryptfs-utils
 efibootmgr
-emacs
 engrampa
 evolution
 exa
@@ -92,6 +93,7 @@ flake8
 flashplugin
 flatpak
 flex
+font-manager
 fortune-mod
 freetype2
 galculator
@@ -289,6 +291,7 @@ poppler-glib
 postgresql
 powertop
 procps-ng
+psensor
 psmisc
 pulseaudio-ctl
 pulseaudio-zeroconf
@@ -383,6 +386,7 @@ wpa_supplicant
 xclip
 xcursor-chameleon-pearl-deepin
 xcursor-simpleandsoft
+xcursor-themes
 xcursor-vanilla-dmz-aa
 xdg-user-dirs
 xdg-user-dirs-gtk
