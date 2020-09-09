@@ -153,6 +153,8 @@
 
 ;; Org Mode
 (after! org
+  ;; Include diary
+  (setq org-agenda-include-diary t)
   ;; Logs
   (setq org-log-state-notes-insert-after-drawers nil
         org-log-into-drawer t
@@ -254,3 +256,19 @@
         "--stdio"))
 ;; For some reason, eslint disables document hightlight so I'm reenabling it
 (add-hook 'lsp-on-idle-hook 'lsp-document-highlight)
+
+(after! python
+  :init
+  (setq lsp-pyls-plugins-pylint-enabled t)
+  (setq lsp-pyls-plugins-autopep8-enabled nil)
+  (setq lsp-pyls-plugins-pyflakes-enabled nil)
+  (setq lsp-pyls-plugins-pycodestyle-enabled nil)
+  (setq lsp-pyls-configuration-sources "pep8")
+  (add-hook 'before-save-hook 'lsp-format-buffer))
+
+;; Setting up pyvenv. On each project, run add-dir-local-variable and specify the virtualenv location
+(use-package pyvenv
+  :ensure t
+  :init
+  (pyvenv-mode 1)
+  (pyvenv-tracking-mode 1))
