@@ -94,7 +94,7 @@ label-disconnected-foreground = #66
 type = internal/date
 interval = 5
 format-padding = 5
-date = 📅 %d-%m-%Y% 🕜 %H:%M%
+date = 📅 %d-%m-%Y 🕜 %H:%M%
 
 [module/battery]
 type = internal/battery
@@ -142,6 +142,7 @@ hwmon-path = /sys/devices/platform/coretemp.0/hwmon/hwmon5/temp1_input
 base-temperature = 20
 warn-temperature = 80
 format-prefix = "🌡"
+label-warn = 🔥 %temperature-c%
 
 [module/gpu-temperature]
 type = internal/temperature
