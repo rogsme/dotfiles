@@ -272,6 +272,7 @@ exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 exec --no-startup-id exec /opt/Mullvad\ VPN/mullvad-gui --no-sandbox
 exec --no-startup-id picom
+exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id /home/roger/.config/i3/autotiling.py
 
 # Random scripts

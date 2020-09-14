@@ -267,6 +267,7 @@
   (add-hook 'before-save-hook 'lsp-format-buffer))
 
 ;; Setting up pyvenv. On each project, run add-dir-local-variable and specify the virtualenv location
+;; https://blog.allardhendriksen.nl/posts/tracking-project-virtual-environments-with-pyvenv-tracking-mode/
 (use-package pyvenv
   :ensure t
   :init
