@@ -115,6 +115,7 @@ gnome-system-log
 gnome-system-monitor
 gnome-terminal
 gnome-themes-extra
+gnu-netcat
 gparted
 gprename
 grep
@@ -160,6 +161,7 @@ jq
 jre8-openjdk
 jre8-openjdk-headless
 kernel-alive
+kubectl
 less
 lib32-flex
 lib32-libva-intel-driver
@@ -295,6 +297,7 @@ psensor
 psmisc
 pulseaudio-ctl
 pulseaudio-zeroconf
+pyenv
 python-numpy
 python-virtualenv
 python2-ptyprocess
@@ -323,7 +326,6 @@ sox
 spectre-meltdown-checker
 speedtest-cli
 sqlitebrowser
-steam-manjaro
 subversion
 sudo
 sysfsutils

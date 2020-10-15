@@ -3,6 +3,7 @@ art-sharp
 bin2iso
 bitwarden-pyro-git
 bluez-git
+bluez-hcitool
 bullshit
 clockify-desktop
 emacs27-git
@@ -35,6 +36,7 @@ python2-xcffib
 s3cmd-git
 simple-scan-git
 slack-desktop
+sonar-scanner
 spotify
 teamviewer
 texlive-latexindent-meta
@@ -43,3 +45,4 @@ xdg-su
 xwobf-git
 yakyak
 zd1211-firmware
+zoom
