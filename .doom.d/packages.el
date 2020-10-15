@@ -57,3 +57,4 @@
 (package! emojify)
 (package! ghub+)
 (package! lsp-python-ms :disable t)
+(package! jenkinsfile-mode)
