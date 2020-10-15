@@ -5,7 +5,7 @@
 #            |___/
 #
 set fish_greeting ""
-set -gx PATH /home/roger/.gem/ruby/2.6.0/bin $PATH
+set -gx PATH /home/roger/.gem/ruby/2.6.0/bin /opt/sonar-scanner/bin $PATH
 set -g theme_powerline_fonts yes
 set -x VIRTUAL_ENV_DISABLE_PROMPT 1
 set -g theme_color_scheme dark
@@ -26,3 +26,6 @@ source "$HOME/.config/fish/abbreviations.fish"
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end
