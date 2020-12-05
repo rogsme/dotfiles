@@ -56,3 +56,5 @@
 (package! ghub+)
 (package! lsp-python-ms :disable t)
 (package! jenkinsfile-mode)
+(package! auto-virtualenv)
+(package! org-bullets)

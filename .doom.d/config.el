@@ -36,7 +36,8 @@
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
 
-(setq doom-theme 'doom-material)
+;; (setq doom-theme 'doom-material)
+(setq doom-theme 'doom-oceanic-next)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -110,12 +111,6 @@
   (interactive)
   (helm-other-buffer '(helm-httpstatus-source) "*helm httpstatus*"))
 
-;; Multiple cursors mode
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
 ;; Removes mouse from code
 (mouse-avoidance-mode "animate")
 
@@ -141,8 +136,6 @@
 (setq-default tab-width 2)
 (setq js-highlight-level 3)
 (setq auto-indent-indent-style 'aggressive)
-;; (require 'aggressive-indent)
-;; (global-aggressive-indent-mode 1)
 
 ;; Org Mode
 (after! org
@@ -224,10 +217,12 @@
           )))
   ;; Enforce ordered tasks
   (setq org-enforce-todo-dependencies t)
-  (setq org-enforce-todo-checkbox-dependencies t))
+  (setq org-enforce-todo-checkbox-dependencies t)
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 ;; Emojify mode
-(add-hook 'after-init-hook #'global-emojify-mode)
+;; (add-hook 'after-init-hook #'global-emojify-mode)
 
 ;; My own menu
 (map! :leader
@@ -247,9 +242,9 @@
       '("node"
         "/home/roger/.vscode-oss/extensions/vscode-eslint-release-2.1.5/server/out/eslintServer.js"
         "--stdio"))
-;; For some reason, eslint disables document hightlight so I'm reenabling it
-(add-hook 'lsp-on-idle-hook 'lsp-document-highlight)
 
+
+(require 'auto-virtualenv)
 (after! python
   :init
   (setq lsp-pyls-plugins-pylint-enabled t)
@@ -257,4 +252,27 @@
   (setq lsp-pyls-plugins-pyflakes-enabled nil)
   (setq lsp-pyls-plugins-pycodestyle-enabled nil)
   (setq lsp-pyls-configuration-sources "pep8")
-  (add-hook 'before-save-hook 'lsp-format-buffer))
+  (add-hook 'before-save-hook 'lsp-format-buffer)
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+  (define-key python-mode-map (kbd "<f5>") 'python-insert-breakpoint))
+
+
+(defvar ruby--byebug-breakpoint-string "require 'byebug'; byebug ## DEBUG ##"
+  "Ruby breakpoint string used by `ruby-insert-breakpoint'")
+
+(defun ruby-insert-breakpoint ()
+  "Inserts a ruby breakpoint using `byebug'"
+  (interactive)
+  (back-to-indentation)
+  ;; this preserves the correct indentation in case the line above
+  ;; point is a nested block
+  (split-line)
+  (insert ruby--byebug-breakpoint-string))
+
+
+(after! ruby-mode
+  :init
+  (add-hook 'ruby-mode-hook 'add-debug-highlight)
+  (define-key ruby-mode-map (kbd "<f5>") 'ruby-insert-breakpoint))
+
+(global-set-key [f4] 'compile)
