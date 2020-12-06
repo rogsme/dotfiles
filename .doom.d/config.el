@@ -117,25 +117,27 @@
 ;; Basic: Turn off bugging yes-or-no-p
 (fset 'yes-or-no-p 'y-or-n-p)
 
-;; PrettierJS
-(eval-after-load 'js2-mode
+;; JavaScript
+;; (eval-after-load 'js2-mode
+(after! js2-mode
   '(progn
      (add-hook 'js2-mode-hook #'add-node-modules-path)
      (add-hook 'js2-mode-hook #'prettier-js-mode)))
 
+;; TypeScript
 (after! typescript-mode
   (add-hook 'typescript-mode-hook #'prettier-js-mode))
 
-(add-hook 'web-mode-hook 'rainbow-mode)
-
-;; Indent
-(setq web-mode-markup-indent-offset 2)
-(setq web-mode-css-indent-offset 2)
-(setq web-mode-code-indent-offset 2)
-(setq js-indent-level 2)
-(setq-default tab-width 2)
-(setq js-highlight-level 3)
-(setq auto-indent-indent-style 'aggressive)
+;; WebMode
+(after! web-mode
+  (add-hook 'web-mode-hook 'rainbow-mode)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
+  (setq js-indent-level 2)
+  (setq-default tab-width 2)
+  (setq js-highlight-level 3)
+  (setq auto-indent-indent-style 'aggressive))
 
 ;; Org Mode
 (after! org
@@ -221,8 +223,15 @@
   (require 'org-bullets)
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-;; Emojify mode
-;; (add-hook 'after-init-hook #'global-emojify-mode)
+;; lsp-mode
+(after! lsp-mode
+  :init
+  (setq lsp-headerline-breadcrumb-enable t)
+  ;; LSP eslint config
+  (setq lsp-eslint-server-command
+        '("node"
+          "/home/roger/.vscode-oss/extensions/vscode-eslint-release-2.1.5/server/out/eslintServer.js"
+          "--stdio")))
 
 ;; My own menu
 (map! :leader
@@ -237,12 +246,7 @@
 (add-hook 'text-mode-hook 'auto-fill-mode)
 (setq-default fill-column 80)
 
-;; LSP eslint config
-(setq lsp-eslint-server-command
-      '("node"
-        "/home/roger/.vscode-oss/extensions/vscode-eslint-release-2.1.5/server/out/eslintServer.js"
-        "--stdio"))
-
+;; Python
 
 (require 'auto-virtualenv)
 (after! python
@@ -253,9 +257,10 @@
   (setq lsp-pyls-plugins-pycodestyle-enabled nil)
   (setq lsp-pyls-configuration-sources "pep8")
   (add-hook 'before-save-hook 'lsp-format-buffer)
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-  (define-key python-mode-map (kbd "<f5>") 'python-insert-breakpoint))
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
+
+;; Ruby
 
 (defvar ruby--byebug-breakpoint-string "require 'byebug'; byebug ## DEBUG ##"
   "Ruby breakpoint string used by `ruby-insert-breakpoint'")
@@ -273,6 +278,8 @@
 (after! ruby-mode
   :init
   (add-hook 'ruby-mode-hook 'add-debug-highlight)
-  (define-key ruby-mode-map (kbd "<f5>") 'ruby-insert-breakpoint))
+  (define-key ruby-mode-map (kbd "<f6>") 'ruby-insert-breakpoint))
 
+;; Compile
 (global-set-key [f4] 'compile)
+(global-set-key [f5] 'recompile)
