@@ -29,7 +29,6 @@ bison
 blueberry
 blueman
 bmenu
-brave
 btrfs-progs
 bumblebee
 bzip2
@@ -40,7 +39,6 @@ catfish
 celluloid
 cheese
 chromium
-clementine
 cmake
 cmatrix
 code
@@ -162,13 +160,14 @@ jre8-openjdk
 jre8-openjdk-headless
 kernel-alive
 kubectl
+ledger-live-bin
 less
 lib32-flex
 lib32-libva-intel-driver
 lib32-libva-mesa-driver
 lib32-libva-vdpau-driver
 lib32-mesa-demos
-lib32-nvidia-440xx-utils
+lib32-nvidia-utils
 lib32-primus
 lib32-virtualgl
 libdvdcss
@@ -191,9 +190,9 @@ linux49
 linux49-bbswitch
 linux49-headers
 linux54
-linux54-nvidia-440xx
 logrotate
 lolcat
+lollypop
 lsb-release
 luv-icon-theme
 lvm2
@@ -233,6 +232,7 @@ mobile-broadband-provider-info
 modemmanager
 mousepad
 mousetweaks
+mpc
 mpd
 mpv
 mtpfs
@@ -263,7 +263,6 @@ nss-mdns
 ntfs-3g
 ntp
 numlockx
-nvidia-440xx-utils
 nvidia-prime
 nvm
 obs-studio
@@ -299,6 +298,7 @@ pulseaudio-ctl
 pulseaudio-zeroconf
 pyenv
 python-numpy
+python-scikit-learn
 python-virtualenv
 python2-ptyprocess
 qt5-graphicaleffects
