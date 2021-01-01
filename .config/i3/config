@@ -243,6 +243,7 @@ assign [class="Evolution"] $ws5
 assign [class="Thunderbird"] $ws5
 assign [class="Liferea"] $ws5
 for_window [class = "Spotify"] move to workspace $ws6
+assign [class="Lollypop"] $ws6
 assign [class="Thunar"] $ws7
 assign [class="Clockify"] $ws8
 
