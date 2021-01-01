@@ -21,9 +21,9 @@
 ;; font string. You generally only need these two:
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
-(setq doom-font (font-spec :family "Source Code Pro Medium" :size 15)
+(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 16)
       doom-variable-pitch-font (font-spec :family "sans")
-      doom-big-font (font-spec :family "Source Code Pro Medium" :size 24))
+      doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
@@ -112,7 +112,7 @@
   (helm-other-buffer '(helm-httpstatus-source) "*helm httpstatus*"))
 
 ;; Removes mouse from code
-(mouse-avoidance-mode "animate")
+;; (mouse-avoidance-mode "animate")
 
 ;; Basic: Turn off bugging yes-or-no-p
 (fset 'yes-or-no-p 'y-or-n-p)
@@ -227,11 +227,15 @@
 (after! lsp-mode
   :init
   (setq lsp-headerline-breadcrumb-enable t)
+  :custom
+  (setq lsp-ui-doc-enable t)
   ;; LSP eslint config
   (setq lsp-eslint-server-command
         '("node"
           "/home/roger/.vscode-oss/extensions/vscode-eslint-release-2.1.5/server/out/eslintServer.js"
           "--stdio")))
+(after! lsp-ui
+  (setq lsp-ui-doc-enable t))
 
 ;; My own menu
 (map! :leader
