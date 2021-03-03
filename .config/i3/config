@@ -229,6 +229,7 @@ focus_follows_mouse no
 
 # Asign workspaces
 assign [class="Brave"] $ws1
+assign [class="LibreWolf"] $ws1
 assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
@@ -257,12 +258,12 @@ for_window [class="Nitrogen"] floating enable sticky enable border normal
 for_window [urgent=latest] focus
 
 # Autostarts
-# exec --no-startup-id sleep 10; exec /usr/bin/evolution
+exec --no-startup-id sleep 20; exec /usr/bin/evolution
 exec --no-startup-id exec /usr/bin/nextcloud
-exec --no-startup-id exec /usr/bin/thunderbird
+# exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
-exec --no-startup-id exec /usr/bin/brave
+exec --no-startup-id exec /usr/bin/librewolf
 exec --no-startup-id exec $terminal
 exec --no-startup-id exec /usr/bin/pasystray
 exec --no-startup-id sleep 10; exec nitrogen --restore

@@ -88,7 +88,6 @@ findutils
 firefox
 fish
 flake8
-flashplugin
 flatpak
 flex
 font-manager
@@ -153,6 +152,7 @@ iputils
 ipw2100-fw
 ipw2200-fw
 isousb
+jdk-openjdk
 jdk8-openjdk
 jfsutils
 jq
@@ -268,7 +268,6 @@ nvm
 obs-studio
 openresolv
 openssh
-orage
 os-prober
 p7zip
 pacman
@@ -306,6 +305,7 @@ qt5-quickcontrols2
 qutebrowser
 ranger
 reiserfsprogs
+rhythmbox
 ripgrep
 rofi
 rsync
@@ -326,6 +326,7 @@ sox
 spectre-meltdown-checker
 speedtest-cli
 sqlitebrowser
+steam-manjaro
 subversion
 sudo
 sysfsutils
@@ -383,7 +384,6 @@ wget
 which
 whois
 wireshark-qt
-woeusb
 wpa_supplicant
 xclip
 xcursor-chameleon-pearl-deepin
