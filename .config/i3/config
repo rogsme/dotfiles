@@ -178,11 +178,16 @@ workspace $ws3 output primary
 workspace $ws5 output primary
 workspace $ws7 output primary
 workspace $ws9 output primary
-workspace $ws2 output DP-2-1
-workspace $ws4 output DP-2-1
-workspace $ws6 output DP-2-1
-workspace $ws8 output DP-2-1
-workspace $ws10 output DP-2-1
+workspace $ws2 output HDMI1
+workspace $ws4 output HDMI1
+workspace $ws6 output HDMI1
+workspace $ws8 output HDMI1
+workspace $ws10 output HDMI1
+workspace $ws2 output HDMI-1
+workspace $ws4 output HDMI-1
+workspace $ws6 output HDMI-1
+workspace $ws8 output HDMI-1
+workspace $ws10 output HDMI-1
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
@@ -224,6 +229,12 @@ bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Shift+Print exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Ctrl+Shift+Print exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
 
+# Shortcuts
+
+bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos.xlsx
+bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
+bindsym $aux+l exec lollypop
+
 # Disable focus follows
 focus_follows_mouse no
 
@@ -245,8 +256,10 @@ assign [class="Thunderbird"] $ws5
 assign [class="Liferea"] $ws5
 for_window [class = "Spotify"] move to workspace $ws6
 assign [class="Lollypop"] $ws6
+assign [class="Clementine"] $ws6
 assign [class="Thunar"] $ws7
-assign [class="Clockify"] $ws8
+assign [class="KeePassXC"] $ws8
+assign [class="Joplin"] $ws9
 
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
@@ -263,7 +276,7 @@ exec --no-startup-id exec /usr/bin/nextcloud
 # exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
-exec --no-startup-id exec /usr/bin/librewolf
+exec --no-startup-id exec /usr/bin/brave
 exec --no-startup-id exec $terminal
 exec --no-startup-id exec /usr/bin/pasystray
 exec --no-startup-id sleep 10; exec nitrogen --restore
@@ -276,6 +289,7 @@ exec --no-startup-id exec /opt/Mullvad\ VPN/mullvad-gui --no-sandbox
 exec --no-startup-id picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id /home/roger/.config/i3/autotiling.py
+exec --no-startup-id exec /usr/bin/keepassxc
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard

@@ -287,3 +287,4 @@
 ;; Compile
 (global-set-key [f4] 'compile)
 (global-set-key [f5] 'recompile)
+(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))

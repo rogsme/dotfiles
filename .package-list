@@ -107,6 +107,7 @@ glibc
 gnome-disk-utility
 gnome-icon-theme
 gnome-keyring
+gnome-passwordsafe
 gnome-screenshot
 gnome-system-log
 gnome-system-monitor
@@ -158,6 +159,8 @@ jfsutils
 jq
 jre8-openjdk
 jre8-openjdk-headless
+keepass
+keepassxc
 kernel-alive
 kubectl
 ledger-live-bin
@@ -194,6 +197,7 @@ logrotate
 lolcat
 lollypop
 lsb-release
+lutris
 luv-icon-theme
 lvm2
 lxappearance
