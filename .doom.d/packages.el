@@ -48,13 +48,7 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
-;
-(package! whitespace-cleanup-mode)
-(package! prettier-js)
-(package! aggressive-indent)
-(package! emojify)
-(package! ghub+)
-(package! lsp-python-ms :disable t)
-(package! jenkinsfile-mode)
+
 (package! auto-virtualenv)
 (package! org-bullets)
+;; (package! lsp-python-ms :disable t)
