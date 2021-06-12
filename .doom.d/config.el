@@ -216,3 +216,5 @@
   ;; (setq lsp-pyls-configuration-sources "pep8")
   ;; (add-hook 'before-save-hook 'lsp-format-buffer)
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
+
+(add-hook 'prog-mode-hook (lambda () (symbol-overlay-mode t)))
