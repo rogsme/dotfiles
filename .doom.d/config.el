@@ -109,6 +109,7 @@
 ;; Removes mouse from code
 ;; (mouse-avoidance-mode "animate")
 
+
 ;; Org Mode
 (after! org
   ;; Include diary
@@ -129,7 +130,8 @@
                   ( "WAIT" (:background "red" :weight bold))
                   ( "SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
                   ( "DONE" . (:foreground "white" :background "forest green" :weight bold))
-                  ( "CANCELLED" . (:foreground "light gray" :slant italic))));; Priorities
+                  ( "CANCELLED" . (:foreground "light gray" :slant italic))))
+  ;; Priorities
   ;; A: Do it now
   ;; B: Decide when to do it
   ;; C: Delegate it
@@ -141,6 +143,7 @@
                              (?B . (:foreground "white" :background "dark green" :weight bold))
                              (?C . (:foreground "yellow"))
                              (?D . (:foreground "gray"))))
+
   ;; Capture templates
   (setq org-capture-templates
         (quote
@@ -153,39 +156,16 @@
           ("ps" "Scheduled" entry
            (file+headline "~/org/personal.org" "Captured")
            (file "~/org/templates/scheduled-task.txt"))
-          ("pl" "Logbook entry for Personal" entry (file+datetree "logbook-personal.org") "** %U - %^{Activity} :LOG:")
-          ;; Massive templates
-          ("m" "Templates for Massive")
-          ("mc" "Templates for CocaCola")
-          ("mcr" "Non-scheduled" entry
-           (file+headline "~/org/Massive/CocaCola/cocacola.org" "Captured")
-           (file "~/org/templates/basic-task.txt"))
-          ("mcs" "Scheduled" entry
-           (file+headline "~/org/Massive/CocaCola/cocacola.org" "Captured")
-           (file "~/org/templates/scheduled-task.txt"))
-          ("mcm" "New daily meeting" entry
-           (file+datetree "~/org/Massive/CocaCola/coca-dailies.org")
-           (file "~/org/templates/meeting.txt"))
-          ("mck" "New Kafein mistake" entry
-           (file+datetree "~/org/Massive/CocaCola/kafein-errors.org")
-           (file "~/org/templates/kafein-errors.txt"))
-          ("ml" "Logbook entry for Massive" entry (file+datetree "logbook-work.org") "** %U - %^{Activity} :LOG:")
-          ;; Tarmac templates
-          ("t" "Templates for Tarmac")
-          ("tv" "Templates for Volition")
-          ("tvr" "Non-scheduled" entry
+          ("pl" "Logbook entry for Personal" entry (file+olp+datetree "logbook-personal.org") "** %U - %^{Tags}\n%?")
+          ;; Lazer templates
+          ("l" "Templates for Lazer")
+          ("lc" "Templates for Certn")
+          ("lct" "Tasks" entry
            (file+headline "~/org/Tarmac/Volition/volition.org" "Captured")
            (file "~/org/templates/basic-task.txt"))
-          ("tvs" "Scheduled" entry
-           (file+headline "~/org/Tarmac/Volition/volition.org" "Captured")
-           (file "~/org/templates/scheduled-task.txt"))
-          ("tvt" "New standup" entry
-           (file+datetree "~/org/Tarmac/Volition/standups.org")
-           (file "~/org/templates/standup.txt"))
-          ("tve" "New EOD email" entry
-           (file+datetree "~/org/Tarmac/Volition/eod-emails.org")
-           (file "~/org/templates/tarmac-eod-email-template.txt"))
-          ("tl" "Logbook entry for Tarmac" entry (file+datetree "~/org/Tarmac/logbook-tarmac.org") "** %U - %^{Activity} :LOG:")
+          ("lcs" "Spike" entry (file certn/new-spike)  (file "~/org/templates/spike.txt"))
+          ("lcl" "Logbook entry for Certn" entry (file+olp+datetree "~/org/Lazer/Certn/logbook-certn.org") "** %U - %^{Tags}\n%?")
+          ("ll" "Logbook entry for Lazer" entry (file+olp+datetree "~/org/Lazer/logbook-lazer.org") "** %U - %^{Tags}\n%?")
           )))
   ;; Enforce ordered tasks
   (setq org-enforce-todo-dependencies t)
@@ -209,12 +189,23 @@
 (require 'auto-virtualenv)
 (after! python
   :init
-  ;; (setq lsp-pyls-plugins-pylint-enabled t)
-  ;; (setq lsp-pyls-plugins-autopep8-enabled nil)
-  ;; (setq lsp-pyls-plugins-pyflakes-enabled nil)
-  ;; (setq lsp-pyls-plugins-pycodestyle-enabled nil)
-  ;; (setq lsp-pyls-configuration-sources "pep8")
-  ;; (add-hook 'before-save-hook 'lsp-format-buffer)
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
 
 (add-hook 'prog-mode-hook (lambda () (symbol-overlay-mode t)))
+(setq enable-local-variables :all)
+
+;; (use-package python-pytest
+;;  :custom
+;;  (python-pytest-executable "/home/roger/code/lazer/certn/api_server/.docker-python-tests.sh"))
+(elpy-enable)
+(after! elpy
+  (set-company-backend! 'elpy-mode
+    '(elpy-company-backend :with company-files company-yasnippet)))
+(setq elpy-rpc-timeout 10)
+
+
+(defun certn/new-spike ()
+  "Create a new org spike in ~/org/Lazer/Certn/."
+  (interactive)
+  (let ((name (read-string "Ticket: ")))
+    (expand-file-name (format "%s.org" name) "~/org/Lazer/Certn/Spikes")))

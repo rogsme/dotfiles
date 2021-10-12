@@ -28,7 +28,7 @@ with open(f"{home}.config/polybar/coins.svg", "r", encoding="utf-8") as icons:
 
 for coin in args.coins:
     get = requests.get(
-        f"https://api.coinranking.com/v1/public/coins?prefix={coin}&base={args.base}").json()["data"]
+        f"https://api.coinranking.com/v1/public/coins?prefix={coin}&base={args.base}&x-access-token=i-have-to-migrate-to-v2").json()["data"]
     price_float = round(float(get["coins"][0]["price"]), args.decimals)
     current_price = get["base"]["sign"] + str(price_float)
     change = get["coins"][0]["change"]
