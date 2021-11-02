@@ -202,6 +202,7 @@
   (set-company-backend! 'elpy-mode
     '(elpy-company-backend :with company-files company-yasnippet)))
 (setq elpy-rpc-timeout 10)
+(remove-hook 'elpy-modules 'elpy-module-flymake)
 
 
 (defun certn/new-spike ()
@@ -209,3 +210,4 @@
   (interactive)
   (let ((name (read-string "Ticket: ")))
     (expand-file-name (format "%s.org" name) "~/org/Lazer/Certn/Spikes")))
+
