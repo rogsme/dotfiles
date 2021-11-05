@@ -267,7 +267,7 @@ for_window [urgent=latest] focus
 
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
-# exec --no-startup-id exec /usr/bin/nextcloud
+exec --no-startup-id exec /usr/bin/nextcloud --background
 # exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec /usr/bin/emacs
