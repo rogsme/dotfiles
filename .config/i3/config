@@ -29,7 +29,7 @@ font pango:DejaVu Sans Mono 8
 
 # xss-lock grabs a logind suspend inhibit lock and will use i3lock to lock the
 # screen before suspend. Use loginctl lock-session to lock your screen.
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
+exec --no-startup-id xss-lock --transfer-sleep-lock ~/.config/i3/i3lock_script.sh
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
@@ -82,8 +82,8 @@ bindsym $mod+Shift+q kill
 # start rofi (a program launcher)
 bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
 
-# start bw-rofi (a rofi frontend for bitwarden)
-bindsym $mod+p exec --no-startup-id "bwpyro -c -1 -w logins"
+# start kpmenu (a rofi frontend for keepass)
+bindsym $mod+p exec --no-startup-id "kpmenu -d ~/Passwords/Passwords.kdbx -m rofi"
 
 # change focus
 bindsym $mod+h focus left
@@ -146,6 +146,7 @@ set $ws7 "7: all"
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
+set $ws11 "11"
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -158,6 +159,7 @@ bindsym $mod+7 workspace number $ws7
 bindsym $mod+8 workspace number $ws8
 bindsym $mod+9 workspace number $ws9
 bindsym $mod+0 workspace number $ws10
+bindsym $mod+$aux+0 workspace number $ws11
 
 # move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace number $ws1
@@ -170,6 +172,7 @@ bindsym $mod+Shift+7 move container to workspace number $ws7
 bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
+bindsym $mod+$aux+Shift+0 move container to workspace number $ws11
 
 workspace $ws1 output primary
 workspace $ws3 output primary
@@ -194,8 +197,8 @@ set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) re
 mode "$mode_system" {
     bindsym l exec --no-startup-id $Locker, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
-    bindsym s exec --no-startup-id $Locker && systemctl suspend, mode "default"
-    bindsym h exec --no-startup-id $Locker && systemctl hibernate, mode "default"
+    bindsym s exec --no-startup-id systemctl suspend, mode "default"
+    bindsym h exec --no-startup-id systemctl hibernate, mode "default"
     bindsym r exec --no-startup-id systemctl reboot, mode "default"
     bindsym Shift+s exec --no-startup-id systemctl poweroff -i, mode "default"
 
@@ -219,14 +222,14 @@ bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 bindsym $aux+Shift+e exec setxkbmap es
 bindsym $aux+Shift+u exec setxkbmap us
 
-# Screnshots
+# Screenshots
 bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
-bindsym --release Shift+Print exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
-bindsym --release Ctrl+Shift+Print exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
+bindsym --release Shift+F12 exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
+bindsym --release Ctrl+Shift+F12 exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
 
 # Shortcuts
 
-bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos.xlsx
+bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos.ods
 bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
 bindsym $aux+l exec lollypop
 
@@ -246,8 +249,10 @@ assign [class="Telegram"] $ws4
 assign [class="Keybase"] $ws4
 assign [class="Ferdi"] $ws4
 assign [class="Signal"] $ws4
+assign [class="SchildiChat"] $ws4
 assign [class="Evolution"] $ws5
 assign [class="Thunderbird"] $ws5
+assign [class="Mailspring"] $ws5
 assign [class="Liferea"] $ws5
 for_window [class = "Spotify"] move to workspace $ws6
 assign [class="Lollypop"] $ws6
@@ -267,10 +272,11 @@ for_window [urgent=latest] focus
 
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
+# exec --no-startup-id exec /usr/bin/mailspring
 exec --no-startup-id exec /usr/bin/nextcloud --background
 # exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
-exec --no-startup-id exec /usr/bin/emacs
+exec --no-startup-id exec emacsclient -c -a emacs
 exec --no-startup-id exec /usr/bin/brave
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
@@ -285,6 +291,9 @@ exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec /usr/bin/keepassxc
+exec --no-startup-id exec /usr/bin/joplin-desktop
+exec --no-startup-id exec /usr/bin/play-with-mpv
+exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard

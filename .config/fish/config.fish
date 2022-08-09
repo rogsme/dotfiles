@@ -20,12 +20,13 @@ alias doom='$HOME/.emacs.d/bin/doom'
 alias ls='exa -la --color=always --group-directories-first'
 alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
+alias emacs="emacsclient -c -a 'emacs'"
 
 source "$HOME/.config/fish/abbreviations.fish"
 
 # tabtab source for packages
 # uninstall by removing these lines
-[ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
+# [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end

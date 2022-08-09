@@ -54,4 +54,10 @@
 (package! idle-highlight-mode)
 (package! symbol-overlay)
 (package! elpy)
+(package! groovy-mode)
+(package! org-recur)
+(package! ox-gfm)
+(package! ox-clip)
+(package! dashboard)
+
 ;; (package! lsp-python-ms :disable t)

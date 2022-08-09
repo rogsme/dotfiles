@@ -9,7 +9,6 @@
  * User: rogs
  * Copyright: Roger Gonzalez
  */
-
 * {
     selected-normal-foreground:  rgba ( 51, 51, 51, 100 % );
     foreground:                  #75D85A;
@@ -20,16 +19,16 @@
     blue:                        rgba ( 38, 139, 210, 100 % );
     urgent-foreground:           rgba ( 255, 153, 153, 100 % );
     alternate-urgent-background: rgba ( 255, 255, 255, 7 % );
-    active-foreground:           #498C3A;
+    active-foreground:           #118200;
     lightbg:                     rgba ( 238, 232, 213, 100 % );
     selected-active-foreground:  rgba ( 51, 51, 51, 100 % );
     alternate-active-background: rgba ( 255, 255, 255, 7 % );
-    background:                  #000000;
+    background:                  #118200;
     bordercolor:                 rgba ( 17, 170, 170, 100 % );
     alternate-normal-foreground: @foreground;
-    normal-background:           rgba ( 0, 0, 0, 0 % );
+    normal-background:           #5fb34c;
     lightfg:                     rgba ( 88, 104, 117, 100 % );
-    selected-normal-background:  #41D315;
+    selected-normal-background:  #74ff00;
     border-color:                @foreground;
     spacing:                     2;
     separatorcolor:              rgba ( 17, 170, 170, 100 % );
@@ -39,7 +38,8 @@
     background-color:            rgba ( 0, 0, 0, 0 % );
     alternate-active-foreground: @active-foreground;
     active-background:           rgba ( 0, 0, 0, 0 % );
-    selected-active-background:  #41D315;
+    active-background:           #41D315;
+    selected-active-background:  #74ff00;
 }
 #window {
     background-color: @background;
@@ -94,7 +94,7 @@
     background-color: @selected-active-background;
     text-color:       @selected-active-foreground;
 }
-#element.alternate.normal {
+#element alternate.normal {
     background-color: @alternate-normal-background;
     text-color:       @alternate-normal-foreground;
 }

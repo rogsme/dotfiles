@@ -9,6 +9,13 @@
 (setq user-full-name "Roger Gonzalez"
       user-mail-address "roger@rogs.me")
 
+;; Add custom packages
+(add-to-list 'load-path "~/.doom.d/custom-packages")
+
+;; Load custom packages
+(require 'screenshot)
+(require 'ox-slack)
+
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
 ;;
@@ -22,9 +29,12 @@
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
 
-(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
+;; (setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
+;;       doom-variable-pitch-font (font-spec :family "sans")
+;;       doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
+(setq doom-font (font-spec :family "MesloLGS NF" :size 14)
       doom-variable-pitch-font (font-spec :family "sans")
-      doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
+      doom-big-font (font-spec :family "MesloLGS NF" :size 24))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -35,7 +45,11 @@
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
-(setq doom-theme 'doom-oceanic-next)
+(setq doom-theme 'doom-badger) ;; obscuro, chulo
+;; (setq doom-theme 'doom-oceanic-next) ;; primero original
+;; (setq doom-theme 'doom-henna) ;; mucho verde + rojo. tambien ta bueno
+;; (setq doom-theme 'doom-moonlight) ;; mucho morado. no esta mal
+;; (setq doom-theme 'doom-tomorrow-night) ;; parecido a badger, sin integracion con ORG
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -116,21 +130,29 @@
   (setq org-agenda-include-diary t)
   ;; Logs
   (setq org-log-state-notes-insert-after-drawers nil
-        org-log-into-drawer t
+        org-log-into-drawer "LOGBOOK"
         org-log-done 'time
         org-log-repeat 'time
         org-log-redeadline 'note
         org-log-reschedule 'note)
   ;; Keyword and faces
   (setq-default org-todo-keywords
-                '((sequence "TODO(t!)" "IN_PROGRESS(i!)" "WAIT(w@/!)" "SOMEDAY(s!)" "|" "DONE(d@/!)" "CANCELLED(c@/!)")))
+                '((sequence "REPEAT(r)" "NEXT(n@/!)" "DELEGATED(e@/!)" "TODO(t@/!)" "WAITING(w@/!)" "SOMEDAY(s@/!)" "PROJ(p)" "|" "DONE(d@)" "CANCELLED(c@/!)" "FORWARDED(f@)")))
   (setq-default org-todo-keyword-faces
-                '(( "TODO" . (:foreground "white" :background "darkorchid4" :weight bold))
-                  ( "IN_PROGRESS" . (:background "deeppink3" :weight bold))
-                  ( "WAIT" (:background "red" :weight bold))
+                '(
+                  ( "REPEAT" . (:foreground "white" :background "indigo" :weight bold))
+                  ( "NEXT" . (:foreground "red" :background "orange" :weight bold))
+                  ( "DELEGATED" . (:foreground "white" :background "blue" :weight bold))
+                  ( "TODO" . (:foreground "white" :background "violet" :weight bold))
+                  ( "WAITING" (:foreground "white" :background "#A9BE00" :weight bold))
                   ( "SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
+                  ( "PROJ" . (:foreground "white" :background "deeppink3" :weight bold))
                   ( "DONE" . (:foreground "white" :background "forest green" :weight bold))
-                  ( "CANCELLED" . (:foreground "light gray" :slant italic))))
+                  ( "CANCELLED" . (:foreground "light gray" :slant italic))
+                  ( "FORWARDED" . (:foreground "light gray" :slant italic))
+                  ))
+  (setq org-fontify-done-headline t)
+  (setq org-fontify-todo-headline t)
   ;; Priorities
   ;; A: Do it now
   ;; B: Decide when to do it
@@ -143,36 +165,176 @@
                              (?B . (:foreground "white" :background "dark green" :weight bold))
                              (?C . (:foreground "yellow"))
                              (?D . (:foreground "gray"))))
-
   ;; Capture templates
   (setq org-capture-templates
         (quote
          (
-          ;; Personal templates
-          ("p" "Templates for personal")
-          ("pr" "Non-scheduled" entry
-           (file+headline "~/org/personal.org" "Captured")
-           (file "~/org/templates/basic-task.txt"))
-          ("ps" "Scheduled" entry
-           (file+headline "~/org/personal.org" "Captured")
-           (file "~/org/templates/scheduled-task.txt"))
-          ("pl" "Logbook entry for Personal" entry (file+olp+datetree "logbook-personal.org") "** %U - %^{Tags}\n%?")
-          ;; Lazer templates
-          ("l" "Templates for Lazer")
-          ("lc" "Templates for Certn")
-          ("lct" "Tasks" entry
-           (file+headline "~/org/Tarmac/Volition/volition.org" "Captured")
-           (file "~/org/templates/basic-task.txt"))
-          ("lcs" "Spike" entry (file certn/new-spike)  (file "~/org/templates/spike.txt"))
-          ("lcl" "Logbook entry for Certn" entry (file+olp+datetree "~/org/Lazer/Certn/logbook-certn.org") "** %U - %^{Tags}\n%?")
-          ("ll" "Logbook entry for Lazer" entry (file+olp+datetree "~/org/Lazer/logbook-lazer.org") "** %U - %^{Tags}\n%?")
+          ("G" "Define a goal" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/goal.org"))
+          ("R" "REPEAT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/repeat.org"))
+          ("N" "NEXT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/next.org"))
+          ("T" "TODO entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/todo.org"))
+          ("W" "WAITING entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/waiting.org"))
+          ("S" "SOMEDAY entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/someday.org"))
+          ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/proj.org"))
+          ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org"))
+          ("p" "Create a daily plan")
+          ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
+          ("pW" "Daily plan work" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
+          ("j" "Journal entry")
+          ("jP" "Journal entry private private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
+          ("jW" "Journal entry work " entry (file+olp+datetree "~/org/journal-work.org") "** %U - %^{Heading}")
+          ("d" "Create a deployment")
+          ("dF" "Deploy features" plain (file+olp+datetree "~/org/deploy-features.org") (file "~/org/templates/deployment.org"))
+          ("dB" "Deploy bugs" plain (file+olp+datetree "~/org/deploy-bugs.org") (file "~/org/templates/deployment.org"))
           )))
+  ;; Custom agenda views
+  (setq org-agenda-custom-commands
+        (quote
+         (
+          ("A" . "Agendas")
+          ("AT" "Daily overview"
+           ((tags-todo "URGENT"
+                       ((org-agenda-overriding-header "Urgent Tasks")))
+            (tags-todo "RADAR"
+                       ((org-agenda-overriding-header "On my radar")))
+            (tags-todo "PHONE+TODO=\"NEXT\""
+                       ((org-agenda-overriding-header "Phone Calls")))
+            (tags-todo "COMPANY"
+                       ((org-agenda-overriding-header "Cuquitoni")))
+            (tags-todo "SHOPPING"
+                       ((org-agenda-overriding-header "Shopping")))
+            (tags-todo "Depth=\"Deep\"/NEXT"
+                       ((org-agenda-overriding-header "Next Actions requiring deep work")))
+            (agenda ""
+                    ((org-agenda-overriding-header "Today")
+                     (org-agenda-span 1)
+                     (org-agenda-start-day "1d")
+                     (org-agenda-sorting-strategy
+                      (quote
+                       (time-up priority-down)))))
+            nil nil))
+          ("AW" "Weekly overview" agenda ""
+           ((org-agenda-overriding-header "Weekly overview")))
+          ("AM" "Monthly overview" agenda ""
+           ((org-agenda-overriding-header "Monthly overview"))
+           (org-agenda-span
+            (quote month))
+           (org-deadline-warning-days 0)
+           (org-agenda-sorting-strategy
+            (quote
+             (time-up priority-down tag-up))))
+          ("W" . "Weekly Review Helper")
+          ("Wn" "New tasks" tags "NEW"
+           ((org-agenda-overriding-header "NEW Tasks")))
+          ("Wd" "Check DELEGATED tasks" todo "DELEGATED"
+           ((org-agenda-overriding-header "DELEGATED tasks")))
+          ("Ww" "Check WAITING tasks" todo "WAITING"
+           ((org-agenda-overriding-header "WAITING tasks")))
+          ("Ws" "Check SOMEDAY tasks" todo "SOMEDAY"
+           ((org-agenda-overriding-header "SOMEDAY tasks")))
+          ("Wf" "Check finished tasks" todo "DONE|CANCELLED|FORWARDED"
+           ((org-agenda-overriding-header "Finished tasks")))
+          ("WP" "Planing ToDos (unscheduled) only" todo "TODO|NEXT"
+           ((org-agenda-overriding-header "To plan")
+            (org-agenda-skip-function
+             (quote
+              (org-agenda-skip-entry-if
+               (quote scheduled)
+               (quote deadline)))))))
+         ))
+  ;;
   ;; Enforce ordered tasks
   (setq org-enforce-todo-dependencies t)
   (setq org-enforce-todo-checkbox-dependencies t)
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  (setq org-track-ordered-property-with-tag t)
 
+  ;; Org bullets
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+
+  ;; Org recur
+  (use-package org-recur
+    :hook ((org-mode . org-recur-mode)
+           (org-agenda-mode . org-recur-agenda-mode))
+    :demand t
+    :config
+    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+
+    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
+    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
+    (define-key org-recur-agenda-mode-map (kbd "C-c 0") 'org-recur-schedule-today)
+
+    (setq org-recur-finish-done t
+          org-recur-finish-archive t))
+
+  ;; Truncate lines to 105 chars
+  ;; Why 105 chars? Because that's the max my screen can handle on vertical split
+  (add-hook 'org-mode-hook #'auto-fill-mode)
+  (setq-default fill-column 105)
+
+  ;; Custom ORG functions
+  ;; Refresh org-agenda after rescheduling a task.
+  (defun org-agenda-refresh ()
+    "Refresh all `org-agenda' buffers."
+    (dolist (buffer (buffer-list))
+      (with-current-buffer buffer
+        (when (derived-mode-p 'org-agenda-mode)
+          (org-agenda-maybe-redo)))))
+
+  (defadvice org-schedule (after refresh-agenda activate)
+    "Refresh org-agenda."
+    (org-agenda-refresh))
+
+  (defun org-focus-private() "Set focus on private things."
+         (interactive)
+         (setq org-agenda-files '("~/org/private.org")))
+  (defun org-focus-work() "Set focus on work things."
+         (interactive)
+         (setq org-agenda-files '("~/org/work.org")))
+  (defun org-focus-all() "Set focus on all things."
+         (interactive)
+         (setq org-agenda-files '("~/org/")))
+  (defun my/org-add-ids-to-headlines-in-file ()
+    "Add ID properties to all headlines in the current file which
+do not already have one."
+    (interactive)
+    (org-map-entries 'org-id-get-create))
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (add-hook 'before-save-hook
+                        'my/org-add-ids-to-headlines-in-file nil 'local)))
+  (defun my/copy-idlink-to-clipboard() "Copy an ID link with the
+headline to killring, if no ID is there then create a new unique
+ID.  This function works only in org-mode or org-agenda buffers.
+
+The purpose of this function is to easily construct id:-links to
+org-mode items. If its assigned to a key it saves you marking the
+text and copying to the killring."
+         (interactive)
+         (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
+           (org-agenda-show)
+           (org-agenda-goto))
+         (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+           (setq mytmphead (nth 4 (org-heading-components)))
+           (setq mytmpid (funcall 'org-id-get-create))
+           (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
+           (kill-new mytmplink)
+           (message "Copied %s to killring (clipboard)" mytmplink)
+           ))
+
+  (global-set-key (kbd "<f5>") 'my/copy-idlink-to-clipboard)
+
+  (defun org-reset-checkbox-state-maybe ()
+    "Reset all checkboxes in an entry if the `RESET_CHECK_BOXES' property is set"
+    (interactive "*")
+    (if (org-entry-get (point) "RESET_CHECK_BOXES")
+        (org-reset-checkbox-state-subtree)))
+
+  (defun org-checklist ()
+    (when (member org-state org-done-keywords) ;; org-state dynamically bound in org.el/org-todo
+      (org-reset-checkbox-state-maybe)))
+
+  (add-hook 'org-after-todo-state-change-hook 'org-checklist))
 
 ;; My own menu
 (map! :leader
@@ -211,3 +373,20 @@
   (let ((name (read-string "Ticket: ")))
     (expand-file-name (format "%s.org" name) "~/org/Lazer/Certn/Spikes")))
 
+;; Dashboard mode
+(use-package dashboard
+  :init      ;; tweak dashboard config before loading it
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-center-content nil) ;; set to 't' for centered content
+  (setq dashboard-items '((recents . 5)
+                          (agenda . 5)
+                          (bookmarks . 5)
+                          (projects . 5)))
+  (setq dashboard-set-navigator t)
+  :config
+  (dashboard-setup-startup-hook)
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book"))))
+(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+(setq doom-fallback-buffer-name "*dashboard*")
