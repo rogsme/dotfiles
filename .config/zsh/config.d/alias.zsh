@@ -21,7 +21,7 @@ alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias prometeo="cd ~/code/prometeo/prometeo"
-alias prometeo-vpn="sudo wg-quick down wg0 && mullvad disconnect && sudo wg-quick up wg0"
+alias prometeo-vpn="sudo wg-quick down wg0 || true && mullvad disconnect && sudo wg-quick up wg0"
 
 # GIT
 alias gcd="git checkout develop"

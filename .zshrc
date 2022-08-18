@@ -33,6 +33,7 @@ fi
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(
+    # zsh-syntax-highlighting
     fast-syntax-highlighting
     zsh-autosuggestions
     zsh-nvm
@@ -62,4 +63,6 @@ unset conf
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-ZSH_AUTOSUGGEST_STRATEGY=(completion match_prev_cmd)
+ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#555555"
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern regexp cursor root line)
