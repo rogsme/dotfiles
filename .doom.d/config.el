@@ -45,11 +45,7 @@
 (custom-set-faces!
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
-(setq doom-theme 'doom-badger) ;; obscuro, chulo
-;; (setq doom-theme 'doom-oceanic-next) ;; primero original
-;; (setq doom-theme 'doom-henna) ;; mucho verde + rojo. tambien ta bueno
-;; (setq doom-theme 'doom-moonlight) ;; mucho morado. no esta mal
-;; (setq doom-theme 'doom-tomorrow-night) ;; parecido a badger, sin integracion con ORG
+(setq doom-theme 'doom-badger)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -120,10 +116,6 @@
   (interactive)
   (helm-other-buffer '(helm-httpstatus-source) "*helm httpstatus*"))
 
-;; Removes mouse from code
-;; (mouse-avoidance-mode "animate")
-
-
 ;; Org Mode
 (after! org
   ;; Include diary
@@ -169,14 +161,14 @@
   (setq org-capture-templates
         (quote
          (
-          ("G" "Define a goal" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/goal.org"))
-          ("R" "REPEAT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/repeat.org"))
-          ("N" "NEXT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/next.org"))
-          ("T" "TODO entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/todo.org"))
-          ("W" "WAITING entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/waiting.org"))
-          ("S" "SOMEDAY entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/someday.org"))
-          ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/proj.org"))
-          ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org"))
+          ("G" "Define a goal" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/goal.org") :empty-lines-after 2)
+          ("R" "REPEAT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/repeat.org") :empty-lines-before 2)
+          ("N" "NEXT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/next.org") :empty-lines-before 2)
+          ("T" "TODO entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/todo.org") :empty-lines-before 2)
+          ("W" "WAITING entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/waiting.org") :empty-lines-before 2)
+          ("S" "SOMEDAY entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/someday.org") :empty-lines-before 2)
+          ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/proj.org") :empty-lines-before 2)
+          ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
           ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
           ("pW" "Daily plan work" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
@@ -294,6 +286,7 @@
   (defun org-focus-all() "Set focus on all things."
          (interactive)
          (setq org-agenda-files '("~/org/")))
+
   (defun my/org-add-ids-to-headlines-in-file ()
     "Add ID properties to all headlines in the current file which
 do not already have one."
@@ -334,17 +327,21 @@ text and copying to the killring."
     (when (member org-state org-done-keywords) ;; org-state dynamically bound in org.el/org-todo
       (org-reset-checkbox-state-maybe)))
 
-  (add-hook 'org-after-todo-state-change-hook 'org-checklist))
+  (add-hook 'org-after-todo-state-change-hook 'org-checklist)
+
+  ;; Save all org buffers on each save
+  (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+  (add-hook 'after-save-hook 'org-save-all-org-buffers))
 
 ;; My own menu
 (map! :leader
       (:prefix-map ("a" . "applications")
-       ;; ispell
-       :desc "Open vterm" "v" #'vterm
-       :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus
-       :desc "Run ispell" "i" #'ispell
-       ))
-
+       :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus)
+      (:prefix-map ("ao" . "org")
+       :desc "Org focus work" "w" #'org-focus-work
+       :desc "Org focus private" "p" #'org-focus-private
+       :desc "Org focus all" "a" #'org-focus-all
+      ))
 
 ;; Python
 
@@ -356,9 +353,6 @@ text and copying to the killring."
 (add-hook 'prog-mode-hook (lambda () (symbol-overlay-mode t)))
 (setq enable-local-variables :all)
 
-;; (use-package python-pytest
-;;  :custom
-;;  (python-pytest-executable "/home/roger/code/lazer/certn/api_server/.docker-python-tests.sh"))
 (elpy-enable)
 (after! elpy
   (set-company-backend! 'elpy-mode
@@ -367,11 +361,13 @@ text and copying to the killring."
 (remove-hook 'elpy-modules 'elpy-module-flymake)
 
 
-(defun certn/new-spike ()
-  "Create a new org spike in ~/org/Lazer/Certn/."
-  (interactive)
-  (let ((name (read-string "Ticket: ")))
-    (expand-file-name (format "%s.org" name) "~/org/Lazer/Certn/Spikes")))
+;; Create new spikes, saved for later
+;; (defun certn/new-spike ()
+;;   "Create a new org spike in ~/org/Lazer/Certn/."
+;;   (interactive)
+;;   (let ((name (read-string "Ticket: ")))
+;;     (expand-file-name (format "%s.org" name) "~/org/Lazer/Certn/Spikes")))
+
 
 ;; Dashboard mode
 (use-package dashboard
@@ -380,7 +376,6 @@ text and copying to the killring."
   (setq dashboard-set-file-icons t)
   (setq dashboard-center-content nil) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
-                          (agenda . 5)
                           (bookmarks . 5)
                           (projects . 5)))
   (setq dashboard-set-navigator t)
@@ -390,3 +385,16 @@ text and copying to the killring."
                                     (bookmarks . "book"))))
 (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
 (setq doom-fallback-buffer-name "*dashboard*")
+
+(defun my/html2org-clipboard ()
+  "Convert clipboard contents from HTML to Org and then paste (yank)."
+  (interactive)
+  (kill-new (shell-command-to-string "timeout 1 xclip -selection clipboard -o -t text/html | pandoc -f html -t json | pandoc -f json -t org --wrap=none"))
+  (yank)
+  (message "Pasted HTML in org"))
+(define-key org-mode-map (kbd "<f4>") 'my/html2org-clipboard)
+
+;; Clipmon as emacs clipboard manager
+(global-set-key (kbd "M-y") 'helm-show-kill-ring)
+(add-to-list 'after-init-hook 'clipmon-mode-start)
+(setq clipmon-timer-interval 1)

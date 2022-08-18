@@ -59,5 +59,6 @@
 (package! ox-gfm)
 (package! ox-clip)
 (package! dashboard)
+(package! clipmon)
 
 ;; (package! lsp-python-ms :disable t)
