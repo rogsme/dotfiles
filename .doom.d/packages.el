@@ -60,5 +60,6 @@
 (package! ox-clip)
 (package! dashboard)
 (package! clipmon)
+(package! butler)
 
 ;; (package! lsp-python-ms :disable t)

@@ -15,6 +15,7 @@
 ;; Load custom packages
 (require 'screenshot)
 (require 'ox-slack)
+(require 'deferred)
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -170,14 +171,14 @@
           ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/proj.org") :empty-lines-before 2)
           ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
-          ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
-          ("pW" "Daily plan work" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t)
+          ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
+          ("pW" "Daily plan work" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("j" "Journal entry")
           ("jP" "Journal entry private private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
           ("jW" "Journal entry work " entry (file+olp+datetree "~/org/journal-work.org") "** %U - %^{Heading}")
           ("d" "Create a deployment")
-          ("dF" "Deploy features" plain (file+olp+datetree "~/org/deploy-features.org") (file "~/org/templates/deployment.org"))
-          ("dB" "Deploy bugs" plain (file+olp+datetree "~/org/deploy-bugs.org") (file "~/org/templates/deployment.org"))
+          ("dF" "Deploy features" plain (file+olp+datetree "~/org/deploy-features.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
+          ("dB" "Deploy bugs" plain (file+olp+datetree "~/org/deploy-bugs.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
           )))
   ;; Custom agenda views
   (setq org-agenda-custom-commands
@@ -348,10 +349,8 @@ text and copying to the killring."
 (require 'auto-virtualenv)
 (after! python
   :init
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv))
-
-(add-hook 'prog-mode-hook (lambda () (symbol-overlay-mode t)))
-(setq enable-local-variables :all)
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+  (setq enable-local-variables :all))
 
 (elpy-enable)
 (after! elpy
@@ -359,6 +358,21 @@ text and copying to the killring."
     '(elpy-company-backend :with company-files company-yasnippet)))
 (setq elpy-rpc-timeout 10)
 (remove-hook 'elpy-modules 'elpy-module-flymake)
+
+(use-package flycheck
+  :config
+  (setq-default flycheck-disabled-checkers '(python-pylint)))
+
+;; LSP config
+(after! lsp-mode
+  (setq lsp-diagnostic-package :none)
+  (setq lsp-headerline-breadcrumb-enable t)
+  (setq lsp-headerline-breadcrumb-icons-enable t))
+
+(after! lsp-ui
+  (setq lsp-ui-doc-enable t))
+
+;; (add-hook 'prog-mode-hook (lambda () (symbol-overlay-mode t)))
 
 
 ;; Create new spikes, saved for later
@@ -397,4 +411,21 @@ text and copying to the killring."
 ;; Clipmon as emacs clipboard manager
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (add-to-list 'after-init-hook 'clipmon-mode-start)
+(defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
 (setq clipmon-timer-interval 1)
+
+;; Jenkins
+(require 'butler)
+(add-to-list 'butler-server-list
+             '(jenkins "prometeo-jenkins"
+                       (server-address . "http://jenkins.prometeoapi")
+                       (auth-file . "~/.authinfo.gpg")))
+
+(defun my/jenkins-verify ()
+  "Check if my current Jenkinsfile has the correct format"
+  (interactive)
+  (projectile-with-default-dir (projectile-acquire-root)
+    (message (shell-command-to-string "/usr/bin/python ~/.doom.d/scripts/check_jenkinsfile.py"))))
+
+(after! groovy-mode
+  (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
