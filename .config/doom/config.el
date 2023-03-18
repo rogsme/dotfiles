@@ -172,11 +172,13 @@
           ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
           ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
-          ("pW" "Daily plan prometeo" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
+          ("pW" "Daily plan Prometeo" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
+          ("pX" "Daily plan X-Team" plain (file+olp+datetree "~/org/plan-xteam.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("j" "Journal entry")
-          ("jP" "Journal entry private private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
-          ("jW" "Journal entry work " entry (file+olp+datetree "~/org/journal-work.org") "** %U - %^{Heading}")
-          ("d" "Create a deployment")
+          ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
+          ("jW" "Journal entry work" entry (file+olp+datetree "~/org/journal-work.org") "** %U - %^{Heading}")
+          ("jX" "Journal entry X-Team" entry (file+olp+datetree "~/org/journal-xteam.org") "** %U - %^{Heading}")
+          ("d" "Create a Prometeo deployment")
           ("dF" "Deploy features" plain (file+olp+datetree "~/org/deploy-features.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
           ("dB" "Deploy bugs" plain (file+olp+datetree "~/org/deploy-bugs.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
           )))
@@ -286,6 +288,10 @@
          (interactive)
          (setq org-agenda-files '("~/org/work.org"))
          (message "Focusing on work Org files"))
+  (defun org-focus-xteam() "Set focus on X-Team things."
+         (interactive)
+         (setq org-agenda-files '("~/org/xteam.org"))
+         (message "Focusing on X-Team Org files"))
   (defun org-focus-all() "Set focus on all things."
          (interactive)
          (setq org-agenda-files '("~/org/"))
@@ -343,6 +349,7 @@ text and copying to the killring."
        :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus)
       (:prefix-map ("ao" . "org")
        :desc "Org focus work" "w" #'org-focus-work
+       :desc "Org focus X-Team" "x" #'org-focus-xteam
        :desc "Org focus private" "p" #'org-focus-private
        :desc "Org focus all" "a" #'org-focus-all
       ))
