@@ -16,7 +16,7 @@ alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rm='rm -i'
 alias mv='mv -i'
 alias ..='cd ..'
-alias doom='$HOME/.emacs.d/bin/doom'
+alias doom='$HOME/.config/emacs/bin/doom'
 alias ls='exa -la --color=always --group-directories-first'
 alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
