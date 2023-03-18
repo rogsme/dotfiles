@@ -226,6 +226,7 @@ bindsym $aux+Shift+u exec setxkbmap us
 bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Shift+F12 exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Ctrl+Shift+F12 exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
+bindsym --release Ctrl+Shift+F11 exec ksnip -r -p "/tmp/image.png"
 
 # Shortcuts
 
@@ -237,7 +238,7 @@ bindsym $aux+l exec lollypop
 focus_follows_mouse no
 
 # Asign workspaces
-assign [class="Brave"] $ws1
+assign [class="Brave"] $ws10
 assign [class="LibreWolf"] $ws1
 assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
@@ -249,11 +250,12 @@ assign [class="Telegram"] $ws4
 assign [class="Keybase"] $ws4
 assign [class="Ferdi"] $ws4
 assign [class="Signal"] $ws4
-assign [class="SchildiChat"] $ws4
+assign [class="Element"] $ws4
 assign [class="Evolution"] $ws5
 assign [class="Thunderbird"] $ws5
 assign [class="Mailspring"] $ws5
-assign [class="Liferea"] $ws5
+assign [class="Liferea"] $ws9
+assign [class="NewsFlash"] $ws9
 for_window [class = "Spotify"] move to workspace $ws6
 assign [class="Lollypop"] $ws6
 assign [class="Clementine"] $ws6
@@ -277,7 +279,8 @@ exec --no-startup-id exec /usr/bin/nextcloud --background
 # exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec emacsclient -c -a emacs
-exec --no-startup-id exec /usr/bin/brave
+exec --no-startup-id exec /usr/bin/librewolf
+exec --no-startup-id exec /usr/bin/firefox
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
@@ -297,7 +300,7 @@ exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard
-bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 25 | xclip -selection clipboard && notify-send 'Copied a random password to the clipboard'"
+bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 50 | xclip -selection clipboard && notify-send 'Copied a random password to the clipboard'"
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
