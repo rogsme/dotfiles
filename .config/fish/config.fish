@@ -21,6 +21,7 @@ alias ls='exa -la --color=always --group-directories-first'
 alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
+alias ptc="pritunl-client"
 
 source "$HOME/.config/fish/abbreviations.fish"
 
