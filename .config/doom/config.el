@@ -51,6 +51,7 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
+(setq org-roam-directory "~/roam/")
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -337,11 +338,18 @@ text and copying to the killring."
     (when (member org-state org-done-keywords) ;; org-state dynamically bound in org.el/org-todo
       (org-reset-checkbox-state-maybe)))
 
-  (add-hook 'org-after-todo-state-change-hook 'org-checklist))
+  (add-hook 'org-after-todo-state-change-hook 'org-checklist)
+
+  (defun org-roam-node-insert-immediate (arg &rest args)
+  (interactive "P")
+  (let ((args (cons arg args))
+        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
+                                                  '(:immediate-finish t)))))
+    (apply #'org-roam-node-insert args)))
 
   ;; Save all org buffers on each save
-  ;; (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  ;; (add-hook 'after-save-hook 'org-save-all-org-buffers))
+  (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+  (add-hook 'after-save-hook 'org-save-all-org-buffers))
 
 ;; My own menu
 (map! :leader
