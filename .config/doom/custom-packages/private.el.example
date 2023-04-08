@@ -1,0 +1,6 @@
+;;; custom-packages/private.el -*- lexical-binding: t; -*-
+
+
+(setq chatgpt-shell-openai-key "my-openai-key")
+
+(provide 'private)
