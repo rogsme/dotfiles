@@ -16,6 +16,7 @@
 (require 'screenshot)
 (require 'ox-slack)
 (require 'deferred)
+(require 'private) ;; Private file. Generate manually
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -462,3 +463,11 @@ text and copying to the killring."
                     ("repo.or.cz" nil "repo.or.cz" forge-repoorcz-repository)
                     ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
                     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
+
+;; ChatGPT
+(require 'chatgpt-shell)
+(require 'ob-chatgpt-shell)
+(require 'ob-dall-e-shell)
+(setq chatgpt-shell-chatgpt-model-version "gpt-3.5-turbo")
+(setq chatgpt-shell-chatgpt-streaming "t")
+(setq chatgpt-shell-chatgpt-system-prompt "You are a senior Python developer in charge of maintaining a very big application")
