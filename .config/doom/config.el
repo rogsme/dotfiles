@@ -464,6 +464,10 @@ text and copying to the killring."
                     ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
                     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
 
+;; Misc
+
+(beacon-mode t)
+
 ;; ChatGPT
 (require 'chatgpt-shell)
 (require 'ob-chatgpt-shell)
@@ -471,3 +475,26 @@ text and copying to the killring."
 (setq chatgpt-shell-chatgpt-model-version "gpt-3.5-turbo")
 (setq chatgpt-shell-chatgpt-streaming "t")
 (setq chatgpt-shell-chatgpt-system-prompt "You are a senior Python developer in charge of maintaining a very big application")
+
+;; Github Copilot
+;; accept completion from copilot and fallback to company
+;; More info https://robert.kra.hn/posts/2023-02-22-copilot-emacs-setup/
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (:map copilot-completion-map
+              ("<tab>" . 'copilot-accept-completion)
+              ("TAB" . 'copilot-accept-completion)
+              ("C-TAB" . 'copilot-accept-completion-by-word)
+              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+;; PlantUML
+(setq plantuml-executable-path "/usr/bin/plantuml")
+(setq plantuml-default-exec-mode 'executable)
+(setq org-plantuml-exec-mode 'plantuml)
+(setq plantuml-server-url 'nil)
+
+(add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+(org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
+(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
+(setq org-babel-default-header-args:plantuml
+      '((:results . "verbatim") (:exports . "results") (:cache . "no")))
