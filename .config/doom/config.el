@@ -174,15 +174,10 @@
           ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
           ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
-          ("pW" "Daily plan Prometeo" plain (file+olp+datetree "~/org/plan-work.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("pX" "Daily plan X-Team" plain (file+olp+datetree "~/org/plan-xteam.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("j" "Journal entry")
           ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
-          ("jW" "Journal entry work" entry (file+olp+datetree "~/org/journal-work.org") "** %U - %^{Heading}")
           ("jX" "Journal entry X-Team" entry (file+olp+datetree "~/org/journal-xteam.org") "** %U - %^{Heading}")
-          ("d" "Create a Prometeo deployment")
-          ("dF" "Deploy features" plain (file+olp+datetree "~/org/deploy-features.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
-          ("dB" "Deploy bugs" plain (file+olp+datetree "~/org/deploy-bugs.org") (file "~/org/templates/deployment.org") :immediate-finish t :jump-to-captured t)
           )))
   ;; Custom agenda views
   (setq org-agenda-custom-commands
@@ -286,10 +281,6 @@
          (interactive)
          (setq org-agenda-files '("~/org/private.org"))
          (message "Focusing on private Org files"))
-  (defun org-focus-work() "Set focus on work things."
-         (interactive)
-         (setq org-agenda-files '("~/org/work.org"))
-         (message "Focusing on work Org files"))
   (defun org-focus-xteam() "Set focus on X-Team things."
          (interactive)
          (setq org-agenda-files '("~/org/xteam.org"))
@@ -357,7 +348,6 @@ text and copying to the killring."
       (:prefix-map ("a" . "applications")
        :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus)
       (:prefix-map ("ao" . "org")
-       :desc "Org focus work" "w" #'org-focus-work
        :desc "Org focus X-Team" "x" #'org-focus-xteam
        :desc "Org focus private" "p" #'org-focus-private
        :desc "Org focus all" "a" #'org-focus-all
@@ -403,21 +393,21 @@ text and copying to the killring."
 
 
 ;; Dashboard mode
-;;(use-package dashboard
-  ;;:init      ;; tweak dashboard config before loading it
-  ;;(setq dashboard-set-heading-icons t)
-  ;;(setq dashboard-set-file-icons t)
-  ;;(setq dashboard-center-content nil) ;; set to 't' for centered content
-  ;;(setq dashboard-items '((recents . 5)
-                          ;;(bookmarks . 5)
-                          ;;(projects . 5)))
-  ;;(setq dashboard-set-navigator t)
-  ;;:config
-  ;;(dashboard-setup-startup-hook)
-  ;;(dashboard-modify-heading-icons '((recents . "file-text")
-                                    ;;(bookmarks . "book"))))
-;;(setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
-;;(setq doom-fallback-buffer-name "*dashboard*")
+;; (use-package dashboard
+;;   :init      ;; tweak dashboard config before loading it
+;;   (setq dashboard-set-heading-icons t)
+;;   (setq dashboard-set-file-icons t)
+;;   (setq dashboard-center-content nil) ;; set to 't' for centered content
+;;   (setq dashboard-items '((recents . 5)
+;;                           (bookmarks . 5)
+;;                           (projects . 5)))
+;;   (setq dashboard-set-navigator t)
+;;   :config
+;;   (dashboard-setup-startup-hook)
+;;   (dashboard-modify-heading-icons '((recents . "file-text")
+;;                                     (bookmarks . "book"))))
+;; (setq initial-buffer-choice (lambda () (get-buffer-create "*dashboard*")))
+;; (setq doom-fallback-buffer-name "*dashboard*")
 
 (defun my/html2org-clipboard ()
   "Convert clipboard contents from HTML to Org and then paste (yank)."
@@ -432,19 +422,6 @@ text and copying to the killring."
 (add-to-list 'after-init-hook 'clipmon-mode-start)
 (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
 (setq clipmon-timer-interval 1)
-
-;; Jenkins
-(require 'butler)
-(add-to-list 'butler-server-list
-             '(jenkins "prometeo-jenkins"
-                       (server-address . "http://jenkins.prometeoapi")
-                       (auth-file . "~/.authinfo.gpg")))
-
-(defun my/jenkins-verify ()
-  "Check if my current Jenkinsfile has the correct format"
-  (interactive)
-  (projectile-with-default-dir (projectile-acquire-root)
-    (message (shell-command-to-string "/usr/bin/python ~/.doom.d/scripts/check_jenkinsfile.py"))))
 
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))

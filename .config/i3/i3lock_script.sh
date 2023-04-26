@@ -6,10 +6,10 @@
 #            |___/
 #
 keepassxc --lock
-if pidof openvpn; then
-    notify-send "Shutting down VPN"
-    pritunl-client stop r1e5vfvldadchscs
-fi
+#if pidof openvpn; then
+    #notify-send "Shutting down VPN"
+    #pritunl-client stop r1e5vfvldadchscs
+#fi
 scrot /tmp/screen.png
 xwobf -s 11 /tmp/screen.png
 i3lock -i /tmp/screen.png

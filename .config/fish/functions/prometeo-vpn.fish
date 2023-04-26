@@ -1,6 +1,0 @@
-function prometeo-vpn
-         sudo wg-quick down wg0
-         pritunl-client stop r1e5vfvldadchscs
-         mullvad disconnect
-         sudo wg-quick up wg0 
-end
