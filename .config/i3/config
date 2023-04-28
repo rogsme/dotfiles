@@ -240,6 +240,7 @@ focus_follows_mouse no
 # Asign workspaces
 assign [class="Brave"] $ws10
 assign [class="LibreWolf"] $ws1
+assign [class="firefox"] $ws1
 assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
@@ -252,16 +253,18 @@ assign [class="Ferdi"] $ws4
 assign [class="Signal"] $ws4
 assign [class="Element"] $ws4
 assign [class="Evolution"] $ws5
-assign [class="Thunderbird"] $ws5
+assign [class="thunderbird"] $ws5
 assign [class="Mailspring"] $ws5
 assign [class="Liferea"] $ws9
 assign [class="NewsFlash"] $ws9
 for_window [class = "Spotify"] move to workspace $ws6
 assign [class="Lollypop"] $ws6
 assign [class="Clementine"] $ws6
+assign [class="Sublime-music"] $ws6
 assign [class="Thunar"] $ws7
 assign [class="KeePassXC"] $ws8
 assign [class="Joplin"] $ws9
+assign [class="kdeconnect.app"] $ws9
 
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
@@ -279,7 +282,7 @@ exec --no-startup-id exec /usr/bin/nextcloud --background
 # exec --no-startup-id exec /usr/bin/evolution
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec emacsclient -c -a emacs
-exec --no-startup-id exec /usr/bin/librewolf
+# exec --no-startup-id exec /usr/bin/librewolf
 exec --no-startup-id exec /usr/bin/firefox
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
@@ -294,9 +297,9 @@ exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec /usr/bin/keepassxc
-exec --no-startup-id exec /usr/bin/joplin-desktop
 exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
+exec --no-startup-id exec /usr/bin/kdeconnect-app
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard
