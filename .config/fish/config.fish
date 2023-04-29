@@ -4,6 +4,7 @@
 # |_|  \___/ \__, |___/    https://git.rogs.me
 #            |___/
 #
+fish_vi_key_bindings
 set fish_greeting ""
 set -gx PATH /home/roger/.gem/ruby/2.7.0/bin /opt/sonar-scanner/bin $PATH
 set -g theme_powerline_fonts yes
@@ -22,6 +23,7 @@ alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias ptc="pritunl-client"
+alias grep="rg -C3"
 
 source "$HOME/.config/fish/abbreviations.fish"
 
