@@ -446,9 +446,6 @@ text and copying to the killring."
 (beacon-mode t)
 
 ;; ChatGPT
-(require 'chatgpt-shell)
-(require 'ob-chatgpt-shell)
-(require 'ob-dall-e-shell)
 (setq chatgpt-shell-chatgpt-model-version "gpt-3.5-turbo")
 (setq chatgpt-shell-chatgpt-streaming "t")
 (setq chatgpt-shell-chatgpt-system-prompt "You are a senior Python developer in charge of maintaining a very big application")

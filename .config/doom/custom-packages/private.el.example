@@ -2,5 +2,6 @@
 
 
 (setq chatgpt-shell-openai-key "my-openai-key")
+(setq dall-e-shell-openai-key "my-openai-key")
 
 (provide 'private)
