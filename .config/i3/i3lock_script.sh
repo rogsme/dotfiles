@@ -13,4 +13,5 @@ keepassxc --lock
 scrot /tmp/screen.png
 xwobf -s 11 /tmp/screen.png
 i3lock -i /tmp/screen.png
+#i3lock -c 000000
 rm /tmp/screen.png

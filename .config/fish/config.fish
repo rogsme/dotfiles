@@ -23,8 +23,7 @@ alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias ptc="pritunl-client"
-alias grep="rg -C3"
-
+alias gr="grep --color=auto -rin -C 3 --exclude-dir={.git,.svn,CVS,.bzr,.hg,.idea,.tox,.cache,.vscode,.npm,.yarn,.stack,__pycache__}"
 source "$HOME/.config/fish/abbreviations.fish"
 
 # tabtab source for packages

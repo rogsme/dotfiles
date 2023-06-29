@@ -6,6 +6,7 @@ bullshit
 cb-psc-sensor
 ceph-libs-bin
 chromedriver
+cocainate-bin
 debtap
 etcher-bin
 f1multiviewer-bin
@@ -33,13 +34,14 @@ pidgin-libnotify-notify-osd
 play-with-mpv-git
 postman-bin
 protonup-qt-bin
+redis-insight-bin
 rofi-keepassxc
 slack-desktop
-sonar-scanner
 spotify
 sublime-music-git
+systemd-fsck-silent
 ttf-ms-win10-auto
-vault-cli
+webex-bin
 woeusb-ng
 xwobf-git
 zoom

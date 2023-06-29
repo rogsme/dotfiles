@@ -29,6 +29,7 @@ bluez-utils
 bmenu
 btrfs-progs
 bzip2
+caffeine-ng
 calibre
 celluloid
 cheese
@@ -94,6 +95,7 @@ gettext
 glibc
 gnome-keyring
 gnome-themes-extra
+gnu-netcat
 go
 gparted
 grep
@@ -127,7 +129,9 @@ iproute2
 iptables
 iputils
 jfsutils
+jpegoptim
 jq
+k9s
 kdeconnect
 keepassxc
 ksnip
@@ -237,6 +241,7 @@ perl-file-mimeinfo
 picom
 pidgin
 pkgconf
+plantuml
 playerctl
 polybar
 poppler-glib
@@ -257,12 +262,14 @@ python-toml
 python-virtualenv
 python-websockets
 python-wheel
+redis
 reiserfsprogs
 ripgrep
 rofi
 rsync
 s-nail
 samba
+sane-airscan
 screenfetch
 scrot
 scummvm
@@ -280,7 +287,6 @@ sudo
 syncthing
 sysfsutils
 system-config-printer
-systemd-fsck-silent
 systemd-sysvcompat
 tar
 tcpdump
@@ -314,6 +320,7 @@ unrar
 usb_modeswitch
 usbutils
 util-linux
+vault
 vi
 vim
 virtualbox
@@ -362,6 +369,7 @@ xorg-server
 xorg-twm
 xorg-xinit
 xorg-xkill
+xsane
 xsel
 xss-lock
 xviewer
