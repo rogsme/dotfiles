@@ -84,7 +84,7 @@ label = %percentage_used%%
 
 [module/wireless-network]
 type = internal/network
-interface = wlp2s0
+interface = wlp0s20f3
 interval = 2.0
 ping-interval = 10
 label-connected = 📶 %essid%

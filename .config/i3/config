@@ -180,11 +180,11 @@ workspace $ws5 output primary
 workspace $ws7 output primary
 workspace $ws9 output primary
 
-workspace $ws2 output HDMI-1
-workspace $ws4 output HDMI-1
-workspace $ws6 output HDMI-1
-workspace $ws8 output HDMI-1
-workspace $ws10 output HDMI-1
+workspace $ws2 output DP-2
+workspace $ws4 output DP-2
+workspace $ws6 output DP-2
+workspace $ws8 output DP-2
+workspace $ws10 output DP-2
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -262,6 +262,7 @@ assign [class="Lollypop"] $ws6
 assign [class="Clementine"] $ws6
 assign [class="Sublime-music"] $ws6
 assign [class="Thunar"] $ws7
+assign [class="Pcmanfm"] $ws7
 assign [class="KeePassXC"] $ws8
 assign [class="Joplin"] $ws9
 assign [class="kdeconnect.app"] $ws9
@@ -300,6 +301,7 @@ exec --no-startup-id exec /usr/bin/keepassxc
 exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id exec /usr/bin/kdeconnect-app
+exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard
