@@ -34,19 +34,19 @@
 ;; (setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
 ;;       doom-variable-pitch-font (font-spec :family "sans")
 ;;       doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
-(setq doom-font (font-spec :family "MesloLGS NF" :size 14)
-      doom-variable-pitch-font (font-spec :family "sans")
-      doom-big-font (font-spec :family "MesloLGS NF" :size 24))
+;;(setq doom-font (font-spec :family "MesloLGS NF" :size 14)
+      ;;doom-variable-pitch-font (font-spec :family "sans")
+      ;;doom-big-font (font-spec :family "MesloLGS NF" :size 24))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(after! doom-themes
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t))
-(custom-set-faces!
-  '(font-lock-comment-face :slant italic)
-  '(font-lock-keyword-face :slant italic))
+;;(after! doom-themes
+  ;;(setq doom-themes-enable-bold t
+        ;;doom-themes-enable-italic t))
+;;(custom-set-faces!
+  ;;'(font-lock-comment-face :slant italic)
+  ;;'(font-lock-keyword-face :slant italic))
 (setq doom-theme 'doom-badger)
 
 ;; If you use `org' and don't want your org files in the default location below,
