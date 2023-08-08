@@ -31,22 +31,22 @@
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
 ;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
 
-;; (setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
-;;       doom-variable-pitch-font (font-spec :family "sans")
-;;       doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
-;;(setq doom-font (font-spec :family "MesloLGS NF" :size 14)
-      ;;doom-variable-pitch-font (font-spec :family "sans")
-      ;;doom-big-font (font-spec :family "MesloLGS NF" :size 24))
+(setq doom-font (font-spec :family "Mononoki Nerd Font" :size 14)
+      doom-variable-pitch-font (font-spec :family "sans")
+      doom-big-font (font-spec :family "Mononoki Nerd Font" :size 24))
+(setq doom-font (font-spec :family "MesloLGS NF" :size 14)
+      doom-variable-pitch-font (font-spec :family "sans")
+      doom-big-font (font-spec :family "MesloLGS NF" :size 24))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;;(after! doom-themes
-  ;;(setq doom-themes-enable-bold t
-        ;;doom-themes-enable-italic t))
-;;(custom-set-faces!
-  ;;'(font-lock-comment-face :slant italic)
-  ;;'(font-lock-keyword-face :slant italic))
+(after! doom-themes
+  (setq doom-themes-enable-bold t
+        doom-themes-enable-italic t))
+(custom-set-faces!
+  '(font-lock-comment-face :slant italic)
+  '(font-lock-keyword-face :slant italic))
 (setq doom-theme 'doom-badger)
 
 ;; If you use `org' and don't want your org files in the default location below,
@@ -341,7 +341,10 @@ text and copying to the killring."
 
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (add-hook 'after-save-hook 'org-save-all-org-buffers))
+  (add-hook 'after-save-hook 'org-save-all-org-buffers)
+
+  ;; Enable Org Modern
+  (with-eval-after-load 'org (global-org-modern-mode)))
 
 ;; My own menu
 (map! :leader
@@ -426,6 +429,7 @@ text and copying to the killring."
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
 
+;; Git
 (setq forge-alist '(("github.com-underarmour" "api.github.com" "github.com" forge-github-repository)
                     ("github.com" "api.github.com" "github.com" forge-github-repository)
                     ("gitlab.com" "gitlab.com/api/v4" "gitlab.com" forge-gitlab-repository)
@@ -441,14 +445,17 @@ text and copying to the killring."
                     ("git.suckless.org" nil "git.suckless.org" forge-stagit-repository)
                     ("git.sr.ht" nil "git.sr.ht" forge-srht-repository)))
 
+;;;; Use delta instead of the default diff
+(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+
 ;; Misc
 
 (beacon-mode t)
 
 ;; ChatGPT
-(setq chatgpt-shell-chatgpt-model-version "gpt-3.5-turbo")
-(setq chatgpt-shell-chatgpt-streaming "t")
-(setq chatgpt-shell-chatgpt-system-prompt "You are a senior Python developer in charge of maintaining a very big application")
+(setq chatgpt-shell-model-version "gpt-4")
+(setq chatgpt-shell-streaming "t")
+(setq chatgpt-shell-system-prompt "You are a senior Python developer in charge of maintaining a very big application")
 
 ;; Github Copilot
 ;; accept completion from copilot and fallback to company
@@ -472,3 +479,7 @@ text and copying to the killring."
 (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
 (setq org-babel-default-header-args:plantuml
       '((:results . "verbatim") (:exports . "results") (:cache . "no")))
+
+;; Go
+(setq lsp-go-analyses '((shadow . t)
+                        (simplifycompositelit . :json-false)))

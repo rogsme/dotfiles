@@ -230,7 +230,8 @@ bindsym --release Ctrl+Shift+F11 exec ksnip -r -p "/tmp/image.png"
 
 # Shortcuts
 
-bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos.ods
+bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos\ USD.ods
+bindsym $aux+u exec loffice ~/Documents/Gastos/Gastos\ UYU.ods
 bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
 bindsym $aux+l exec lollypop
 
