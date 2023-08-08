@@ -341,10 +341,7 @@ text and copying to the killring."
 
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (add-hook 'after-save-hook 'org-save-all-org-buffers)
-
-  ;; Enable Org Modern
-  (with-eval-after-load 'org (global-org-modern-mode)))
+  (add-hook 'after-save-hook 'org-save-all-org-buffers))
 
 ;; My own menu
 (map! :leader

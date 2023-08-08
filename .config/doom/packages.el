@@ -70,4 +70,3 @@
 (package! dall-e-shell)
 (package! ob-dall-e-shell)
 (package! magit-delta)
-(package! org-modern)
