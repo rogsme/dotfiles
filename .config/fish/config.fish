@@ -18,12 +18,12 @@ alias rm='rm -i'
 alias mv='mv -i'
 alias ..='cd ..'
 alias doom='$HOME/.config/emacs/bin/doom'
-alias ls='exa -la --color=always --group-directories-first'
+alias ls='exa -la --color=always --group-directories-first --icons'
 alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias ptc="pritunl-client"
-alias gr="grep --color=auto -rin -C 3 --exclude-dir={.git,.svn,CVS,.bzr,.hg,.idea,.tox,.cache,.vscode,.npm,.yarn,.stack,__pycache__}"
+alias grep="rg -n --with-filename --smart-case"
 source "$HOME/.config/fish/abbreviations.fish"
 
 # tabtab source for packages
