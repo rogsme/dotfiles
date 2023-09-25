@@ -478,3 +478,18 @@ text and copying to the killring."
 ;; Go
 (setq lsp-go-analyses '((shadow . t)
                         (simplifycompositelit . :json-false)))
+
+
+
+
+;; JavaScript & TypeScript
+
+;;;; Tide mode
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (tide-hl-identifier-mode +1)
+  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint))
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+(add-hook 'typescript-ts-mode-hook #'setup-tide-mode)
