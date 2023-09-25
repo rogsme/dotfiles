@@ -341,7 +341,9 @@ text and copying to the killring."
 
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (add-hook 'after-save-hook 'org-save-all-org-buffers))
+  (add-hook 'after-save-hook 'org-save-all-org-buffers)
+  (require 'org-download)
+  (add-hook 'dired-mode-hook 'org-download-enable))
 
 ;; My own menu
 (map! :leader
@@ -445,14 +447,10 @@ text and copying to the killring."
 ;;;; Use delta instead of the default diff
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
-;; Misc
-
-(beacon-mode t)
-
 ;; ChatGPT
 (setq chatgpt-shell-model-version "gpt-4")
 (setq chatgpt-shell-streaming "t")
-(setq chatgpt-shell-system-prompt "You are a senior Python developer in charge of maintaining a very big application")
+(setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 
 ;; Github Copilot
 ;; accept completion from copilot and fallback to company

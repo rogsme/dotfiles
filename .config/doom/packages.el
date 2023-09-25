@@ -63,10 +63,10 @@
 (package! butler)
 (package! copilot
   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
-(package! beacon)
 (package! plantuml-mode)
 (package! chatgpt-shell)
 (package! ob-chatgpt-shell)
 (package! dall-e-shell)
 (package! ob-dall-e-shell)
 (package! magit-delta)
+(package! org-download)
