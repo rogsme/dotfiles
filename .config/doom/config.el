@@ -50,10 +50,11 @@
 (setq doom-theme 'doom-badger)
 
 ;; Update init file
+;; More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-645448095
 (defun doom/ediff-init-and-example ()
   "ediff the current `init.el' with the example in doom-emacs-dir"
   (interactive)
-  (ediff-files (concat doom-private-dir "init.el")
+  (ediff-files (concat doom-user-dir "init.el")
                (concat doom-emacs-dir "templates/init.example.el")))
 
 (define-key! help-map "di"   #'doom/ediff-init-and-example)
