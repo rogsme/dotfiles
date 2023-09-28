@@ -70,3 +70,4 @@
 (package! ob-dall-e-shell)
 (package! magit-delta)
 (package! org-download)
+(package! axe)
