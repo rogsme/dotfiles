@@ -49,6 +49,15 @@
   '(font-lock-keyword-face :slant italic))
 (setq doom-theme 'doom-badger)
 
+;; Update init file
+(defun doom/ediff-init-and-example ()
+  "ediff the current `init.el' with the example in doom-emacs-dir"
+  (interactive)
+  (ediff-files (concat doom-private-dir "init.el")
+               (concat doom-emacs-dir "templates/init.example.el")))
+
+(define-key! help-map "di"   #'doom/ediff-init-and-example)
+
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
@@ -493,3 +502,4 @@ text and copying to the killring."
 
 (add-hook 'typescript-mode-hook #'setup-tide-mode)
 (add-hook 'typescript-ts-mode-hook #'setup-tide-mode)
+(add-hook 'typescript-tsx-mode-hook #'setup-tide-mode)
