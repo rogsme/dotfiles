@@ -67,7 +67,6 @@
 (package! chatgpt-shell)
 (package! ob-chatgpt-shell)
 (package! dall-e-shell)
-(package! ob-dall-e-shell)
 (package! magit-delta)
 (package! org-download)
 (package! axe)
