@@ -53,7 +53,6 @@
 (package! org-bullets)
 (package! idle-highlight-mode)
 (package! symbol-overlay)
-(package! elpy)
 (package! groovy-mode)
 (package! org-recur)
 (package! ox-gfm)

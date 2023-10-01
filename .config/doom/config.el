@@ -373,17 +373,6 @@ text and copying to the killring."
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (setq enable-local-variables :all))
 
-(elpy-enable)
-(after! elpy
-  (set-company-backend! 'elpy-mode
-    '(elpy-company-backend :with company-files company-yasnippet)))
-(setq elpy-rpc-timeout 10)
-(remove-hook 'elpy-modules 'elpy-module-flymake)
-
-(use-package flycheck
-  :config
-  (setq-default flycheck-disabled-checkers '(python-pylint)))
-
 ;; LSP config
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)
