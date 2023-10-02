@@ -70,3 +70,5 @@
 (package! magit-delta)
 (package! org-download)
 (package! axe)
+(package! deferred)
+(package! ox-slack)

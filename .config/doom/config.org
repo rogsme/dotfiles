@@ -1,12 +1,46 @@
+#+TITLE: rogs DOOM Emacs config
+#+AUTHOR: Roger Gonzalez (rogs)
+#+DESCRIPTION: rogs personal Doom Emacs config.
+
+* Basic configuration
+:PROPERTIES:
+:ID:       4e8ec984-b517-4e34-b018-7464650b2b9f
+:END:
+
+First off, set my user and email
+#+begin_src emacs-lisp
 (setq user-full-name "Roger Gonzalez"
       user-mail-address "roger@rogs.me")
+#+end_src
 
+* Look and feel
+:PROPERTIES:
+:ID:       0b198a7a-c736-4dd4-84a3-0ea21bcdc4fb
+:END:
+
+This part of the configuration focus on the look and feel of Doom Emacs.
+
+** Fonts
+:PROPERTIES:
+:ID:       b4df4ef4-d0ca-4047-90b3-f4128425aa9f
+:END:
+
+This works only in Linux. On MacOS we keep the default fonts.
+
+#+begin_src emacs-lisp
 (if (not (eq system-type 'darwin))
     (progn
       (setq doom-font (font-spec :family "MesloLGS NF" :size 14)
             doom-variable-pitch-font (font-spec :family "sans")
             doom-big-font (font-spec :family "MesloLGS NF" :size 24))))
+#+end_src
 
+** Theme
+:PROPERTIES:
+:ID:       3bae130e-3336-4bc7-9378-82c315e2aea6
+:END:
+
+#+begin_src emacs-lisp
 (after! doom-themes
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t))
@@ -14,12 +48,46 @@
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 (setq doom-theme 'doom-badger)
+#+end_src
 
+** Misc
+:PROPERTIES:
+:ID:       cf3c202b-7610-4038-8e15-654a95a9d1dc
+:END:
+
+*** Display relative numbers on the buffer
+:PROPERTIES:
+:ID:       6a510691-0b78-44b8-ab92-518971051d8a
+:END:
+#+begin_src emacs-lisp
 (setq display-line-numbers-type 'relative)
+#+end_src
 
+* Org Mode + Org Roam
+:PROPERTIES:
+:ID:       96b93a81-3272-4f7a-a667-8a8783849d64
+:END:
+
+The big one. My entire life is in Org Mode and/or Org Roam.
+
+** Set the directory
+:PROPERTIES:
+:ID:       99cbc04c-604c-4427-94fc-aa0603c78809
+:END:
+
+#+begin_src emacs-lisp
 (setq org-directory "~/org/")
 (setq org-roam-directory "~/roam/")
+#+end_src
 
+** Configuration
+:PROPERTIES:
+:ID:       37915445-e875-4da0-bab0-3f8f8b8e89f5
+:END:
+
+TODO: Breakup later
+
+#+begin_src emacs-lisp
 (after! org
   ;; Include diary
   (setq org-agenda-include-diary t)
@@ -244,35 +312,110 @@ text and copying to the killring."
   (add-hook 'after-save-hook 'org-save-all-org-buffers)
   (require 'org-download)
   (add-hook 'dired-mode-hook 'org-download-enable))
+#+end_src
 
+* Programming languages
+:PROPERTIES:
+:ID:       fcb176c9-c9e5-42f6-b31d-3dafe8d0f64b
+:END:
+
+** LSP
+:PROPERTIES:
+:ID:       84836840-8642-46ad-8068-dc07086708f3
+:END:
+
+#+begin_src emacs-lisp
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-headerline-breadcrumb-icons-enable t))
+#+end_src
 
+** Python
+:PROPERTIES:
+:ID:       8f3279cf-53e2-4fe5-b30b-724d2d081cbe
+:END:
+
+#+begin_src emacs-lisp
 (require 'auto-virtualenv)
 (after! python
   :init
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (setq enable-local-variables :all))
+#+end_src
+** Groovy
+:PROPERTIES:
+:ID:       8f8956c2-a7a3-4508-8f30-dc7a2f5e105b
+:END:
 
+#+begin_src emacs-lisp
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
+#+end_src
 
+** Go
+:PROPERTIES:
+:ID:       ee0c0fc1-7801-45ba-9302-73a78ce3d329
+:END:
+
+#+begin_src emacs-lisp
 (setq lsp-go-analyses '((shadow . t)
                         (simplifycompositelit . :json-false)))
+#+end_src
 
+* Custom
+:PROPERTIES:
+:ID:       cd8a28bd-d91f-4ba8-b637-cb542ff5cca4
+:END:
+
+Here's where custom functionalities get configured.
+
+** Custom packages
+:PROPERTIES:
+:ID:       483ed79c-9eba-4544-8333-dda0139e9a08
+:END:
+
+  | Package name    | Description                                    | URL                                     |
+  |-----------------+------------------------------------------------+-----------------------------------------|
+  | ~screenshot.el~ | Good for taking screenshots directly in Emacs. | https://github.com/tecosaur/screenshot  |
+  | ~private.el~    | This is a file for private values.             | ~./custom-packages/private.el.example~. |
+
+#+begin_src emacs-lisp
 (add-to-list 'load-path "~/.config/doom/custom-packages")
 
 (require 'screenshot)
 (require 'private)
+#+end_src
 
+** Custom functions
+:PROPERTIES:
+:ID:       0888b2db-9a0d-463d-89ad-371fcbfa0473
+:END:
+*** Update DOOM Emacs init.el file
+:PROPERTIES:
+:ID:       af485cc4-be52-4bb4-889d-7de8bea1ed66
+:END:
+
+This function brings up a comparisson between the current ~init.el~ file and the example file
+(~templates/init.example.el~). Very useful for upgrading manually.
+
+More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-645448095
+
+#+begin_src emacs-lisp
 (defun rg/ediff-init-and-example ()
   (interactive)
   (ediff-files (concat doom-user-dir "init.el")
                (concat doom-emacs-dir "templates/init.example.el")))
 
 (define-key! help-map "di"   #'rg/ediff-init-and-example)
+#+end_src
+*** HTTP Statuses
+:PROPERTIES:
+:ID:       3fa9d843-f163-4f04-8129-918fb57603a4
+:END:
 
+This is a custom helm command that displays all the HTTP status with its description.
+
+#+begin_src emacs-lisp
 (defvar helm-httpstatus-source
   '((name . "HTTP STATUS")
     (candidates . (("100 Continue") ("101 Switching Protocols")
@@ -315,7 +458,18 @@ text and copying to the killring."
 (defun helm-httpstatus ()
   (interactive)
   (helm-other-buffer '(helm-httpstatus-source) "*helm httpstatus*"))
+#+end_src
 
+*** Convert HTML to org
+:PROPERTIES:
+:ID:       b81dff7f-9bc5-4601-97fe-6c2b9e78366c
+:END:
+
+Depends on ~pandoc~ and ~xclip~.
+
+Convert clipboard contents from HTML to Org and then paste (yank).
+
+#+begin_src emacs-lisp
 (defun rg/html2org-clipboard ()
   (interactive)
   (kill-new (shell-command-to-string "timeout 1 xclip -selection clipboard -o -t text/html | pandoc -f html -t json | pandoc -f json -t org --wrap=none"))
@@ -323,7 +477,15 @@ text and copying to the killring."
   (message "Pasted HTML in org"))
 (after! org
   (define-key org-mode-map (kbd "<f4>") 'rg/html2org-clipboard))
+#+end_src
+*** My own menu
+:PROPERTIES:
+:ID:       60a0316f-8bb8-40fe-af45-e42cdb6da60a
+:END:
 
+This is a custom menu for my own functions
+
+#+begin_src emacs-lisp
 (map! :leader
       (:prefix-map ("a" . "applications")
        :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus)
@@ -332,21 +494,66 @@ text and copying to the killring."
        :desc "Org focus private" "p" #'org-focus-private
        :desc "Org focus all" "a" #'org-focus-all
       ))
+#+end_src
+* Misc
+:PROPERTIES:
+:ID:       b57fe5fe-18ce-4215-ba94-8deee3a2b64f
+:END:
+** Clipmon
+:PROPERTIES:
+:ID:       7b6776af-f357-4f87-9850-4eae4f8daa76
+:END:
 
+Clipmon is my clipboard manager in Emacs.
+
+#+begin_src emacs-lisp
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (add-to-list 'after-init-hook 'clipmon-mode-start)
 (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
 (setq clipmon-timer-interval 1)
+#+end_src
 
+** Git
+:PROPERTIES:
+:ID:       51176440-f985-4c90-94a7-bed48286272c
+:END:
+*** Add UnderArmour to forge-alist
+:PROPERTIES:
+:ID:       559b5963-3aee-480c-a982-7e49fa41c52b
+:END:
+
+I had to do this to manage multiple git profiles.
+
+#+begin_src emacs-lisp
 (after! forge
 (add-to-list 'forge-alist '("github.com-underarmour" forge-github-repository)))
+#+end_src
 
+*** Set ~delta~ as the default magit diff
+:PROPERTIES:
+:ID:       fa6dc3cb-50d7-49cd-96cb-e91a122b1316
+:END:
+
+#+begin_src emacs-lisp
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+#+end_src
 
+** ChatGPT
+:PROPERTIES:
+:ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
+:END:
+
+#+begin_src emacs-lisp
 (setq chatgpt-shell-model-version "gpt-4")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
+#+end_src
+** Github Copilot
+:PROPERTIES:
+:ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
+:END:
 
+#+begin_src emacs-lisp
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
   :bind (:map copilot-completion-map
@@ -354,7 +561,14 @@ text and copying to the killring."
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+#+end_src
 
+** PlantUML
+:PROPERTIES:
+:ID:       87ed3201-3df7-4ee1-a4ce-4fe8312f9d08
+:END:
+
+#+begin_src emacs-lisp
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
 (setq org-plantuml-exec-mode 'plantuml)
@@ -366,3 +580,4 @@ text and copying to the killring."
       '((:results . "verbatim") (:exports . "results") (:cache . "no")))
 (after! org
 (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+#+end_src
