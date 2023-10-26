@@ -243,7 +243,8 @@ text and copying to the killring."
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
   (add-hook 'after-save-hook 'org-save-all-org-buffers)
   (require 'org-download)
-  (add-hook 'dired-mode-hook 'org-download-enable))
+  (add-hook 'dired-mode-hook 'org-download-enable)
+  (add-hook 'org-mode-hook 'org-auto-tangle-mode))
 
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)

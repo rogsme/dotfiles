@@ -72,3 +72,4 @@
 (package! axe)
 (package! deferred)
 (package! ox-slack)
+(package! org-auto-tangle)
