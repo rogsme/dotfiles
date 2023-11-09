@@ -254,7 +254,8 @@ text and copying to the killring."
 (after! python
   :init
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-  (setq enable-local-variables :all))
+  (setq enable-local-variables :all)
+  (flycheck-add-next-checker 'lsp 'python-mypy))
 
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
@@ -344,7 +345,7 @@ text and copying to the killring."
 
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
-(setq chatgpt-shell-model-version "gpt-4")
+(setq chatgpt-shell-model-version "gpt-4-1106-preview")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 
