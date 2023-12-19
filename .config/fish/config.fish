@@ -31,3 +31,13 @@ source "$HOME/.config/fish/abbreviations.fish"
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end
+
+# Ngrok completion
+if command -v ngrok >/dev/null
+    eval (ngrok completion | source)
+end
+
+# Kubectl completion
+if command -v kubectl >/dev/null
+    eval (kubectl completion fish | source)
+end
