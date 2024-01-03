@@ -23,6 +23,7 @@ alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias grep="rg -n --with-filename --smart-case"
+alias dock="xrandr --output DP-3-1 --primary --auto --left-of DP-2 --output DP-2 --auto --output DP-3-3 --auto --right-of DP-2 --output eDP-1 --off"
 source "$HOME/.config/fish/abbreviations.fish"
 
 # tabtab source for packages
