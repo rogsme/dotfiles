@@ -254,8 +254,7 @@ text and copying to the killring."
 (after! python
   :init
   (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
-  (setq enable-local-variables :all)
-  (flycheck-add-next-checker 'lsp 'python-mypy))
+  (setq enable-local-variables :all))
 
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
