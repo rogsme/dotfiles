@@ -73,3 +73,4 @@
 (package! deferred)
 (package! ox-slack)
 (package! org-auto-tangle)
+(package! poetry)
