@@ -5,3 +5,4 @@ tmp/
 
 
 .config/vifm/vifminfo
+.config/doom/custom-packages/private.el

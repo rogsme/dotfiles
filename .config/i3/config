@@ -265,6 +265,7 @@ assign [class="Sublime-music"] $ws6
 assign [class="Thunar"] $ws7
 assign [class="Pcmanfm"] $ws7
 assign [class="KeePassXC"] $ws8
+assign [class="Bitwarden"] $ws8
 assign [class="Joplin"] $ws9
 assign [class="kdeconnect.app"] $ws9
 
@@ -298,7 +299,8 @@ exec --no-startup-id picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
-exec --no-startup-id exec /usr/bin/keepassxc
+exec --no-startup-id exec /usr/bin/bitwarden-desktop
+# exec --no-startup-id exec /usr/bin/keepassxc
 exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id exec /usr/bin/kdeconnect-app
