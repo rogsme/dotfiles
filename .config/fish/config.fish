@@ -23,8 +23,11 @@ alias pr='ping rogs.me'
 alias my-ip="curl ifconfig.me"
 alias emacs="emacsclient -c -a 'emacs'"
 alias grep="rg -n --with-filename --smart-case"
-alias dock="xrandr --output DP-3-1 --primary --auto --left-of DP-2 --output DP-2 --auto --output DP-3-3 --auto --right-of DP-2 --output eDP-1 --off"
+alias dock="xrandr --output DP-2-3 --auto --primary --left-of DP-2-1 --output DP-2-1 --auto --output eDP-1 --off"
 source "$HOME/.config/fish/abbreviations.fish"
+alias cpuinfo="watch -n1 'grep \"^[c]pu MHz\" /proc/cpuinfo'"
+alias vpn-on="protonvpn-cli c --cc US -p UDP"
+alias vpn-off="protonvpn-cli d"
 
 # tabtab source for packages
 # uninstall by removing these lines

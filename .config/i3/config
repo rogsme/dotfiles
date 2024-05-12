@@ -180,11 +180,11 @@ workspace $ws5 output primary
 workspace $ws7 output primary
 workspace $ws9 output primary
 
-workspace $ws2 output DP-2
-workspace $ws4 output DP-2
-workspace $ws6 output DP-2
-workspace $ws8 output DP-2
-workspace $ws10 output DP-2
+workspace $ws2 output DP-2-1
+workspace $ws4 output DP-2-1
+workspace $ws6 output DP-2-1
+workspace $ws8 output DP-2-1
+workspace $ws10 output DP-2-1
 
 # reload the configuration file
 bindsym $mod+Shift+c reload

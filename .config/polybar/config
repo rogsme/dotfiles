@@ -35,7 +35,7 @@ font-4 = FontAwesome:size=10;0
 font-5 = Noto Color Emoji:scale=12;0
 modules-left = i3 music
 modules-center = xwindow
-modules-right = pulseaudio xkeyboard cpu memory wireless-network mullvad-status battery clock
+modules-right = pulseaudio xkeyboard cpu memory wireless-network protonvpn-status battery clock
 
 
 [module/i3]
@@ -136,9 +136,9 @@ interval = 1
 label = %output%
 exec = ~/.config/polybar/music
 
-[module/mullvad-status]
+[module/protonvpn-status]
 type = custom/script
-exec = /home/roger/.config/polybar/mullvad_status.sh
+exec = /home/roger/.config/polybar/protonvpn_status.sh
 interval = 1
 
 [module/cpu-temperature]
