@@ -49,7 +49,6 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
-(package! auto-virtualenv)
 (package! org-bullets)
 (package! idle-highlight-mode)
 (package! symbol-overlay)
@@ -73,4 +72,4 @@
 (package! deferred)
 (package! ox-slack)
 (package! org-auto-tangle)
-(package! poetry)
+;; (package! poetry)

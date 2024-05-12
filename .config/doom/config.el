@@ -79,7 +79,7 @@
           ("j" "Journal entry")
           ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
           ("jX" "Journal entry X-Team" entry (file+olp+datetree "~/org/journal-xteam.org") "** %U - %^{Heading}")
-          ("jX" "Journal entry Lazer" entry (file+olp+datetree "~/org/journal-lazer.org") "** %U - %^{Heading}")
+          ("jL" "Journal entry Lazer" entry (file+olp+datetree "~/org/journal-lazer.org") "** %U - %^{Heading}")
           )))
   ;; Custom agenda views
   (setq org-agenda-custom-commands
@@ -256,12 +256,12 @@ text and copying to the killring."
   (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-headerline-breadcrumb-icons-enable t))
 
-(require 'auto-virtualenv)
+;; (require 'auto-virtualenv)
 (after! python
   :init
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (add-hook 'python-mode-hook #'poetry-tracking-mode)
-  (setq enable-local-variables :all))
+  (setq enable-local-variables :all)
+  (setq poetry-tracking-strategy 'projectile))
 
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
