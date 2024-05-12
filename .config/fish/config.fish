@@ -26,8 +26,8 @@ alias grep="rg -n --with-filename --smart-case"
 alias dock="xrandr --output DP-2-3 --auto --primary --left-of DP-2-1 --output DP-2-1 --auto --output eDP-1 --off"
 source "$HOME/.config/fish/abbreviations.fish"
 alias cpuinfo="watch -n1 'grep \"^[c]pu MHz\" /proc/cpuinfo'"
-alias vpn-on="protonvpn-cli c --cc US -p UDP"
-alias vpn-off="protonvpn-cli d"
+alias vpn-on="sudo protonvpn c --cc US -p UDP"
+alias vpn-off="sudo protonvpn d"
 
 # tabtab source for packages
 # uninstall by removing these lines

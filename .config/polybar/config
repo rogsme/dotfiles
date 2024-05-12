@@ -139,7 +139,7 @@ exec = ~/.config/polybar/music
 [module/protonvpn-status]
 type = custom/script
 exec = /home/roger/.config/polybar/protonvpn_status.sh
-interval = 1
+interval = 5
 
 [module/cpu-temperature]
 type = internal/temperature
