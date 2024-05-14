@@ -5,7 +5,8 @@
  ;; If there is more than one, they won't work right.
  '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(safe-local-variable-values
-   '((poetry-tracking-strategy . "projectile")
+   '((lsp-pylsp-plugins-ruff-enabled . t)
+     (poetry-tracking-strategy . "projectile")
      (poetry-tracking-mode quote projectile)
      (poetry-tracking-strategy quote projectile)
      (projectile-project-compilation-cmd . "npm run python:lint")
