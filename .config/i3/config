@@ -36,7 +36,8 @@ exec --no-startup-id xss-lock --transfer-sleep-lock ~/.config/i3/i3lock_script.s
 exec --no-startup-id nm-applet
 
 # Screen resolution
-exec --no-startup-id sleep 2; autorandr --change
+exec_always --no-startup-id sleep 2; autorandr --change
+bindsym $mod+Shift+x exec autorandr --change
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -286,7 +287,7 @@ exec --no-startup-id exec /usr/bin/nextcloud --background
 # exec_always --no-startup-id .config/conky/start.sh
 exec --no-startup-id exec emacsclient -c -a emacs
 # exec --no-startup-id exec /usr/bin/librewolf
-exec --no-startup-id exec /usr/bin/firefox
+exec --no-startup-id sleep 5; exec /usr/bin/firefox
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
@@ -303,7 +304,7 @@ exec --no-startup-id exec /usr/bin/bitwarden-desktop
 # exec --no-startup-id exec /usr/bin/keepassxc
 exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
-exec --no-startup-id exec /usr/bin/kdeconnect-app
+exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 
 # Random scripts
