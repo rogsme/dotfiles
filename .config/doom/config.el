@@ -74,11 +74,9 @@
           ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
           ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
-          ("pX" "Daily plan X-Team" plain (file+olp+datetree "~/org/plan-xteam.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("pL" "Daily plan Lazer" plain (file+olp+datetree "~/org/plan-lazer.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("j" "Journal entry")
           ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
-          ("jX" "Journal entry X-Team" entry (file+olp+datetree "~/org/journal-xteam.org") "** %U - %^{Heading}")
           ("jL" "Journal entry Lazer" entry (file+olp+datetree "~/org/journal-lazer.org") "** %U - %^{Heading}")
           )))
   ;; Custom agenda views
@@ -183,10 +181,6 @@
          (interactive)
          (setq org-agenda-files '("~/org/private.org"))
          (message "Focusing on private Org files"))
-  (defun org-focus-xteam() "Set focus on X-Team things."
-         (interactive)
-         (setq org-agenda-files '("~/org/xteam.org"))
-         (message "Focusing on X-Team Org files"))
   (defun org-focus-lazer() "Set focus on Lazer things."
          (interactive)
          (setq org-agenda-files '("~/org/lazer.org"))
@@ -259,7 +253,8 @@ text and copying to the killring."
 ;; (require 'auto-virtualenv)
 (after! python
   :init
-  (add-hook 'python-mode-hook #'poetry-tracking-mode)
+  (require 'auto-virtualenv)
+  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
   (setq enable-local-variables :all)
   (setq poetry-tracking-strategy 'projectile))
 
@@ -336,7 +331,6 @@ text and copying to the killring."
       (:prefix-map ("a" . "applications")
        :desc "HTTP Status cheatsheet" "h" #'helm-httpstatus)
       (:prefix-map ("ao" . "org")
-       :desc "Org focus X-Team" "x" #'org-focus-xteam
        :desc "Org focus Lazer" "l" #'org-focus-lazer
        :desc "Org focus private" "p" #'org-focus-private
        :desc "Org focus all" "a" #'org-focus-all
