@@ -28,6 +28,7 @@ source "$HOME/.config/fish/abbreviations.fish"
 alias cpuinfo="watch -n1 'grep \"^[c]pu MHz\" /proc/cpuinfo'"
 alias vpn-on="sudo protonvpn c --cc US -p UDP"
 alias vpn-off="sudo protonvpn d"
+alias fix-bluetooth="sudo systemctl restart bluetooth.service && sleep 10 && sudo systemctl restart logid.service && bash ~/.config/i3/connect-speakers.sh > /dev/null 2>&1"
 
 # tabtab source for packages
 # uninstall by removing these lines
@@ -45,3 +46,6 @@ end
 if command -v kubectl >/dev/null
     eval (kubectl completion fish | source)
 end
+
+# ASDF
+source ~/.asdf/asdf.fish
