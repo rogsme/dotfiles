@@ -227,7 +227,7 @@ bindsym $aux+Shift+u exec setxkbmap us
 bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Shift+F12 exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Ctrl+Shift+F12 exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
-bindsym --release Ctrl+Shift+F11 exec ksnip -r -p "/tmp/image.png"
+bindsym --release Ctrl+Shift+F11 exec flameshot gui
 
 # Do not disturb
 bindsym $mod+m exec "~/.config/i3/scripts/toggle_dnd.sh"
