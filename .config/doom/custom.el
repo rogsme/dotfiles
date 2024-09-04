@@ -5,7 +5,9 @@
  ;; If there is more than one, they won't work right.
  '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(safe-local-variable-values
-   '((lsp-pylsp-plugins-ruff-enabled . t)
+   '((magit-gptcommit-prompt . "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]")
+     (lsp-eslint-working-directories . \./src)
+     (lsp-pylsp-plugins-ruff-enabled . t)
      (poetry-tracking-strategy . "projectile")
      (poetry-tracking-mode quote projectile)
      (poetry-tracking-strategy quote projectile)

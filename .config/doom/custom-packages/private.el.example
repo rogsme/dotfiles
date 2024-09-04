@@ -1,7 +1,5 @@
 ;;; custom-packages/private.el -*- lexical-binding: t; -*-
 
-
-(setq chatgpt-shell-openai-key "my-openai-key")
-(setq dall-e-shell-openai-key "my-openai-key")
+(defvar openai-key "a-big-openai-key")
 
 (provide 'private)

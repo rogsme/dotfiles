@@ -546,11 +546,34 @@ I had to do this to manage multiple git profiles.
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
 :END:
 
+*** ChatGPT Shell
+:PROPERTIES:
+:ID:       9bdfbd96-deec-4335-8d2c-77fff0283708
+:END:
+
 #+begin_src emacs-lisp
-(setq chatgpt-shell-model-version "gpt-4-1106-preview")
+(setq chatgpt-shell-model-version "gpt-4o")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
+(setq chatgpt-shell-openai-key openai-key)
+(setq dall-e-shell-openai-key openai-key)
 #+end_src
+*** Magit GPT
+:PROPERTIES:
+:ID:       3f720f16-b7a3-4127-81e9-87d849827639
+:END:
+
+#+begin_src emacs-lisp
+(require 'llm-openai)
+(setq magit-gptcommit-llm-provider (make-llm-openai :key openai-key))
+(setq llm-warn-on-nonfree nil)
+
+(after! magit
+  (magit-gptcommit-mode 1)
+  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]")
+  (magit-gptcommit-status-buffer-setup))
+#+end_src
+
 ** Github Copilot
 :PROPERTIES:
 :ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
@@ -582,5 +605,10 @@ I had to do this to manage multiple git profiles.
 (setq org-babel-default-header-args:plantuml
       '((:results . "verbatim") (:exports . "results") (:cache . "no")))
 (after! org
-(add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
+
+** Magit GPT
+:PROPERTIES:
+:ID:       e7d6eea5-9fc2-478c-9bb3-6eb6c5665875
+:END:

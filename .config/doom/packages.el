@@ -73,3 +73,4 @@
 (package! ox-slack)
 (package! org-auto-tangle)
 (package! auto-virtualenv)
+(package! magit-gptcommit)

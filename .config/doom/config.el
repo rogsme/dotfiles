@@ -346,9 +346,20 @@ text and copying to the killring."
 
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
-(setq chatgpt-shell-model-version "gpt-4-1106-preview")
+(setq chatgpt-shell-model-version "gpt-4o")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
+(setq chatgpt-shell-openai-key openai-key)
+(setq dall-e-shell-openai-key openai-key)
+
+(require 'llm-openai)
+(setq magit-gptcommit-llm-provider (make-llm-openai :key openai-key))
+(setq llm-warn-on-nonfree nil)
+
+(after! magit
+  (magit-gptcommit-mode 1)
+  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]")
+  (magit-gptcommit-status-buffer-setup))
 
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
@@ -368,4 +379,4 @@ text and copying to the killring."
 (setq org-babel-default-header-args:plantuml
       '((:results . "verbatim") (:exports . "results") (:cache . "no")))
 (after! org
-(add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
