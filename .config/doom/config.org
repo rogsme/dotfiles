@@ -341,7 +341,9 @@ text and copying to the killring."
 (after! python
   :init
   (require 'auto-virtualenv)
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+ (setq auto-virtualenv-global-dirs
+      '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
+  (add-hook 'python-mode-hook 'auto-virtualenv-setup)
   (setq enable-local-variables :all)
   (setq poetry-tracking-strategy 'projectile))
 #+end_src
@@ -520,18 +522,6 @@ Clipmon is my clipboard manager in Emacs.
 :PROPERTIES:
 :ID:       51176440-f985-4c90-94a7-bed48286272c
 :END:
-*** Add UnderArmour to forge-alist
-:PROPERTIES:
-:ID:       559b5963-3aee-480c-a982-7e49fa41c52b
-:END:
-
-I had to do this to manage multiple git profiles.
-
-#+begin_src emacs-lisp
-(after! forge
-(add-to-list 'forge-alist '("github.com-underarmour" forge-github-repository)))
-#+end_src
-
 *** Set ~delta~ as the default magit diff
 :PROPERTIES:
 :ID:       fa6dc3cb-50d7-49cd-96cb-e91a122b1316
@@ -539,6 +529,24 @@ I had to do this to manage multiple git profiles.
 
 #+begin_src emacs-lisp
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+#+end_src
+
+*** Test
+:PROPERTIES:
+:ID:       2c8ead63-0929-4f52-9816-85d8e24b8123
+:END:
+#+begin_src emacs-lisp
+(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  (when-let ((buf (magit-commit-message-buffer)))
+    (with-current-buffer buf
+      (let ((orig-message (git-commit-buffer-message)))
+        (apply orig-fun args)
+        (save-excursion
+          (goto-char (point-min))
+          (insert (string-trim-right orig-message "\n$")))))))
+
+(advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
 ** ChatGPT

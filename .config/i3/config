@@ -246,6 +246,7 @@ focus_follows_mouse no
 assign [class="Brave"] $ws10
 assign [class="LibreWolf"] $ws1
 assign [class="firefox"] $ws1
+assign [class="zen-alpha"] $ws1
 assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
@@ -286,7 +287,8 @@ for_window [urgent=latest] focus
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id exec emacsclient -c -a emacs
-exec --no-startup-id sleep 5; exec /usr/bin/firefox
+# exec --no-startup-id sleep 5; exec /usr/bin/firefox
+exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet

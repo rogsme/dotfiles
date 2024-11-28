@@ -254,7 +254,9 @@ text and copying to the killring."
 (after! python
   :init
   (require 'auto-virtualenv)
-  (add-hook 'python-mode-hook 'auto-virtualenv-set-virtualenv)
+ (setq auto-virtualenv-global-dirs
+      '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
+  (add-hook 'python-mode-hook 'auto-virtualenv-setup)
   (setq enable-local-variables :all)
   (setq poetry-tracking-strategy 'projectile))
 
@@ -341,10 +343,19 @@ text and copying to the killring."
 (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
 (setq clipmon-timer-interval 1)
 
-(after! forge
-(add-to-list 'forge-alist '("github.com-underarmour" forge-github-repository)))
-
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+
+(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  (when-let ((buf (magit-commit-message-buffer)))
+    (with-current-buffer buf
+      (let ((orig-message (git-commit-buffer-message)))
+        (apply orig-fun args)
+        (save-excursion
+          (goto-char (point-min))
+          (insert (string-trim-right orig-message "\n$")))))))
+
+(advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 
 (setq chatgpt-shell-model-version "gpt-4o")
 (setq chatgpt-shell-streaming "t")
