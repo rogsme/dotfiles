@@ -251,6 +251,7 @@ assign [class="qutebrowser"] $ws1
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
 assign [class="Alacritty"] $ws3
+assign [class="ghostty"] $ws3
 for_window [class = "DBeaver"] move to workspace $ws2
 assign [class="Slack"] $ws4
 assign [class="Telegram"] $ws4

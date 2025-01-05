@@ -3,9 +3,9 @@
 
 (if (not (eq system-type 'darwin))
     (progn
-      (setq doom-font (font-spec :family "MesloLGS NF" :size 14)
+      (setq doom-font (font-spec :family "MesloLGS Nerd Font" :size 14)
             doom-variable-pitch-font (font-spec :family "sans")
-            doom-big-font (font-spec :family "MesloLGS NF" :size 24))))
+            doom-big-font (font-spec :family "MesloLGS Nerd Font" :size 24))))
 
 (after! doom-themes
   (setq doom-themes-enable-bold t
