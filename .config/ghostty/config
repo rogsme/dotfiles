@@ -1,0 +1,61 @@
+#########
+# Basic #
+#########
+gtk-titlebar=false
+background-opacity = 0.80
+term = xterm-256color
+
+font-size = 11
+font-family = MesloLGS NF
+class = ghostty
+font-thicken = true
+
+##########
+# Colors #
+##########
+
+background = 000000
+foreground = d0d0d0
+selection-background = 555555
+
+# Normal colors
+# Black
+palette = 0=#282a36
+# Red
+palette = 1=#f07178
+# Green
+palette = 2=#c3e88d
+# Yellow
+palette = 3=#ffcb6b
+# Blue
+palette = 4=#82aaff
+# Magenta
+palette = 5=#c792ea
+# Cyan
+palette = 6=#89ddff
+# White
+palette = 7=#d0d0d0
+
+# Bright colors
+# Black
+palette = 8=#434758
+# Red
+palette = 9=#ff8b92
+# Green
+palette = 10=#ddffa7
+# Yellow
+palette = 11=#ffe585
+# Blue
+palette = 12=#9cc4ff
+# Magenta
+palette = 13=#e1acff
+# Cyan
+palette = 14=#a3f7ff
+# White
+palette = 15=#ffffff
+
+# Cursor
+cursor-color = #FFFFFF
+cursor-text = #000000
+cursor-style-blink = false
+cursor-invert-fg-bg = true
