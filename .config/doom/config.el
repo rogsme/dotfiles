@@ -250,7 +250,6 @@ text and copying to the killring."
   (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-headerline-breadcrumb-icons-enable t))
 
-;; (require 'auto-virtualenv)
 (after! python
   :init
   (require 'auto-virtualenv)
@@ -265,6 +264,8 @@ text and copying to the killring."
 
 (setq lsp-go-analyses '((shadow . t)
                         (simplifycompositelit . :json-false)))
+
+(setq restclient-same-buffer-response nil)
 
 (add-to-list 'load-path "~/.config/doom/custom-packages")
 

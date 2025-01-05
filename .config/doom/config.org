@@ -337,7 +337,6 @@ text and copying to the killring."
 :END:
 
 #+begin_src emacs-lisp
-;; (require 'auto-virtualenv)
 (after! python
   :init
   (require 'auto-virtualenv)
@@ -365,6 +364,14 @@ text and copying to the killring."
 #+begin_src emacs-lisp
 (setq lsp-go-analyses '((shadow . t)
                         (simplifycompositelit . :json-false)))
+#+end_src
+
+** RestClient
+:PROPERTIES:
+:ID:       cf97ccd8-7023-48f0-8273-a1a64fad3fd0
+:END:
+#+begin_src emacs-lisp
+(setq restclient-same-buffer-response nil)
 #+end_src
 
 * Custom
@@ -531,7 +538,7 @@ Clipmon is my clipboard manager in Emacs.
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 #+end_src
 
-*** Test
+*** Accept pre-commit messages when creating git commits with magit-gptcommit mode
 :PROPERTIES:
 :ID:       2c8ead63-0929-4f52-9816-85d8e24b8123
 :END:
