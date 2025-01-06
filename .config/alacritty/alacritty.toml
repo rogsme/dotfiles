@@ -1,3 +1,7 @@
+#
+# | '__/ _ \ / _` / __|
+# | | | (_) | (_| \__ \    Roger González
+# |_|  \___/ \__, |___/    https://rogs.me
 [colors.bright]
 black = "0x434758"
 blue = "0x9cc4ff"
@@ -29,7 +33,7 @@ background = "0x555555"
 TERM = "xterm-256color"
 
 [font]
-size = 11.0
+size = 12.0
 
 [font.normal]
 family = "MesloLGS Nerd Font"
@@ -48,7 +52,7 @@ history = 10000
 multiplier = 3
 
 [window]
-opacity = 0.85
+opacity = 0.80
 title = "Alacritty"
 
 [window.class]
