@@ -5,7 +5,7 @@ IFS=$'\n\t'
 STATE=$(xfconf-query -c xfce4-notifyd -p /do-not-disturb)
 
 if [ "$STATE" = "true" ]; then
-  echo "DND ✅"
+  echo "✅ DND "
 else
-  echo "DND ❌"
+  echo "❌ DND "
 fi
