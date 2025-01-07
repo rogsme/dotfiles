@@ -1,6 +1,8 @@
 #  Dotfiles
-![Screenshot of my desktop](https://git.rogs.me/me/dotfiles/raw/branch/master/.screenshots/image1.png) 
-![Screenshot of my desktop](https://git.rogs.me/me/dotfiles/raw/branch/master/.screenshots/image2.png) 
+![2025-01-07-185327](/uploads/f422a18768ccf21958dba0c2ef6cab5b/2025-01-07-185327.png)
+![2025-01-07-185523](/uploads/993e7b45fe20bd01b751013f6845355a/2025-01-07-185523.png)
+![2025-01-07-190422](/uploads/13c70f7b3737397348bba6318145787e/2025-01-07-190422.png)
+
 Dotfiles are the customization files that are used to personalize your Linux or other Unix-based system.  You can tell that a file is a dotfile because the name of the file will begin with a period--a dot!  The period at the beginning of a filename or directory name indicates that it is a hidden file or directory.  This repository contains my personal dotfiles.  They are stored here for convenience so that I may quickly access them on new machines or new installs.  Also, others may find some of my configurations helpful in customizing their own dotfiles.  
 
 # Who Am I?

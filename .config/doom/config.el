@@ -14,6 +14,7 @@
   '(font-lock-comment-face :slant italic)
   '(font-lock-keyword-face :slant italic))
 (setq doom-theme 'doom-badger)
+(setq fancy-splash-image "~/.config/doom/logo.png")
 
 (setq display-line-numbers-type 'relative)
 
