@@ -22,7 +22,7 @@ set $aux Mod1
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-font pango:DejaVu Sans Mono 8
+font pango:DejaVu Sans Mono
 
 # The combination of xss-lock, nm-applet and pactl is a popular choice, so
 # they are included here as an example. Modify as you see fit.
@@ -59,8 +59,8 @@ for_window [class=".*"] border pixel 2
 
 # Use gaps
 # smart_gaps on
-gaps inner 2
-gaps outer 2
+gaps inner 4
+gaps outer 4
 
 bindsym $mod+Shift+t gaps inner current set 2; gaps outer current set 2
 bindsym $mod+s gaps inner current plus 5
@@ -74,7 +74,7 @@ floating_modifier $mod
 
 # start a terminal
 set $terminal alacritty
-set $auxTerminal sakura
+set $auxTerminal ghostty
 bindsym $mod+Return exec $terminal
 
 # kill focused window
@@ -82,9 +82,6 @@ bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
 bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
-
-# start kpmenu (a rofi frontend for keepass)
-bindsym $mod+p exec --no-startup-id "kpmenu -d ~/Passwords/Passwords.kdbx -m rofi"
 
 # change focus
 bindsym $mod+h focus left
@@ -110,11 +107,17 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
-# resize windows
-bindsym $mod+Shift+y resize shrink width 10 px or 10 ppt
-bindsym $mod+Shift+u resize grow height 10 px or 10 ppt
-bindsym $mod+Shift+i resize shrink height 10 px or 10 ppt
-bindsym $mod+Shift+o resize grow width 10 px or 10 ppt
+bindsym $mod+r mode "Resize"
+
+mode "Resize" {
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
 
 # toggle split orientation
 bindsym $mod+t split toggle
@@ -143,11 +146,11 @@ set $ws3 "3: "
 set $ws4 "4: "
 set $ws5 "5: "
 set $ws6 "6: "
-set $ws7 "7: all"
+set $ws7 "7: "
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
-set $ws11 "11"
+set $ws11 "11: "
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
@@ -187,6 +190,8 @@ workspace $ws6 output DP-2-1
 workspace $ws8 output DP-2-1
 workspace $ws10 output DP-2-1
 
+workspace $ws11 output DP-2-2
+
 # reload the configuration file
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
@@ -194,8 +199,8 @@ bindsym $mod+Shift+r restart
 # lock the screen
 set $Locker exec "~/.config/i3/scripts/i3lock_script.sh"
 
-set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
-mode "$mode_system" {
+set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+mode "$mode_power" {
     bindsym l exec --no-startup-id $Locker, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
     bindsym s exec --no-startup-id systemctl suspend, mode "default"
@@ -208,7 +213,7 @@ mode "$mode_system" {
     bindsym Escape mode "default"
 }
 
-bindsym $mod+Shift+e mode "$mode_system"
+bindsym $mod+Shift+e mode "$mode_power"
 
 # Start Polybar
 exec_always --no-startup-id .config/polybar/launch.sh
@@ -235,40 +240,54 @@ bindsym $mod+m exec "~/.config/i3/scripts/toggle_dnd.sh"
 # Shortcuts
 
 bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos\ USD.ods
-bindsym $aux+u exec loffice ~/Documents/Gastos/Gastos\ UYU.ods
 bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
 bindsym $aux+l exec feishin
 
 # Disable focus follows
 focus_follows_mouse no
 
-# Asign workspaces
+# Workspace Assignments
+# 1: Browsers
 assign [class="Brave"] $ws10
 assign [class="LibreWolf"] $ws1
 assign [class="firefox"] $ws1
 assign [class="zen-alpha"] $ws1
 assign [class="qutebrowser"] $ws1
+
+# 2: Development
 assign [class="Emacs"] $ws2
 assign [class="Postman"] $ws2
+for_window [class="DBeaver"] move to workspace $ws2
+
+# 3: Terminal
 assign [class="Alacritty"] $ws3
 assign [class="ghostty"] $ws3
-for_window [class = "DBeaver"] move to workspace $ws2
+
+# 4: Communication
 assign [class="Slack"] $ws4
 assign [class="Telegram"] $ws4
 assign [class="Keybase"] $ws4
 assign [class="Ferdi"] $ws4
 assign [class="Signal"] $ws4
 assign [class="Element"] $ws4
+
+# 5: Mail/Calendar
 assign [class="Evolution"] $ws5
 assign [class="thunderbird"] $ws5
 assign [class="Mailspring"] $ws5
+
+# 6: Music
 for_window [class = "Spotify"] move to workspace $ws6
 assign [class="Lollypop"] $ws6
 assign [class="feishin"] $ws6
 assign [class="Clementine"] $ws6
 assign [class="Sublime-music"] $ws6
+
+# 7: File managers
 assign [class="Thunar"] $ws7
 assign [class="Pcmanfm"] $ws7
+
+# 8: Misc
 assign [class="KeePassXC"] $ws8
 assign [class="Bitwarden"] $ws8
 assign [class="Joplin"] $ws9
@@ -276,20 +295,17 @@ assign [class="kdeconnect.app"] $ws9
 assign [class="Liferea"] $ws9
 assign [class="NewsFlash"] $ws9
 
+
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
-for_window [class="Galculator"] floating enable border pixel 1
-for_window [class="GParted"] floating enable border normal
-for_window [class="Nitrogen"] floating enable sticky enable border normal
-for_window [class="Wireguird"] floating enable border pixel 1
+for_window [class="(Galculator|GParted|Nitrogen|Wireguard)"] floating enable border normal
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
 
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
-exec --no-startup-id exec emacsclient -c -a emacs
-# exec --no-startup-id sleep 5; exec /usr/bin/firefox
+exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
 exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
@@ -307,6 +323,10 @@ exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 
+# Small scripts
+exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
+exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh &
+
 # Random scripts
 ## Generate a random password and copy it to the clipboard
 bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 50 | xclip -selection clipboard && notify-send 'Copied a random password to the clipboard' -i password"
@@ -314,7 +334,7 @@ bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\
 # Window colors
 # class                 border  backgr. text    indicator child_border
 client.focused          #75D85A #75D85A #424242 #75D85A   #75D85A
-client.focused_inactive #75D85A #5f676a #ffffff #484e50   #75D85A
-client.unfocused        #75D85A #204D14 #424242 #292d2e   #75D85A
-client.urgent           #75D85A #900000 #ffffff #900000   #75D85A
-client.placeholder      #75D85A #0c0c0c #ffffff #000000   #75D85A
+client.focused_inactive #3B4B58 #3B4B58 #ffffff #3B4B58   #3B4B58
+client.unfocused        #202932 #202932 #7A7A7A #202932   #202932
+client.urgent           #990000 #990000 #ffffff #990000   #990000
+client.placeholder      #0c0c0c #0c0c0c #ffffff #000000   #0c0c0c
