@@ -62,7 +62,7 @@ for_window [class=".*"] border pixel 2
 gaps inner 4
 gaps outer 4
 
-bindsym $mod+Shift+t gaps inner current set 2; gaps outer current set 2
+bindsym $mod+Shift+t gaps inner current set 4; gaps outer current set 4
 bindsym $mod+s gaps inner current plus 5
 bindsym $mod+Shift+s gaps inner current minus 5
 bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
@@ -251,7 +251,7 @@ focus_follows_mouse no
 assign [class="Brave"] $ws10
 assign [class="LibreWolf"] $ws1
 assign [class="firefox"] $ws1
-assign [class="zen-alpha"] $ws1
+assign [class="zen"] $ws1
 assign [class="qutebrowser"] $ws1
 
 # 2: Development
@@ -324,7 +324,7 @@ exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 
 # Small scripts
-exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
+# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
 exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh &
 
 # Random scripts

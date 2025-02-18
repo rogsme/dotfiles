@@ -13,6 +13,7 @@ set -g theme_color_scheme dark
 set -g theme_display_date no
 set -x TERM xterm-256color
 set -x EDITOR vim
+set -x VISUAL vim
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 alias rm='rm -i'
 alias mv='mv -i'
@@ -29,6 +30,7 @@ alias cpuinfo="watch -n1 'grep \"^[c]pu MHz\" /proc/cpuinfo'"
 alias vpn-on="sudo protonvpn c --cc US -p UDP"
 alias vpn-off="sudo protonvpn d"
 alias fix-bluetooth="sudo systemctl restart bluetooth.service && sleep 10 && sudo systemctl restart logid.service && bash ~/.config/i3/connect-speakers.sh > /dev/null 2>&1"
+alias get-class="xprop | grep WM_CLASS"
 
 # tabtab source for packages
 # uninstall by removing these lines
