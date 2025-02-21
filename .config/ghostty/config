@@ -11,7 +11,7 @@ background-opacity = 0.80
 term = xterm-256color
 confirm-close-surface=false
 window-decoration=false
-mouse-scroll-multiplier=2
+# mouse-scroll-multiplier=2
 
 font-size = 12
 font-family = MesloLGS NF
