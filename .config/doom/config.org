@@ -524,6 +524,7 @@ Clipmon is my clipboard manager in Emacs.
 (add-to-list 'after-init-hook 'clipmon-mode-start)
 (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
 (setq clipmon-timer-interval 1)
+
 #+end_src
 
 ** Git
