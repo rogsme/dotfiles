@@ -73,8 +73,8 @@ bindsym $mod+Shift+z gaps outer current minus 5
 floating_modifier $mod
 
 # start a terminal
-set $terminal alacritty
-set $auxTerminal ghostty
+set $terminal ghostty
+set $auxTerminal alacritty
 bindsym $mod+Return exec $terminal
 
 # kill focused window
@@ -311,6 +311,7 @@ exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
 exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
 exec --no-startup-id /usr/bin/unclutter
 exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
