@@ -66,4 +66,6 @@ palette = 15=#ffffff
 cursor-color = #FFFFFF
 cursor-text = #000000
 cursor-style-blink = false
+cursor-style = block
+shell-integration-features = no-cursor
 cursor-invert-fg-bg = true
