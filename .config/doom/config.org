@@ -603,7 +603,7 @@ Clipmon is my clipboard manager in Emacs.
 (setq forge-llm-llm-provider (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
 #+end_src
 
-** Github Copilot
+*** Github Copilot
 :PROPERTIES:
 :ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
 :END:
@@ -618,7 +618,11 @@ Clipmon is my clipboard manager in Emacs.
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
 #+end_src
 
-** PlantUML
+** Others
+:PROPERTIES:
+:ID:       ccd2e4f2-d58d-4fd3-8d79-1ccd41719122
+:END:
+*** PlantUML
 :PROPERTIES:
 :ID:       87ed3201-3df7-4ee1-a4ce-4fe8312f9d08
 :END:
@@ -636,8 +640,3 @@ Clipmon is my clipboard manager in Emacs.
 (after! org
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml)))
 #+end_src
-
-** Magit GPT
-:PROPERTIES:
-:ID:       e7d6eea5-9fc2-478c-9bb3-6eb6c5665875
-:END:
