@@ -408,7 +408,7 @@ Here's where custom functionalities get configured.
 :ID:       af485cc4-be52-4bb4-889d-7de8bea1ed66
 :END:
 
-This function brings up a comparisson between the current ~init.el~ file and the example file
+This function brings up a comparison between the current ~init.el~ file and the example file
 (~templates/init.example.el~). Very useful for upgrading manually.
 
 More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-645448095
@@ -558,7 +558,7 @@ Clipmon is my clipboard manager in Emacs.
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
-** ChatGPT
+** LLM
 :PROPERTIES:
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
 :END:
@@ -581,14 +581,26 @@ Clipmon is my clipboard manager in Emacs.
 :END:
 
 #+begin_src emacs-lisp
-(require 'llm-openai)
-(setq magit-gptcommit-llm-provider (make-llm-openai :key openai-key))
+(require 'llm-ollama)
+(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "tavernari/git-commit-message" :chat-model "tavernari/git-commit-message"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
   (magit-gptcommit-mode 1)
-  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]")
+  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]. Respond only with the commit message and nothing else.")
   (magit-gptcommit-status-buffer-setup))
+#+end_src
+
+*** Forge LLM
+:PROPERTIES:
+:ID:       51b0f8e3-68b3-46af-91d4-a9b87b1e6b94
+:END:
+
+#+begin_src emacs-lisp
+(require 'forge-llm)
+(forge-llm-setup)
+(require 'llm-claude)
+(setq forge-llm-llm-provider (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
 #+end_src
 
 ** Github Copilot

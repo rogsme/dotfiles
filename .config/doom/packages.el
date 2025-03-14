@@ -73,3 +73,6 @@
 (package! org-auto-tangle)
 (package! auto-virtualenv)
 (package! magit-gptcommit)
+(package! forge-llm
+  :recipe (:host gitlab :repo "rogs/forge-llm"))
+(package! llm)

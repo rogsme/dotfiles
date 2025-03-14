@@ -1,5 +1,6 @@
 ;;; custom-packages/private.el -*- lexical-binding: t; -*-
 
 (defvar openai-key "a-big-openai-key")
+(defvar anthropic-key "a-big-anthropic-key")
 
 (provide 'private)

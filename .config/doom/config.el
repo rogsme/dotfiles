@@ -365,14 +365,19 @@ text and copying to the killring."
 (setq chatgpt-shell-openai-key openai-key)
 (setq dall-e-shell-openai-key openai-key)
 
-(require 'llm-openai)
-(setq magit-gptcommit-llm-provider (make-llm-openai :key openai-key))
+(require 'llm-ollama)
+(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "tavernari/git-commit-message" :chat-model "tavernari/git-commit-message"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
   (magit-gptcommit-mode 1)
-  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]")
+  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]. Respond only with the commit message and nothing else.")
   (magit-gptcommit-status-buffer-setup))
+
+(require 'forge-llm)
+(forge-llm-setup)
+(require 'llm-claude)
+(setq forge-llm-llm-provider (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
 
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
