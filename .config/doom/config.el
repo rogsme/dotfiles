@@ -258,7 +258,9 @@ text and copying to the killring."
       '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
   (add-hook 'python-mode-hook 'auto-virtualenv-setup)
   (setq enable-local-variables :all)
-  (setq poetry-tracking-strategy 'projectile))
+  (setq poetry-tracking-strategy 'projectile)
+  (setq cov-coverage-mode t)
+  (add-hook 'python-mode-hook 'cov-mode))
 
 (after! groovy-mode
   (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
