@@ -72,7 +72,11 @@
 (package! ox-slack)
 (package! org-auto-tangle)
 (package! auto-virtualenv)
-(package! magit-gptcommit)
+(package! magit-gptcommit
+  :recipe (:host github
+           :repo "rogsme/magit-gptcommit"
+           :branch "abort-gptcommit-if-buffer-gets-killed"))
 (package! forge-llm
   :recipe (:host gitlab :repo "rogs/forge-llm"))
 (package! llm)
+(package! cov)
