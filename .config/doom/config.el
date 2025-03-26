@@ -408,6 +408,7 @@ Now, write the commit message in this exact format:
 (forge-llm-setup)
 (require 'llm-claude)
 (setq forge-llm-llm-provider (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
+(setq forge-llm-max-diff-size 'nil)
 
 (use-package! copilot
   :hook (prog-mode . copilot-mode)
