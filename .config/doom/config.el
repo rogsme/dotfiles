@@ -368,12 +368,40 @@ text and copying to the killring."
 (setq dall-e-shell-openai-key openai-key)
 
 (require 'llm-ollama)
-(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "tavernari/git-commit-message" :chat-model "tavernari/git-commit-message"))
+(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "gemma3:12b" :chat-model "gemma3:12b"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
   (magit-gptcommit-mode 1)
-  (setq magit-gptcommit-prompt "You are an expert programmer writing a commit message. You went over every file diff that was changed in it. Summarize the commit into a single specific and cohesive theme. Remember to write in only one line, no more than 50 characters. Write your response using the imperative tense following the kernel git commit style guide. Write a high level title. THE FILE DIFFS:```%s```. Now write Commit message in follow template: [one line of summary]. Respond only with the commit message and nothing else.")
+  (setq magit-gptcommit-prompt
+      "You are an expert programmer crafting a Git commit message. Carefully review the following file diffs as if you had read each line.
+
+Your goal is to generate a commit message that follows the kernel Git commit style guide.
+
+SUMMARY INSTRUCTIONS:
+- Write a one-line summary of the change, no more than 50 characters.
+- Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging' or 'Improves logging').
+- Do not include prefixes like Fix:, Feat:, or Chore: at the beggining of the summary
+- The summary must not end with a period.
+- Ensure the summary reflects a single, specific, and cohesive purpose.
+
+COMMENT INSTRUCTIONS:
+- After the summary, write concise developer-facing comments explaining the commit.
+- Each comment must be on its own line and prefixed with '-'.
+- Each comment must end with a period.
+- Do not include any paragraphs, introductions, or extra explanations.
+- Do not use backticks (`) anywhere in the summary or comments.
+
+THE FILE DIFFS:
+%s
+
+Now, write the commit message in this exact format:
+<summary line>
+
+- comment1
+- comment2
+- commentN")
+
   (magit-gptcommit-status-buffer-setup))
 
 (require 'forge-llm)
