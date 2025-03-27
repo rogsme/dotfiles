@@ -77,3 +77,4 @@
   :recipe (:host gitlab :repo "rogs/forge-llm"))
 (package! llm)
 (package! cov)
+(package! aidermacs)

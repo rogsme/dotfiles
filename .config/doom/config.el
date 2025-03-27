@@ -381,7 +381,7 @@ Your goal is to generate a commit message that follows the kernel Git commit sty
 SUMMARY INSTRUCTIONS:
 - Write a one-line summary of the change, no more than 50 characters.
 - Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging' or 'Improves logging').
-- Do not include prefixes like Fix:, Feat:, or Chore: at the beggining of the summary
+- Do not include prefixes like Fix:, Feat:, or Chore: at the beginning of the summary.
 - The summary must not end with a period.
 - Ensure the summary reflects a single, specific, and cohesive purpose.
 
@@ -391,6 +391,7 @@ COMMENT INSTRUCTIONS:
 - Each comment must end with a period.
 - Do not include any paragraphs, introductions, or extra explanations.
 - Do not use backticks (`) anywhere in the summary or comments.
+- Do not use Markdown formatting (e.g., *, **, #, _, or inline code).
 
 THE FILE DIFFS:
 %s
@@ -401,6 +402,7 @@ Now, write the commit message in this exact format:
 - comment1
 - comment2
 - commentN")
+
 
   (magit-gptcommit-status-buffer-setup))
 
@@ -417,6 +419,23 @@ Now, write the commit message in this exact format:
               ("TAB" . 'copilot-accept-completion)
               ("C-TAB" . 'copilot-accept-completion-by-word)
               ("C-<tab>" . 'copilot-accept-completion-by-word)))
+
+(after! aidermacs
+  ;; Set API keys
+  (setenv "ANTHROPIC_API_KEY" anthropic-key)
+  (setenv "OPENAI_API_KEY" openai-key)
+  (setenv "GEMINI_API_KEY" gemini-key)
+
+  ;; General settings
+  (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-auto-commits nil)
+  (setq aidermacs-backend 'vterm)
+  (setq aidermacs-vterm-multiline-newline-key "S-<return>"))
+
+;; Keybinding for Aidermacs menu
+(map! :leader
+      :desc "Aidermacs"
+      "l" #'aidermacs-transient-menu)
 
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
