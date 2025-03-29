@@ -660,12 +660,15 @@ Now, write the commit message in this exact format:
   (setenv "ANTHROPIC_API_KEY" anthropic-key)
   (setenv "OPENAI_API_KEY" openai-key)
   (setenv "GEMINI_API_KEY" gemini-key)
+  (setenv "OLLAMA_API_BASE" "https://ollama.rogs.casa")
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
-  (setq aidermacs-vterm-multiline-newline-key "S-<return>"))
+  (setq aidermacs-vterm-multiline-newline-key "S-<return>")
+  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask"))
+
 
 ;; Keybinding for Aidermacs menu
 (map! :leader
