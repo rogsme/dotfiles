@@ -14,10 +14,19 @@ Key principles in this configuration:
 - Integrate personal productivity systems through Org-mode
 - Optimize for both writing and coding tasks
 
+This document serves both as configuration and as documentation. Each section explains not just what the code does, but why it's important to my workflow. If you're new to Doom Emacs, you can use this as a reference for setting up your own configuration.
+
+To navigate this file efficiently:
+- Use `SPC n s` to search for specific settings
+- Use `TAB` on headings to expand/collapse sections
+- Look for the explanatory text before each code block
+
 * Basic configuration
 :PROPERTIES:
 :ID:       4e8ec984-b517-4e34-b018-7464650b2b9f
 :END:
+
+This section contains fundamental identity settings that are used by various Emacs packages, particularly for version control systems like Git and for email clients. These settings ensure that my contributions are properly attributed.
 
 First off, set my user and email
 #+begin_src emacs-lisp
@@ -85,6 +94,16 @@ The cornerstone of my productivity system. My entire life is managed through Org
 
 The setup includes custom agenda views, capture templates, and todo states that implement a GTD-inspired system with my own modifications for different types of tasks and projects.
 
+Key components of this system:
+- Custom TODO states that reflect my workflow (NEXT, WAITING, SOMEDAY, etc.)
+- Visual styling to quickly identify task states and priorities
+- Capture templates for different types of information
+- Custom agenda views for different perspectives on my tasks
+- Recurring task handling with org-recur
+- ID-based linking for creating a personal knowledge graph
+
+This section is organized into logical subsections, each focusing on a specific aspect of the Org Mode configuration. The most frequently used features are placed earlier in the file.
+
 ** Set the directory
 :PROPERTIES:
 :ID:       99cbc04c-604c-4427-94fc-aa0603c78809
@@ -129,7 +148,24 @@ This section contains the foundational settings for Org mode, including director
 :ID:       37915445-e875-4da0-bab0-3f8f8b8e89f6
 :END:
 
-Configuration for task tracking, including TODO keywords, priorities, and logging behavior.
+Configuration for task tracking, including TODO keywords, priorities, and logging behavior. This implements a GTD-inspired workflow with custom states to track different stages of task completion.
+
+The TODO keywords are carefully chosen to represent distinct states in my workflow:
+- REPEAT: Tasks that recur on a schedule
+- NEXT: The immediate next actions I should focus on
+- DELEGATED: Tasks I've assigned to someone else
+- TODO: Standard tasks that need to be done
+- WAITING: Tasks blocked by external factors
+- SOMEDAY: Ideas or tasks for future consideration
+- PROJ: Project containers that group related tasks
+
+Priorities follow a simple decision matrix:
+- A: Do it now (urgent and important)
+- B: Decide when to do it (important but not urgent)
+- C: Delegate it (urgent but not important)
+- D: Just an idea (neither urgent nor important)
+
+The logging configuration ensures I maintain a history of state changes, completion times, and notes about rescheduling.
 
 #+begin_src emacs-lisp
 (after! org
@@ -328,7 +364,16 @@ Configuration for handling recurring tasks with org-recur.
 :ID:       37915445-e875-4da0-bab0-3f8f8b8e8911
 :END:
 
-Custom functions to enhance Org mode functionality.
+Custom functions to enhance Org mode functionality. These functions extend Org mode's capabilities to better support my specific workflow needs, including:
+
+- Automatic agenda refreshing after rescheduling tasks
+- Focus functions to filter agenda views by context
+- Automatic ID generation for reliable linking between notes
+- Clipboard functions for quick creation of Org links
+- Checkbox reset functionality for recurring tasks
+- Streamlined node insertion for Org-roam
+
+These functions represent solutions to friction points I've encountered in my daily use of Org mode, making the system more efficient and tailored to my needs.
 
 #+begin_src emacs-lisp
 (after! org
@@ -437,6 +482,14 @@ related notes or tasks."
 :END:
 
 This section configures language-specific settings for the programming languages I use regularly. Each language has its own requirements for linting, formatting, and IDE-like features, which are handled through LSP where possible.
+
+My development workflow relies on having consistent tooling across different languages, with features like:
+- Code completion and documentation
+- Syntax checking and linting
+- Formatting according to language standards
+- Navigation and refactoring tools
+
+LSP (Language Server Protocol) provides most of these features in a standardized way across languages, while language-specific configurations handle unique requirements for each language ecosystem.
 
 ** LSP
 :PROPERTIES:
@@ -711,7 +764,15 @@ The configuration below sets up Clipmon to check the clipboard every second and 
 
 This section configures various AI assistants and Large Language Model integrations. These tools augment my workflow by providing code suggestions, helping with documentation, and automating repetitive tasks like writing commit messages.
 
-I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the task requirements and privacy considerations.
+I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the task requirements and privacy considerations:
+
+- GitHub Copilot: For real-time code suggestions while typing
+- ChatGPT Shell: For general programming assistance and problem-solving
+- Magit GPT: For automatically generating meaningful commit messages
+- Forge LLM: For analyzing and summarizing GitHub issues and PRs
+- Aider: For more complex code generation and refactoring tasks
+
+Each tool has specific strengths, and I've configured them to complement each other in my development workflow. The API keys are stored in a separate private.el file for security.
 
 *** ChatGPT Shell
 :PROPERTIES:
