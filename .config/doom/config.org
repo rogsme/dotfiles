@@ -236,17 +236,20 @@ TODO: Breakup this section into smaller, more focused components later
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
 
   ;; Org recur
-  (use-package org-recur
-    :hook ((org-mode . org-recur-mode)
-           (org-agenda-mode . org-recur-agenda-mode))
-    :demand t
-    :config
-    (define-key org-recur-mode-map (kbd "C-c d") 'org-recur-finish)
+  ;; Load org-recur
+  (require 'org-recur)
 
-    ;; Rebind the 'd' key in org-agenda (default: `org-agenda-day-view').
-    (define-key org-recur-agenda-mode-map (kbd "C-c d") 'org-recur-finish)
-    (define-key org-recur-agenda-mode-map (kbd "C-c 0") 'org-recur-schedule-today)
-
+  (after! org-recur
+    (add-hook 'org-mode-hook #'org-recur-mode)
+    (add-hook 'org-agenda-mode-hook #'org-recur-agenda-mode)
+    
+    (map! :map org-recur-mode-map
+          "C-c d" #'org-recur-finish)
+    
+    (map! :map org-recur-agenda-mode-map
+          "C-c d" #'org-recur-finish
+          "C-c 0" #'org-recur-schedule-today)
+    
     (setq org-recur-finish-done t
           org-recur-finish-archive t))
 
@@ -585,11 +588,12 @@ Clipmon serves as my clipboard manager within Emacs. I chose it over alternative
 The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring accessible through M-y with helm integration.
 
 #+begin_src emacs-lisp
-(use-package clipmon
-  :init
+;; Ensure clipmon is loaded
+(require 'clipmon)
+
+(after! clipmon
   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
   (add-to-list 'after-init-hook 'clipmon-mode-start)
-  :config
   (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
     (let ((interprogram-cut-function nil)) ad-do-it))
   (setq clipmon-timer-interval 1))
@@ -715,13 +719,16 @@ Now, write the commit message in this exact format:
 :END:
 
 #+begin_src emacs-lisp
-(use-package! copilot
-  :hook (prog-mode . copilot-mode)
-  :bind (:map copilot-completion-map
-              ("<tab>" . 'copilot-accept-completion)
-              ("TAB" . 'copilot-accept-completion)
-              ("C-TAB" . 'copilot-accept-completion-by-word)
-              ("C-<tab>" . 'copilot-accept-completion-by-word)))
+;; Load copilot
+(require 'copilot)
+
+(after! copilot
+  (add-hook 'prog-mode-hook #'copilot-mode)
+  (map! :map copilot-completion-map
+        "<tab>" #'copilot-accept-completion
+        "TAB" #'copilot-accept-completion
+        "C-TAB" #'copilot-accept-completion-by-word
+        "C-<tab>" #'copilot-accept-completion-by-word))
 #+end_src
 *** Aider
 :PROPERTIES:
