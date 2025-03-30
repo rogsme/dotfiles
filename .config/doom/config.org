@@ -2,6 +2,18 @@
 #+AUTHOR: Roger Gonzalez (rogs)
 #+DESCRIPTION: rogs personal Doom Emacs config.
 
+* Introduction
+:PROPERTIES:
+:ID:       4e8ec984-b517-4e34-b018-7464650b2b9f
+:END:
+
+This configuration represents my personal Doom Emacs setup, focused on productivity, organization with Org-mode, and programming. The file is organized into logical sections, starting with basic settings, then appearance, followed by major functionality areas like Org-mode and programming language support.
+
+Key principles in this configuration:
+- Prioritize keyboard-driven workflows
+- Integrate personal productivity systems through Org-mode
+- Optimize for both writing and coding tasks
+
 * Basic configuration
 :PROPERTIES:
 :ID:       4e8ec984-b517-4e34-b018-7464650b2b9f
@@ -18,7 +30,7 @@ First off, set my user and email
 :ID:       0b198a7a-c736-4dd4-84a3-0ea21bcdc4fb
 :END:
 
-This part of the configuration focus on the look and feel of Doom Emacs.
+This section configures the visual aspects of my Emacs experience. I prefer a clean, distraction-free interface with a dark theme that's easy on the eyes during long coding sessions. Font choices prioritize readability and support for programming ligatures.
 
 ** Fonts
 :PROPERTIES:
@@ -69,7 +81,9 @@ This works only in Linux. On MacOS we keep the default fonts.
 :ID:       96b93a81-3272-4f7a-a667-8a8783849d64
 :END:
 
-The big one. My entire life is in Org Mode and/or Org Roam.
+The cornerstone of my productivity system. My entire life is managed through Org Mode and Org Roam, from task management and note-taking to project planning and knowledge management. This extensive configuration reflects years of refinement to match my personal workflow.
+
+The setup includes custom agenda views, capture templates, and todo states that implement a GTD-inspired system with my own modifications for different types of tasks and projects.
 
 ** Set the directory
 :PROPERTIES:
@@ -86,7 +100,15 @@ The big one. My entire life is in Org Mode and/or Org Roam.
 :ID:       37915445-e875-4da0-bab0-3f8f8b8e89f5
 :END:
 
-TODO: Breakup later
+This is the core Org-mode configuration that implements my personal productivity system. It includes:
+
+- Custom TODO keywords that reflect my workflow states (NEXT, WAITING, SOMEDAY, etc.)
+- Visual styling for different task states and priorities
+- Capture templates for quickly adding different types of content
+- Custom agenda views for different perspectives on my tasks
+- Recurring task handling with org-recur
+
+TODO: Breakup this section into smaller, more focused components later
 
 #+begin_src emacs-lisp
 (after! org
@@ -274,7 +296,12 @@ ID.  This function works only in org-mode or org-agenda buffers.
 
 The purpose of this function is to easily construct id:-links to
 org-mode items. If its assigned to a key it saves you marking the
-text and copying to the killring."
+text and copying to the killring.
+
+This function is a cornerstone of my note-linking workflow. It creates and copies 
+an org-mode ID link to the current heading, making it easy to reference content 
+across my knowledge base. I use this constantly when creating connections between 
+related notes or tasks."
          (interactive)
          (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
            (org-agenda-show)
@@ -320,6 +347,8 @@ text and copying to the killring."
 :PROPERTIES:
 :ID:       fcb176c9-c9e5-42f6-b31d-3dafe8d0f64b
 :END:
+
+This section configures language-specific settings for the programming languages I use regularly. Each language has its own requirements for linting, formatting, and IDE-like features, which are handled through LSP where possible.
 
 ** LSP
 :PROPERTIES:
@@ -389,10 +418,12 @@ Here's where custom functionalities get configured.
 :ID:       483ed79c-9eba-4544-8333-dda0139e9a08
 :END:
 
+These are additional packages that aren't part of the standard Doom modules but that I find essential for my workflow:
+
   | Package name    | Description                                    | URL                                     |
   |-----------------+------------------------------------------------+-----------------------------------------|
   | ~screenshot.el~ | Good for taking screenshots directly in Emacs. | https://github.com/tecosaur/screenshot  |
-  | ~private.el~    | This is a file for private values.             | ~./custom-packages/private.el.example~. |
+  | ~private.el~    | This is a file for private values and API keys that shouldn't be in version control. | ~./custom-packages/private.el.example~. |
 
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.config/doom/custom-packages")
@@ -416,19 +447,21 @@ This function brings up a comparison between the current ~init.el~ file and the 
 More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-645448095
 
 #+begin_src emacs-lisp
-(defun rg/ediff-init-and-example ()
+(defun my/ediff-init-and-example ()
   (interactive)
   (ediff-files (concat doom-user-dir "init.el")
                (concat doom-emacs-dir "templates/init.example.el")))
 
-(define-key! help-map "di"   #'rg/ediff-init-and-example)
+(define-key! help-map "di"   #'my/ediff-init-and-example)
 #+end_src
 *** HTTP Statuses
 :PROPERTIES:
 :ID:       3fa9d843-f163-4f04-8129-918fb57603a4
 :END:
 
-This is a custom helm command that displays all the HTTP status with its description.
+This is a custom helm command that displays all the HTTP status codes with their descriptions. As a developer working with web APIs, I frequently need to reference these codes. This function provides a quick, searchable reference without leaving Emacs or disrupting my workflow.
+
+Usage: `M-x helm-httpstatus` or through the applications menu with `SPC a h`
 
 #+begin_src emacs-lisp
 (defvar helm-httpstatus-source
@@ -480,18 +513,22 @@ This is a custom helm command that displays all the HTTP status with its descrip
 :ID:       b81dff7f-9bc5-4601-97fe-6c2b9e78366c
 :END:
 
-Depends on ~pandoc~ and ~xclip~.
+This function converts clipboard contents from HTML to Org format and then pastes (yanks) the result. It's extremely useful when researching online and wanting to capture formatted content directly into my org notes without losing structure.
 
-Convert clipboard contents from HTML to Org and then paste (yank).
+Dependencies:
+- ~pandoc~ for the format conversion
+- ~xclip~ for clipboard access
+
+Usage: Press F4 in any org-mode buffer to convert and paste HTML from clipboard
 
 #+begin_src emacs-lisp
-(defun rg/html2org-clipboard ()
+(defun my/html2org-clipboard ()
   (interactive)
   (kill-new (shell-command-to-string "timeout 1 xclip -selection clipboard -o -t text/html | pandoc -f html -t json | pandoc -f json -t org --wrap=none"))
   (yank)
   (message "Pasted HTML in org"))
 (after! org
-  (define-key org-mode-map (kbd "<f4>") 'rg/html2org-clipboard))
+  (define-key org-mode-map (kbd "<f4>") 'my/html2org-clipboard))
 #+end_src
 *** My own menu
 :PROPERTIES:
@@ -519,7 +556,9 @@ This is a custom menu for my own functions
 :ID:       7b6776af-f357-4f87-9850-4eae4f8daa76
 :END:
 
-Clipmon is my clipboard manager in Emacs.
+Clipmon serves as my clipboard manager within Emacs. I chose it over alternatives like ~helm-clipboard~ because it offers better integration with my workflow and provides automatic monitoring of clipboard changes. This allows me to maintain a history of copied text without manual intervention.
+
+The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring accessible through M-y with helm integration.
 
 #+begin_src emacs-lisp
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
@@ -564,6 +603,10 @@ Clipmon is my clipboard manager in Emacs.
 :PROPERTIES:
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
 :END:
+
+This section configures various AI assistants and Large Language Model integrations. These tools augment my workflow by providing code suggestions, helping with documentation, and automating repetitive tasks like writing commit messages.
+
+I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the task requirements and privacy considerations.
 
 *** ChatGPT Shell
 :PROPERTIES:
