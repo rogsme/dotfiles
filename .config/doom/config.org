@@ -258,69 +258,81 @@ TODO: Breakup this section into smaller, more focused components later
   ;; Custom ORG functions
   ;; Refresh org-agenda after rescheduling a task.
   (defun org-agenda-refresh ()
-    "Refresh all `org-agenda' buffers."
-    (dolist (buffer (buffer-list))
-      (with-current-buffer buffer
-        (when (derived-mode-p 'org-agenda-mode)
+    "Refresh all `org-agenda' buffers more efficiently."
+    (let ((agenda-buffers (seq-filter
+                           (lambda (buf)
+                             (with-current-buffer buf
+                               (derived-mode-p 'org-agenda-mode)))
+                           (buffer-list))))
+      (dolist (buffer agenda-buffers)
+        (with-current-buffer buffer
           (org-agenda-maybe-redo)))))
 
   (defadvice org-schedule (after refresh-agenda activate)
     "Refresh org-agenda."
     (org-agenda-refresh))
 
-  (defun org-focus-private() "Set focus on private things."
-         (interactive)
-         (setq org-agenda-files '("~/org/private.org"))
-         (message "Focusing on private Org files"))
-  (defun org-focus-lazer() "Set focus on Lazer things."
-         (interactive)
-         (setq org-agenda-files '("~/org/lazer.org"))
-         (message "Focusing on Lazer Org files"))
-  (defun org-focus-all() "Set focus on all things."
-         (interactive)
-         (setq org-agenda-files '("~/org/"))
-         (message "Focusing on all Org files"))
+  (defun org-focus (files msg)
+    "Set focus on specific org FILES with notification MSG."
+    (setq org-agenda-files files)
+    (message msg))
+
+  (defun org-focus-private ()
+    "Set focus on private things."
+    (interactive)
+    (org-focus '("~/org/private.org") "Focusing on private Org files"))
+
+  (defun org-focus-lazer ()
+    "Set focus on Lazer things."
+    (interactive)
+    (org-focus '("~/org/lazer.org") "Focusing on Lazer Org files"))
+
+  (defun org-focus-all ()
+    "Set focus on all things."
+    (interactive)
+    (org-focus '("~/org/") "Focusing on all Org files"))
 
   (defun my/org-add-ids-to-headlines-in-file ()
     "Add ID properties to all headlines in the current file which
 do not already have one."
     (interactive)
     (org-map-entries 'org-id-get-create))
+
   (add-hook 'org-mode-hook
             (lambda ()
               (add-hook 'before-save-hook
                         'my/org-add-ids-to-headlines-in-file nil 'local)))
-  (defun my/copy-idlink-to-clipboard() "Copy an ID link with the
-headline to killring, if no ID is there then create a new unique
-ID.  This function works only in org-mode or org-agenda buffers.
+  (defun my/copy-idlink-to-clipboard ()
+    "Copy an ID link with the headline to killring.
+If no ID exists, create a new unique ID. This function works only in
+org-mode or org-agenda buffers.
 
 The purpose of this function is to easily construct id:-links to
 org-mode items. If its assigned to a key it saves you marking the
 text and copying to the killring.
 
-This function is a cornerstone of my note-linking workflow. It creates and copies 
-an org-mode ID link to the current heading, making it easy to reference content 
-across my knowledge base. I use this constantly when creating connections between 
+This function is a cornerstone of my note-linking workflow. It creates and copies
+an org-mode ID link to the current heading, making it easy to reference content
+across my knowledge base. I use this constantly when creating connections between
 related notes or tasks."
-         (interactive)
-         (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
-           (org-agenda-show)
-           (org-agenda-goto))
-         (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
-           (setq mytmphead (nth 4 (org-heading-components)))
-           (setq mytmpid (funcall 'org-id-get-create))
-           (setq mytmplink (format "[[id:%s][%s]]" mytmpid mytmphead))
-           (kill-new mytmplink)
-           (message "Copied %s to killring (clipboard)" mytmplink)
-           ))
+    (interactive)
+    (when (eq major-mode 'org-agenda-mode) ;if we are in agenda mode we switch to orgmode
+      (org-agenda-show)
+      (org-agenda-goto))
+    (when (eq major-mode 'org-mode) ; do this only in org-mode buffers
+      (let* ((heading (nth 4 (org-heading-components)))
+             (id (org-id-get-create))
+             (link (format "[[id:%s][%s]]" id heading)))
+        (kill-new link)
+        (message "Copied %s to killring (clipboard)" link))))
 
   (global-set-key (kbd "<f5>") 'my/copy-idlink-to-clipboard)
 
   (defun org-reset-checkbox-state-maybe ()
-    "Reset all checkboxes in an entry if the `RESET_CHECK_BOXES' property is set"
+    "Reset all checkboxes in an entry if the `RESET_CHECK_BOXES' property is set."
     (interactive "*")
-    (if (org-entry-get (point) "RESET_CHECK_BOXES")
-        (org-reset-checkbox-state-subtree)))
+    (when (org-entry-get (point) "RESET_CHECK_BOXES")
+      (org-reset-checkbox-state-subtree)))
 
   (defun org-checklist ()
     (when (member org-state org-done-keywords) ;; org-state dynamically bound in org.el/org-todo
@@ -329,11 +341,13 @@ related notes or tasks."
   (add-hook 'org-after-todo-state-change-hook 'org-checklist)
 
   (defun org-roam-node-insert-immediate (arg &rest args)
-  (interactive "P")
-  (let ((args (cons arg args))
-        (org-roam-capture-templates (list (append (car org-roam-capture-templates)
-                                                  '(:immediate-finish t)))))
-    (apply #'org-roam-node-insert args)))
+    "Insert a node immediately without the capture process."
+    (interactive "P")
+    (let ((args (cons arg args))
+          (org-roam-capture-templates
+           (list (append (car org-roam-capture-templates)
+                         '(:immediate-finish t)))))
+      (apply #'org-roam-node-insert args)))
 
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
@@ -448,9 +462,14 @@ More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-6
 
 #+begin_src emacs-lisp
 (defun my/ediff-init-and-example ()
+  "Compare init.el with the example init file."
   (interactive)
-  (ediff-files (concat doom-user-dir "init.el")
-               (concat doom-emacs-dir "templates/init.example.el")))
+  (let ((init-file (concat doom-user-dir "init.el"))
+        (example-file (concat doom-emacs-dir "templates/init.example.el")))
+    (if (and (file-exists-p init-file)
+             (file-exists-p example-file))
+        (ediff-files init-file example-file)
+      (message "Cannot find init.el or example file"))))
 
 (define-key! help-map "di"   #'my/ediff-init-and-example)
 #+end_src
@@ -523,10 +542,15 @@ Usage: Press F4 in any org-mode buffer to convert and paste HTML from clipboard
 
 #+begin_src emacs-lisp
 (defun my/html2org-clipboard ()
+  "Convert HTML in clipboard to Org format and paste it."
   (interactive)
-  (kill-new (shell-command-to-string "timeout 1 xclip -selection clipboard -o -t text/html | pandoc -f html -t json | pandoc -f json -t org --wrap=none"))
-  (yank)
-  (message "Pasted HTML in org"))
+  (condition-case err
+      (progn
+        (kill-new (shell-command-to-string
+                   "timeout 1 xclip -selection clipboard -o -t text/html | pandoc -f html -t json | pandoc -f json -t org --wrap=none"))
+        (yank)
+        (message "Pasted HTML in org"))
+    (error (message "Error converting HTML to Org: %s" (error-message-string err)))))
 (after! org
   (define-key org-mode-map (kbd "<f4>") 'my/html2org-clipboard))
 #+end_src
@@ -561,10 +585,14 @@ Clipmon serves as my clipboard manager within Emacs. I chose it over alternative
 The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring accessible through M-y with helm integration.
 
 #+begin_src emacs-lisp
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(add-to-list 'after-init-hook 'clipmon-mode-start)
-(defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate) (let ((interprogram-cut-function nil)) ad-do-it))
-(setq clipmon-timer-interval 1)
+(use-package clipmon
+  :init
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (add-to-list 'after-init-hook 'clipmon-mode-start)
+  :config
+  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
+    (let ((interprogram-cut-function nil)) ad-do-it))
+  (setq clipmon-timer-interval 1))
 
 #+end_src
 
@@ -587,13 +615,15 @@ The configuration below sets up Clipmon to check the clipboard every second and 
 :END:
 #+begin_src emacs-lisp
 (defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
   (when-let ((buf (magit-commit-message-buffer)))
     (with-current-buffer buf
-      (let ((orig-message (git-commit-buffer-message)))
+      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
         (apply orig-fun args)
-        (save-excursion
-          (goto-char (point-min))
-          (insert (string-trim-right orig-message "\n$")))))))
+        (unless (string-empty-p orig-message)
+          (save-excursion
+            (goto-char (point-min))
+            (insert orig-message)))))))
 
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
