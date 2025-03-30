@@ -24,6 +24,24 @@
 (after! org
   ;; Include diary
   (setq org-agenda-include-diary t)
+
+  ;; Enforce ordered tasks
+  (setq org-enforce-todo-dependencies t)
+  (setq org-enforce-todo-checkbox-dependencies t)
+  (setq org-track-ordered-property-with-tag t)
+
+  ;; Text formatting
+  (add-hook 'org-mode-hook #'auto-fill-mode)
+  (setq-default fill-column 105)
+
+  ;; Save all org buffers on each save
+  (add-hook 'auto-save-hook 'org-save-all-org-buffers)
+  (add-hook 'after-save-hook 'org-save-all-org-buffers)
+  (require 'org-download)
+  (add-hook 'dired-mode-hook 'org-download-enable)
+  (add-hook 'org-mode-hook 'org-auto-tangle-mode))
+
+(after! org
   ;; Logs
   (setq org-log-state-notes-insert-after-drawers nil
         org-log-into-drawer "LOGBOOK"
@@ -31,60 +49,84 @@
         org-log-repeat 'time
         org-log-redeadline 'note
         org-log-reschedule 'note)
-  ;; Keyword and faces
+
+  ;; TODO keywords and states
   (setq-default org-todo-keywords
-                '((sequence "REPEAT(r)" "NEXT(n@/!)" "DELEGATED(e@/!)" "TODO(t@/!)" "WAITING(w@/!)" "SOMEDAY(s@/!)" "PROJ(p)" "|" "DONE(d@)" "CANCELLED(c@/!)" "FORWARDED(f@)")))
-  (setq-default org-todo-keyword-faces
-                '(
-                  ( "REPEAT" . (:foreground "white" :background "indigo" :weight bold))
-                  ( "NEXT" . (:foreground "red" :background "orange" :weight bold))
-                  ( "DELEGATED" . (:foreground "white" :background "blue" :weight bold))
-                  ( "TODO" . (:foreground "white" :background "violet" :weight bold))
-                  ( "WAITING" (:foreground "white" :background "#A9BE00" :weight bold))
-                  ( "SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
-                  ( "PROJ" . (:foreground "white" :background "deeppink3" :weight bold))
-                  ( "DONE" . (:foreground "white" :background "forest green" :weight bold))
-                  ( "CANCELLED" . (:foreground "light gray" :slant italic))
-                  ( "FORWARDED" . (:foreground "light gray" :slant italic))
-                  ))
-  (setq org-fontify-done-headline t)
-  (setq org-fontify-todo-headline t)
-  ;; Priorities
+                '((sequence "REPEAT(r)" "NEXT(n@/!)" "DELEGATED(e@/!)" "TODO(t@/!)"
+                            "WAITING(w@/!)" "SOMEDAY(s@/!)" "PROJ(p)" "|"
+                            "DONE(d@)" "CANCELLED(c@/!)" "FORWARDED(f@)")))
+
+  ;; Priorities configuration
   ;; A: Do it now
   ;; B: Decide when to do it
   ;; C: Delegate it
   ;; D: Just an idea
   (setq org-highest-priority ?A)
   (setq org-lowest-priority ?D)
-  (setq org-default-priority ?B)
+  (setq org-default-priority ?B))
+
+(after! org
+  ;; TODO keyword faces
+  (setq-default org-todo-keyword-faces
+                '(("REPEAT" . (:foreground "white" :background "indigo" :weight bold))
+                  ("NEXT" . (:foreground "red" :background "orange" :weight bold))
+                  ("DELEGATED" . (:foreground "white" :background "blue" :weight bold))
+                  ("TODO" . (:foreground "white" :background "violet" :weight bold))
+                  ("WAITING" (:foreground "white" :background "#A9BE00" :weight bold))
+                  ("SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
+                  ("PROJ" . (:foreground "white" :background "deeppink3" :weight bold))
+                  ("DONE" . (:foreground "white" :background "forest green" :weight bold))
+                  ("CANCELLED" . (:foreground "light gray" :slant italic))
+                  ("FORWARDED" . (:foreground "light gray" :slant italic))))
+
+  ;; Priority faces
   (setq org-priority-faces '((?A . (:foreground "white" :background "dark red" :weight bold))
                              (?B . (:foreground "white" :background "dark green" :weight bold))
                              (?C . (:foreground "yellow"))
                              (?D . (:foreground "gray"))))
-  ;; Capture templates
+
+  ;; Headline styling
+  (setq org-fontify-done-headline t)
+  (setq org-fontify-todo-headline t)
+
+  ;; Org bullets for prettier headings
+  (require 'org-bullets)
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(after! org
   (setq org-capture-templates
         (quote
-         (
-          ("G" "Define a goal" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/goal.org") :empty-lines-after 1)
-          ("R" "REPEAT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/repeat.org") :empty-lines-before 1)
-          ("N" "NEXT entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/next.org") :empty-lines-before 1)
-          ("T" "TODO entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/todo.org") :empty-lines-before 1)
-          ("W" "WAITING entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/waiting.org") :empty-lines-before 1)
-          ("S" "SOMEDAY entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/someday.org") :empty-lines-before 1)
-          ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture") (file "~/org/templates/proj.org") :empty-lines-before 1)
-          ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer") (file "~/org/templates/book.org") :empty-lines-after 2)
+         (("G" "Define a goal" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/goal.org") :empty-lines-after 1)
+          ("R" "REPEAT entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/repeat.org") :empty-lines-before 1)
+          ("N" "NEXT entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/next.org") :empty-lines-before 1)
+          ("T" "TODO entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/todo.org") :empty-lines-before 1)
+          ("W" "WAITING entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/waiting.org") :empty-lines-before 1)
+          ("S" "SOMEDAY entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/someday.org") :empty-lines-before 1)
+          ("P" "PROJ entry" entry (file+headline "~/org/capture.org" "Capture")
+           (file "~/org/templates/proj.org") :empty-lines-before 1)
+          ("B" "Book on the to-read-list" entry (file+headline "~/org/private.org" "Libros para leer")
+           (file "~/org/templates/book.org") :empty-lines-after 2)
           ("p" "Create a daily plan")
-          ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
-          ("pL" "Daily plan Lazer" plain (file+olp+datetree "~/org/plan-lazer.org") (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
+          ("pP" "Daily plan private" plain (file+olp+datetree "~/org/plan-free.org")
+           (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
+          ("pL" "Daily plan Lazer" plain (file+olp+datetree "~/org/plan-lazer.org")
+           (file "~/org/templates/dailyplan.org") :immediate-finish t :jump-to-captured t)
           ("j" "Journal entry")
-          ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org") "** %U - %^{Heading}")
-          ("jL" "Journal entry Lazer" entry (file+olp+datetree "~/org/journal-lazer.org") "** %U - %^{Heading}")
-          )))
-  ;; Custom agenda views
+          ("jP" "Journal entry private" entry (file+olp+datetree "~/org/journal-private.org")
+           "** %U - %^{Heading}")
+          ("jL" "Journal entry Lazer" entry (file+olp+datetree "~/org/journal-lazer.org")
+           "** %U - %^{Heading}")))))
+
+(after! org
   (setq org-agenda-custom-commands
         (quote
-         (
-          ("A" . "Agendas")
+         (("A" . "Agendas")
           ("AT" "Daily overview"
            ((tags-todo "URGENT"
                        ((org-agenda-overriding-header "Urgent Tasks")))
@@ -133,43 +175,28 @@
              (quote
               (org-agenda-skip-entry-if
                (quote scheduled)
-               (quote deadline)))))))
-         ))
-  ;;
-  ;; Enforce ordered tasks
-  (setq org-enforce-todo-dependencies t)
-  (setq org-enforce-todo-checkbox-dependencies t)
-  (setq org-track-ordered-property-with-tag t)
+               (quote deadline))))))))))
 
-  ;; Org bullets
-  (require 'org-bullets)
-  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-
-  ;; Org recur
+(after! org
   ;; Load org-recur
   (require 'org-recur)
 
   (after! org-recur
     (add-hook 'org-mode-hook #'org-recur-mode)
     (add-hook 'org-agenda-mode-hook #'org-recur-agenda-mode)
-    
+
     (map! :map org-recur-mode-map
           "C-c d" #'org-recur-finish)
-    
+
     (map! :map org-recur-agenda-mode-map
           "C-c d" #'org-recur-finish
           "C-c 0" #'org-recur-schedule-today)
-    
+
     (setq org-recur-finish-done t
-          org-recur-finish-archive t))
+          org-recur-finish-archive t)))
 
-  ;; Truncate lines to 105 chars
-  ;; Why 105 chars? Because that's the max my screen can handle on vertical split
-  (add-hook 'org-mode-hook #'auto-fill-mode)
-  (setq-default fill-column 105)
-
-  ;; Custom ORG functions
-  ;; Refresh org-agenda after rescheduling a task.
+(after! org
+  ;; Refresh org-agenda after rescheduling a task
   (defun org-agenda-refresh ()
     "Refresh all `org-agenda' buffers more efficiently."
     (let ((agenda-buffers (seq-filter
@@ -185,6 +212,7 @@
     "Refresh org-agenda."
     (org-agenda-refresh))
 
+  ;; Focus functions
   (defun org-focus (files msg)
     "Set focus on specific org FILES with notification MSG."
     (setq org-agenda-files files)
@@ -205,6 +233,7 @@
     (interactive)
     (org-focus '("~/org/") "Focusing on all Org files"))
 
+  ;; ID management
   (defun my/org-add-ids-to-headlines-in-file ()
     "Add ID properties to all headlines in the current file which
 do not already have one."
@@ -215,6 +244,7 @@ do not already have one."
             (lambda ()
               (add-hook 'before-save-hook
                         'my/org-add-ids-to-headlines-in-file nil 'local)))
+
   (defun my/copy-idlink-to-clipboard ()
     "Copy an ID link with the headline to killring.
 If no ID exists, create a new unique ID. This function works only in
@@ -241,6 +271,7 @@ related notes or tasks."
 
   (global-set-key (kbd "<f5>") 'my/copy-idlink-to-clipboard)
 
+  ;; Checkbox handling
   (defun org-reset-checkbox-state-maybe ()
     "Reset all checkboxes in an entry if the `RESET_CHECK_BOXES' property is set."
     (interactive "*")
@@ -253,6 +284,7 @@ related notes or tasks."
 
   (add-hook 'org-after-todo-state-change-hook 'org-checklist)
 
+  ;; Org-roam functions
   (defun org-roam-node-insert-immediate (arg &rest args)
     "Insert a node immediately without the capture process."
     (interactive "P")
@@ -260,14 +292,7 @@ related notes or tasks."
           (org-roam-capture-templates
            (list (append (car org-roam-capture-templates)
                          '(:immediate-finish t)))))
-      (apply #'org-roam-node-insert args)))
-
-  ;; Save all org buffers on each save
-  (add-hook 'auto-save-hook 'org-save-all-org-buffers)
-  (add-hook 'after-save-hook 'org-save-all-org-buffers)
-  (require 'org-download)
-  (add-hook 'dired-mode-hook 'org-download-enable)
-  (add-hook 'org-mode-hook 'org-auto-tangle-mode))
+      (apply #'org-roam-node-insert args))))
 
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)
