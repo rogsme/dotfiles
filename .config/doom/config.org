@@ -872,7 +872,7 @@ Now, write the commit message in this exact format:
   (setenv "ANTHROPIC_API_KEY" anthropic-key)
   (setenv "OPENAI_API_KEY" openai-key)
   (setenv "GEMINI_API_KEY" gemini-key)
-  (setenv "OLLAMA_API_BASE" "https://ollama.rogs.casa")
+  (setenv "OLLAMA_API_BASE" ollama-api-base)
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
