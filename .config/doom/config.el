@@ -425,7 +425,7 @@ related notes or tasks."
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
-(setq chatgpt-shell-model-version "gpt-4o")
+(setq chatgpt-shell-model-version "chatgpt-4o-latest")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openai-key openai-key)
