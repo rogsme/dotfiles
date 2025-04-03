@@ -842,8 +842,8 @@ Now, write the commit message in this exact format:
 #+begin_src emacs-lisp
 (require 'forge-llm)
 (forge-llm-setup)
-(require 'llm-claude)
-(setq forge-llm-llm-provider (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
+(require 'llm-gemini)
+(setq forge-llm-llm-provider (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
 (setq forge-llm-max-diff-size 'nil)
 #+end_src
 
@@ -878,6 +878,7 @@ Now, write the commit message in this exact format:
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
+  (setq aidermacs-default-model "gemini-2.5-pro")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
