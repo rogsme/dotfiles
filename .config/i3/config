@@ -73,8 +73,8 @@ bindsym $mod+Shift+z gaps outer current minus 5
 floating_modifier $mod
 
 # start a terminal
-set $terminal ghostty
-set $auxTerminal alacritty
+set $terminal alacritty
+set $auxTerminal ghostty
 bindsym $mod+Return exec $terminal
 
 # kill focused window
