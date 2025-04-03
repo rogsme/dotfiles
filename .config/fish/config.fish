@@ -31,6 +31,7 @@ alias vpn-on="sudo protonvpn c --cc US -p UDP"
 alias vpn-off="sudo protonvpn d"
 alias fix-bluetooth="sudo systemctl restart bluetooth.service && sleep 10 && sudo systemctl restart logid.service && bash ~/.config/i3/connect-speakers.sh > /dev/null 2>&1"
 alias get-class="xprop | grep WM_CLASS"
+alias update-aider="uv tool install --force --python python3.12 aider-chat@latest && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m pip install --upgrade --upgrade-strategy only-if-needed aider-chat[playwright] && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m playwright install chromium"
 
 # tabtab source for packages
 # uninstall by removing these lines
