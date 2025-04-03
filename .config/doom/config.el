@@ -425,10 +425,12 @@ related notes or tasks."
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
-(setq chatgpt-shell-model-version "chatgpt-4o-latest")
+(setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openai-key openai-key)
+(setq chatgpt-shell-google-key gemini-key)
+(setq chatgpt-shell-anthropic-key anthropic-key)
 (setq dall-e-shell-openai-key openai-key)
 
 (require 'llm-ollama)
