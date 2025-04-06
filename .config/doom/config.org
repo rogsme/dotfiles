@@ -774,6 +774,23 @@ I use a combination of local models (via Ollama) and cloud services (OpenAI, Ant
 
 Each tool has specific strengths, and I've configured them to complement each other in my development workflow. The API keys are stored in a separate private.el file for security.
 
+*** LLM Menu
+:PROPERTIES:
+:ID:       3edab1be-80d2-418a-9b1f-8fba752093d3
+:END:
+To streamline interaction with the various Large Language Model (LLM) tools integrated into my workflow, this section defines a dedicated menu accessible via the leader key. This provides quick, mnemonic access to frequently used AI assistants like Aider and ChatGPT Shell, avoiding the need for `M-x` and keeping these tools readily available.
+
+The menu is bound to `SPC l` (for LLMs) and currently contains:
+- `SPC l a`: Launches the Aidermacs transient menu (`aidermacs-transient-menu`).
+- `SPC l c`: Launches the ChatGPT Shell transient menu (`chatgpt-shell-transient`).
+
+#+begin_src emacs-lisp
+(map! :leader
+      (:prefix-map ("l" . "LLMs")
+       :desc "Aidermacs" "a" #'aidermacs-transient-menu
+       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
+#+end_src
+
 *** ChatGPT Shell
 :PROPERTIES:
 :ID:       9bdfbd96-deec-4335-8d2c-77fff0283708
@@ -883,13 +900,6 @@ Now, write the commit message in this exact format:
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2"))
-
-
-;; Keybinding for Aidermacs menu
-(map! :leader
-      :desc "Aidermacs"
-      "l" #'aidermacs-transient-menu)
-
 #+end_src
 ** Others
 :PROPERTIES:

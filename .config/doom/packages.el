@@ -61,7 +61,8 @@
 (package! copilot
   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 (package! plantuml-mode)
-(package! chatgpt-shell)
+(package! chatgpt-shell
+  :recipe (:host github :repo "rogsme/chatgpt-shell" :branch "add-transient-menu"))
 (package! ob-chatgpt-shell)
 (package! dall-e-shell)
 (package! ob-dall-e-shell)

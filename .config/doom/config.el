@@ -425,6 +425,11 @@ related notes or tasks."
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
+(map! :leader
+      (:prefix-map ("l" . "LLMs")
+       :desc "Aidermacs" "a" #'aidermacs-transient-menu
+       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
+
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
@@ -503,12 +508,6 @@ Now, write the commit message in this exact format:
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2"))
-
-
-;; Keybinding for Aidermacs menu
-(map! :leader
-      :desc "Aidermacs"
-      "l" #'aidermacs-transient-menu)
 
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
