@@ -1,0 +1,405 @@
+#+TITLE: Polybar Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:conf :tangle config :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* Polybar Configuration
+:PROPERTIES:
+:ID:       2df7b3fd-be4c-4d75-9d6b-e64e7828169a
+:END:
+This document outlines the configuration for Polybar, a lightweight status bar. It's written using
+Org-mode's literate programming features, allowing for documentation alongside the code. The
+configuration is automatically tangled into the =config= file required by Polybar upon saving this Org
+file, thanks to the =#+auto_tangle: t= property and a corresponding Emacs setup (detailed at the end).
+
+** Header
+:PROPERTIES:
+:ID:       575b523c-955f-4d67-8512-f1b527d39d11
+:END:
+This section adds an ASCII art header comment to the top of the tangled =config= file for
+personalization. It doesn't affect Polybar's functionality.
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+
+#+end_src
+
+** Colors
+:PROPERTIES:
+:ID:       ba5e8a13-6e9d-488f-a8c8-591f3f7b33e2
+:END:
+Defines the color palette used throughout the Polybar configuration. These variables make it easy to
+maintain a consistent theme and can be referenced in other sections using `${colors.variable_name}`.
+#+begin_src conf
+[colors]
+accent = #75d85a
+background = #AA000000
+foreground = #ffffff
+urgent = #990000
+urgent-underline = #990000
+dimmed = #888888
+highlight = #e5c07b
+success = #55ffffff
+muted = #666666
+#+end_src
+
+** Bar Configuration
+:PROPERTIES:
+:ID:       fbd62c62-acfb-48ea-808f-66a37417e420
+:END:
+Configures the main properties of the bar itself. This includes its dimensions, position (tied to the
+`MONITOR` environment variable), appearance (background, foreground, over/underline styles), padding,
+margins, and the fonts used. It also defines the order and placement of modules in the left, center, and
+right sections of the bar.
+#+begin_src conf
+[bar/top]
+monitor = ${env:MONITOR:}
+enable-ipc = true
+width = 100%
+height = 26
+
+background = ${colors.background}
+foreground = ${colors.foreground}
+
+overline-size = 2
+overline-color = ${colors.accent}
+underline-size = 2
+underline-color = ${colors.accent}
+
+padding-left = 2
+padding-right = 2
+module-margin-left = 2
+module-margin-right = 2
+
+font-0 = NotoSans-Regular:size=10;0
+font-1 = MaterialIcons:size=10;2
+font-2 = Termsynu:size=10;0
+font-3 = Siji:pixelsize=10;1
+font-4 = FontAwesome:size=10;0
+font-5 = Noto Color Emoji:scale=12;0
+
+modules-left = i3 music
+modules-center = xwindow
+modules-right = pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
+#+end_src
+
+** i3 Module
+:PROPERTIES:
+:ID:       2e3d5e88-0ebb-4074-a406-b489baf141a8
+:END:
+Displays i3 window manager workspaces and mode information. It uses icons (from `font-1` and `font-0`) to
+represent different workspace states (focused, unfocused, visible, urgent) and applies specific colors
+and underlines for clarity. `pin-workspaces = true` ensures workspaces are always shown even if empty on
+other monitors (if applicable).
+#+begin_src conf
+[module/i3]
+type = internal/i3
+format = <label-state> <label-mode>
+pin-workspaces = true
+
+label-dimmed-underline = ${colors.background}
+
+label-focused =  %name%
+label-focused-foreground = ${colors.accent}
+label-focused-underline = ${colors.accent}
+label-focused-font = 1
+label-focused-padding = 4
+
+label-unfocused =  %name%
+label-unfocused-font = 0
+label-unfocused-padding = 3
+
+label-urgent =  %name%
+label-urgent-foreground = ${colors.foreground}
+label-urgent-background = ${colors.urgent}
+label-urgent-underline = ${colors.urgent-underline}
+label-urgent-font = 1
+label-urgent-padding = 3
+
+label-visible =  %name%
+label-visible-foreground = ${colors.success}
+label-visible-font = 0
+label-visible-padding = 4
+#+end_src
+
+** CPU Module
+:PROPERTIES:
+:ID:       1244d450-9c41-49b0-9c27-3ebdc31f02de
+:END:
+Shows the current CPU utilization percentage. Updates frequently (every 0.5 seconds) and uses a '🎛'
+prefix (likely from `font-5`, Noto Color Emoji). The value is underlined with the highlight color. A
+warning state is triggered if usage exceeds 95%, although no specific format change is defined for the
+warning state here.
+#+begin_src conf
+[module/cpu]
+type = internal/cpu
+interval = 0.5
+warn-percentage = 95
+format-prefix = "🎛 "
+format-underline = ${colors.highlight}
+label = %percentage:2%%
+#+end_src
+
+** Memory Module
+:PROPERTIES:
+:ID:       02bea2d6-482c-4f97-b0fe-a1bb4462080c
+:END:
+Displays the percentage of RAM currently in use. Updates every 3 seconds and uses a '📊' prefix (likely
+from `font-5`). The value is underlined with the accent color. A warning state is triggered if usage
+exceeds 90%.
+#+begin_src conf
+[module/memory]
+type = internal/memory
+interval = 3
+warn-percentage = 90
+format-prefix = " 📊 "
+format-underline = ${colors.accent}
+label = %percentage_used%%
+#+end_src
+
+** Network Module
+:PROPERTIES:
+:ID:       4d75cc95-a5d3-4ac3-83d6-132bfbd2883f
+:END:
+Monitors the status of the specified wireless network interface (`wlp0s20f3`). Shows the SSID and network
+speed (padded to 9 characters) when connected (📶) and a 'not connected' message (🚫) when disconnected.
+Includes a blinking animation (⚠/📶) to indicate packet loss.
+#+begin_src conf
+[module/wireless-network]
+type = internal/network
+interface = wlp0s20f3
+interval = 2.0
+format-connected = 📶 <label-connected>
+format-disconnected = <label-disconnected>
+format-packetloss = <animation-packetloss> <label-connected>
+label-connected = %essid% %netspeed:9%
+label-connected-foreground = #eefafa
+label-disconnected = 🚫 not connected
+label-disconnected-foreground = ${colors.dimmed}
+animation-packetloss-0 = ⚠
+animation-packetloss-0-foreground = #ffa64c
+animation-packetloss-1 = 📶
+animation-packetloss-1-foreground = #000000
+animation-packetloss-framerate = 500
+#+end_src
+
+** Clock Module
+:PROPERTIES:
+:ID:       b9bc5f2f-60cd-4af1-a7d8-ae08c14fe0db
+:END:
+Displays the current date and time. Updates every 5 seconds. The format includes day, month, year, hour,
+and minute (e.g., 📅 DD-MM-YYYY 🕜 HH:MM). The `%{O4}` adds a 4-pixel right offset for spacing. Icons
+likely come from `font-5`.
+#+begin_src conf
+[module/clock]
+type = internal/date
+interval = 5
+date = 📅 %d-%m-%Y 🕜 %H:%M%
+format = <label>   %{O4}
+#+end_src
+
+** Battery Module
+:PROPERTIES:
+:ID:       1bab6a07-301c-4635-acc2-23e111d0923a
+:END:
+Shows the current battery status for `BAT0` and adapter `AC`. Uses different icons (🔌/🔋 from `font-3`,
+Siji) and labels depending on whether the battery is charging, discharging, or full (defined as 99% or
+higher). The percentage labels use `font-2` (Termsynu).
+#+begin_src conf
+[module/battery]
+type = internal/battery
+full-at = 99
+battery = BAT0
+adapter = AC
+format-charging = %{T3} 🔌 <label-charging> %{T-}
+format-discharging = %{T3}🔋  <label-discharging> %{T-}
+format-full = %{T3}🔌  <label-full> %{T-}
+label-charging-font = 2
+label-discharging-font = 2
+label-full = 100%
+#+end_src
+
+** Window Module
+:PROPERTIES:
+:ID:       1a97f59b-6f5c-4178-9724-4db491147799
+:END:
+Displays the title of the currently active window (`xwindow`). The title is truncated to a maximum of 50
+characters (`label-maxlen`) to prevent it from taking up too much space on the bar.
+#+begin_src conf
+[module/xwindow]
+type = internal/xwindow
+label-maxlen = 50
+label-foreground = ${colors.foreground}
+#+end_src
+
+** Keyboard Module
+:PROPERTIES:
+:ID:       33605481-48d4-40e9-8a94-22b5a18836e0
+:END:
+Shows the current keyboard layout by executing a custom script (`keyboard_lang.sh`). The script's output
+is displayed in the bar. Updates every second. This approach is often used when the built-in
+`internal/xkeyboard` module doesn't meet specific needs.
+#+begin_src conf
+[module/xkeyboard]
+type = custom/script
+exec = /home/roger/.config/polybar/keyboard_lang.sh
+interval = 1
+#+end_src
+
+** Audio Module
+:PROPERTIES:
+:ID:       336131a7-466d-435d-aa5d-fd2647185cb9
+:END:
+Displays the current PulseAudio volume level (using the 🔊 icon, likely from `font-5`) or a muted icon
+(🔈) if the audio is muted. The muted icon uses the `dimmed` color. Updates every second.
+#+begin_src conf
+[module/pulseaudio]
+type = internal/pulseaudio
+label-volume = 🔊 %percentage%%
+label-muted = 🔈
+label-muted-foreground = ${colors.muted}
+interval = 1
+#+end_src
+
+** Spotify Module
+:PROPERTIES:
+:ID:       8df357e0-6463-4d62-9ed1-cb3319fcfaa0
+:END:
+Displays the current Spotify status (play/pause state, song title, artist, album) using a custom Python
+script (`spotify_status.py`). Updates every second. The script arguments control text truncation length
+(`-t 80`), the font used for play/pause icons (`--playpause-font=1`), the specific icons for play/pause
+states (`-p '⏯,⏸️'`), and the overall output format (`-f`).
+#+begin_src conf
+[module/spotify]
+type = custom/script
+interval = 1
+exec = python /home/roger/.config/polybar/spotify_status.py -t 80 --playpause-font=1 -p '⏯,⏸️' -f ' {play_pause} {song} - {artist} - {album}'
+#+end_src
+
+** Music Module
+:PROPERTIES:
+:ID:       bba107c2-b029-4062-a664-5084d8077159
+:END:
+Displays information from a generic music player, likely using MPRIS (Media Player Remote Interfacing
+Specification), via a custom script (`~/.config/polybar/music`). The script's output is displayed
+directly (`label = %output%`). Updates every second. This can work with various players like Spotify,
+VLC, etc., if the script supports them.
+#+begin_src conf
+[module/music]
+type = custom/script
+interval = 1
+label = %output%
+exec = ~/.config/polybar/music
+#+end_src
+
+** ProtonVPN Module
+:PROPERTIES:
+:ID:       5423289c-0994-482b-9148-5f64c37ae4e1
+:END:
+Shows the connection status of ProtonVPN by executing a custom script (`protonvpn_status.sh`). The
+script's output indicates whether the VPN is connected, disconnected, or in another state. Updates every
+15 seconds.
+#+begin_src conf
+[module/protonvpn-status]
+type = custom/script
+exec = /home/roger/.config/polybar/protonvpn_status.sh
+interval = 15
+#+end_src
+
+** Do Not Disturb Module
+:PROPERTIES:
+:ID:       e494ecce-e6f6-4f3d-87f7-4299012ab329
+:END:
+Indicates whether a 'Do Not Disturb' mode is active, likely by checking the status of a notification
+daemon (like `dunst`) via a custom script (`dnd_status.sh`). The script's output presumably changes to
+reflect the DND state. Updates every second.
+#+begin_src conf
+[module/dnd]
+type = custom/script
+exec = /home/roger/.config/polybar/dnd_status.sh
+interval = 1
+#+end_src
+
+** CPU Temperature Module
+:PROPERTIES:
+:ID:       561fdf25-f9bd-41c8-b719-bd23dd501a97
+:END:
+Displays the CPU temperature obtained from a specific hardware monitoring path
+(`/sys/devices/platform/coretemp.0/hwmon/hwmon5/temp1_input`). Updates every 0.5 seconds. Uses '🌡' as a
+prefix. If the temperature exceeds the `warn-temperature` (80°C), it displays a warning format with a
+fire icon (🔥).
+#+begin_src conf
+[module/cpu-temperature]
+type = internal/temperature
+interval = 0.5
+thermal-zone = 0
+hwmon-path = /sys/devices/platform/coretemp.0/hwmon/hwmon5/temp1_input
+base-temperature = 20
+warn-temperature = 80
+format-prefix = "🌡"
+label-warn = 🔥 %temperature-c%
+#+end_src
+
+** GPU Temperature Module
+:PROPERTIES:
+:ID:       85b64b44-fa61-4389-a234-f665cdbb8ac6
+:END:
+Displays the GPU temperature obtained from a specific hardware monitoring path
+(`/sys/devices/virtual/hwmon/hwmon4/temp9_input`). Updates every 0.5 seconds. A warning state is
+triggered if the temperature exceeds 80°C, although no specific warning format (like a prefix or
+different label) is defined in this configuration block. The default label format (`%temperature-c%`)
+will likely still be used unless overridden elsewhere or by default Polybar behavior for warnings.
+#+begin_src conf
+[module/gpu-temperature]
+type = internal/temperature
+interval = 0.5
+thermal-zone = 0
+hwmon-path = /sys/devices/virtual/hwmon/hwmon4/temp9_input
+base-temperature = 20
+warn-temperature = 80
+#+end_src
+
+** Cryptocurrency Module
+:PROPERTIES:
+:ID:       2a233eed-8e1d-4af1-b53f-68662498607f
+:END:
+Displays the price of Bitcoin (BTC) in US Dollars (USD) using a custom Python script (`pcrypto.py`). The
+script is called with arguments specifying the base currency and the coin symbol. Updates every 60
+seconds.
+#+begin_src conf
+[module/crypto]
+type = custom/script
+exec = python ~/.config/polybar/pcrypto.py --base USD --coins btc
+interval = 60
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       cf0495ac-2aac-4077-829f-2d27f1385f13
+:END:
+This configuration file uses Org Mode's literate programming capabilities. To automatically generate the
+=config= file needed by Polybar every time this =.org= file is saved in Emacs, you need to add the
+following Elisp code to your Emacs initialization file (e.g., =~/.emacs.d/init.el=). This code defines a
+function `org-babel-auto-tangle` and adds it to the `after-save-hook`. When an Org file is saved, this
+function checks for the `#+auto_tangle: t` property at the beginning of the file and, if found, runs
+`org-babel-tangle` to generate the output file(s) (in this case, =config=).
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
