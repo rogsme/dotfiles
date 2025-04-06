@@ -1,0 +1,236 @@
+#+TITLE: Alacritty Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:toml :tangle alacritty.toml :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* Alacritty Configuration
+:PROPERTIES:
+:ID:       31f77af3-c31a-441d-9e1b-e51ffd1f1e32
+:END:
+This is my Alacritty terminal emulator configuration. It is set up to automatically tangle to a file
+named =alacritty.toml= whenever saved. This literate configuration approach allows embedding explanations
+directly alongside the settings, making it easier to understand and maintain.
+
+** Header
+:PROPERTIES:
+:ID:       c5a1d80e-e0f0-4761-ba7a-bab7f04595fd
+:END:
+A decorative header block included at the top of the tangled =alacritty.toml= file.
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+
+#+end_src
+
+** Colors
+:PROPERTIES:
+:ID:       12377a86-a121-456e-85ae-7551d7fe1b88
+:END:
+Defines the color scheme used within the terminal. This configuration uses a custom theme inspired by
+common dark palettes.
+
+*** Bright Colors
+:PROPERTIES:
+:ID:       835012a9-6152-4178-8cdf-fba84dac1ab5
+:END:
+These colors are used for brighter versions of the standard 8 ANSI colors, often invoked with specific
+escape codes or application settings.
+#+begin_src toml
+[colors.bright]
+black = "0x434758"
+blue = "0x9cc4ff"
+cyan = "0xa3f7ff"
+green = "0xddffa7"
+magenta = "0xe1acff"
+red = "0xff8b92"
+white = "0xffffff"
+yellow = "0xffe585"
+#+end_src
+
+*** Normal Colors
+:PROPERTIES:
+:ID:       fe941840-824b-4c9b-b039-600e29dd641d
+:END:
+These are the standard 8 ANSI colors used by most terminal applications.
+#+begin_src toml
+[colors.normal]
+black = "0x282a36"
+blue = "0x82aaff"
+cyan = "0x89ddff"
+green = "0xc3e88d"
+magenta = "0xc792ea"
+red = "0xf07178"
+white = "0xd0d0d0"
+yellow = "0xffcb6b"
+#+end_src
+
+*** Primary Colors
+:PROPERTIES:
+:ID:       65f8f19f-2e08-4ad6-8603-fbe1ccfa8de9
+:END:
+Defines the default foreground (text) and background colors of the terminal window itself.
+#+begin_src toml
+[colors.primary]
+background = "0x000000"
+foreground = "0xd0d0d0"
+#+end_src
+
+*** Selection Colors
+:PROPERTIES:
+:ID:       77668efc-403b-4c7c-9a49-cce5d96d89d2
+:END:
+Sets the background color for selected text. The foreground color of selected text remains the default
+foreground unless explicitly set.
+#+begin_src toml
+[colors.selection]
+background = "0x555555"
+#+end_src
+
+** Environment
+:PROPERTIES:
+:ID:       7ab3b82f-203c-4602-8401-e9ecb6d1994d
+:END:
+Sets environment variables within Alacritty. =TERM = "xterm-256color"= is widely compatible and signals
+support for 256 colors to terminal applications like =vim=, =tmux=, etc.
+#+begin_src toml
+[env]
+TERM = "xterm-256color"
+#+end_src
+
+** Font Configuration
+:PROPERTIES:
+:ID:       4b52e7a9-4f26-4dea-8668-daf604300ea0
+:END:
+Configures the fonts used for rendering text in the terminal.
+
+*** Font Size
+:PROPERTIES:
+:ID:       3ecce3a8-ef33-4400-bb3c-e57fd45a64a6
+:END:
+#+begin_src toml
+[font]
+size = 12.0
+#+end_src
+
+*** Normal Font
+:PROPERTIES:
+:ID:       9eee157f-227e-491b-8a34-e3e7ffb2e583
+:END:
+Specifies the default font family. 'MesloLGS Nerd Font Composite' is chosen for its clarity and built-in
+support for icons (via Nerd Fonts patching). The same family is used for bold/italic variants, relying on
+the font itself to provide these styles.
+#+begin_src toml
+[font.normal]
+family = "MesloLGS Nerd Font Composite"
+#+end_src
+
+*** Bold Font
+:PROPERTIES:
+:ID:       b82b2562-df4b-475d-96f3-f4d676089446
+:END:
+#+begin_src toml
+[font.bold]
+family = "MesloLGS Nerd Font Composite"
+#+end_src
+
+*** Italic Font
+:PROPERTIES:
+:ID:       8450c6de-3de7-48d9-8d63-d6077ea4b09c
+:END:
+#+begin_src toml
+[font.italic]
+family = "MesloLGS Nerd Font Composite"
+#+end_src
+
+*** Bold Italic Font
+:PROPERTIES:
+:ID:       b59df042-3915-401e-b910-d6c583effb17
+:END:
+#+begin_src toml
+[font.bold_italic]
+family = "MesloLGS Nerd Font Composite"
+#+end_src
+
+** Scrolling
+:PROPERTIES:
+:ID:       003d8543-238a-4cf0-a5c9-5dc5f003e72a
+:END:
+Configures scrollback behavior:
+- =history=: Defines the maximum number of lines kept in the scrollback buffer (10000 lines).
+- =multiplier=: Controls how many lines are scrolled per mouse wheel tick or keypress (3 lines).
+#+begin_src toml
+[scrolling]
+history = 10000
+multiplier = 3
+#+end_src
+
+** Window Settings
+:PROPERTIES:
+:ID:       1a4ba770-51b6-40e7-84e7-612af257b7d0
+:END:
+Adjusts various aspects of the Alacritty window appearance and behavior.
+
+*** General Window Settings
+:PROPERTIES:
+:ID:       d421baaa-d101-42aa-8d1e-b3c9c5eb880c
+:END:
+Configures general window properties:
+- =opacity=: Sets the window background opacity (0.0 - 1.0). 0.80 means 80% opaque. Requires a running compositor (e.g., Picom, Mutter, KWin).
+- =title=: The default title displayed for the Alacritty window. Can be overridden by shell prompts or applications.
+#+begin_src toml
+[window]
+opacity = 0.80
+title = "Alacritty"
+#+end_src
+
+*** Window Class
+:PROPERTIES:
+:ID:       21ce9db5-8e5f-4349-9099-b97eaa475117
+:END:
+Sets the window class (general) and instance names. These are primarily used by Wayland compositors and
+some X11 window managers for identification, allowing specific window rules (like placement or
+decoration) to be applied.
+#+begin_src toml
+[window.class]
+general = "Alacritty"
+instance = "Alacritty"
+#+end_src
+
+*** Window Padding
+:PROPERTIES:
+:ID:       62c31bf6-7a73-4299-b909-8a4e6380267b
+:END:
+Adds padding (in pixels) around the terminal content within the window.
+#+begin_src toml
+[window.padding]
+x = 6
+y = 6
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       53ff9430-9965-4c4f-a133-e144cf641c47
+:END:
+To enable auto-tangling on save, you'll need to add a function to your Emacs configuration. This requires
+Emacs with Org Mode and the =org-babel= functionality enabled (usually default). Add the following to
+your =~/.emacs.d/init.el= or equivalent (using =use-package= here for demonstration):
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
