@@ -1,0 +1,633 @@
+#+TITLE: i3 Window Manager Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:conf :tangle config :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* i3 Configuration
+:PROPERTIES:
+:ID:       ec9a7551-34d7-4172-86b1-379ce4e53a51
+:END:
+This is my personal configuration for the i3 window manager. It's written using Org Mode's literate
+programming features, which allows embedding documentation directly alongside the code. This file is
+configured to automatically "tangle" the code blocks into the actual i3 configuration file (named
+=config= in the same directory) whenever this Org file is saved in Emacs (see the [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]]
+section). This approach keeps the configuration well-documented and easier to manage.
+
+** Header
+:PROPERTIES:
+:ID:       107a2e74-7d42-4455-bb71-7bfb6ab7f8cf
+:END:
+This is just a simple header block containing ASCII art with personal information, which will appear at
+the top of the tangled =config= file.
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+
+#+end_src
+
+** Basic Settings
+:PROPERTIES:
+:ID:       c2a32a32-b383-45e3-83a6-7d3f710f908b
+:END:
+Here, we define some fundamental settings for i3.
+- =$mod=: Sets the primary modifier key. =Mod4= is typically the Super key (Windows key).
+- =$aux=: Sets an auxiliary modifier key. =Mod1= is usually the Alt key. Using an auxiliary modifier
+  allows for more keybinding combinations without conflicts.
+- =font=: Specifies the font used for window titles and, by default, the i3bar. =pango:DejaVu Sans Mono=
+  enables Pango for text rendering, which provides better support for Unicode glyphs (like icons),
+  right-to-left text, and improved scaling on high-resolution displays.
+#+begin_src conf
+set $mod Mod4
+set $aux Mod1
+
+font pango:DejaVu Sans Mono
+#+end_src
+
+** System Management
+:PROPERTIES:
+:ID:       e980bd11-e95c-4cff-8e22-387d238d1862
+:END:
+This section configures integration with system services and utilities.
+- =xss-lock=: Automatically locks the screen using a specified script
+  (=~/.config/i3/scripts/i3lock_script.sh=) before the system suspends. It uses `logind` to manage sleep
+  inhibitors. You can manually lock the screen using =loginctl lock-session=.
+- =nm-applet=: Starts the NetworkManager applet, providing a system tray icon for managing network
+  connections (especially useful for Wi-Fi).
+- =autorandr=: Manages display configurations. =exec_always= ensures it runs on startup and i3 restart.
+  The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
+  (=$mod+Shift+x=) is also set to manually trigger a display profile change.
+#+begin_src conf
+exec --no-startup-id xss-lock --transfer-sleep-lock ~/.config/i3/scripts/i3lock_script.sh
+
+exec --no-startup-id nm-applet
+
+# Screen resolution
+exec_always --no-startup-id sleep 2; autorandr --change
+bindsym $mod+Shift+x exec autorandr --change
+#+end_src
+
+** Audio Controls
+:PROPERTIES:
+:ID:       8cce53d6-97d3-48e4-86c8-23d81cb671de
+:END:
+Keybindings for controlling audio volume and media playback.
+- Volume control uses =pactl= (PulseAudio Control) to adjust the volume and mute status of the default
+  audio sink (output) and source (input/microphone).
+- =$refresh_i3status=: This variable defines a command to send the =SIGUSR1= signal to the =i3status=
+  process. This is commonly used to tell status bars (like i3bar or Polybar when using the i3status
+  module) to refresh their display immediately after a change (like volume).
+- Media keys (Next, Previous, Play/Pause) are bound to =playerctl=, a command-line utility to control
+  MPRIS-compatible media players (like Spotify, VLC, etc.).
+#+begin_src conf
+set $refresh_i3status killall -SIGUSR1 i3status
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -10% && $refresh_i3status
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && $refresh_i3status
+bindsym XF86AudioMicMute exec --no-startup-id pactl set-source-mute @DEFAULT_SOURCE@ toggle && $refresh_i3status
+
+bindsym XF86AudioNext exec playerctl next
+bindsym XF86AudioPrev exec playerctl previous
+bindsym XF86AudioPlay exec playerctl play-pause
+#+end_src
+
+** Brightness Controls
+:PROPERTIES:
+:ID:       5f791fdf-fa93-4355-be0b-9b03f5e0313b
+:END:
+Bindings for adjusting screen brightness using the dedicated function keys found on many laptops. It uses
+the =xbacklight= utility.
+#+begin_src conf
+bindsym XF86MonBrightnessUp exec xbacklight -inc 20
+bindsym XF86MonBrightnessDown exec xbacklight -dec 20
+#+end_src
+
+** Window Appearance
+:PROPERTIES:
+:ID:       ae204653-b553-499d-8c81-67385acb56fa
+:END:
+Settings related to how windows look and are arranged.
+- =for_window [class=".*"] border pixel 2=: This rule applies to all windows (matched by the regex =.*=)
+  and sets their border style to =pixel= with a thickness of 2 pixels. This effectively hides the default
+  title bars, saving screen space.
+- =gaps inner 4= / =gaps outer 4=: Configures gaps (empty space) between windows (inner) and between
+  windows and screen edges (outer).
+- The =smart_gaps on= line (commented out) would automatically remove outer gaps if there's only one
+  window on the workspace.
+- Keybindings are provided to dynamically adjust or reset inner and outer gaps during the session.
+#+begin_src conf
+# Disable titlebars
+for_window [class=".*"] border pixel 2
+
+# Use gaps
+# smart_gaps on
+gaps inner 4
+gaps outer 4
+
+bindsym $mod+Shift+t gaps inner current set 4; gaps outer current set 4
+bindsym $mod+s gaps inner current plus 5
+bindsym $mod+Shift+s gaps inner current minus 5
+bindsym $mod+Shift+d gaps inner current set 0; gaps outer current set 0
+bindsym $mod+z gaps outer current plus 5
+bindsym $mod+Shift+z gaps outer current minus 5
+#+end_src
+
+** Window Management
+:PROPERTIES:
+:ID:       27e3cc34-781f-474b-b34a-6072eb9e4bfb
+:END:
+Core bindings for managing windows.
+- =floating_modifier $mod=: Allows dragging floating windows by holding the =$mod= key (Super) and
+  clicking/dragging with the mouse.
+- =$terminal= / =$auxTerminal=: Defines variables for the preferred terminal emulator (=alacritty=) and
+  an auxiliary one (=ghostty=).
+- =$mod+Return=: Opens a new instance of the default terminal (=$terminal=).
+- =$mod+Shift+q=: Kills the currently focused window.
+- =$mod+d=: Launches =rofi= in =combi= mode, allowing searching for and launching applications (=drun=)
+  or switching to open windows (=window=).
+#+begin_src conf
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+
+# start a terminal
+set $terminal alacritty
+set $auxTerminal ghostty
+bindsym $mod+Return exec $terminal
+
+# kill focused window
+bindsym $mod+Shift+q kill
+
+# start rofi (a program launcher)
+bindsym $mod+d exec --no-startup-id "rofi -combi-modi window,drun -show combi"
+#+end_src
+
+** Navigation
+:PROPERTIES:
+:ID:       aab86286-395c-40f2-b7c5-051d31fcda2c
+:END:
+Keybindings for changing focus between windows and moving windows around.
+- Focus changes can be done using Vim-style keys (h, j, k, l) or the standard arrow keys, combined with
+  the =$mod= key.
+- Moving windows uses the same keys but adds the =Shift= modifier (e.g., =$mod+Shift+h= moves the focused
+  window left).
+- A dedicated "Resize" mode is defined, activated by =$mod+r=. While in this mode, the h, j, k, l keys
+  resize the focused window. Pressing =Return= or =Escape= exits the resize mode and returns to the
+  default keybinding set.
+#+begin_src conf
+# change focus
+bindsym $mod+h focus left
+bindsym $mod+j focus down
+bindsym $mod+k focus up
+bindsym $mod+l focus right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# move windows:
+bindsym $mod+Shift+h move left
+bindsym $mod+Shift+j move down
+bindsym $mod+Shift+k move up
+bindsym $mod+Shift+l move right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+bindsym $mod+r mode "Resize"
+
+mode "Resize" {
+    bindsym h resize shrink width 10 px or 10 ppt
+    bindsym j resize grow height 10 px or 10 ppt
+    bindsym k resize shrink height 10 px or 10 ppt
+    bindsym l resize grow width 10 px or 10 ppt
+
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+#+end_src
+
+** Layout Management
+:PROPERTIES:
+:ID:       dece85d5-2fd5-45f4-9999-6e7966081443
+:END:
+Bindings for controlling the layout of window containers.
+- =$mod+t=: Toggles the split orientation (horizontal/vertical) for the current container. New windows
+  will be placed accordingly.
+- =$mod+f=: Toggles fullscreen mode for the focused window or container.
+- =$mod+w= / =$mod+e=: Change the layout mode of the current container. =tabbed= shows windows like tabs
+  in a browser. =toggle split= switches between the default split layout and stacked layout (titles shown
+  vertically).
+- =$mod+Shift+space=: Toggles the focused window between tiling (managed by i3's layout) and floating
+  (can be moved/resized freely).
+- =$mod+space=: Switches focus between tiling and floating windows on the current workspace.
+- =$mod+a=: Moves focus to the parent container, useful for applying layout changes or moving multiple
+  windows together.
+#+begin_src conf
+# toggle split orientation
+bindsym $mod+t split toggle
+
+# enter fullscreen mode for the focused container
+bindsym $mod+f fullscreen toggle
+
+# change container layout (stacked, tabbed, toggle split)
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+
+# toggle tiling / floating
+bindsym $mod+Shift+space floating toggle
+
+# change focus between tiling / floating windows
+bindsym $mod+space focus mode_toggle
+
+# focus the parent container
+bindsym $mod+a focus parent
+#+end_src
+
+** Workspaces
+:PROPERTIES:
+:ID:       5f06548f-e0c6-43de-8313-efdced5931a9
+:END:
+Configuration related to i3 workspaces (virtual desktops).
+- Workspace names are defined using variables (=$ws1=, =$ws2=, etc.). This makes it easy to change names
+  later. Icons (like , ) are used, requiring a Nerd Font or similar for proper display in the status
+  bar.
+- Keybindings =$mod+[1-0]= switch to the corresponding workspace. =$mod+$aux+0= switches to workspace 11.
+- Keybindings =$mod+Shift+[1-0]= move the focused container to the corresponding workspace.
+  =$mod+$aux+Shift+0= moves to workspace 11.
+- Workspaces are explicitly assigned to specific monitor outputs (`primary`, `DP-2-1`, `DP-2-2`). This
+  ensures a consistent workspace layout across multiple monitors. Odd-numbered workspaces appear on the
+  primary monitor, even-numbered on the second, and workspace 11 on the third.
+#+begin_src conf
+# Define names for default workspaces for which we configure key bindings later on.
+# We use variables to avoid repeating the names in multiple places.
+set $ws1 "1: "
+set $ws2 "2: "
+set $ws3 "3: "
+set $ws4 "4: "
+set $ws5 "5: "
+set $ws6 "6: "
+set $ws7 "7: "
+set $ws8 "8"
+set $ws9 "9"
+set $ws10 "10"
+set $ws11 "11: "
+
+# switch to workspace
+bindsym $mod+1 workspace number $ws1
+bindsym $mod+2 workspace number $ws2
+bindsym $mod+3 workspace number $ws3
+bindsym $mod+4 workspace number $ws4
+bindsym $mod+5 workspace number $ws5
+bindsym $mod+6 workspace number $ws6
+bindsym $mod+7 workspace number $ws7
+bindsym $mod+8 workspace number $ws8
+bindsym $mod+9 workspace number $ws9
+bindsym $mod+0 workspace number $ws10
+bindsym $mod+$aux+0 workspace number $ws11
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number $ws1
+bindsym $mod+Shift+2 move container to workspace number $ws2
+bindsym $mod+Shift+3 move container to workspace number $ws3
+bindsym $mod+Shift+4 move container to workspace number $ws4
+bindsym $mod+Shift+5 move container to workspace number $ws5
+bindsym $mod+Shift+6 move container to workspace number $ws6
+bindsym $mod+Shift+7 move container to workspace number $ws7
+bindsym $mod+Shift+8 move container to workspace number $ws8
+bindsym $mod+Shift+9 move container to workspace number $ws9
+bindsym $mod+Shift+0 move container to workspace number $ws10
+bindsym $mod+$aux+Shift+0 move container to workspace number $ws11
+
+workspace $ws1 output primary
+workspace $ws3 output primary
+workspace $ws5 output primary
+workspace $ws7 output primary
+workspace $ws9 output primary
+
+workspace $ws2 output DP-2-1
+workspace $ws4 output DP-2-1
+workspace $ws6 output DP-2-1
+workspace $ws8 output DP-2-1
+workspace $ws10 output DP-2-1
+
+workspace $ws11 output DP-2-2
+#+end_src
+
+** System Commands
+:PROPERTIES:
+:ID:       cdedb31b-0b53-4504-8531-1a4164ae7c23
+:END:
+Bindings for managing the i3 session and the system itself.
+- =$mod+Shift+c=: Reloads the i3 configuration file (~/.config/i3/config). Useful after making changes.
+- =$mod+Shift+r=: Restarts i3 in place. This preserves the current layout and session, useful for
+  applying changes that require a restart or upgrading i3.
+- =$Locker=: Defines a variable for the screen locking command, using the same script as =xss-lock=.
+- A "System" mode (similar to the "Resize" mode) is defined for power management actions. Activated by
+  =$mod+Shift+e=, it provides single-key shortcuts for locking (l), logging out (e), suspending (s),
+  hibernating (h), rebooting (r), and shutting down (Shift+s). Pressing =Return= or =Escape= exits this
+  mode.
+#+begin_src conf
+# reload the configuration file
+bindsym $mod+Shift+c reload
+# restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
+bindsym $mod+Shift+r restart
+# lock the screen
+set $Locker exec "~/.config/i3/scripts/i3lock_script.sh"
+
+set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+mode "$mode_power" {
+    bindsym l exec --no-startup-id $Locker, mode "default"
+    bindsym e exec --no-startup-id i3-msg exit, mode "default"
+    bindsym s exec --no-startup-id systemctl suspend, mode "default"
+    bindsym h exec --no-startup-id systemctl hibernate, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id systemctl poweroff -i, mode "default"
+
+    # back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+
+bindsym $mod+Shift+e mode "$mode_power"
+#+end_src
+
+** Status Bar
+:PROPERTIES:
+:ID:       f71c0252-1c0c-484a-9454-a6fa11389b60
+:END:
+This section handles the status bar. Instead of using the default i3bar with i3status, this configuration
+uses Polybar.
+- =exec_always --no-startup-id .config/polybar/launch.sh=: Executes a script located at
+  =.config/polybar/launch.sh= on i3 startup and restart. This script is responsible for launching and
+  configuring the Polybar instances. The actual appearance and content of the bar are defined in the
+  Polybar configuration files, not here.
+#+begin_src conf
+# Start Polybar
+exec_always --no-startup-id .config/polybar/launch.sh
+#+end_src
+
+** Program Shortcuts
+:PROPERTIES:
+:ID:       74cae34a-66d8-42e6-b161-bd0552369f65
+:END:
+Custom keybindings to launch frequently used applications and perform specific actions.
+- =$aux+f=: Opens Thunar file manager.
+- =$aux+c=: Opens an image viewer (`xviewer`) showing a Vim cheatsheet.
+- =$aux+a=: Opens `lxappearance` for changing GTK themes, icons, and fonts.
+- =$mod+Shift+b=: Opens the auxiliary terminal (=$auxTerminal=, ghostty) running a script named `bmenu`.
+- Language Switching: =$aux+Shift+e= sets the keyboard layout to Spanish (es), =$aux+Shift+u= sets it to
+  US English (us) using =setxkbmap=.
+- Screenshots: Various bindings using =scrot= and =flameshot= for capturing the full screen, a selected
+  area (saving to file or clipboard), or launching the Flameshot GUI. The =--release= flag triggers the
+  action when the key is released.
+- Do Not Disturb: =$mod+m= toggles a Do Not Disturb mode via a custom script.
+- Custom Shortcuts: Bindings using =$aux= to open specific LibreOffice Calc spreadsheets (=loffice=) and
+  the Feishin music player.
+#+begin_src conf
+# Hotkeys for opening programs
+bindsym $aux+f exec /usr/bin/thunar
+bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
+bindsym $aux+a exec /usr/bin/lxappearance
+bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
+
+# Languages
+bindsym $aux+Shift+e exec setxkbmap es
+bindsym $aux+Shift+u exec setxkbmap us
+
+# Screenshots
+bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
+bindsym --release Shift+F12 exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
+bindsym --release Ctrl+Shift+F12 exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
+bindsym --release Ctrl+Shift+F11 exec flameshot gui
+
+# Do not disturb
+bindsym $mod+m exec "~/.config/i3/scripts/toggle_dnd.sh"
+
+# Shortcuts
+
+bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos\ USD.ods
+bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
+bindsym $aux+l exec feishin
+#+end_src
+
+** Focus Behavior
+:PROPERTIES:
+:ID:       28c668ac-c174-4c7f-a152-2434d377579c
+:END:
+Configures how window focus changes in relation to the mouse cursor.
+- =focus_follows_mouse no=: Disables focus follows mouse. This means a window only gains focus when
+  explicitly clicked on, not just when the mouse cursor moves over it. This can prevent accidental focus
+  changes.
+#+begin_src conf
+# Disable focus follows
+focus_follows_mouse no
+#+end_src
+
+** Workspace Assignments
+:PROPERTIES:
+:ID:       1632a49b-ec39-4b59-b457-0024c5c01265
+:END:
+Rules to automatically assign specific applications to predefined workspaces when they are opened. This
+helps maintain an organized workflow. Assignments are based on the window class (obtained using tools
+like `xprop`).
+- Browsers (LibreWolf, Firefox, etc.) go to $ws1 (Workspace 1). Brave goes to $ws10.
+- Development tools (Emacs, Postman, DBeaver) go to $ws2. Note the use of `for_window ... move` for
+  DBeaver, which might be necessary if `assign` doesn't work reliably for that specific application.
+- Terminals (Alacritty, ghostty) go to $ws3.
+- Communication apps (Slack, Telegram, Signal, etc.) go to $ws4.
+- Mail/Calendar apps (Evolution, Thunderbird, Mailspring) go to $ws5.
+- Music players (Spotify, Lollypop, Feishin, etc.) go to $ws6.
+- File managers (Thunar, Pcmanfm) go to $ws7.
+- Miscellaneous utilities (KeePassXC, Bitwarden, Joplin, KDE Connect, Liferea, NewsFlash) are assigned to
+  $ws8 and $ws9.
+- Floating Rules: Specific windows (like file transfer dialogs, Galculator, GParted, Nitrogen) are set to
+  open in floating mode automatically.
+- Urgent Focus: =for_window [urgent=latest] focus= automatically switches focus to a workspace containing
+  a window that has set its "urgent" hint (e.g., a new chat message notification).
+#+begin_src conf
+# Workspace Assignments
+# 1: Browsers
+assign [class="Brave"] $ws10
+assign [class="LibreWolf"] $ws1
+assign [class="firefox"] $ws1
+assign [class="zen"] $ws1
+assign [class="qutebrowser"] $ws1
+
+# 2: Development
+assign [class="Emacs"] $ws2
+assign [class="Postman"] $ws2
+for_window [class="DBeaver"] move to workspace $ws2
+
+# 3: Terminal
+assign [class="Alacritty"] $ws3
+assign [class="ghostty"] $ws3
+
+# 4: Communication
+assign [class="Slack"] $ws4
+assign [class="Telegram"] $ws4
+assign [class="Keybase"] $ws4
+assign [class="Ferdi"] $ws4
+assign [class="Signal"] $ws4
+assign [class="Element"] $ws4
+
+# 5: Mail/Calendar
+assign [class="Evolution"] $ws5
+assign [class="thunderbird"] $ws5
+assign [class="Mailspring"] $ws5
+
+# 6: Music
+for_window [class = "Spotify"] move to workspace $ws6
+assign [class="Lollypop"] $ws6
+assign [class="feishin"] $ws6
+assign [class="Clementine"] $ws6
+assign [class="Sublime-music"] $ws6
+
+# 7: File managers
+assign [class="Thunar"] $ws7
+assign [class="Pcmanfm"] $ws7
+
+# 8: Misc
+assign [class="KeePassXC"] $ws8
+assign [class="Bitwarden"] $ws8
+assign [class="Joplin"] $ws9
+assign [class="kdeconnect.app"] $ws9
+assign [class="Liferea"] $ws9
+assign [class="NewsFlash"] $ws9
+
+
+# Open specific applications in floating mode
+for_window [title="File Transfer*"] floating enable
+for_window [class="(Galculator|GParted|Nitrogen|Wireguard)"] floating enable border normal
+
+# switch to workspace with urgent window automatically
+for_window [urgent=latest] focus
+#+end_src
+
+** Autostart Applications
+:PROPERTIES:
+:ID:       7087b33c-9793-40e1-aa78-5ae49d6bf991
+:END:
+Applications and services launched automatically when i3 starts. The =--no-startup-id= flag prevents i3
+from showing a "busy" cursor while these applications load. =sleep= commands are used to stagger the
+startup of some applications, potentially reducing initial resource load or waiting for dependencies
+(like network or system tray) to become ready.
+- Core applications like Thunderbird (mail), Emacs (editor), Zen Browser, and a terminal instance are
+  started with delays.
+- =nitrogen --restore=: Restores the previously set wallpaper.
+- =blueman-applet=: System tray applet for Bluetooth management.
+- =polkit-gnome-authentication-agent-1=: Handles PolicyKit authentication requests (e.g., for
+  administrative tasks).
+- =gnome-keyring-daemon=: Manages passwords and secrets.
+- =unclutter=: Hides the mouse cursor when idle.
+- =xfce4-power-manager=: Handles power management events (like laptop lid close, battery levels).
+- =pamac-tray=: Provides notifications for package updates (on Arch-based systems using Pamac).
+- =picom=: A compositor, responsible for visual effects like transparency, shadows, and fading.
+  =exec_always= ensures it restarts if it crashes.
+- =xfce4-notifyd=: A notification daemon to display desktop notifications.
+- =autotiling=: A script that automatically adjusts the split direction (horizontal/vertical) based on
+  window dimensions, aiming for a more balanced layout.
+- =xinput set-prop 14 345 1=: Likely a specific command to configure a touchpad or mouse setting (device
+  ID 14, property 345 set to 1). This is hardware-specific.
+- =play-with-mpv=: Likely related to a browser extension that allows opening videos in the MPV player.
+- =~/.config/i3/connect-speakers.sh=: A custom script, probably for setting up audio outputs.
+- =kdeconnect-app=: Starts the KDE Connect application for integrating phone notifications and file
+  sharing.
+- =dbus-update-activation-environment=: Ensures important environment variables (like =DISPLAY=) are
+  available to D-Bus activated services, which is crucial for proper integration of many modern desktop
+  applications.
+#+begin_src conf
+# Autostarts
+exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
+exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
+exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
+exec --no-startup-id sleep 5; exec $terminal
+exec --no-startup-id sleep 10; exec nitrogen --restore
+exec --no-startup-id blueman-applet
+exec --no-startup-id /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
+exec --no-startup-id /usr/bin/gnome-keyring-daemon --start --components=pkcs11,secrets,ssh
+exec --no-startup-id /usr/bin/unclutter
+exec --no-startup-id xfce4-power-manager
+exec --no-startup-id pamac-tray
+exec_always --no-startup-id sleep 5; exec picom
+exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
+exec_always --no-startup-id autotiling
+exec --no-startup-id xinput set-prop 14 345 1
+exec --no-startup-id exec /usr/bin/play-with-mpv
+exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
+exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
+exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
+#+end_src
+
+** Scripts
+:PROPERTIES:
+:ID:       126b52b7-5aad-4f45-a296-b425503d6043
+:END:
+Execution of custom scripts and miscellaneous bindings.
+- =internet_check.sh= (commented out) and =weather_notify.sh= are custom scripts launched at startup
+  (likely for status bar information or notifications).
+- =$aux+p=: A keybinding that generates a 50-character random password using =/dev/urandom= and =tr=,
+  copies it to the clipboard using =xclip=, and sends a notification.
+#+begin_src conf
+# Small scripts
+# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
+exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh &
+
+# Random scripts
+## Generate a random password and copy it to the clipboard
+bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\]^_`{|}~' </dev/urandom | head -c 50 | xclip -selection clipboard && notify-send 'Copied a random password to the clipboard' -i password"
+#+end_src
+
+** Appearance
+:PROPERTIES:
+:ID:       df9bc8c5-3bc4-4644-aa5c-f78b99b220eb
+:END:
+Defines the colors used for window borders and title bars (though title bars are effectively hidden by
+the `border pixel` setting earlier, these colors still define the border appearance). Colors are
+specified for different window states: focused, inactive focused, unfocused, urgent, and placeholder.
+Each line defines colors for the border, background, text, indicator (used in tabbed/stacked layouts),
+and child border.
+#+begin_src conf
+# Window colors
+# class                 border  backgr. text    indicator child_border
+client.focused          #75D85A #75D85A #424242 #75D85A   #75D85A
+client.focused_inactive #3B4B58 #3B4B58 #ffffff #3B4B58   #3B4B58
+client.unfocused        #202932 #202932 #7A7A7A #202932   #202932
+client.urgent           #990000 #990000 #ffffff #990000   #990000
+client.placeholder      #0c0c0c #0c0c0c #ffffff #000000   #0c0c0c
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       1b2cd201-99aa-43a3-a5bd-3679716d279d
+:END:
+This final section provides instructions for users of Emacs on how to enable the automatic tangling
+feature used by this configuration file. It involves adding a small piece of Emacs Lisp code to the
+user's Emacs configuration (=~/.emacs.d/init.el= or similar). This code defines a function
+=org-babel-auto-tangle= that checks if an Org file being saved has the =#+auto_tangle: t= property set.
+If it does, it automatically runs =org-babel-tangle=, extracting the code blocks into the target file
+specified by the =:tangle= header argument (in this case, the =config= file). This function is then added
+to the =after-save-hook=, ensuring it runs every time an Org file is saved.
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
