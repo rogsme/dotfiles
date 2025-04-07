@@ -8,12 +8,9 @@
 :ID:       e7ff52ea-2ed0-4258-8016-323934fa2724
 :END:
 
-[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-185327.png]]
-
-[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-185523.png]]
-
-[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-190422.png]]
-
+[[https://gitlab.com/-/project/16079618/uploads/f422a18768ccf21958dba0c2ef6cab5b/2025-01-07-185327.png]]
+[[https://gitlab.com/-/project/16079618/uploads/993e7b45fe20bd01b751013f6845355a/2025-01-07-185523.png]]
+[[https://gitlab.com/-/project/16079618/uploads/13c70f7b3737397348bba6318145787e/2025-01-07-190422.png]]
 
 Dotfiles are the customization files that are used to personalize your Linux or other Unix-based system.
 You can tell that a file is a dotfile because the name of the file will begin with a period--a dot! The
