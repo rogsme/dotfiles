@@ -1,0 +1,96 @@
+#+TITLE: Dotfiles
+#+AUTHOR: Roger González
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil h:4
+
+* Dotfiles
+:PROPERTIES:
+:ID:       e7ff52ea-2ed0-4258-8016-323934fa2724
+:END:
+[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-185327.png]]
+[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-185523.png]]
+[[https://gitlab.com/rogs/dotfiles/-/raw/master/screenshots/2025-01-07-190422.png]]
+
+Dotfiles are the customization files that are used to personalize your Linux or other Unix-based system.
+You can tell that a file is a dotfile because the name of the file will begin with a period--a dot! The
+period at the beginning of a filename or directory name indicates that it is a hidden file or directory.
+This repository contains my personal dotfiles. They are stored here for convenience so that I may quickly
+access them on new machines or new installs. Also, others may find some of my configurations helpful in
+customizing their own dotfiles.
+
+** Configurations
+:PROPERTIES:
+:ID:       81c82579-f802-4ed4-8728-10b80f5271f2
+:END:
+All important configuration files are designed to be managed with Org-mode's tangling feature. Each
+configuration is contained in a =README.org= file that automatically tangles to the appropriate config
+file when saved.
+
+| Configuration | Description                       | Path                           |
+|---------------+-----------------------------------+--------------------------------|
+| [[./.config/i3/README.org][i3wm]]          | Tiling window manager             | =.config/i3/README.org=        |
+| [[./.config/polybar/README.org][Polybar]]       | Status bar                        | =.config/polybar/README.org=   |
+| [[./.config/alacritty/README.org][Alacritty]]     | GPU-accelerated terminal emulator | =.config/alacritty/README.org= |
+| [[./.config/fish/README.org][Fish Shell]]    | User-friendly shell               | =.config/fish/README.org=      |
+| [[./.config/ghostty/README.org][Ghostty]]       | Modern terminal emulator          | =.config/ghostty/README.org=   |
+
+** Who Am I?
+:PROPERTIES:
+:ID:       eb1fa4e2-77fb-4a7f-ae31-e2413ad634e0
+:END:
+#+HTML: <img align="left" border="0" padding="4" src="https://gitlab.com/rogs/dotfiles/-/raw/master/.me-small.png">
+
+- My website: https://rogs.me
+- My wiki: https://wiki.rogs.me
+- My gitlab: https://gitlab.com/rogs
+
+** How To Manage Your Own Dotfiles
+:PROPERTIES:
+:ID:       c6e5d53d-e85e-4e02-9a0d-5c25f8a003f2
+:END:
+There are a hundred ways to manage your dotfiles. My first suggestion would be to read up on the subject.
+A great place to start is "Your unofficial guide to dotfiles on GitHub": https://dotfiles.github.io/
+
+Personally, I use the git bare repository method for managing my dotfiles:
+https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo/
+
+** Org-mode Tangling
+:PROPERTIES:
+:ID:       0b82ec84-cdf5-4b6e-9038-40676a629385
+:END:
+All configuration files in this repository use Org-mode's literate programming capabilities through
+tangling. This approach offers several benefits:
+
+- *Documentation and code together*: Each configuration file includes both the code and detailed
+  explanations
+- *Organized structure*: Configurations are broken down into logical sections with headings
+- *Auto-tangling*: Files are automatically processed when saved (with proper setup)
+
+*** Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       27863cd5-b90e-41a6-aca8-efa6f49f48fa
+:END:
+To enable auto-tangling on save, add the following to your Emacs configuration:
+
+#+begin_src emacs-lisp
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
+
+** License
+:PROPERTIES:
+:ID:       268cdeb6-6ec6-4beb-95f7-63c5b4327af0
+:END:
+The files and scripts in this repository are licensed under the GNU General Public License v3.0
+(GPL-3.0). This is a copyleft license that requires anyone who distributes your code or a derivative work
+to make the source available under the same terms. It also provides an express grant of patent rights
+from contributors to users. The GPL-3.0 ensures your code remains free and open source, protecting it
+from being incorporated into proprietary software.
