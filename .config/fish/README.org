@@ -1,0 +1,208 @@
+#+TITLE: Fish Shell Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:fish :tangle config.fish :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* Fish Shell Configuration
+:PROPERTIES:
+:ID:       e853361b-1423-4531-a381-28d974cdbf2b
+:END:
+This document outlines my personal configuration for the Fish shell (Friendly Interactive SHell). It's
+written using Org Mode for literate programming, allowing configuration code and documentation to coexist
+seamlessly. The setup automatically tangles the code blocks into a usable =config.fish= file located in
+the appropriate Fish configuration directory whenever this Org file is saved in Emacs (see [[Setting Up Auto-Tangle][Setting Up
+Auto-Tangle]] section).
+
+The primary goal is to create a productive, visually informative, and customized shell environment.
+
+** How it looks
+:PROPERTIES:
+:ID:       dd9efae8-f35a-4a36-85a8-805ce30634b2
+:END:
+A preview of the shell appearance with the configured theme and settings:
+[[https://raw.githubusercontent.com/Rogergonzalez21/fish_dotfiles/master/preview.png]]
+
+** Uses
+:PROPERTIES:
+:ID:       cfb962e7-b2b4-4679-9a37-4e910c06e0b2
+:END:
+This configuration leverages several tools and concepts:
+- [[https://github.com/jorgebucaran/fisher][Fisher]]: A plugin manager for the Fish shell, used to install themes and plugins.
+- [[https://github.com/oh-my-fish/oh-my-fish][Oh my fish!]]: While not explicitly used for managing plugins here (Fisher is preferred), the ecosystem
+  provides inspiration and potentially themes/functions.
+- [[https://github.com/oh-my-fish/theme-bobthefish][Bobthefish]]: A popular and highly configurable Powerline-style theme for Fish, providing informative
+  prompts.
+- My own abbreviations: Custom shortcuts defined in =abbreviations.fish= to speed up common commands.
+
+* Configuration
+:PROPERTIES:
+:ID:       0a3f89c0-6e0a-4e6d-ba21-883d5acde098
+:END:
+This section contains the core configuration code, broken down into logical parts.
+
+** Header
+:PROPERTIES:
+:ID:       2ad9ca5a-ee36-4af7-a9c5-54cdeba05901
+:END:
+A decorative ASCII art header included at the top of the generated =config.fish= file.
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+
+#+end_src
+
+** Basic Settings
+:PROPERTIES:
+:ID:       95e96731-ed36-4d2e-ab6d-18f3ea773768
+:END:
+Fundamental settings to control shell behavior, appearance, and environment variables.
+#+begin_src fish
+# Enable Vi key bindings for command-line editing
+fish_vi_key_bindings
+# Disable the default Fish greeting message
+set fish_greeting ""
+# Add paths for Ruby gems and Sonar Scanner to the system PATH
+set -gx PATH /home/roger/.gem/ruby/2.7.0/bin /opt/sonar-scanner/bin $PATH
+# Enable Powerline fonts for the theme
+set -g theme_powerline_fonts yes
+# Disable prompt modification by Python virtual environments (handled by the theme)
+set -x VIRTUAL_ENV_DISABLE_PROMPT 1
+# Set the Bobthefish theme color scheme to dark
+set -g theme_color_scheme dark
+# Disable date display in the theme's prompt
+set -g theme_display_date no
+# Set the terminal type for compatibility (ensures colors and features work correctly)
+set -x TERM xterm-256color
+# Set the default command-line editor to Vim
+set -x EDITOR vim
+# Set the default visual editor (often used by programs like git) to Vim
+set -x VISUAL vim
+#+end_src
+
+** Aliases
+:PROPERTIES:
+:ID:       ed262dc3-f58f-44f0-8bde-ac57c457b706
+:END:
+Custom shortcuts (aliases) for frequently used commands to reduce typing and improve workflow.
+#+begin_src fish
+# Alias for managing dotfiles using a bare Git repository
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+# Add interactive confirmation prompts before removing files
+alias rm='rm -i'
+# Add interactive confirmation prompts before moving/renaming files
+alias mv='mv -i'
+# Shortcut to navigate to the parent directory
+alias ..='cd ..'
+# Shortcut for the Doom Emacs command-line interface
+alias doom='$HOME/.config/emacs/bin/doom'
+# Use 'exa' for directory listings: long format, all files, colors, icons, dirs first
+alias ls='exa -la --color=always --group-directories-first --icons'
+# Ping personal website
+alias pr='ping rogs.me'
+# Get current public IP address using ifconfig.me
+alias my-ip="curl ifconfig.me"
+# Use emacsclient to connect to a running Emacs daemon for faster startup
+alias emacs="emacsclient -c -a 'emacs'"
+# Use ripgrep (rg) for searching: show line numbers, filename, smart case sensitivity
+alias grep="rg -n --with-filename --smart-case"
+# Specific xrandr command to configure displays for a docking station setup
+alias dock="xrandr --output DP-2-3 --auto --primary --left-of DP-2-1 --output DP-2-1 --auto --output eDP-1 --off"
+#+end_src
+
+** External Configuration
+:PROPERTIES:
+:ID:       99b34469-ea64-4d8c-9091-176a0ac38c4d
+:END:
+Load configurations stored in separate files.
+#+begin_src fish
+# Source a separate file containing custom Fish shell abbreviations
+source "$HOME/.config/fish/abbreviations.fish"
+#+end_src
+
+** System Utilities
+:PROPERTIES:
+:ID:       53f4073c-9351-46af-a09c-0c2af2c16ae3
+:END:
+Aliases for various system administration, monitoring, and troubleshooting tasks.
+#+begin_src fish
+# Monitor CPU frequency in real-time using 'watch'
+alias cpuinfo="watch -n1 'grep \"^[c]pu MHz\" /proc/cpuinfo'"
+# Connect to ProtonVPN, specifying US servers and UDP protocol
+alias vpn-on="sudo protonvpn c --cc US -p UDP"
+# Disconnect from ProtonVPN
+alias vpn-off="sudo protonvpn d"
+# Attempt to fix Bluetooth issues by restarting services and running a connection script
+alias fix-bluetooth="sudo systemctl restart bluetooth.service && sleep 10 && sudo systemctl restart logid.service && bash ~/.config/i3/connect-speakers.sh > /dev/null 2>&1"
+# Use xprop to get the WM_CLASS property of a window (useful for window manager rules)
+alias get-class="xprop | grep WM_CLASS"
+# Update the aider-chat tool using uv and pip, ensuring playwright dependencies are met
+alias update-aider="uv tool install --force --python python3.12 aider-chat@latest && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m pip install --upgrade --upgrade-strategy only-if-needed aider-chat[playwright] && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m playwright install chromium"
+#+end_src
+
+** External Tools Integration
+:PROPERTIES:
+:ID:       8cb58d5f-3d36-44ab-ace3-02eee923754a
+:END:
+Code snippets required to integrate external command-line tools, primarily for enabling shell completions
+and setting up environment variables.
+#+begin_src fish
+# tabtab source for packages (Currently commented out)
+# Provides generic completion support for various tools.
+# uninstall by removing these lines
+# [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
+
+# The next line updates PATH for the Google Cloud SDK.
+# Sources the script provided by Google Cloud SDK to add its tools to the PATH.
+if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end
+
+# Ngrok completion
+# Enables command-line completion for the ngrok tool if it's installed.
+if command -v ngrok >/dev/null
+    eval (ngrok completion | source)
+end
+
+# Kubectl completion
+# Enables command-line completion for the kubectl (Kubernetes CLI) tool if it's installed.
+if command -v kubectl >/dev/null
+    eval (kubectl completion fish | source)
+end
+
+# ASDF
+# Sources the initialization script for the ASDF version manager, making its commands available.
+source ~/.asdf/asdf.fish
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       b080b2cc-8841-4ee5-8c1c-e39588e9f7b6
+:END:
+
+This configuration file uses Org Mode's literate programming capabilities. To automatically generate the
+=config= file needed by Polybar every time this =.org= file is saved in Emacs, you need to add the
+following Elisp code to your Emacs initialization file (e.g., =~/.emacs.d/init.el=). This code defines a
+function `org-babel-auto-tangle` and adds it to the `after-save-hook`. When an Org file is saved, this
+function checks for the `#+auto_tangle: t` property at the beginning of the file and, if found, runs
+`org-babel-tangle` to generate the output file(s) (in this case, =config=).
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved if they have '#+auto_tangle: t'."
+    (when (eq major-mode 'org-mode)
+      ;; Check for the #+auto_tangle property in the Org file
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        ;; If the property exists and is set to "t", tangle the file
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  ;; Add the function to the 'after-save-hook' to run it after every save
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
