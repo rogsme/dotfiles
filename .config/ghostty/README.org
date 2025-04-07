@@ -1,0 +1,170 @@
+#+TITLE: Ghostty Terminal Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args :tangle config :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* Ghostty Terminal Configuration
+:PROPERTIES:
+:ID:       38ee36dc-396b-4430-9b8c-e121f9a53932
+:END:
+This file contains the configuration settings for the Ghostty terminal emulator. It's written using Org
+Mode's literate programming features, allowing for clear documentation alongside the configuration code.
+
+The configuration is automatically tangled (extracted) into a file named =config= in the same directory
+whenever this Org file is saved in Emacs, thanks to the =#+auto_tangle: t= property and a custom Emacs
+Lisp function (detailed at the end). This ensures the Ghostty application always uses the latest settings
+defined here.
+
+** Header
+:PROPERTIES:
+:ID:       912f9aa5-9c5f-4b27-8590-e123b5a2cdaa
+:END:
+A decorative header block.
+
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+
+#+end_src
+
+** Basic Settings
+:PROPERTIES:
+:ID:       a8db8b74-02c0-41d8-bf1b-6fa1e9cb17f4
+:END:
+This section covers fundamental appearance and behavior settings for the terminal window.
+
+#+begin_src conf
+#########
+# Basic #
+#########
+gtk-titlebar=false          # Use Ghostty's custom titlebar instead of the GTK default.
+background-opacity = 0.80   # Set the terminal background transparency (0.0=fully transparent, 1.0=fully opaque).
+term = xterm-256color       # Set the TERM environment variable value reported by the terminal.
+confirm-close-surface=false # Disable confirmation dialog when closing a terminal window/tab.
+window-decoration=false     # Disable window decorations (like borders and title bar) managed by the window manager. Useful for tiling WMs.
+mouse-scroll-multiplier=2   # Adjust the speed of scrolling with the mouse wheel.
+
+font-size = 12              # Set the default font size.
+font-family = MesloLGS NF   # Specify the primary font family. 'MesloLGS NF' includes Nerd Fonts glyphs.
+class = ghostty             # Set the window class hint, useful for window manager rules.
+font-thicken = true         # Apply a slight thickening effect to the font for better visibility.
+#+end_src
+
+** Colors
+:PROPERTIES:
+:ID:       e0d66d24-0727-4fae-9c7b-207f58c60bed
+:END:
+Defines the core color elements of the terminal interface.
+
+#+begin_src conf
+##########
+# Colors #
+##########
+
+background = 000000           # Default background color (black).
+foreground = d0d0d0           # Default text color (light gray).
+selection-background = 555555 # Background color for selected text (medium gray).
+#+end_src
+
+** Normal Colors
+:PROPERTIES:
+:ID:       43c754d2-a6ae-4dc0-8a5f-099e5db52085
+:END:
+These are the standard 8 ANSI colors used by many terminal applications.
+
+#+begin_src conf
+# Normal colors
+# Black
+palette = 0=#282a36
+# Red
+palette = 1=#f07178
+# Green
+palette = 2=#c3e88d
+# Yellow
+palette = 3=#ffcb6b
+# Blue
+palette = 4=#82aaff
+# Magenta
+palette = 5=#c792ea
+# Cyan
+palette = 6=#89ddff
+# White
+palette = 7=#d0d0d0
+#+end_src
+
+** Bright Colors
+:PROPERTIES:
+:ID:       ebc101e5-ef7a-4e04-b17c-b362535e15d7
+:END:
+These are the brighter variants of the standard 8 ANSI colors.
+
+#+begin_src conf
+# Bright colors
+# Black
+palette = 8=#434758
+# Red
+palette = 9=#ff8b92
+# Green
+palette = 10=#ddffa7
+# Yellow
+palette = 11=#ffe585
+# Blue
+palette = 12=#9cc4ff
+# Magenta
+palette = 13=#e1acff
+# Cyan
+palette = 14=#a3f7ff
+# White
+palette = 15=#ffffff
+#+end_src
+
+** Cursor Settings
+:PROPERTIES:
+:ID:       4d4c0742-314e-4ffa-b297-c9b23f2ebd51
+:END:
+Controls the appearance and behavior of the text cursor within the terminal.
+
+#+begin_src conf
+# Cursor
+cursor-color = #FFFFFF          # The color of the cursor itself (white).
+cursor-text = #000000           # The color of the text character under the cursor (black).
+cursor-style-blink = false      # Disable cursor blinking.
+cursor-style = block            # Set the cursor shape to a solid block.
+shell-integration-features = no-cursor # Disable cursor shape changes based on shell integration hints (e.g., Vim mode).
+cursor-invert-fg-bg = true      # When the cursor is over text, invert the foreground and background colors instead of using cursor-text.
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       fae42d41-2163-436c-b0ed-7601e6682929
+:END:
+
+This configuration file uses Org Mode's literate programming capabilities. To automatically generate the
+=config= file needed by Polybar every time this =.org= file is saved in Emacs, you need to add the
+following Elisp code to your Emacs initialization file (e.g., =~/.emacs.d/init.el=). This code defines a
+function `org-babel-auto-tangle` and adds it to the `after-save-hook`. When an Org file is saved, this
+function checks for the `#+auto_tangle: t` property at the beginning of the file and, if found, runs
+`org-babel-tangle` to generate the output file(s) (in this case, =config=).
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved if they have '#+auto_tangle: t'."
+    (when (eq major-mode 'org-mode)
+      ;; Check for the #+auto_tangle property in the Org file's keywords
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        ;; If the property exists and is set to "t", tangle the file
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  ;; Run the auto-tangle function after any buffer is saved
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src

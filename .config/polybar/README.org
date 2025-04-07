@@ -20,6 +20,7 @@ file, thanks to the =#+auto_tangle: t= property and a corresponding Emacs setup 
 :END:
 This section adds an ASCII art header comment to the top of the tangled =config= file for
 personalization. It doesn't affect Polybar's functionality.
+
 #+begin_src conf
 #
 # ██████╗  ██████╗  ██████╗ ███████╗
