@@ -500,10 +500,11 @@ Now, write the commit message in this exact format:
   (setenv "OPENAI_API_KEY" openai-key)
   (setenv "GEMINI_API_KEY" gemini-key)
   (setenv "OLLAMA_API_BASE" ollama-api-base)
+  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "gemini-2.5-pro")
+  (setq aidermacs-default-model "openrouter/google/gemini-2.5-pro-exp-03-25:free")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
