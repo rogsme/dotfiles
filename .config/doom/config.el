@@ -496,10 +496,10 @@ Now, write the commit message in this exact format:
 
 (after! aidermacs
   ;; Set API keys
-  (setenv "ANTHROPIC_API_KEY" anthropic-key)
-  (setenv "OPENAI_API_KEY" openai-key)
-  (setenv "GEMINI_API_KEY" gemini-key)
-  (setenv "OLLAMA_API_BASE" ollama-api-base)
+  ;; (setenv "ANTHROPIC_API_KEY" anthropic-key)
+  ;; (setenv "OPENAI_API_KEY" openai-key)
+  ;; (setenv "GEMINI_API_KEY" gemini-key)
+  ;; (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
 
   ;; General settings
