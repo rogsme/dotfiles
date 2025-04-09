@@ -102,8 +102,8 @@ alias mv='mv -i'
 alias ..='cd ..'
 # Shortcut for the Doom Emacs command-line interface
 alias doom='$HOME/.config/emacs/bin/doom'
-# Use 'exa' for directory listings: long format, all files, colors, icons, dirs first
-alias ls='exa -la --color=always --group-directories-first --icons'
+# Use 'eza' for directory listings: long format, all files, colors, icons, dirs first
+alias ls='eza -la --color=always --group-directories-first --icons'
 # Ping personal website
 alias pr='ping rogs.me'
 # Get current public IP address using ifconfig.me
