@@ -469,6 +469,24 @@ related notes or tasks."
 
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
+(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
+  (when-let ((buf (magit-commit-message-buffer)))
+    (with-current-buffer buf
+      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
+        (apply orig-fun args)
+        (unless (string-empty-p orig-message)
+          (save-excursion
+            (goto-char (point-min))
+            (insert orig-message)))))))
+
+(advice-add 'magit-gptcommit-commit-accept
+
+(map! :leader
+      (:prefix-map ("l" . "LLMs")
+       :desc "Aidermacs" "a" #'aidermacs-transient-menu
+       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
+
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")

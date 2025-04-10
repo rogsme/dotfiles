@@ -487,11 +487,11 @@ derived from emails, leverages powerful text editing capabilities for composing 
 consistent keyboard-driven interface.
 
 Key components of this setup:
-- **Backend Tools:** Uses =mbsync= (from =isync=) for fetching mail via IMAP and =msmtp= for sending mail
+- Backend Tools: Uses =mbsync= (from =isync=) for fetching mail via IMAP and =msmtp= for sending mail
   via SMTP. These are external tools that =mu4e= interfaces with.
-- **Mail Storage:** Mail is stored locally in the Maildir format specified by =mu4e-maildir= (=~/.mail=),
+- Mail Storage: Mail is stored locally in the Maildir format specified by =mu4e-maildir= (=~/.mail=),
   enabling offline access and fast searching via the =mu= indexer.
-- **Configuration Structure:** The settings are broken down into logical blocks below: Basic Setup,
+- Configuration Structure: The settings are broken down into logical blocks below: Basic Setup,
   Composing, Viewing, Sending, Account Specific, and Custom Marks.
 
 *Note:* This setup requires the =mu= command-line tool and its Emacs interface, =mu4e=. If =mu4e= is
@@ -888,6 +888,8 @@ The configuration below sets up Clipmon to check the clipboard every second and 
             (insert orig-message)))))))
 
 (advice-add 'magit-gptcommit-commit-accept
+#+end_src
+
 ** LLM
 :PROPERTIES:
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
