@@ -294,6 +294,64 @@ related notes or tasks."
                          '(:immediate-finish t)))))
       (apply #'org-roam-node-insert args))))
 
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+
+(after! mu4e
+  (setq mu4e-maildir "~/.mail"
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval 150
+        mu4e-change-filenames-when-moving t))
+
+(after! mu4e
+  (setq mu4e-compose-format-flowed t
+        mu4e-compose-org-mode nil
+        mu4e-compose-html-format-flowed nil
+        mu4e-compose-signature-auto-include nil))
+
+(after! mu4e
+  (setq mu4e-view-show-images t
+        mm-text-html-renderer 'shr))
+
+(after! mu4e
+  (setq message-kill-buffer-on-exit t
+        auth-sources '("~/.authinfo.gpg")
+        sendmail-program (executable-find "msmtp")
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function #'message-send-mail-with-sendmail))
+
+(after! mu4e
+  (set-email-account! "roger@rogs.me"
+    `((mu4e-sent-folder       . "/roger@rogs.me/Sent")
+      (mu4e-drafts-folder     . "/roger@rogs.me/Drafts")
+      (mu4e-trash-folder      . "/roger@rogs.me/Trash")
+      (mu4e-refile-folder     . "/roger@rogs.me/Archive")
+      (smtpmail-smtp-user     . "roger@rogs.me")
+      (smtpmail-smtp-server   . "127.0.0.1")
+      (smtpmail-smtp-service  . 1025)
+      (smtpmail-stream-type   . starttls)
+      (user-mail-address      . "roger@rogs.me")
+      (mu4e-compose-signature . ,(string-join
+        '("Roger González"
+          "Senior Python Developer / DevOps engineer"
+          ""
+          "E: roger@rogs.me"
+          "P: +59899563410"
+          "W: https://rogs.me"
+          "PGP: ADDF BCB7 8B86 8D93 FC4E 3224 C7EC E9C6 C36E C2E6")
+        "\n")))
+    t))
+
+(setq mu4e-marks
+      `((refile
+         :char ("r" . "▶")
+         :prompt "refile"
+         :dyn-target (lambda (msg) (mu4e-get-refile-folder msg))
+         :action (lambda (docid msg target)
+                   (mu4e--server-move docid
+                                      (mu4e--mark-check-target target) "-FLAGS \\Draft")))
+        ,@mu4e-marks))
+
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-headerline-breadcrumb-icons-enable t))
@@ -411,25 +469,6 @@ related notes or tasks."
 
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
-(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
-  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
-  (when-let ((buf (magit-commit-message-buffer)))
-    (with-current-buffer buf
-      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
-        (apply orig-fun args)
-        (unless (string-empty-p orig-message)
-          (save-excursion
-            (goto-char (point-min))
-            (insert orig-message)))))))
-
-(advice-add 'magit-gptcommit-commit-accept
-            :around #'my/magit-gptcommit-commit-accept-wrapper)
-
-(map! :leader
-      (:prefix-map ("l" . "LLMs")
-       :desc "Aidermacs" "a" #'aidermacs-transient-menu
-       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
-
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
@@ -504,11 +543,11 @@ Now, write the commit message in this exact format:
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "openrouter/google/gemini-2.5-pro-exp-03-25:free")
+  (setq aidermacs-default-model "gemini/gemini-2.5-pro-exp-03-25")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
-  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings --map-tokens 8192"))
 
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)

@@ -476,6 +476,140 @@ related notes or tasks."
       (apply #'org-roam-node-insert args))))
 #+end_src
 
+* Email (mu4e)
+:PROPERTIES:
+:ID:       aecdbef2-af4b-4f9b-9aa4-94393b66395f
+:END:
+
+This section configures my email client, =mu4e= (mu for Emacs), integrating email directly into my Emacs
+workflow. Managing email within Emacs allows for seamless integration with Org mode for task management
+derived from emails, leverages powerful text editing capabilities for composing messages, and maintains a
+consistent keyboard-driven interface.
+
+Key components of this setup:
+- **Backend Tools:** Uses =mbsync= (from =isync=) for fetching mail via IMAP and =msmtp= for sending mail
+  via SMTP. These are external tools that =mu4e= interfaces with.
+- **Mail Storage:** Mail is stored locally in the Maildir format specified by =mu4e-maildir= (=~/.mail=),
+  enabling offline access and fast searching via the =mu= indexer.
+- **Configuration Structure:** The settings are broken down into logical blocks below: Basic Setup,
+  Composing, Viewing, Sending, Account Specific, and Custom Marks.
+
+*Note:* This setup requires the =mu= command-line tool and its Emacs interface, =mu4e=. If =mu4e= is
+installed system-wide (e.g., via a package manager) instead of through Doom's =:email mu4e= module, you
+might need to explicitly add its directory (often =/usr/share/emacs/site-lisp/mu4e=) to Emacs'
+=load-path=, as shown in the first code block below. If Doom manages =mu4e=, that line might be
+redundant.
+
+#+begin_src emacs-lisp
+(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e")
+#+end_src
+
+*** Basic Setup (Maildir, Fetching)
+:PROPERTIES:
+:ID:       503999c4-db77-42fa-8686-df4839bf618b
+:END:
+This block sets the root mail directory, the command used to fetch mail (=mbsync=), the interval for
+checking new mail, and ensures compatibility with =mbsync= when moving files.
+#+begin_src emacs-lisp
+(after! mu4e
+  (setq mu4e-maildir "~/.mail"
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-update-interval 150
+        mu4e-change-filenames-when-moving t))
+#+end_src
+
+*** Composing Settings
+:PROPERTIES:
+:ID:       e1b5f5af-7c44-4539-a9b6-96e1c0f6e1e8
+:END:
+These settings control aspects of writing emails, such as using =format=flowed= for plain text, disabling
+Org mode for composing by default, and preventing automatic signature insertion.
+#+begin_src emacs-lisp
+(after! mu4e
+  (setq mu4e-compose-format-flowed t
+        mu4e-compose-org-mode nil
+        mu4e-compose-html-format-flowed nil
+        mu4e-compose-signature-auto-include nil))
+#+end_src
+
+*** Viewing Settings
+:PROPERTIES:
+:ID:       fd5baefb-ac40-40e5-bfff-f5f6cd58a392
+:END:
+Configure how emails are displayed, enabling inline images and setting =shr= as the HTML renderer.
+#+begin_src emacs-lisp
+(after! mu4e
+  (setq mu4e-view-show-images t
+        mm-text-html-renderer 'shr))
+#+end_src
+
+*** Sending Settings (General)
+:PROPERTIES:
+:ID:       4d47f993-be0f-4156-a31b-eab5331fbe1e
+:END:
+This block configures the general mechanism for sending mail, specifying the external program (=msmtp=),
+the source for authentication credentials (=~/.authinfo.gpg=), and the function Emacs uses to initiate
+sending. It also ensures the compose buffer closes after sending and passes necessary arguments to
+=msmtp=. Specific server details are handled per-account.
+#+begin_src emacs-lisp
+(after! mu4e
+  (setq message-kill-buffer-on-exit t
+        auth-sources '("~/.authinfo.gpg")
+        sendmail-program (executable-find "msmtp")
+        message-sendmail-f-is-evil t
+        message-sendmail-extra-arguments '("--read-envelope-from")
+        message-send-mail-function #'message-send-mail-with-sendmail))
+#+end_src
+
+*** Account Specific Configuration
+:PROPERTIES:
+:ID:       62543551-4678-4851-bbe4-fc1c4f67ca5a
+:END:
+The =set-email-account!= helper manages settings specific to the "roger@rogs.me" account, including
+standard mail folder locations (Sent, Drafts, Trash, Archive/Refile), the SMTP username, SMTP server
+details (address, port, encryption), the default 'From' address, and the multi-line signature. The final
+=t= argument designates this as the default account.
+#+begin_src emacs-lisp
+(after! mu4e
+  (set-email-account! "roger@rogs.me"
+    `((mu4e-sent-folder       . "/roger@rogs.me/Sent")
+      (mu4e-drafts-folder     . "/roger@rogs.me/Drafts")
+      (mu4e-trash-folder      . "/roger@rogs.me/Trash")
+      (mu4e-refile-folder     . "/roger@rogs.me/Archive")
+      (smtpmail-smtp-user     . "roger@rogs.me")
+      (smtpmail-smtp-server   . "127.0.0.1")
+      (smtpmail-smtp-service  . 1025)
+      (smtpmail-stream-type   . starttls)
+      (user-mail-address      . "roger@rogs.me")
+      (mu4e-compose-signature . ,(string-join
+        '("Roger González"
+          "Senior Python Developer / DevOps engineer"
+          ""
+          "E: roger@rogs.me"
+          "P: +59899563410"
+          "W: https://rogs.me"
+          "PGP: ADDF BCB7 8B86 8D93 FC4E 3224 C7EC E9C6 C36E C2E6")
+        "\n")))
+    t))
+#+end_src
+
+*** Custom Marks
+:PROPERTIES:
+:ID:       b8d23c40-bac2-48c5-8298-3ef81ff2555b
+:END:
+The following code defines custom marks for =mu4e=. Specifically, it adds a mark associated with the 'r' key (displayed as '▶') to quickly refile (archive) messages to the default refile folder configured for the account (=mu4e-refile-folder=). The =,@mu4e-marks= ensures that default marks are preserved.
+#+begin_src emacs-lisp
+(setq mu4e-marks
+      `((refile
+         :char ("r" . "▶")
+         :prompt "refile"
+         :dyn-target (lambda (msg) (mu4e-get-refile-folder msg))
+         :action (lambda (docid msg target)
+                   (mu4e--server-move docid
+                                      (mu4e--mark-check-target target) "-FLAGS \\Draft")))
+        ,@mu4e-marks))
+#+end_src
+
 * Programming languages
 :PROPERTIES:
 :ID:       fcb176c9-c9e5-42f6-b31d-3dafe8d0f64b
@@ -754,9 +888,6 @@ The configuration below sets up Clipmon to check the clipboard every second and 
             (insert orig-message)))))))
 
 (advice-add 'magit-gptcommit-commit-accept
-            :around #'my/magit-gptcommit-commit-accept-wrapper)
-#+end_src
-
 ** LLM
 :PROPERTIES:
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
@@ -896,11 +1027,11 @@ Now, write the commit message in this exact format:
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "openrouter/google/gemini-2.5-pro-exp-03-25:free")
+  (setq aidermacs-default-model "gemini/gemini-2.5-pro-exp-03-25")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
-  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings --map-tokens 8192"))
 #+end_src
 
 ** Others
