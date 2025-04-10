@@ -17,8 +17,8 @@ Key principles in this configuration:
 This document serves both as configuration and as documentation. Each section explains not just what the code does, but why it's important to my workflow. If you're new to Doom Emacs, you can use this as a reference for setting up your own configuration.
 
 To navigate this file efficiently:
-- Use `SPC n s` to search for specific settings
-- Use `TAB` on headings to expand/collapse sections
+- Use =SPC n s= to search for specific settings
+- Use =TAB= on headings to expand/collapse sections
 - Look for the explanatory text before each code block
 
 * Basic configuration
@@ -593,23 +593,6 @@ details (address, port, encryption), the default 'From' address, and the multi-l
     t))
 #+end_src
 
-*** Custom Marks
-:PROPERTIES:
-:ID:       b8d23c40-bac2-48c5-8298-3ef81ff2555b
-:END:
-The following code defines custom marks for =mu4e=. Specifically, it adds a mark associated with the 'r' key (displayed as '▶') to quickly refile (archive) messages to the default refile folder configured for the account (=mu4e-refile-folder=). The =,@mu4e-marks= ensures that default marks are preserved.
-#+begin_src emacs-lisp
-(setq mu4e-marks
-      `((refile
-         :char ("r" . "▶")
-         :prompt "refile"
-         :dyn-target (lambda (msg) (mu4e-get-refile-folder msg))
-         :action (lambda (docid msg target)
-                   (mu4e--server-move docid
-                                      (mu4e--mark-check-target target) "-FLAGS \\Draft")))
-        ,@mu4e-marks))
-#+end_src
-
 * Programming languages
 :PROPERTIES:
 :ID:       fcb176c9-c9e5-42f6-b31d-3dafe8d0f64b
@@ -741,7 +724,7 @@ More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-6
 
 This is a custom helm command that displays all the HTTP status codes with their descriptions. As a developer working with web APIs, I frequently need to reference these codes. This function provides a quick, searchable reference without leaving Emacs or disrupting my workflow.
 
-Usage: `M-x helm-httpstatus` or through the applications menu with `SPC a h`
+Usage: =M-x helm-httpstatus= or through the applications menu with =SPC a h=
 
 #+begin_src emacs-lisp
 (defvar helm-httpstatus-source
@@ -888,6 +871,7 @@ The configuration below sets up Clipmon to check the clipboard every second and 
             (insert orig-message)))))))
 
 (advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
 ** LLM
@@ -911,11 +895,11 @@ Each tool has specific strengths, and I've configured them to complement each ot
 :PROPERTIES:
 :ID:       3edab1be-80d2-418a-9b1f-8fba752093d3
 :END:
-To streamline interaction with the various Large Language Model (LLM) tools integrated into my workflow, this section defines a dedicated menu accessible via the leader key. This provides quick, mnemonic access to frequently used AI assistants like Aider and ChatGPT Shell, avoiding the need for `M-x` and keeping these tools readily available.
+To streamline interaction with the various Large Language Model (LLM) tools integrated into my workflow, this section defines a dedicated menu accessible via the leader key. This provides quick, mnemonic access to frequently used AI assistants like Aider and ChatGPT Shell, avoiding the need for =M-x= and keeping these tools readily available.
 
-The menu is bound to `SPC l` (for LLMs) and currently contains:
-- `SPC l a`: Launches the Aidermacs transient menu (`aidermacs-transient-menu`).
-- `SPC l c`: Launches the ChatGPT Shell transient menu (`chatgpt-shell-transient`).
+The menu is bound to =SPC l= (for LLMs) and currently contains:
+- =SPC l a=: Launches the Aidermacs transient menu (=aidermacs-transient-menu=).
+- =SPC l c=: Launches the ChatGPT Shell transient menu (=chatgpt-shell-transient=).
 
 #+begin_src emacs-lisp
 (map! :leader

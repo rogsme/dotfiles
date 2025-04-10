@@ -342,16 +342,6 @@ related notes or tasks."
         "\n")))
     t))
 
-(setq mu4e-marks
-      `((refile
-         :char ("r" . "▶")
-         :prompt "refile"
-         :dyn-target (lambda (msg) (mu4e-get-refile-folder msg))
-         :action (lambda (docid msg target)
-                   (mu4e--server-move docid
-                                      (mu4e--mark-check-target target) "-FLAGS \\Draft")))
-        ,@mu4e-marks))
-
 (after! lsp-mode
   (setq lsp-headerline-breadcrumb-enable t)
   (setq lsp-headerline-breadcrumb-icons-enable t))
@@ -481,6 +471,7 @@ related notes or tasks."
             (insert orig-message)))))))
 
 (advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
