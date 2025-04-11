@@ -1,0 +1,21 @@
+IMAPAccount proton
+Host 127.0.0.1
+Port 1143
+User roger@rogs.me
+PassCmd "gpg --quiet --for-your-eyes-only --no-tty -d ~/.authinfo.gpg | awk '/127.0.0.1.*roger@rogs.me/ { print $NF }'"
+TLSType NONE
+
+IMAPStore proton-far
+Account proton
+
+MaildirStore proton-near
+Path ~/.mail/roger@rogs.me/
+Inbox ~/.mail/roger@rogs.me/Inbox
+SubFolders Verbatim
+
+Channel proton
+Far :proton-far:
+Near :proton-near:
+Patterns *
+Create Both
+SyncState *
