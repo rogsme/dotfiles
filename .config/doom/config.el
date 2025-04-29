@@ -487,7 +487,7 @@ related notes or tasks."
 (setq dall-e-shell-openai-key openai-key)
 
 (require 'llm-ollama)
-(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "gemma3:12b" :chat-model "gemma3:12b"))
+(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "gemma3:12b-it-qat" :chat-model "gemma3:12b-it-qat"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
