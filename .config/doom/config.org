@@ -929,7 +929,7 @@ The menu is bound to =SPC l= (for LLMs) and currently contains:
 
 #+begin_src emacs-lisp
 (require 'llm-ollama)
-(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122"  :embedding-model "gemma3:12b-it-qat" :chat-model "gemma3:12b-it-qat"))
+(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
