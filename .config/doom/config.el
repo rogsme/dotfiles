@@ -303,6 +303,19 @@ related notes or tasks."
         mu4e-change-filenames-when-moving t))
 
 (after! mu4e
+  (setq mu4e-headers-skip-duplicates t
+        mu4e-headers-include-related nil
+        mu4e-headers-include-trash nil
+        mu4e-headers-visible-fields '(:date :flags :from :subject)))
+
+(after! mu4e
+  (setq mu4e-bookmarks
+        '(("maildir:/roger@rogs.me/Inbox AND NOT maildir:/roger@rogs.me/Trash" "Inbox" ?i)
+          ("flag:unread AND NOT maildir:/roger@rogs.me/Trash" "Unread" ?u)
+          ("date:today..now AND NOT maildir:/roger@rogs.me/Trash" "Today" ?t)
+          ("date:7d..now AND NOT maildir:/roger@rogs.me/Trash" "Last 7 days" ?w))))
+
+(after! mu4e
   (setq mu4e-compose-format-flowed t
         mu4e-compose-org-mode nil
         mu4e-compose-html-format-flowed nil
@@ -556,7 +569,7 @@ Now, write the commit message in this exact format:
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
-  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings --map-tokens 8192"))
+  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
 
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
