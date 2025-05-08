@@ -691,9 +691,9 @@ Here's where custom functionalities get configured.
 
 These are additional packages that aren't part of the standard Doom modules but that I find essential for my workflow:
 
-  | Package name    | Description                                    | URL                                     |
-  |-----------------+------------------------------------------------+-----------------------------------------|
-  | ~screenshot.el~ | Good for taking screenshots directly in Emacs. | https://github.com/tecosaur/screenshot  |
+  | Package name    | Description                                                                          | URL                                     |
+  |-----------------+--------------------------------------------------------------------------------------+-----------------------------------------|
+  | ~screenshot.el~ | Good for taking screenshots directly in Emacs.                                       | https://github.com/tecosaur/screenshot  |
   | ~private.el~    | This is a file for private values and API keys that shouldn't be in version control. | ~./custom-packages/private.el.example~. |
 
 #+begin_src emacs-lisp
@@ -722,7 +722,7 @@ More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-6
   "Compare init.el with the example init file."
   (interactive)
   (let ((init-file (concat doom-user-dir "init.el"))
-        (example-file (concat doom-emacs-dir "templates/init.example.el")))
+        (example-file (concat doom-emacs-dir "static/init.example.el")))
     (if (and (file-exists-p init-file)
              (file-exists-p example-file))
         (ediff-files init-file example-file)
@@ -789,7 +789,9 @@ Usage: =M-x helm-httpstatus= or through the applications menu with =SPC a h=
 :ID:       b81dff7f-9bc5-4601-97fe-6c2b9e78366c
 :END:
 
-This function converts clipboard contents from HTML to Org format and then pastes (yanks) the result. It's extremely useful when researching online and wanting to capture formatted content directly into my org notes without losing structure.
+This function converts clipboard contents from HTML to Org format and then pastes (yanks) the result.
+It's extremely useful when researching online and wanting to capture formatted content directly into my
+org notes without losing structure.
 
 Dependencies:
 - ~pandoc~ for the format conversion
@@ -811,6 +813,7 @@ Usage: Press F4 in any org-mode buffer to convert and paste HTML from clipboard
 (after! org
   (define-key org-mode-map (kbd "<f4>") 'my/html2org-clipboard))
 #+end_src
+
 *** My own menu
 :PROPERTIES:
 :ID:       60a0316f-8bb8-40fe-af45-e42cdb6da60a
@@ -837,12 +840,14 @@ This is a custom menu for my own functions
 :ID:       7b6776af-f357-4f87-9850-4eae4f8daa76
 :END:
 
-Clipmon serves as my clipboard manager within Emacs. I chose it over alternatives like ~helm-clipboard~ because it offers better integration with my workflow and provides automatic monitoring of clipboard changes. This allows me to maintain a history of copied text without manual intervention.
+Clipmon serves as my clipboard manager within Emacs. I chose it over alternatives like ~helm-clipboard~
+because it offers better integration with my workflow and provides automatic monitoring of clipboard
+changes. This allows me to maintain a history of copied text without manual intervention.
 
-The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring accessible through M-y with helm integration.
+The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring
+accessible through M-y with helm integration.
 
 #+begin_src emacs-lisp
-;; Ensure clipmon is loaded
 (require 'clipmon)
 
 (after! clipmon

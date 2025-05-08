@@ -387,7 +387,7 @@ related notes or tasks."
   "Compare init.el with the example init file."
   (interactive)
   (let ((init-file (concat doom-user-dir "init.el"))
-        (example-file (concat doom-emacs-dir "templates/init.example.el")))
+        (example-file (concat doom-emacs-dir "static/init.example.el")))
     (if (and (file-exists-p init-file)
              (file-exists-p example-file))
         (ediff-files init-file example-file)
@@ -460,7 +460,6 @@ related notes or tasks."
        :desc "Org focus all" "a" #'org-focus-all
       ))
 
-;; Ensure clipmon is loaded
 (require 'clipmon)
 
 (after! clipmon
