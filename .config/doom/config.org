@@ -892,39 +892,73 @@ The configuration below sets up Clipmon to check the clipboard every second and 
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
 :END:
 
-This section configures various AI assistants and Large Language Model integrations. These tools augment my workflow by providing code suggestions, helping with documentation, and automating repetitive tasks like writing commit messages.
+This section configures various AI assistants and Large Language Model integrations. These tools augment
+my workflow by providing code suggestions, helping with documentation, and automating repetitive tasks
+like writing commit messages.
 
-I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the task requirements and privacy considerations:
+I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the
+task requirements and privacy considerations:
 
 - GitHub Copilot: For real-time code suggestions while typing
 - ChatGPT Shell: For general programming assistance and problem-solving
 - Magit GPT: For automatically generating meaningful commit messages
-- Forge LLM: For analyzing and summarizing GitHub issues and PRs
+- Forge LLM: For generating PR descriptions
 - Aider: For more complex code generation and refactoring tasks
 
-Each tool has specific strengths, and I've configured them to complement each other in my development workflow. The API keys are stored in a separate private.el file for security.
+Each tool has specific strengths, and I've configured them to complement each other in my development
+workflow. The API keys are stored in a separate private.el file for security.
 
 *** LLM Menu
 :PROPERTIES:
 :ID:       3edab1be-80d2-418a-9b1f-8fba752093d3
 :END:
-To streamline interaction with the various Large Language Model (LLM) tools integrated into my workflow, this section defines a dedicated menu accessible via the leader key. This provides quick, mnemonic access to frequently used AI assistants like Aider and ChatGPT Shell, avoiding the need for =M-x= and keeping these tools readily available.
 
-The menu is bound to =SPC l= (for LLMs) and currently contains:
-- =SPC l a=: Launches the Aidermacs transient menu (=aidermacs-transient-menu=).
-- =SPC l c=: Launches the ChatGPT Shell transient menu (=chatgpt-shell-transient=).
+This section defines a convenient LLM command menu bound to =SPC l= (for "LLMs") using Doom Emacs' =map!=
+macro. The idea is to make it super fast to launch the most common AI-powered tools I use without
+resorting to =M-x= or remembering long command names.
+
+Each submenu entry corresponds to a different assistant or LLM feature:
+
+- =SPC l a=: Opens the Aidermacs transient menu. This is where I do more involved interactions like
+  editing files or running multi-step workflows with Aider.
+- =SPC l c=: Opens the ChatGPT Shell transient. Great for quick conversations, answering questions, or
+  doing ad-hoc debugging.
+- =SPC l f=: Calls =my/set-forge-llm-provider= to switch the active provider for Forge LLM. Useful when I
+  want to use a different model (e.g. Gemini vs Claude) for generating pull request descriptions.
+
+The menu is intentionally kept short and memorable, focused on the LLM features I use most often. I can
+always expand it later if new tools join the lineup.
 
 #+begin_src emacs-lisp
 (map! :leader
       (:prefix-map ("l" . "LLMs")
        :desc "Aidermacs" "a" #'aidermacs-transient-menu
-       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
+       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient
+       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider))
 #+end_src
 
 *** ChatGPT Shell
 :PROPERTIES:
 :ID:       9bdfbd96-deec-4335-8d2c-77fff0283708
 :END:
+
+This config block sets up =chatgpt-shell=, a shell-like interface to interact with various LLM providers
+(OpenAI, Gemini, Anthropic) directly inside Emacs. It’s great for general-purpose LLM queries, quick code
+snippets, debugging help, or asking questions in natural language.
+
+Key settings:
+
+- =chatgpt-shell-model-version=: Selects the default model. In this case, it's set to
+  =gemini-2.5-pro-exp=.
+- =chatgpt-shell-streaming=: Enables real-time streaming of responses (instead of waiting for the full
+  message).
+- =chatgpt-shell-system-prompt=: Sets the tone and expertise of the assistant. I define it to act like a
+  senior developer who knows every language.
+- API keys: Each service (OpenAI, Gemini, Anthropic) is configured with its respective variable. These
+  are defined in =private.el= for security and loaded into this config.
+
+This setup gives me flexibility to work with multiple providers while maintaining a consistent
+shell-style UX inside Emacs.
 
 #+begin_src emacs-lisp
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
@@ -935,10 +969,24 @@ The menu is bound to =SPC l= (for LLMs) and currently contains:
 (setq chatgpt-shell-anthropic-key anthropic-key)
 (setq dall-e-shell-openai-key openai-key)
 #+end_src
+
 *** Magit GPT
 :PROPERTIES:
 :ID:       3f720f16-b7a3-4127-81e9-87d849827639
 :END:
+
+This section configures =magit-gptcommit=, an integration that uses an LLM to automatically generate
+well-written Git commit messages based on the current file diffs. I’m using a local model via Ollama (in
+this case, =gemma3:12b=) to keep everything offline and fast.
+
+The key part here is the custom prompt. It's designed to enforce a consistent commit message format,
+following the Linux kernel commit style. The prompt instructs the model to:
+
+- Generate a one-line summary in imperative tense (no prefixes or trailing periods).
+- Add bullet-style developer comments below the summary, each on a separate line.
+- Avoid markdown formatting or code fences.
+
+This gives me consistent, clean, and useful commit messages without having to write them myself.
 
 #+begin_src emacs-lisp
 (require 'llm-ollama)
@@ -977,30 +1025,69 @@ Now, write the commit message in this exact format:
 - comment2
 - commentN")
 
-
   (magit-gptcommit-status-buffer-setup))
 #+end_src
+
 
 *** Forge LLM
 :PROPERTIES:
 :ID:       51b0f8e3-68b3-46af-91d4-a9b87b1e6b94
 :END:
 
+This section sets up Forge LLM to work with multiple providers (Gemini, Claude, and Qwen via OpenRouter),
+allowing me to dynamically choose which model to use with ~M-x my/set-forge-llm-provider~ or ~SPC l f~.
+This gives me the flexibility to pick the most appropriate model depending on the context. For instance,
+using Claude for more coherent long-form reasoning or Gemini because it's free.
+
+The default provider is set to Gemini, but I can call ~my/set-forge-llm-provider~ at any time to switch
+providers on the fly. The selected LLM is then used by Forge LLM when I run the pull request generation.
+
+The ~forge-llm-max-diff-size~ is set to ~nil~ to avoid truncating large diffs, ensuring I get full
+context when generating PR descriptions.
+
 #+begin_src emacs-lisp
 (require 'forge-llm)
-(forge-llm-setup)
 (require 'llm-gemini)
-(setq forge-llm-llm-provider (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
-(setq forge-llm-max-diff-size 'nil)
+(require 'llm-claude)
+(require 'llm-openai)
+
+(defun my/set-forge-llm-provider (provider)
+  "Set the Forge LLM provider dynamically."
+  (interactive
+   (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
+  (setq forge-llm-llm-provider
+        (pcase provider
+          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-sonnet"))
+          ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1" :chat-model "qwen/qwen3-235b-a22b" :key openrouter-api-key))))
+
+  (message "Forge LLM provider set to %s" provider))
+
+(setq forge-llm-llm-provider
+      (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+
+(forge-llm-setup)
+(setq forge-llm-max-diff-size nil)
 #+end_src
+
 
 *** Github Copilot
 :PROPERTIES:
 :ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
 :END:
 
+This section enables GitHub Copilot for real-time AI-assisted code completions inside Emacs.
+
+The =prog-mode-hook= ensures Copilot is active in all programming buffers. The keybindings are also
+customized to improve the editing experience:
+
+- =<tab>= and =TAB=: Accept the current Copilot suggestion.
+- =C-TAB=: Accept the suggestion word by word (helpful for partial completions or fine-tuning).
+
+This setup makes Copilot feel more natural and responsive while coding, without getting in the way of
+other completions or keybindings.
+
 #+begin_src emacs-lisp
-;; Load copilot
 (require 'copilot)
 
 (after! copilot
@@ -1011,10 +1098,31 @@ Now, write the commit message in this exact format:
         "C-TAB" #'copilot-accept-completion-by-word
         "C-<tab>" #'copilot-accept-completion-by-word))
 #+end_src
+
 *** Aider
 :PROPERTIES:
 :ID:       42318f75-3a25-44ad-bfeb-d83338045385
 :END:
+
+This section configures Aider (via Aidermacs), a powerful AI assistant focused on code editing,
+refactoring, and multi-file interactions. It’s perfect for large or complex changes where context and
+iteration matter more than quick completions.
+
+Here’s a breakdown of the config:
+
+- API keys are loaded into the environment from variables defined in =private.el=, keeping them secure
+  and out of version control.
+- =aidermacs-use-architect-mode=: Enables enhanced mode with structured input/output formatting.
+- =aidermacs-default-model=: Sets Gemini as the default model, but this can be switched easily.
+- =aidermacs-auto-commits=: Disabled to avoid unintended Git changes during a session.
+- =aidermacs-backend=: Uses =vterm= as the terminal backend for smoother interaction.
+- =aidermacs-vterm-multiline-newline-key=: Custom binding to insert newlines in vterm when chatting with the model.
+- =aidermacs-extra-args=: Adds extra CLI flags for Aider sessions to fine-tune the UX (streaming, dark
+  mode, Vim-style prompts, etc.).
+
+This setup gives me a highly customizable and scriptable interface for working on larger edits with LLMs,
+all from within Emacs.
+
 #+begin_src emacs-lisp
 (after! aidermacs
   ;; Set API keys

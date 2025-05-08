@@ -489,7 +489,8 @@ related notes or tasks."
 (map! :leader
       (:prefix-map ("l" . "LLMs")
        :desc "Aidermacs" "a" #'aidermacs-transient-menu
-       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient))
+       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient
+       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider))
 
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
@@ -535,16 +536,31 @@ Now, write the commit message in this exact format:
 - comment2
 - commentN")
 
-
   (magit-gptcommit-status-buffer-setup))
 
 (require 'forge-llm)
-(forge-llm-setup)
 (require 'llm-gemini)
-(setq forge-llm-llm-provider (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
-(setq forge-llm-max-diff-size 'nil)
+(require 'llm-claude)
+(require 'llm-openai)
 
-;; Load copilot
+(defun my/set-forge-llm-provider (provider)
+  "Set the Forge LLM provider dynamically."
+  (interactive
+   (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
+  (setq forge-llm-llm-provider
+        (pcase provider
+          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-sonnet"))
+          ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1" :chat-model "qwen/qwen3-235b-a22b" :key openrouter-api-key))))
+
+  (message "Forge LLM provider set to %s" provider))
+
+(setq forge-llm-llm-provider
+      (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+
+(forge-llm-setup)
+(setq forge-llm-max-diff-size nil)
+
 (require 'copilot)
 
 (after! copilot
