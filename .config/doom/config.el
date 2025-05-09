@@ -549,7 +549,7 @@ Now, write the commit message in this exact format:
   (setq forge-llm-llm-provider
         (pcase provider
           ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
-          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-sonnet"))
+          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
           ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1" :chat-model "qwen/qwen3-235b-a22b" :key openrouter-api-key))))
 
   (message "Forge LLM provider set to %s" provider))
