@@ -56,7 +56,7 @@ alias fix-bluetooth="sudo systemctl restart bluetooth.service && sleep 10 && sud
 # Use xprop to get the WM_CLASS property of a window (useful for window manager rules)
 alias get-class="xprop | grep WM_CLASS"
 # Update the aider-chat tool using uv and pip, ensuring playwright dependencies are met
-alias update-aider="uv tool install --force --python python3.12 aider-chat@latest && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m pip install --upgrade --upgrade-strategy only-if-needed aider-chat[playwright] && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m playwright install chromium"
+alias update-aider="uv tool install --force --python python3.12 --with pip aider-chat@latest && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m pip install --upgrade --upgrade-strategy only-if-needed aider-chat[playwright] && /home/roger/.local/share/uv/tools/aider-chat/bin/python3 -m playwright install chromium"
 
 # tabtab source for packages (Currently commented out)
 # Provides generic completion support for various tools.
