@@ -489,7 +489,8 @@ related notes or tasks."
       (:prefix-map ("l" . "LLMs")
        :desc "Aidermacs" "a" #'aidermacs-transient-menu
        :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient
-       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider))
+       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
+       :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
 
 (setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
@@ -498,6 +499,20 @@ related notes or tasks."
 (setq chatgpt-shell-google-key gemini-key)
 (setq chatgpt-shell-anthropic-key anthropic-key)
 (setq dall-e-shell-openai-key openai-key)
+
+(defun my/set-magit-gptcommit-provider (provider)
+  "Set the Magit GPT commit LLM provider dynamically."
+  (interactive
+   (list (completing-read "Choose LLM for Magit GPT Commit: " '("Gemini" "Claude" "Qwen" "Ollama"))))
+  (setq magit-gptcommit-llm-provider
+        (pcase provider
+          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
+          ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1"
+                                              :chat-model "qwen/qwen3-235b-a22b"
+                                              :key openrouter-api-key))
+          ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))))
+  (message "Magit GPT provider set to %s" provider))
 
 (require 'llm-ollama)
 (setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))
