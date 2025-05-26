@@ -492,7 +492,7 @@ related notes or tasks."
        :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
        :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
 
-(setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
+(setq chatgpt-shell-model-version "gemini-2.5-flash-preview-05-20")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openai-key openai-key)
@@ -506,7 +506,7 @@ related notes or tasks."
    (list (completing-read "Choose LLM for Magit GPT Commit: " '("Gemini" "Claude" "Qwen" "Ollama"))))
   (setq magit-gptcommit-llm-provider
         (pcase provider
-          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
           ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
           ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1"
                                               :chat-model "qwen/qwen3-235b-a22b"
@@ -563,14 +563,14 @@ Now, write the commit message in this exact format:
    (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
   (setq forge-llm-llm-provider
         (pcase provider
-          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
           ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
           ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1" :chat-model "qwen/qwen3-235b-a22b" :key openrouter-api-key))))
 
   (message "Forge LLM provider set to %s" provider))
 
 (setq forge-llm-llm-provider
-      (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-pro-exp-03-25"))
+      (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
@@ -595,7 +595,7 @@ Now, write the commit message in this exact format:
 
   ;; General settings
   (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "gemini/gemini-2.5-pro-exp-03-25")
+  (setq aidermacs-default-model "gemini/gemini-2.5-flash-preview-05-20")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
