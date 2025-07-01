@@ -913,18 +913,70 @@ task requirements and privacy considerations:
 Each tool has specific strengths, and I've configured them to complement each other in my development
 workflow. The API keys are stored in a separate private.el file for security.
 
-*** Misc
+*** Dependencies
+:PROPERTIES:
+:ID:       9c27b6c6-4a62-4aa7-b818-ab52440892a8
+:END:
+
+This section loads all the required LLM backend packages. These are necessary for the constructor
+functions like =make-llm-claude= and =make-llm-openrouter-compatible= to work correctly. Wrapping them
+in a helper allows for easy reuse and potential lazy-loading in the future.
+
+#+begin_src emacs-lisp
+(defun my/require-llm-backends ()
+  "Load all LLM backends used in my config."
+  (require 'llm-claude)
+  (require 'llm-openai)
+  (require 'llm-ollama))
+
+(my/require-llm-backends)
+#+end_src
+
+*** Setup
 :PROPERTIES:
 :ID:       ad66ec49-7d9c-40cf-83d2-4e706bf240a4
 :END:
-**** make-llm-openrouter-compatible
+
+This section contains shared configuration and helper functions used by multiple LLM-related tools.
+
+**** LLM model constants
 :PROPERTIES:
-:ID:       5d6d59fa-cc1e-4e47-bf70-002d56c2e274
+:ID:       147f666f-5d5e-4d10-8334-1aedc3cbbca9
 :END:
 
-This helper function creates an LLM provider compatible with OpenRouter, using a given model string.
-It wraps ~make-llm-openai-compatible~ with the correct API URL and your personal OpenRouter key, keeping
-things DRY and making it easy to switch between supported models like Gemini or Qwen.
+This block defines string constants for the model identifiers I use most frequently.
+It helps me avoid hardcoding the same model names in different places.
+
+#+begin_src emacs-lisp
+(defconst my/gemini-model "google/gemini-2.5-flash-lite-preview-06-17")
+(defconst my/qwen-model "qwen/qwen3-235b-a22b")
+(defconst my/claude-model "claude-sonnet-4-20250514")
+(defconst my/ollama-model "gemma3:12b")
+#+end_src
+
+**** API key environment setup
+:PROPERTIES:
+:ID:       783b30cc-a698-45c5-8609-164111535dab
+:END:
+
+This helper function loads the necessary environment variables for LLM tools from my `private.el`.
+I call it in places like Aider or Forge where shell commands or HTTP requests depend on the correct env.
+
+#+begin_src emacs-lisp
+(defun my/setup-llm-env ()
+  (setenv "OPENAI_API_KEY" openai-key)
+  (setenv "OLLAMA_API_BASE" ollama-api-base)
+  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
+  (setenv "ANTHROPIC_API_KEY" anthropic-key))
+#+end_src
+
+**** OpenRouter-compatible wrapper
+:PROPERTIES:
+:ID:       29bfae86-f79d-4965-b179-80c5a930cb77
+:END:
+
+This helper wraps =make-llm-openai-compatible= and sets it up for use with OpenRouter's unified endpoint.
+It makes switching between models like Gemini or Qwen easy and avoids repetition.
 
 #+begin_src emacs-lisp
 (defun make-llm-openrouter-compatible (chat-model)
@@ -933,6 +985,24 @@ things DRY and making it easy to switch between supported models like Gemini or 
    :url "https://openrouter.ai/api/v1"
    :chat-model chat-model
    :key openrouter-api-key))
+#+end_src
+
+**** General LLM provider switcher
+:PROPERTIES:
+:ID:       1aa4d814-f574-41ef-8019-cfdd9241e88b
+:END:
+
+This central function maps a provider name string to the corresponding LLM configuration object.
+Both Magit GPT and Forge LLM call this to set their active model.
+
+#+begin_src emacs-lisp
+(defun my/llm-provider (name)
+  "Return a configured LLM provider instance by NAME."
+  (pcase name
+    ("Gemini" (make-llm-openrouter-compatible my/gemini-model))
+    ("Claude" (make-llm-claude :key anthropic-key :chat-model my/claude-model))
+    ("Qwen"   (make-llm-openrouter-compatible my/qwen-model))
+    ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model my/ollama-model))))
 #+end_src
 
 *** LLM Menu
@@ -1025,29 +1095,24 @@ This gives me consistent, clean, and useful commit messages without having to wr
 (defun my/set-magit-gptcommit-provider (provider)
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM for Magit GPT Commit: " '("Gemini" "Claude" "Qwen" "Ollama"))))
-  (setq magit-gptcommit-llm-provider
-        (pcase provider
-          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
-          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))
-          ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))))
+   (list (completing-read "Choose LLM for Magit GPT Commit: "
+                          '("Gemini" "Claude" "Qwen" "Ollama"))))
+  (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-(require 'llm-ollama)
-(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Ollama"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
   (magit-gptcommit-mode 1)
   (setq magit-gptcommit-prompt
-      "You are an expert programmer crafting a Git commit message. Carefully review the following file diffs as if you had read each line.
+        "You are an expert programmer crafting a Git commit message. Carefully review the following file diffs as if you had read each line.
 
 Your goal is to generate a commit message that follows the kernel Git commit style guide.
 
 SUMMARY INSTRUCTIONS:
 - Write a one-line summary of the change, no more than 50 characters.
-- Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging' or 'Improves logging').
+- Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging').
 - Do not include prefixes like Fix:, Feat:, or Chore: at the beginning of the summary.
 - The summary must not end with a period.
 - Ensure the summary reflects a single, specific, and cohesive purpose.
@@ -1073,7 +1138,6 @@ Now, write the commit message in this exact format:
   (magit-gptcommit-status-buffer-setup))
 #+end_src
 
-
 *** Forge LLM
 :PROPERTIES:
 :ID:       51b0f8e3-68b3-46af-91d4-a9b87b1e6b94
@@ -1092,29 +1156,20 @@ context when generating PR descriptions.
 
 #+begin_src emacs-lisp
 (require 'forge-llm)
-(require 'llm-gemini)
-(require 'llm-claude)
-(require 'llm-openai)
+(my/setup-llm-env)
 
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
-  (setq forge-llm-llm-provider
-        (pcase provider
-          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
-          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))))
-
+  (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-(setq forge-llm-llm-provider
-      (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
+(setq forge-llm-llm-provider (my/llm-provider "Gemini"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
 #+end_src
-
 
 *** Github Copilot
 :PROPERTIES:

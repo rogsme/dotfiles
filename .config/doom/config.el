@@ -485,12 +485,39 @@ related notes or tasks."
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
+(defun my/require-llm-backends ()
+  "Load all LLM backends used in my config."
+  (require 'llm-claude)
+  (require 'llm-openai)
+  (require 'llm-ollama))
+
+(my/require-llm-backends)
+
+(defconst my/gemini-model "google/gemini-2.5-flash-lite-preview-06-17")
+(defconst my/qwen-model "qwen/qwen3-235b-a22b")
+(defconst my/claude-model "claude-sonnet-4-20250514")
+(defconst my/ollama-model "gemma3:12b")
+
+(defun my/setup-llm-env ()
+  (setenv "OPENAI_API_KEY" openai-key)
+  (setenv "OLLAMA_API_BASE" ollama-api-base)
+  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
+  (setenv "ANTHROPIC_API_KEY" anthropic-key))
+
 (defun make-llm-openrouter-compatible (chat-model)
   "Return an OpenRouter-compatible LLM config for CHAT-MODEL."
   (make-llm-openai-compatible
    :url "https://openrouter.ai/api/v1"
    :chat-model chat-model
    :key openrouter-api-key))
+
+(defun my/llm-provider (name)
+  "Return a configured LLM provider instance by NAME."
+  (pcase name
+    ("Gemini" (make-llm-openrouter-compatible my/gemini-model))
+    ("Claude" (make-llm-claude :key anthropic-key :chat-model my/claude-model))
+    ("Qwen"   (make-llm-openrouter-compatible my/qwen-model))
+    ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model my/ollama-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -510,29 +537,24 @@ related notes or tasks."
 (defun my/set-magit-gptcommit-provider (provider)
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM for Magit GPT Commit: " '("Gemini" "Claude" "Qwen" "Ollama"))))
-  (setq magit-gptcommit-llm-provider
-        (pcase provider
-          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
-          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))
-          ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))))
+   (list (completing-read "Choose LLM for Magit GPT Commit: "
+                          '("Gemini" "Claude" "Qwen" "Ollama"))))
+  (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-(require 'llm-ollama)
-(setq magit-gptcommit-llm-provider (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Ollama"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
   (magit-gptcommit-mode 1)
   (setq magit-gptcommit-prompt
-      "You are an expert programmer crafting a Git commit message. Carefully review the following file diffs as if you had read each line.
+        "You are an expert programmer crafting a Git commit message. Carefully review the following file diffs as if you had read each line.
 
 Your goal is to generate a commit message that follows the kernel Git commit style guide.
 
 SUMMARY INSTRUCTIONS:
 - Write a one-line summary of the change, no more than 50 characters.
-- Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging' or 'Improves logging').
+- Use the imperative tense (for example, use 'Improve logging output' instead of 'Improved logging').
 - Do not include prefixes like Fix:, Feat:, or Chore: at the beginning of the summary.
 - The summary must not end with a period.
 - Ensure the summary reflects a single, specific, and cohesive purpose.
@@ -558,24 +580,16 @@ Now, write the commit message in this exact format:
   (magit-gptcommit-status-buffer-setup))
 
 (require 'forge-llm)
-(require 'llm-gemini)
-(require 'llm-claude)
-(require 'llm-openai)
+(my/setup-llm-env)
 
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
-  (setq forge-llm-llm-provider
-        (pcase provider
-          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
-          ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))))
-
+  (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-(setq forge-llm-llm-provider
-      (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
+(setq forge-llm-llm-provider (my/llm-provider "Gemini"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
