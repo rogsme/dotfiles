@@ -1241,11 +1241,7 @@ accessible through M-y with helm integration.
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
-** Others
-:PROPERTIES:
-:ID:       ccd2e4f2-d58d-4fd3-8d79-1ccd41719122
-:END:
-*** PlantUML
+** PlantUML
 :PROPERTIES:
 :ID:       87ed3201-3df7-4ee1-a4ce-4fe8312f9d08
 :END:
