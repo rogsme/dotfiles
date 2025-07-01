@@ -492,7 +492,7 @@ related notes or tasks."
     ("Gemini" (make-llm-openrouter-compatible my/gemini-model))
     ("Claude" (make-llm-claude :key anthropic-key :chat-model my/claude-model))
     ("Qwen"   (make-llm-openrouter-compatible my/qwen-model))
-    ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model my/ollama-model))))
+    ("Ollama" (make-llm-ollama :scheme "http" :host ollama-api-base :chat-model my/ollama-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
