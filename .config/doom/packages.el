@@ -78,9 +78,5 @@
 (package! llm)
 (package! cov)
 (package! aidermacs)
-(package! ws-butler
-  :recipe (:host github
-           :repo "emacsmirror/nongnu_elpa"
-           :branch "elpa/ws-butler"
-           :local-repo "ws-butler")
-  :pin "9ee5a7657a22e836618813c2e2b64a548d27d2ff")
+(package! ghub
+:pin "12d1472579075135327278b843e23f055f659b3c")
