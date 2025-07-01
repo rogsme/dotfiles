@@ -485,6 +485,13 @@ related notes or tasks."
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
+(defun make-llm-openrouter-compatible (chat-model)
+  "Return an OpenRouter-compatible LLM config for CHAT-MODEL."
+  (make-llm-openai-compatible
+   :url "https://openrouter.ai/api/v1"
+   :chat-model chat-model
+   :key openrouter-api-key))
+
 (map! :leader
       (:prefix-map ("l" . "LLMs")
        :desc "Aidermacs" "a" #'aidermacs-transient-menu
@@ -506,11 +513,9 @@ related notes or tasks."
    (list (completing-read "Choose LLM for Magit GPT Commit: " '("Gemini" "Claude" "Qwen" "Ollama"))))
   (setq magit-gptcommit-llm-provider
         (pcase provider
-          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
+          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
           ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1"
-                                              :chat-model "qwen/qwen3-235b-a22b"
-                                              :key openrouter-api-key))
+          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))
           ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model "gemma3:12b"))))
   (message "Magit GPT provider set to %s" provider))
 
@@ -563,14 +568,14 @@ Now, write the commit message in this exact format:
    (list (completing-read "Choose LLM: " '("Gemini" "Claude" "Qwen"))))
   (setq forge-llm-llm-provider
         (pcase provider
-          ("Gemini" (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
+          ("Gemini" (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
           ("Claude" (make-llm-claude :key anthropic-key :chat-model "claude-3-7-sonnet-latest"))
-          ("Qwen" (make-llm-openai-compatible :url "https://openrouter.ai/api/v1" :chat-model "qwen/qwen3-235b-a22b" :key openrouter-api-key))))
+          ("Qwen" (make-llm-openrouter-compatible "qwen/qwen3-235b-a22b"))))
 
   (message "Forge LLM provider set to %s" provider))
 
 (setq forge-llm-llm-provider
-      (make-llm-gemini :key gemini-key :chat-model "gemini-2.5-flash-preview-05-20"))
+      (make-llm-openrouter-compatible "google/gemini-2.5-flash-lite-preview-06-17"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
@@ -589,13 +594,12 @@ Now, write the commit message in this exact format:
   ;; Set API keys
   (setenv "ANTHROPIC_API_KEY" anthropic-key)
   (setenv "OPENAI_API_KEY" openai-key)
-  (setenv "GEMINI_API_KEY" gemini-key)
   (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
 
   ;; General settings
-  (setq aidermacs-use-architect-mode t)
-  (setq aidermacs-default-model "gemini/gemini-2.5-flash-preview-05-20")
+  (setq aidermacs-default-chat-mode "ask")
+  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-lite-preview-06-17")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
