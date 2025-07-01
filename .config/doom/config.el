@@ -479,6 +479,8 @@ related notes or tasks."
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
   (setenv "ANTHROPIC_API_KEY" anthropic-key))
 
+(my/setup-llm-env)
+
 (defun make-llm-openrouter-compatible (chat-model)
   "Return an OpenRouter-compatible LLM config for CHAT-MODEL."
   (make-llm-openai-compatible
@@ -555,7 +557,6 @@ Now, write the commit message in this exact format:
   (magit-gptcommit-status-buffer-setup))
 
 (require 'forge-llm)
-(my/setup-llm-env)
 
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
@@ -580,13 +581,6 @@ Now, write the commit message in this exact format:
         "C-<tab>" #'copilot-accept-completion-by-word))
 
 (after! aidermacs
-  ;; Set API keys
-  (setenv "ANTHROPIC_API_KEY" anthropic-key)
-  (setenv "OPENAI_API_KEY" openai-key)
-  (setenv "OLLAMA_API_BASE" ollama-api-base)
-  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
-
-  ;; General settings
   (setq aidermacs-default-chat-mode "ask")
   (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-lite-preview-06-17")
   (setq aidermacs-auto-commits nil)

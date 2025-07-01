@@ -908,6 +908,8 @@ I call it in places like Aider or Forge where shell commands or HTTP requests de
   (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
   (setenv "ANTHROPIC_API_KEY" anthropic-key))
+
+(my/setup-llm-env)
 #+end_src
 
 *** OpenRouter-compatible wrapper
@@ -1096,7 +1098,6 @@ context when generating PR descriptions.
 
 #+begin_src emacs-lisp
 (require 'forge-llm)
-(my/setup-llm-env)
 
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
@@ -1165,13 +1166,6 @@ all from within Emacs.
 
 #+begin_src emacs-lisp
 (after! aidermacs
-  ;; Set API keys
-  (setenv "ANTHROPIC_API_KEY" anthropic-key)
-  (setenv "OPENAI_API_KEY" openai-key)
-  (setenv "OLLAMA_API_BASE" ollama-api-base)
-  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
-
-  ;; General settings
   (setq aidermacs-default-chat-mode "ask")
   (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-lite-preview-06-17")
   (setq aidermacs-auto-commits nil)
