@@ -831,68 +831,8 @@ This is a custom menu for my own functions
        :desc "Org focus all" "a" #'org-focus-all
       ))
 #+end_src
-* Misc
-:PROPERTIES:
-:ID:       b57fe5fe-18ce-4215-ba94-8deee3a2b64f
-:END:
-** Clipmon
-:PROPERTIES:
-:ID:       7b6776af-f357-4f87-9850-4eae4f8daa76
-:END:
 
-Clipmon serves as my clipboard manager within Emacs. I chose it over alternatives like ~helm-clipboard~
-because it offers better integration with my workflow and provides automatic monitoring of clipboard
-changes. This allows me to maintain a history of copied text without manual intervention.
-
-The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring
-accessible through M-y with helm integration.
-
-#+begin_src emacs-lisp
-(require 'clipmon)
-
-(after! clipmon
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (add-to-list 'after-init-hook 'clipmon-mode-start)
-  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
-    (let ((interprogram-cut-function nil)) ad-do-it))
-  (setq clipmon-timer-interval 1))
-
-#+end_src
-
-** Git
-:PROPERTIES:
-:ID:       51176440-f985-4c90-94a7-bed48286272c
-:END:
-*** Set ~delta~ as the default magit diff
-:PROPERTIES:
-:ID:       fa6dc3cb-50d7-49cd-96cb-e91a122b1316
-:END:
-
-#+begin_src emacs-lisp
-(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
-#+end_src
-
-*** Accept pre-commit messages when creating git commits with magit-gptcommit mode
-:PROPERTIES:
-:ID:       2c8ead63-0929-4f52-9816-85d8e24b8123
-:END:
-#+begin_src emacs-lisp
-(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
-  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
-  (when-let ((buf (magit-commit-message-buffer)))
-    (with-current-buffer buf
-      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
-        (apply orig-fun args)
-        (unless (string-empty-p orig-message)
-          (save-excursion
-            (goto-char (point-min))
-            (insert orig-message)))))))
-
-(advice-add 'magit-gptcommit-commit-accept
-            :around #'my/magit-gptcommit-commit-accept-wrapper)
-#+end_src
-
-** LLM
+* LLM
 :PROPERTIES:
 :ID:       0a32d2a9-2156-42a3-90f7-419ac1a25496
 :END:
@@ -913,7 +853,7 @@ task requirements and privacy considerations:
 Each tool has specific strengths, and I've configured them to complement each other in my development
 workflow. The API keys are stored in a separate private.el file for security.
 
-*** Dependencies
+** Dependencies
 :PROPERTIES:
 :ID:       9c27b6c6-4a62-4aa7-b818-ab52440892a8
 :END:
@@ -932,14 +872,14 @@ in a helper allows for easy reuse and potential lazy-loading in the future.
 (my/require-llm-backends)
 #+end_src
 
-*** Setup
+** Setup
 :PROPERTIES:
 :ID:       ad66ec49-7d9c-40cf-83d2-4e706bf240a4
 :END:
 
 This section contains shared configuration and helper functions used by multiple LLM-related tools.
 
-**** LLM model constants
+*** LLM model constants
 :PROPERTIES:
 :ID:       147f666f-5d5e-4d10-8334-1aedc3cbbca9
 :END:
@@ -954,7 +894,7 @@ It helps me avoid hardcoding the same model names in different places.
 (defconst my/ollama-model "gemma3:12b")
 #+end_src
 
-**** API key environment setup
+*** API key environment setup
 :PROPERTIES:
 :ID:       783b30cc-a698-45c5-8609-164111535dab
 :END:
@@ -970,7 +910,7 @@ I call it in places like Aider or Forge where shell commands or HTTP requests de
   (setenv "ANTHROPIC_API_KEY" anthropic-key))
 #+end_src
 
-**** OpenRouter-compatible wrapper
+*** OpenRouter-compatible wrapper
 :PROPERTIES:
 :ID:       29bfae86-f79d-4965-b179-80c5a930cb77
 :END:
@@ -987,7 +927,7 @@ It makes switching between models like Gemini or Qwen easy and avoids repetition
    :key openrouter-api-key))
 #+end_src
 
-**** General LLM provider switcher
+*** General LLM provider switcher
 :PROPERTIES:
 :ID:       1aa4d814-f574-41ef-8019-cfdd9241e88b
 :END:
@@ -1005,7 +945,7 @@ Both Magit GPT and Forge LLM call this to set their active model.
     ("Ollama" (make-llm-ollama :scheme "http" :host "192.168.0.122" :chat-model my/ollama-model))))
 #+end_src
 
-*** LLM Menu
+** LLM Menu
 :PROPERTIES:
 :ID:       3edab1be-80d2-418a-9b1f-8fba752093d3
 :END:
@@ -1035,7 +975,7 @@ always expand it later if new tools join the lineup.
        :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
 #+end_src
 
-*** ChatGPT Shell
+** ChatGPT Shell
 :PROPERTIES:
 :ID:       9bdfbd96-deec-4335-8d2c-77fff0283708
 :END:
@@ -1068,7 +1008,7 @@ shell-style UX inside Emacs.
 (setq dall-e-shell-openai-key openai-key)
 #+end_src
 
-*** Magit GPT
+** Magit GPT
 :PROPERTIES:
 :ID:       3f720f16-b7a3-4127-81e9-87d849827639
 :END:
@@ -1138,7 +1078,7 @@ Now, write the commit message in this exact format:
   (magit-gptcommit-status-buffer-setup))
 #+end_src
 
-*** Forge LLM
+** Forge LLM
 :PROPERTIES:
 :ID:       51b0f8e3-68b3-46af-91d4-a9b87b1e6b94
 :END:
@@ -1171,7 +1111,7 @@ context when generating PR descriptions.
 (setq forge-llm-max-diff-size nil)
 #+end_src
 
-*** Github Copilot
+** Github Copilot
 :PROPERTIES:
 :ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
 :END:
@@ -1199,7 +1139,7 @@ other completions or keybindings.
         "C-<tab>" #'copilot-accept-completion-by-word))
 #+end_src
 
-*** Aider
+** Aider
 :PROPERTIES:
 :ID:       42318f75-3a25-44ad-bfeb-d83338045385
 :END:
@@ -1238,6 +1178,67 @@ all from within Emacs.
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+#+end_src
+
+* Misc
+:PROPERTIES:
+:ID:       b57fe5fe-18ce-4215-ba94-8deee3a2b64f
+:END:
+** Clipmon
+:PROPERTIES:
+:ID:       7b6776af-f357-4f87-9850-4eae4f8daa76
+:END:
+
+Clipmon serves as my clipboard manager within Emacs. I chose it over alternatives like ~helm-clipboard~
+because it offers better integration with my workflow and provides automatic monitoring of clipboard
+changes. This allows me to maintain a history of copied text without manual intervention.
+
+The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring
+accessible through M-y with helm integration.
+
+#+begin_src emacs-lisp
+(require 'clipmon)
+
+(after! clipmon
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (add-to-list 'after-init-hook 'clipmon-mode-start)
+  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
+    (let ((interprogram-cut-function nil)) ad-do-it))
+  (setq clipmon-timer-interval 1))
+
+#+end_src
+
+** Git
+:PROPERTIES:
+:ID:       51176440-f985-4c90-94a7-bed48286272c
+:END:
+*** Set ~delta~ as the default magit diff
+:PROPERTIES:
+:ID:       fa6dc3cb-50d7-49cd-96cb-e91a122b1316
+:END:
+
+#+begin_src emacs-lisp
+(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+#+end_src
+
+*** Accept pre-commit messages when creating git commits with magit-gptcommit mode
+:PROPERTIES:
+:ID:       2c8ead63-0929-4f52-9816-85d8e24b8123
+:END:
+#+begin_src emacs-lisp
+(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
+  (when-let ((buf (magit-commit-message-buffer)))
+    (with-current-buffer buf
+      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
+        (apply orig-fun args)
+        (unless (string-empty-p orig-message)
+          (save-excursion
+            (goto-char (point-min))
+            (insert orig-message)))))))
+
+(advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
 ** Others

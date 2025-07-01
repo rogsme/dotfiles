@@ -460,31 +460,6 @@ related notes or tasks."
        :desc "Org focus all" "a" #'org-focus-all
       ))
 
-(require 'clipmon)
-
-(after! clipmon
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (add-to-list 'after-init-hook 'clipmon-mode-start)
-  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
-    (let ((interprogram-cut-function nil)) ad-do-it))
-  (setq clipmon-timer-interval 1))
-
-(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
-
-(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
-  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
-  (when-let ((buf (magit-commit-message-buffer)))
-    (with-current-buffer buf
-      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
-        (apply orig-fun args)
-        (unless (string-empty-p orig-message)
-          (save-excursion
-            (goto-char (point-min))
-            (insert orig-message)))))))
-
-(advice-add 'magit-gptcommit-commit-accept
-            :around #'my/magit-gptcommit-commit-accept-wrapper)
-
 (defun my/require-llm-backends ()
   "Load all LLM backends used in my config."
   (require 'llm-claude)
@@ -618,6 +593,31 @@ Now, write the commit message in this exact format:
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+
+(require 'clipmon)
+
+(after! clipmon
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (add-to-list 'after-init-hook 'clipmon-mode-start)
+  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
+    (let ((interprogram-cut-function nil)) ad-do-it))
+  (setq clipmon-timer-interval 1))
+
+(add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
+
+(defun my/magit-gptcommit-commit-accept-wrapper (orig-fun &rest args)
+  "Wrapper for magit-gptcommit-commit-accept to preserve original message."
+  (when-let ((buf (magit-commit-message-buffer)))
+    (with-current-buffer buf
+      (let ((orig-message (string-trim-right (or (git-commit-buffer-message) "") "\n$")))
+        (apply orig-fun args)
+        (unless (string-empty-p orig-message)
+          (save-excursion
+            (goto-char (point-min))
+            (insert orig-message)))))))
+
+(advice-add 'magit-gptcommit-commit-accept
+            :around #'my/magit-gptcommit-commit-accept-wrapper)
 
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
