@@ -468,7 +468,7 @@ related notes or tasks."
 
 (my/require-llm-backends)
 
-(defconst my/gemini-model "google/gemini-2.5-flash-lite-preview-06-17")
+(defconst my/gemini-model "google/gemini-2.5-flash-preview-05-20")
 (defconst my/qwen-model "qwen/qwen3-235b-a22b")
 (defconst my/claude-model "claude-sonnet-4-20250514")
 (defconst my/ollama-model "gemma3:12b")
@@ -503,7 +503,7 @@ related notes or tasks."
        :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
        :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
 
-(setq chatgpt-shell-model-version "gemini-2.5-flash-preview-05-20")
+(setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openai-key openai-key)
@@ -582,7 +582,7 @@ Now, write the commit message in this exact format:
 
 (after! aidermacs
   (setq aidermacs-default-chat-mode "ask")
-  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-lite-preview-06-17")
+  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-preview-05-20")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")

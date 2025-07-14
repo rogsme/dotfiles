@@ -78,5 +78,3 @@
 (package! llm)
 (package! cov)
 (package! aidermacs)
-(package! ghub
-:pin "12d1472579075135327278b843e23f055f659b3c")
