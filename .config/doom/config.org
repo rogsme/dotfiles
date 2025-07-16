@@ -888,7 +888,7 @@ This block defines string constants for the model identifiers I use most frequen
 It helps me avoid hardcoding the same model names in different places.
 
 #+begin_src emacs-lisp
-(defconst my/gemini-model "google/gemini-2.5-flash-preview-05-20")
+(defconst my/gemini-model "google/gemini-2.5-flash")
 (defconst my/qwen-model "qwen/qwen3-235b-a22b")
 (defconst my/claude-model "claude-sonnet-4-20250514")
 (defconst my/ollama-model "gemma3:12b")
@@ -1167,7 +1167,7 @@ all from within Emacs.
 #+begin_src emacs-lisp
 (after! aidermacs
   (setq aidermacs-default-chat-mode "ask")
-  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash-preview-05-20")
+  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
