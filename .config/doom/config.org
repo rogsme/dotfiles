@@ -34,6 +34,19 @@ First off, set my user and email
       user-mail-address "roger@rogs.me")
 #+end_src
 
+* Shells
+:PROPERTIES:
+:ID:       72bedc3d-e7fe-4cf6-9d1b-543a848ca672
+:END:
+
+I use a non-POSIX shell (fish), so I need to tell Emacs to sue the correct shells
+
+#+begin_src emacs-lisp
+(setq shell-file-name (executable-find "bash"))
+(setq-default vterm-shell "/usr/bin/fish")
+(setq-default explicit-shell-file-name "/usr/bin/fish")
+#+end_src
+
 * Look and feel
 :PROPERTIES:
 :ID:       0b198a7a-c736-4dd4-84a3-0ea21bcdc4fb

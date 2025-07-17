@@ -1,6 +1,10 @@
 (setq user-full-name "Roger Gonzalez"
       user-mail-address "roger@rogs.me")
 
+(setq shell-file-name (executable-find "bash"))
+(setq-default vterm-shell "/usr/bin/fish")
+(setq-default explicit-shell-file-name "/usr/bin/fish")
+
 (if (not (eq system-type 'darwin))
     (progn
       (setq doom-font (font-spec :family "MesloLGS Nerd Font" :size 14)
