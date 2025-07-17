@@ -503,12 +503,10 @@ related notes or tasks."
        :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
        :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
 
-(setq chatgpt-shell-model-version "gemini-2.5-pro-exp")
+(setq chatgpt-shell-model-version "qwen/qwen-2.5-coder-32b-instruct")
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
-(setq chatgpt-shell-openai-key openai-key)
-(setq chatgpt-shell-google-key gemini-key)
-(setq chatgpt-shell-anthropic-key anthropic-key)
+(setq chatgpt-shell-openrouter-key openrouter-api-key)
 (setq dall-e-shell-openai-key openai-key)
 
 (defun my/set-magit-gptcommit-provider (provider)
@@ -581,7 +579,6 @@ Now, write the commit message in this exact format:
         "C-<tab>" #'copilot-accept-completion-by-word))
 
 (after! aidermacs
-  (setq aidermacs-default-chat-mode "ask")
   (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
