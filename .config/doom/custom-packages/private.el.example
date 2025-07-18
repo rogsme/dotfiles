@@ -1,6 +1,5 @@
 ;;; custom-packages/private.el -*- lexical-binding: t; -*-
 
-(defvar openai-key "a-big-openai-key")
 (defvar ollama-api-base "my-ollama-api")
 (defvar openrouter-api-key "my-openrouter-key")
 

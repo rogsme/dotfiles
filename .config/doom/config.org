@@ -1019,7 +1019,6 @@ shell-style UX inside Emacs.
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openrouter-key openrouter-api-key)
-(setq dall-e-shell-openai-key openai-key)
 #+end_src
 
 ** Magit GPT

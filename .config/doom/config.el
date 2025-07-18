@@ -512,7 +512,6 @@ related notes or tasks."
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-openrouter-key openrouter-api-key)
-(setq dall-e-shell-openai-key openai-key)
 
 (defun my/set-magit-gptcommit-provider (provider)
   "Set the Magit GPT commit LLM provider dynamically."
