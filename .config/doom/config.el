@@ -474,7 +474,7 @@ related notes or tasks."
 
 (defconst my/gemini-flash-model "google/gemini-2.5-flash")
 (defconst my/gemini-pro-model "google/gemini-2.5-pro")
-(defconst my/qwen-model "qwen/qwen3-235b-a22b")
+(defconst my/qwen-model "qwen/qwen3-235b-a22b-07-25")
 (defconst my/claude-sonnet-model "anthropic/claude-sonnet-4")
 (defconst my/claude-opus-model "anthropic/claude-opus-4")
 (defconst my/ollama-model "gemma3:12b")
