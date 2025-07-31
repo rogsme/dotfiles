@@ -198,7 +198,8 @@ exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
-bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
+# 🐈
+bindsym $aux+c exec notify-send -u normal -t 3000 "🚨 Cat Alert!" "🐈 A horde of cats is incoming! Prepare the screen...️" && mpv "https://www.youtube.com/live/RdmQb8LbxJ8"
 bindsym $aux+a exec /usr/bin/lxappearance
 bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 
@@ -277,6 +278,7 @@ assign [class="NewsFlash"] $ws9
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
 for_window [class="(Galculator|GParted|Nitrogen|Wireguard)"] floating enable border normal
+for_window [class="(mpv)"] floating enable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus

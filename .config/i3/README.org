@@ -383,7 +383,7 @@ exec_always --no-startup-id .config/polybar/launch.sh
 :END:
 Custom keybindings to launch frequently used applications and perform specific actions.
 - =$aux+f=: Opens Thunar file manager.
-- =$aux+c=: Opens an image viewer (`xviewer`) showing a Vim cheatsheet.
+- =$aux+c=: Opens a cat stream 🐈.
 - =$aux+a=: Opens `lxappearance` for changing GTK themes, icons, and fonts.
 - =$mod+Shift+b=: Opens the auxiliary terminal (=$auxTerminal=, ghostty) running a script named `bmenu`.
 - Language Switching: =$aux+Shift+e= sets the keyboard layout to Spanish (es), =$aux+Shift+u= sets it to
@@ -397,7 +397,8 @@ Custom keybindings to launch frequently used applications and perform specific a
 #+begin_src conf
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
-bindsym $aux+c exec xviewer ~/.vim-cheatsheet.gif
+# 🐈
+bindsym $aux+c exec notify-send -u normal -t 3000 "🚨 Cat Alert!" "🐈 A horde of cats is incoming! Prepare the screen...️" && mpv "https://www.youtube.com/live/RdmQb8LbxJ8"
 bindsym $aux+a exec /usr/bin/lxappearance
 bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 
@@ -509,6 +510,7 @@ assign [class="NewsFlash"] $ws9
 # Open specific applications in floating mode
 for_window [title="File Transfer*"] floating enable
 for_window [class="(Galculator|GParted|Nitrogen|Wireguard)"] floating enable border normal
+for_window [class="(mpv)"] floating enable
 
 # switch to workspace with urgent window automatically
 for_window [urgent=latest] focus
