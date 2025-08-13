@@ -43,6 +43,8 @@ alias grep="rg -n --with-filename --smart-case"
 alias dock="xrandr --output DP-2-3 --auto --primary --left-of DP-2-1 --output DP-2-1 --auto --output eDP-1 --off"
 # Cool cmatrix
 alias cmatrix="cmatrix -a -r"
+# Open a quick webserver at point
+alias s="python -m http.server 8000"
 
 # Source a separate file containing custom Fish shell abbreviations
 source "$HOME/.config/fish/abbreviations.fish"
