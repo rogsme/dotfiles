@@ -1,0 +1,12 @@
+alias:
+  - "lazer-sonnet:openai/anthropic/claude-sonnet-4-20250514"
+  - "lazer-haiku:openai/anthropic/claude-3-5-haiku-20241022"
+  - "lazer-gemini:openai/gemini/gemini-2.5-flash"
+  - "lazer-gemini-weak:openai/gemini/gemini-2.0-flash"
+
+cache-prompts: true
+cache-keepalive-pings: 6
+
+dark-mode: true
+pretty: true
+stream: true
