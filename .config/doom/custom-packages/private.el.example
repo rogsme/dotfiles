@@ -2,5 +2,7 @@
 
 (defvar ollama-api-base "my-ollama-api")
 (defvar openrouter-api-key "my-openrouter-key")
+(defvar openai-api-base "my-openai-api-base")
+(defvar openai-api-key "my-openai-api-key")
 
 (provide 'private)

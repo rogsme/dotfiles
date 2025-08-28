@@ -920,7 +920,9 @@ I call it in places like Aider or Forge where shell commands or HTTP requests de
 #+begin_src emacs-lisp
 (defun my/setup-llm-env ()
   (setenv "OLLAMA_API_BASE" ollama-api-base)
-  (setenv "OPENROUTER_API_KEY" openrouter-api-key))
+  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
+  (setenv "OPENAI_API_BASE" openai-api-base)
+  (setenv "OPENAI_API_KEY" openai-api-key))
 (my/setup-llm-env)
 #+end_src
 

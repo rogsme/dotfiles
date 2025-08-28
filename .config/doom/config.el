@@ -481,7 +481,9 @@ related notes or tasks."
 
 (defun my/setup-llm-env ()
   (setenv "OLLAMA_API_BASE" ollama-api-base)
-  (setenv "OPENROUTER_API_KEY" openrouter-api-key))
+  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
+  (setenv "OPENAI_API_BASE" openai-api-base)
+  (setenv "OPENAI_API_KEY" openai-api-key))
 (my/setup-llm-env)
 
 (defun make-llm-openrouter-compatible (chat-model)
