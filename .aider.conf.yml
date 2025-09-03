@@ -1,8 +1,12 @@
 alias:
+  # Claude
   - "lazer-sonnet:openai/anthropic/claude-sonnet-4-20250514"
   - "lazer-haiku:openai/anthropic/claude-3-5-haiku-20241022"
+  # Gemini
   - "lazer-gemini:openai/gemini/gemini-2.5-flash"
   - "lazer-gemini-weak:openai/gemini/gemini-2.0-flash"
+  # Qwen3
+  - "lazer-qwen:openai/cerebras/qwen-3-coder-480b"
 
 cache-prompts: true
 cache-keepalive-pings: 6

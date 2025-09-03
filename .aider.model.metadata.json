@@ -40,5 +40,19 @@
     "output_cost_per_token": 0.0,
     "litellm_provider": "openai",
     "mode": "chat"
+  },
+  "openai/cerebras/qwen-3-coder-480b": {
+    "max_tokens": 128000,
+    "max_input_tokens": 128000,
+    "max_output_tokens": 128000,
+    "input_cost_per_token": 0.000002,
+    "output_cost_per_token": 0.000002,
+    "litellm_provider": "openai",
+    "mode": "chat",
+    "supports_vision": false,
+    "supports_function_calling": true,
+    "supports_assistant_prefill": false,
+    "non_thinking_only": true,
+    "tokens_per_second": 2000
   }
 }

@@ -39,3 +39,9 @@
 - name: openai/gemini/gemini-2.0-flash
   edit_format: diff
   use_repo_map: true
+
+# Qwen 3 Coder 480B — mirrors upstream defaults
+- name: openai/cerebras/qwen-3-coder-480b
+  edit_format: diff
+  weak_model_name: openai/gemini/gemini-2.0-flash
+  use_repo_map: true
