@@ -45,7 +45,7 @@ font-5 = Noto Color Emoji:scale=12;0
 
 modules-left = i3 music
 modules-center = xwindow
-modules-right = pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
+modules-right = crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
 
 [module/i3]
 type = internal/i3
@@ -185,5 +185,5 @@ warn-temperature = 80
 
 [module/crypto]
 type = custom/script
-exec = python ~/.config/polybar/pcrypto.py --base USD --coins btc
+exec = ~/.config/polybar/btc.sh
 interval = 60
