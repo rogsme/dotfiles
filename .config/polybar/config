@@ -82,7 +82,7 @@ interval = 0.5
 warn-percentage = 95
 format-prefix = "🎛 "
 format-underline = ${colors.highlight}
-label = %percentage:2%%
+label = %percentage:02%%
 
 [module/memory]
 type = internal/memory
@@ -90,7 +90,7 @@ interval = 3
 warn-percentage = 90
 format-prefix = " 📊 "
 format-underline = ${colors.accent}
-label = %percentage_used%%
+label = %percentage_used:02%%
 
 [module/wireless-network]
 type = internal/network
