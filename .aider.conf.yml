@@ -7,6 +7,8 @@ alias:
   - "lazer-gemini-weak:openai/gemini/gemini-2.0-flash"
   # Qwen3
   - "lazer-qwen:openai/cerebras/qwen-3-coder-480b"
+  # Kimi K2
+  - "lazer-kimi:openai/groq/moonshotai/kimi-k2-instruct-0905"
 
 cache-prompts: true
 cache-keepalive-pings: 6

@@ -45,3 +45,11 @@
   edit_format: diff
   weak_model_name: openai/gemini/gemini-2.0-flash
   use_repo_map: true
+
+- name: openai/groq/moonshotai/kimi-k2-instruct-0905
+  edit_format: diff
+  weak_model_name: openai/gemini/gemini-2.0-flash
+  use_repo_map: true
+  examples_as_sys_msg: true
+  extra_params:
+    temperature: 0.6
