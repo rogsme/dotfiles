@@ -1247,6 +1247,23 @@ accessible through M-y with helm integration.
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 #+end_src
 
+** Forge
+:PROPERTIES:
+:ID:       1af391bb-82d3-4ed7-8d7e-a12bcfd71708
+:END:
+*** Set my gitea instance in forge
+:PROPERTIES:
+:ID:       16bc3a82-c706-4c3d-942a-f3d16513e024
+:END:
+#+begin_src emacs-lisp
+(with-eval-after-load 'forge
+  (add-to-list 'forge-alist
+               '("git.rogs.me"                 ; GITHOST
+                 "git.rogs.me/api/v1"          ; APIHOST
+                 "git.rogs.me"                 ; WEBHOST + INSTANCE-ID
+                 forge-gitea-repository)))     ; CLASS
+#+end_src
+
 ** PlantUML
 :PROPERTIES:
 :ID:       87ed3201-3df7-4ee1-a4ce-4fe8312f9d08

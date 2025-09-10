@@ -616,6 +616,13 @@ Now, write the commit message in this exact format:
 (advice-add 'magit-gptcommit-commit-accept
             :around #'my/magit-gptcommit-commit-accept-wrapper)
 
+(with-eval-after-load 'forge
+  (add-to-list 'forge-alist
+               '("git.rogs.me"                 ; GITHOST
+                 "git.rogs.me/api/v1"          ; APIHOST
+                 "git.rogs.me"                 ; WEBHOST + INSTANCE-ID
+                 forge-gitea-repository)))     ; CLASS
+
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
 (setq org-plantuml-exec-mode 'plantuml)

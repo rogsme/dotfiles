@@ -77,3 +77,7 @@
 (package! llm)
 (package! cov)
 (package! aidermacs)
+(unpin! magit forge ghub)   ;; let these float past Doom's pins
+(package! magit :pin nil)
+(package! forge :pin nil)
+(package! ghub :pin nil)
