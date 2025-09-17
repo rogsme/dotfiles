@@ -68,5 +68,21 @@
     "supports_assistant_prefill": false,
     "non_thinking_only": true,
     "tokens_per_second": 400
+  },
+  "openai/xai/grok-code-fast": {
+    "max_tokens": 256000,
+    "max_input_tokens": 256000,
+    "max_output_tokens": 256000,
+    "input_cost_per_token": 0.00000020,
+    "output_cost_per_token": 0.00000150,
+    "cached_input_cost_per_token": 0.00000002,
+    "litellm_provider": "openai",
+    "mode": "chat",
+    "supports_vision": false,
+    "supports_function_calling": true,
+    "supports_assistant_prefill": false,
+    "supports_structured_outputs": true,
+    "reasoning": true,
+    "tokens_per_second": 190
   }
 }

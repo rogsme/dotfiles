@@ -46,6 +46,7 @@
   weak_model_name: openai/gemini/gemini-2.0-flash
   use_repo_map: true
 
+# Kimi K2 Instruct — mirrors upstream defaults
 - name: openai/groq/moonshotai/kimi-k2-instruct-0905
   edit_format: diff
   weak_model_name: openai/gemini/gemini-2.0-flash
@@ -53,3 +54,11 @@
   examples_as_sys_msg: true
   extra_params:
     temperature: 0.6
+
+# Grok Code Fast — mirrors upstream defaults for Grok 4
+- name: openai/xai/grok-code-fast
+  use_repo_map: true
+  edit_format: diff
+  weak_model_name: openai/gemini/gemini-2.0-flash
+  accepts_settings:
+    - reasoning_effort
