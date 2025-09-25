@@ -80,7 +80,3 @@ end
 if command -v kubectl >/dev/null
     eval (kubectl completion fish | source)
 end
-
-# ASDF
-# Sources the initialization script for the ASDF version manager, making its commands available.
-source ~/.asdf/asdf.fish
