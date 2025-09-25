@@ -128,7 +128,7 @@ support for icons (via Nerd Fonts patching). The same family is used for bold/it
 the font itself to provide these styles.
 #+begin_src toml
 [font.normal]
-family = "MesloLGS Nerd Font Composite"
+family = "MesloEmoji"
 #+end_src
 
 *** Bold Font
@@ -137,7 +137,7 @@ family = "MesloLGS Nerd Font Composite"
 :END:
 #+begin_src toml
 [font.bold]
-family = "MesloLGS Nerd Font Composite"
+family = "MesloEmoji"
 #+end_src
 
 *** Italic Font
@@ -146,7 +146,7 @@ family = "MesloLGS Nerd Font Composite"
 :END:
 #+begin_src toml
 [font.italic]
-family = "MesloLGS Nerd Font Composite"
+family = "MesloEmoji"
 #+end_src
 
 *** Bold Italic Font
@@ -155,7 +155,7 @@ family = "MesloLGS Nerd Font Composite"
 :END:
 #+begin_src toml
 [font.bold_italic]
-family = "MesloLGS Nerd Font Composite"
+family = "MesloEmoji"
 #+end_src
 
 ** Scrolling
