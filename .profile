@@ -13,3 +13,5 @@
 export EDITOR=/usr/bin/nano
 export TERM=xterm-256color
 [[ -f ~/.extend.profile ]] && . ~/.extend.profile
+
+. "$HOME/.local/bin/env"
