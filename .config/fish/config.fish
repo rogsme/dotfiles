@@ -3,7 +3,7 @@ fish_vi_key_bindings
 # Disable the default Fish greeting message
 set fish_greeting ""
 # Add paths for Ruby gems and Sonar Scanner to the system PATH
-set -gx PATH /home/roger/.gem/ruby/2.7.0/bin /opt/sonar-scanner/bin /home/roger/.fly/bin $PATH
+set -gx PATH /home/roger/.gem/ruby/2.7.0/bin /opt/sonar-scanner/bin /home/roger/.config/emacs/bin /home/roger/.fly/bin $PATH
 # Enable Powerline fonts for the theme
 set -g theme_powerline_fonts yes
 # Disable prompt modification by Python virtual environments (handled by the theme)
@@ -27,8 +27,6 @@ alias rm='rm -i'
 alias mv='mv -i'
 # Shortcut to navigate to the parent directory
 alias ..='cd ..'
-# Shortcut for the Doom Emacs command-line interface
-alias doom='$HOME/.config/emacs/bin/doom'
 # Use 'eza' for directory listings: long format, all files, colors, icons, dirs first
 alias ls='eza -la --color=always --group-directories-first --icons'
 # Ping personal website
@@ -86,5 +84,3 @@ end
 # ASDF
 # Sources the initialization script for the ASDF version manager, making its commands available.
 source ~/.asdf/asdf.fish
-
-# flyctl
