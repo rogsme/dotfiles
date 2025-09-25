@@ -539,9 +539,9 @@ startup of some applications, potentially reducing initial resource load or wait
 - =xfce4-notifyd=: A notification daemon to display desktop notifications.
 - =autotiling=: A script that automatically adjusts the split direction (horizontal/vertical) based on
   window dimensions, aiming for a more balanced layout.
-- =xinput set-prop 14 345 1=: Likely a specific command to configure a touchpad or mouse setting (device
+- =xinput set-prop 14 345 1=: A specific command to configure a touchpad or mouse setting (device
   ID 14, property 345 set to 1). This is hardware-specific.
-- =play-with-mpv=: Likely related to a browser extension that allows opening videos in the MPV player.
+- =play-with-mpv=: Related to a browser extension that allows opening videos in the MPV player.
 - =~/.config/i3/connect-speakers.sh=: A custom script, probably for setting up audio outputs.
 - =kdeconnect-app=: Starts the KDE Connect application for integrating phone notifications and file
   sharing.
@@ -565,7 +565,6 @@ exec_always --no-startup-id sleep 5; exec picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
-exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
@@ -577,7 +576,6 @@ exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPL
 :END:
 Execution of custom scripts and miscellaneous bindings.
 - =internet_check.sh= (commented out) and =weather_notify.sh= are custom scripts launched at startup
-  (likely for status bar information or notifications).
 - =$aux+p=: A keybinding that generates a 50-character random password using =/dev/urandom= and =tr=,
   copies it to the clipboard using =xclip=, and sends a notification.
 #+begin_src conf

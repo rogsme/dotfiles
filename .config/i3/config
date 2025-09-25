@@ -198,8 +198,6 @@ exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
-# 🐈
-bindsym $aux+c exec notify-send -u normal -t 3000 "🚨 Cat Alert!" "🐈 A horde of cats is incoming! Prepare the screen..." && mpv --mute=yes "https://www.youtube.com/watch?v=OYg55DdxjJI"
 bindsym $aux+a exec /usr/bin/lxappearance
 bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 
@@ -299,7 +297,6 @@ exec_always --no-startup-id sleep 5; exec picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
 exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
-exec --no-startup-id exec /usr/bin/play-with-mpv
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
