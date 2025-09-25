@@ -332,7 +332,6 @@ Bindings for managing the i3 session and the system itself.
 - =$mod+Shift+c=: Reloads the i3 configuration file (~/.config/i3/config). Useful after making changes.
 - =$mod+Shift+r=: Restarts i3 in place. This preserves the current layout and session, useful for
   applying changes that require a restart or upgrading i3.
-- =$Locker=: Defines a variable for the screen locking command, using the same script as =xss-lock=.
 - A "System" mode (similar to the "Resize" mode) is defined for power management actions. Activated by
   =$mod+Shift+e=, it provides single-key shortcuts for locking (l), logging out (e), suspending (s),
   hibernating (h), rebooting (r), and shutting down (Shift+s). Pressing =Return= or =Escape= exits this
@@ -342,12 +341,10 @@ Bindings for managing the i3 session and the system itself.
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# lock the screen
-set $Locker exec "~/.config/i3/scripts/i3lock_script.sh"
 
 set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_power" {
-    bindsym l exec --no-startup-id $Locker, mode "default"
+    bindsym l exec --no-startup-id i3lock-fancy -p, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
     bindsym s exec --no-startup-id systemctl suspend, mode "default"
     bindsym h exec --no-startup-id systemctl hibernate, mode "default"

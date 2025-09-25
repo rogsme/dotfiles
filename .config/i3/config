@@ -174,12 +174,10 @@ workspace $ws11 output DP-2-2
 bindsym $mod+Shift+c reload
 # restart i3 inplace (preserves your layout/session, can be used to upgrade i3)
 bindsym $mod+Shift+r restart
-# lock the screen
-set $Locker exec "~/.config/i3/scripts/i3lock_script.sh"
 
 set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_power" {
-    bindsym l exec --no-startup-id $Locker, mode "default"
+    bindsym l exec --no-startup-id i3lock-fancy -p, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
     bindsym s exec --no-startup-id systemctl suspend, mode "default"
     bindsym h exec --no-startup-id systemctl hibernate, mode "default"
@@ -198,6 +196,8 @@ exec_always --no-startup-id .config/polybar/launch.sh
 
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
+# 🐈
+bindsym $aux+c exec notify-send -u normal -t 3000 "🚨 Cat Alert!" "🐈 A horde of cats is incoming! Prepare the screen..." && mpv --mute=yes "https://www.youtube.com/live/RdmQb8LbxJ8"
 bindsym $aux+a exec /usr/bin/lxappearance
 bindsym $mod+Shift+b exec $auxTerminal -e 'bmenu'
 
