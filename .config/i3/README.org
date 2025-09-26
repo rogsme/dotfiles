@@ -60,10 +60,17 @@ This section configures integration with system services and utilities.
   inhibitors. You can manually lock the screen using =loginctl lock-session=.
 - =nm-applet=: Starts the NetworkManager applet, providing a system tray icon for managing network
   connections (especially useful for Wi-Fi).
+ - =autorandr=: Manages display configurations. =exec_always= ensures it runs on startup and i3 restart.
+  The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
+  (=$mod+Shift+x=) is also set to manually trigger a display profile change.
+
 #+begin_src conf
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
+
+exec_always --no-startup-id sleep 2; autorandr --change
+bindsym $mod+Shift+x exec autorandr --change
 #+end_src
 
 ** Audio Controls
