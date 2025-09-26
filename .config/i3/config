@@ -11,7 +11,7 @@ set $aux Mod1
 
 font pango:DejaVu Sans Mono
 
-exec --no-startup-id xss-lock --transfer-sleep-lock ~/.config/i3/scripts/i3lock_script.sh
+exec --no-startup-id xss-lock --transfer-sleep-lock i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 

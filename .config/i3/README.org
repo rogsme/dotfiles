@@ -55,8 +55,8 @@ font pango:DejaVu Sans Mono
 :ID:       e980bd11-e95c-4cff-8e22-387d238d1862
 :END:
 This section configures integration with system services and utilities.
-- =xss-lock=: Automatically locks the screen using a specified script
-  (=~/.config/i3/scripts/i3lock_script.sh=) before the system suspends. It uses `logind` to manage sleep
+- =xss-lock=: Automatically locks the screen using i3lock-fancy before the system suspends. It uses
+  `logind` to manage sleep.
   inhibitors. You can manually lock the screen using =loginctl lock-session=.
 - =nm-applet=: Starts the NetworkManager applet, providing a system tray icon for managing network
   connections (especially useful for Wi-Fi).
@@ -64,7 +64,7 @@ This section configures integration with system services and utilities.
   The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
   (=$mod+Shift+x=) is also set to manually trigger a display profile change.
 #+begin_src conf
-exec --no-startup-id xss-lock --transfer-sleep-lock ~/.config/i3/scripts/i3lock_script.sh
+exec --no-startup-id xss-lock --transfer-sleep-lock i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
