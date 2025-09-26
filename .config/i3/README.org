@@ -64,7 +64,7 @@ This section configures integration with system services and utilities.
   The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
   (=$mod+Shift+x=) is also set to manually trigger a display profile change.
 #+begin_src conf
-exec --no-startup-id xss-lock --transfer-sleep-lock i3lock-fancy -p
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
@@ -549,7 +549,7 @@ startup of some applications, potentially reducing initial resource load or wait
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
-exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
+exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet

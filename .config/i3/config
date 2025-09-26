@@ -11,7 +11,7 @@ set $aux Mod1
 
 font pango:DejaVu Sans Mono
 
-exec --no-startup-id xss-lock --transfer-sleep-lock i3lock-fancy -p
+exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
@@ -284,7 +284,7 @@ for_window [urgent=latest] focus
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
-exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
+exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
