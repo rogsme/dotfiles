@@ -66,5 +66,3 @@ unset conf
 ZSH_AUTOSUGGEST_STRATEGY=(match_prev_cmd completion)
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#555555"
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern regexp cursor root line)
-
-. "$HOME/.local/bin/env"

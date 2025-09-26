@@ -42,5 +42,3 @@ colors() {
 [ -r /usr/share/bash-completion/bash_completion   ] && . /usr/share/bash-completion/bash_completion
 
 export TERM=xterm-256color
-
-. "$HOME/.local/bin/env"
