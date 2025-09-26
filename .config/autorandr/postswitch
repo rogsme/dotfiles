@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# Restore wallpaper right away
+nitrogen --restore &
+
+# Wait for outputs to settle
+sleep 5
+
+# Restart i3 to redraw bars/workspaces
+i3-msg restart
+
