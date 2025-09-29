@@ -5,6 +5,10 @@ function doom
             echo "🚀 Running: doom $argv"
             set_color normal
 
+            # make sure node 22 is active
+            nvm install 22 >/dev/null
+            nvm use 22
+
             command doom $argv
             if test $status -eq 0
                 set_color green
