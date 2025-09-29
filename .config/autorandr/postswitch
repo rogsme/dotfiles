@@ -9,3 +9,7 @@ sleep 5
 # Restart i3 to redraw bars/workspaces
 i3-msg restart
 
+sleep 5
+
+# Kick a placement pass inside the running i3 so DISPLAY/DBUS are correct
+i3-msg 'exec --no-startup-id ~/.config/i3/place-workspaces.sh' >/dev/null
