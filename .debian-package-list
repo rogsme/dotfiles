@@ -1490,6 +1490,7 @@ libplacebo349:amd64				install
 libplasma6:amd64				install
 libplasmaactivities6:amd64			install
 libplasmaquick6:amd64				install
+libplayerctl2:amd64				install
 libplist-2.0-4:amd64				install
 libplymouth5:amd64				install
 libpng16-16t64:amd64				install
@@ -2529,6 +2530,7 @@ pinentry-gnome3					install
 pkexec						install
 plasma-activities-bin				install
 plasma-desktoptheme				install
+playerctl					install
 plymouth					install
 plymouth-label					install
 pocketsphinx-en-us				install
@@ -2693,6 +2695,8 @@ systemsettings					install
 sysvinit-utils					install
 t1-cyrillic					install
 t1-teams					install
+tailscale					install
+tailscale-archive-keyring			install
 tango-icon-theme				install
 tar						install
 task-albanian-desktop				install
