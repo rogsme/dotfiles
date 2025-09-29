@@ -78,8 +78,11 @@ bc						install
 binutils					install
 binutils-common:amd64				install
 binutils-x86-64-linux-gnu			install
+blueman						install
+bluetooth					install
 bluez						install
 bluez-firmware					install
+bluez-obexd					install
 bolt						install
 bsdextrautils					install
 bsdutils					install
@@ -91,6 +94,8 @@ busybox						install
 bzip2						install
 bzip2-doc					install
 ca-certificates					install
+cheese						install
+cheese-common					install
 cmatrix						install
 coinor-libcbc3.1:amd64				install
 coinor-libcgl1:amd64				install
@@ -156,6 +161,7 @@ dmidecode					install
 dmsetup						install
 dns-root-data					install
 dnsmasq-base					install
+docbook-xml					install
 docker-buildx-plugin				install
 docker-ce					install
 docker-ce-cli					install
@@ -178,6 +184,7 @@ emacsen-common					install
 enchant-2					install
 eslint						install
 espeak-ng-data:amd64				install
+evolution-data-server-common			install
 exfalso						install
 exfatprogs					install
 exim4-base					install
@@ -489,6 +496,7 @@ gir1.2-handy-1:amd64				install
 gir1.2-harfbuzz-0.0:amd64			install
 gir1.2-ibus-1.0:amd64				install
 gir1.2-keybinder-3.0				install
+gir1.2-nm-1.0:amd64				install
 gir1.2-notify-0.7:amd64				install
 gir1.2-packagekitglib-1.0			install
 gir1.2-pango-1.0:amd64				install
@@ -502,6 +510,7 @@ glib-networking:amd64				install
 glib-networking-common				install
 glib-networking-services			install
 gnome-accessibility-themes			install
+gnome-desktop3-data				install
 gnome-icon-theme				install
 gnome-keyring					install
 gnome-keyring-pkcs11:amd64			install
@@ -511,6 +520,7 @@ gnome-software-plugin-deb			install
 gnome-software-plugin-fwupd			install
 gnome-themes-extra:amd64			install
 gnome-themes-extra-data				install
+gnome-video-effects				install
 gnupg						install
 gnupg-l10n					install
 gnupg-utils					install
@@ -534,6 +544,7 @@ grub2-common					install
 gsasl-common					install
 gsettings-desktop-schemas			install
 gstreamer1.0-alsa:amd64				install
+gstreamer1.0-clutter-3.0:amd64			install
 gstreamer1.0-gl:amd64				install
 gstreamer1.0-gtk3:amd64				install
 gstreamer1.0-libav:amd64			install
@@ -793,6 +804,9 @@ libcairo2:amd64					install
 libcairomm-1.0-1v5:amd64			install
 libcairomm-1.16-1:amd64				install
 libcaja-extension1:amd64			install
+libcamel-1.2-64t64:amd64			install
+libcanberra-gtk3-0:amd64			install
+libcanberra-gtk3-module:amd64			install
 libcanberra0:amd64				install
 libcap-ng0:amd64				install
 libcap2:amd64					install
@@ -807,19 +821,30 @@ libcdparanoia0:amd64				install
 libcdr-0.1-1:amd64				install
 libcfitsio10t64:amd64				install
 libcharls2:amd64				install
+libcheese-gtk25:amd64				install
+libcheese8:amd64				install
 libchromaprint1:amd64				install
 libcjson1:amd64					install
 libclone-perl:amd64				install
 libcloudproviders0:amd64			install
 libclucene-contribs1t64:amd64			install
 libclucene-core1t64:amd64			install
+libclutter-1.0-0:amd64				install
+libclutter-1.0-common				install
+libclutter-gst-3.0-0:amd64			install
+libclutter-gtk-1.0-0:amd64			install
 libcmis-0.6-6t64				install
 libcodec2-1.2:amd64				install
+libcogl-common					install
+libcogl-pango20:amd64				install
+libcogl-path20:amd64				install
+libcogl20:amd64					install
 libcolamd3:amd64				install
 libcolord2:amd64				install
 libcolorhug2:amd64				install
 libcom-err2:amd64				install
 libcommon-sense-perl:amd64			install
+libconfig++11:amd64				install
 libconfig11:amd64				install
 libconfuse-common				install
 libconfuse2:amd64				install
@@ -872,7 +897,12 @@ libdvdread8t64:amd64				install
 libdw1t64:amd64					install
 libe-book-0.1-1:amd64				install
 libeb16t64:amd64				install
+libebackend-1.2-11t64:amd64			install
+libebook-1.2-21t64:amd64			install
+libebook-contacts-1.2-4t64:amd64		install
 libebur128-1:amd64				install
+libedata-book-1.2-27t64:amd64			install
+libedataserver-1.2-27t64:amd64			install
 libedit2:amd64					install
 libefiboot1t64:amd64				install
 libefivar1t64:amd64				install
@@ -998,6 +1028,7 @@ libglx-mesa0:amd64				install
 libglx0:amd64					install
 libgme0:amd64					install
 libgmp10:amd64					install
+libgnome-desktop-3-20t64:amd64			install
 libgnutls-dane0t64:amd64			install
 libgnutls30t64:amd64				install
 libgomp1:amd64					install
@@ -1450,6 +1481,7 @@ libpcre2-8-0:amd64				install
 libpcsclite1:amd64				install
 libperl5.40:amd64				install
 libpgm-5.3-0t64:amd64				install
+libphonenumber8:amd64				install
 libpipeline1:amd64				install
 libpipewire-0.3-0t64:amd64			install
 libpipewire-0.3-common				install
@@ -1948,6 +1980,7 @@ libxinerama1:amd64				install
 libxkbcommon-x11-0:amd64			install
 libxkbcommon0:amd64				install
 libxkbfile1:amd64				install
+libxkbregistry0:amd64				install
 libxklavier16:amd64				install
 libxml-parser-perl				install
 libxml-twig-perl				install
@@ -1979,6 +2012,7 @@ libxxf86vm1:amd64				install
 libxxhash0:amd64				install
 libyajl2:amd64					install
 libyaml-0-2:amd64				install
+libyelp0:amd64					install
 libyuv0:amd64					install
 libz3-4:amd64					install
 libzbar0t64:amd64				install
@@ -2006,9 +2040,11 @@ lm-sensors					install
 locales						install
 login						install
 login.defs					install
+logiops						install
 logrotate					install
 logsave						install
 lolcat						install
+lsb-release					install
 lsof						install
 luit						install
 lxappearance					install
@@ -2509,6 +2545,7 @@ proj-data					install
 psmisc						install
 publicsuffix					install
 pulseaudio					install
+pulseaudio-module-bluetooth			install
 pulseaudio-utils				install
 python3						install
 python3-brlapi:amd64				install
@@ -2519,6 +2556,7 @@ python3-charset-normalizer			install
 python3-cups:amd64				install
 python3-cupshelpers				install
 python3-dbus					install
+python3-distro					install
 python3-feedparser				install
 python3-gi					install
 python3-gi-cairo				install
@@ -2622,6 +2660,7 @@ scrot						install
 sed						install
 sensible-utils					install
 sgml-base					install
+sgml-data					install
 shared-mime-info				install
 shim-helpers-amd64-signed			install
 shim-signed:amd64				install
@@ -2913,6 +2952,8 @@ xssproxy					install
 xterm						install
 xxkb						install
 xz-utils					install
+yelp						install
+yelp-xsl					install
 yt-dlp						install
 zen-browser					install
 zenity						install
