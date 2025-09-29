@@ -505,6 +505,7 @@ gir1.2-secret-1:amd64				install
 gir1.2-soup-3.0:amd64				install
 gir1.2-wnck-3.0:amd64				install
 git						install
+git-delta					install
 git-man						install
 glib-networking:amd64				install
 glib-networking-common				install
