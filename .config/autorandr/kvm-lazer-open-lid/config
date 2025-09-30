@@ -10,7 +10,7 @@ output HDMI-3
 off
 output DVI-I-4-4
 off
-output DVI-I-1-1
+output DVI-I-3-3
 off
 output eDP-1
 off
@@ -21,8 +21,8 @@ pos 0x0
 primary
 rate 60.00
 x-prop-non_desktop 0
-output DVI-I-3-3
-crtc 6
+output DVI-I-1-1
+crtc 7
 mode 1920x1080
 pos 1920x0
 rate 60.00
