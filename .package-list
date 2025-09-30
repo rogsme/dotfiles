@@ -21,6 +21,7 @@ avahi
 azure-cli
 b43-fwcutter
 base
+base-devel
 bash-completion
 bitwarden
 blueman
@@ -52,6 +53,7 @@ dhclient
 dhcpcd
 diffutils
 discord
+displaylink
 dmidecode
 dmraid
 dnsmasq
@@ -154,6 +156,7 @@ lightdm
 lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
 linux61
+linux61-headers
 linux61-nvidia
 logiops
 logrotate
