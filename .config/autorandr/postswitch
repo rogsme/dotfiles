@@ -1,15 +1,13 @@
 #!/bin/sh
 
 # Restore wallpaper right away
+sleep 5
 nitrogen --restore &
 
-# Wait for outputs to settle
-sleep 5
-
 # Restart i3 to redraw bars/workspaces
+sleep 5
 i3-msg restart
 
-sleep 5
-
 # Kick a placement pass inside the running i3 so DISPLAY/DBUS are correct
+sleep 5
 i3-msg 'exec --no-startup-id ~/.config/i3/place-workspaces.sh' >/dev/null
