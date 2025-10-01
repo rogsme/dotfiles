@@ -15,6 +15,21 @@
   accepts_settings:
     - thinking_tokens
 
+# Claude Sonnet 4.5 — mirrors upstream settings
+- name: openai/anthropic/claude-sonnet-4-5
+  edit_format: diff
+  weak_model_name: openai/anthropic/claude-3-5-haiku-20241022
+  use_repo_map: true
+  extra_params:
+    extra_headers:
+      anthropic-beta: "prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19"
+    max_tokens: 64000
+  cache_control: true
+  editor_model_name: openai/anthropic/claude-sonnet-4-5
+  editor_edit_format: editor-diff
+  accepts_settings:
+    - thinking_tokens
+
 # Claude 3.5 Haiku — mirrors upstream settings
 - name: openai/anthropic/claude-3-5-haiku-20241022
   edit_format: diff

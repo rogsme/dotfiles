@@ -11,6 +11,18 @@
     "supports_function_calling": true,
     "supports_assistant_prefill": true
   },
+  "openai/anthropic/claude-sonnet-4-5": {
+    "max_tokens": 64000,
+    "max_input_tokens": 200000,
+    "max_output_tokens": 64000,
+    "input_cost_per_token": 0.000003,   // $3 / 1M
+    "output_cost_per_token": 0.000015,  // $15 / 1M
+    "litellm_provider": "openai",
+    "mode": "chat",
+    "supports_vision": true,
+    "supports_function_calling": true,
+    "supports_assistant_prefill": true
+  },
   "openai/anthropic/claude-3-5-haiku-20241022": {
     "max_tokens": 8000,
     "max_input_tokens": 200000,

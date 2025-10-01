@@ -1,6 +1,6 @@
 alias:
   # Claude
-  - "lazer-sonnet:openai/anthropic/claude-sonnet-4-20250514"
+  - "lazer-sonnet:openai/anthropic/claude-sonnet-4-5"
   - "lazer-haiku:openai/anthropic/claude-3-5-haiku-20241022"
   # Gemini
   - "lazer-gemini:openai/gemini/gemini-2.5-flash"
