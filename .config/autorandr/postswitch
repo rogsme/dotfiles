@@ -10,4 +10,4 @@ i3-msg restart
 
 # Kick a placement pass inside the running i3 so DISPLAY/DBUS are correct
 sleep 5
-i3-msg 'exec --no-startup-id ~/.config/i3/place-workspaces.sh' >/dev/null
+#i3-msg 'exec --no-startup-id ~/.config/i3/place-workspaces.sh' >/dev/null
