@@ -360,8 +360,16 @@ related notes or tasks."
     t))
 
 (after! lsp-mode
-  (setq lsp-headerline-breadcrumb-enable t)
-  (setq lsp-headerline-breadcrumb-icons-enable t))
+  (setq lsp-headerline-breadcrumb-enable t
+        lsp-headerline-breadcrumb-icons-enable t))
+
+(setq lsp-pyright-langserver-command "pyright"   ;; or "basedpyright"
+      lsp-pyright-python-executable-cmd "python3" ;; change to "python" if you prefer
+      lsp-pyright-typechecking-mode "strict")      ;; "off" | "basic" | "strict"
+
+(after! lsp-mode
+  (require 'lsp-pyright)
+  (add-hook! python-mode #'lsp-deferred))
 
 (after! python
   :init
@@ -505,10 +513,11 @@ related notes or tasks."
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
-       :desc "Aidermacs" "a" #'aidermacs-transient-menu
-       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient
-       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
-       :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
+       :desc "Aidermacs"                "a" #'aidermacs-transient-menu
+       :desc "ChatGPT Shell"            "c" #'chatgpt-shell-transient
+       :desc "Set Forge LLM Provider"   "f" #'my/set-forge-llm-provider
+       :desc "Set Magit GPT Provider"   "m" #'my/set-magit-gptcommit-provider
+       :desc "Claude Code (menu)"       "C" #'claude-code-transient))
 
 (setq chatgpt-shell-model-version "qwen/qwen-2.5-coder-32b-instruct")
 (setq chatgpt-shell-streaming "t")
@@ -590,6 +599,19 @@ Now, write the commit message in this exact format:
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+
+;; Use vterm for the terminal backend (eat is default upstream)
+(setq claude-code-terminal-backend 'vterm)
+
+;; Make commands available; no UI until you start Claude
+(claude-code-mode 1)
+
+;; Open Claude buffers like *claude:~/...:default* in a right side window
+(add-to-list 'display-buffer-alist
+             '("\\`\\*claude:.*\\*\\'"
+               (display-buffer-in-side-window)
+               (side . right)
+               (window-width . 0.5)))
 
 (require 'clipmon)
 

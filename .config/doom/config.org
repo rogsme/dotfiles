@@ -641,8 +641,16 @@ LSP (Language Server Protocol) provides most of these features in a standardized
 
 #+begin_src emacs-lisp
 (after! lsp-mode
-  (setq lsp-headerline-breadcrumb-enable t)
-  (setq lsp-headerline-breadcrumb-icons-enable t))
+  (setq lsp-headerline-breadcrumb-enable t
+        lsp-headerline-breadcrumb-icons-enable t))
+
+(setq lsp-pyright-langserver-command "pyright"   ;; or "basedpyright"
+      lsp-pyright-python-executable-cmd "python3" ;; change to "python" if you prefer
+      lsp-pyright-typechecking-mode "strict")      ;; "off" | "basic" | "strict"
+
+(after! lsp-mode
+  (require 'lsp-pyright)
+  (add-hook! python-mode #'lsp-deferred))
 #+end_src
 
 ** Python
@@ -980,6 +988,9 @@ Each submenu entry corresponds to a different assistant or LLM feature:
   doing ad-hoc debugging.
 - =SPC l f=: Calls =my/set-forge-llm-provider= to switch the active provider for Forge LLM. Useful when I
   want to use a different model (e.g. Gemini vs Claude) for generating pull request descriptions.
+- =SPC l m=: Calls =my/set-magit-gptcommit-provider= to switch the LLM used for generating commit messages.
+- =SPC l C=: Opens the Claude Code transient menu. This provides a project-aware Claude-powered assistant
+  for code navigation, refactoring, and error fixing directly via the official Claude Code CLI.
 
 The menu is intentionally kept short and memorable, focused on the LLM features I use most often. I can
 always expand it later if new tools join the lineup.
@@ -987,10 +998,11 @@ always expand it later if new tools join the lineup.
 #+begin_src emacs-lisp
 (map! :leader
       (:prefix-map ("l" . "LLMs")
-       :desc "Aidermacs" "a" #'aidermacs-transient-menu
-       :desc "ChatGPT Shell" "c" #'chatgpt-shell-transient
-       :desc "Set Forge LLM Provider" "f" #'my/set-forge-llm-provider
-       :desc "Set Magit GPT Provider" "m" #'my/set-magit-gptcommit-provider))
+       :desc "Aidermacs"                "a" #'aidermacs-transient-menu
+       :desc "ChatGPT Shell"            "c" #'chatgpt-shell-transient
+       :desc "Set Forge LLM Provider"   "f" #'my/set-forge-llm-provider
+       :desc "Set Magit GPT Provider"   "m" #'my/set-magit-gptcommit-provider
+       :desc "Claude Code (menu)"       "C" #'claude-code-transient))
 #+end_src
 
 ** ChatGPT Shell
@@ -1184,6 +1196,29 @@ all from within Emacs.
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
   (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+#+end_src
+
+** Claude Code
+:PROPERTIES:
+:ID:       6b7b5a2b-claude-code-conf-20251006
+:END:
+Claude Code integrates the official Claude Code CLI with Emacs, so I can start a project-scoped session,
+send regions/files, fix errors at point, and resume past sessions without leaving my buffers. I’m using
+~vterm~ as the terminal backend and expose a transient so the common actions are one keystroke away.
+
+#+begin_src emacs-lisp
+;; Use vterm for the terminal backend (eat is default upstream)
+(setq claude-code-terminal-backend 'vterm)
+
+;; Make commands available; no UI until you start Claude
+(claude-code-mode 1)
+
+;; Open Claude buffers like *claude:~/...:default* in a right side window
+(add-to-list 'display-buffer-alist
+             '("\\`\\*claude:.*\\*\\'"
+               (display-buffer-in-side-window)
+               (side . right)
+               (window-width . 0.5)))
 #+end_src
 
 * Misc
