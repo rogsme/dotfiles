@@ -2,7 +2,16 @@
       user-mail-address "roger@rogs.me")
 
 (setq shell-file-name (executable-find "bash"))
-(setq-default vterm-shell "/usr/bin/fish")
+(setq-default
+ vterm-shell
+ (cond
+  ((eq system-type 'darwin)
+   "/opt/homebrew/bin/fish")  ;; macOS (Apple Silicon/Homebrew)
+  ((eq system-type 'gnu/linux)
+   "/usr/bin/fish")           ;; Linux
+  (t
+   (or (executable-find "fish")
+       (getenv "SHELL")))))   ;; fallback
 (setq-default explicit-shell-file-name "/usr/bin/fish")
 
 (if (not (eq system-type 'darwin))
