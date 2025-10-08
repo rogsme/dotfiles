@@ -80,3 +80,6 @@ end
 if command -v kubectl >/dev/null
     eval (kubectl completion fish | source)
 end
+
+# opencode
+fish_add_path /home/roger/.opencode/bin
