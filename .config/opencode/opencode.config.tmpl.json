@@ -43,7 +43,9 @@
       "name": "Ollama (local)",
       "options": { "baseURL": "http://${OLLAMA_API_BASE}:11434/v1" },
       "models": {
-        "qwen3-coder:latest": { "name": "Qwen3 Coder (local)" }
+        "qwen3-coder:latest": { "name": "Qwen3 Coder (local)" },
+        "gpt-oss:latest": { "name": "GPT-OSS (local)" },
+        "qwen2.5-coder:latest": { "name": "Qwen 2.5 Coder (local)" }
       }
     }
   },
