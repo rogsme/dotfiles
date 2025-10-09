@@ -526,7 +526,8 @@ related notes or tasks."
        :desc "ChatGPT Shell"            "c" #'chatgpt-shell-transient
        :desc "Set Forge LLM Provider"   "f" #'my/set-forge-llm-provider
        :desc "Set Magit GPT Provider"   "m" #'my/set-magit-gptcommit-provider
-       :desc "Claude Code (menu)"       "C" #'claude-code-transient))
+       :desc "Claude Code (menu)"       "C" #'claude-code-transient
+       :desc "OpenCode"                 "o" #'opencode-menu))
 
 (setq chatgpt-shell-model-version "qwen/qwen-2.5-coder-32b-instruct")
 (setq chatgpt-shell-streaming "t")
@@ -621,6 +622,10 @@ Now, write the commit message in this exact format:
                (display-buffer-in-side-window)
                (side . right)
                (window-width . 0.5)))
+
+(after! opencode
+  (setq opencode-terminal-type 'vterm
+        opencode-split-direction 'vertical))
 
 (require 'clipmon)
 

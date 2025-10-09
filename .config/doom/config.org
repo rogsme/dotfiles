@@ -1000,6 +1000,8 @@ Each submenu entry corresponds to a different assistant or LLM feature:
 - =SPC l m=: Calls =my/set-magit-gptcommit-provider= to switch the LLM used for generating commit messages.
 - =SPC l C=: Opens the Claude Code transient menu. This provides a project-aware Claude-powered assistant
   for code navigation, refactoring, and error fixing directly via the official Claude Code CLI.
+- =SPC l o=: Opens the OpenCode menu. This provides an AI-powered coding assistant for various software
+  engineering tasks, integrating intelligent suggestions and project management features directly in Emacs.
 
 The menu is intentionally kept short and memorable, focused on the LLM features I use most often. I can
 always expand it later if new tools join the lineup.
@@ -1011,7 +1013,8 @@ always expand it later if new tools join the lineup.
        :desc "ChatGPT Shell"            "c" #'chatgpt-shell-transient
        :desc "Set Forge LLM Provider"   "f" #'my/set-forge-llm-provider
        :desc "Set Magit GPT Provider"   "m" #'my/set-magit-gptcommit-provider
-       :desc "Claude Code (menu)"       "C" #'claude-code-transient))
+       :desc "Claude Code (menu)"       "C" #'claude-code-transient
+       :desc "OpenCode"                 "o" #'opencode-menu))
 #+end_src
 
 ** ChatGPT Shell
@@ -1228,6 +1231,18 @@ send regions/files, fix errors at point, and resume past sessions without leavin
                (display-buffer-in-side-window)
                (side . right)
                (window-width . 0.5)))
+#+end_src
+
+** OpenCode
+:PROPERTIES:
+:ID:       8c3f2dd6-3176-4b00-bfa7-80adcb57fbb9
+:END:
+OpenCode is an interactive AI-powered coding assistant that integrates with Emacs to help with software engineering tasks, providing intelligent code suggestions, debugging assistance, and project management features.
+
+#+begin_src emacs-lisp
+(after! opencode
+  (setq opencode-terminal-type 'vterm
+        opencode-split-direction 'vertical))
 #+end_src
 
 * Misc
