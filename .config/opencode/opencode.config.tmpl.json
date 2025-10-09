@@ -1,6 +1,24 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "system",
+  "tools": {
+    "webfetch": true
+  },
+  "mcp": {
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      },
+      "enabled": true
+    },
+    "consult7": {
+      "type": "local",
+      "command": ["uvx", "consult7", "openrouter", "${CONSULT7_API_KEY}"],
+      "enabled": true
+    }
+  },
   "provider": {
     "lazer": {
       "npm": "@ai-sdk/openai-compatible",
@@ -12,8 +30,8 @@
         "cerebras/qwen-3-coder-480b": {
           "name": "Qwen3 Coder"
         },
-        "gemini/gemini-2.5-flash": {
-          "name": "Gemini 2.5 Flash"
+        "gemini/gemini-2.0-flash": {
+          "name": "Gemini 2.0 Flash"
         },
         "gemini/gemini-2.5-flash": {
           "name": "Gemini 2.5 Flash"
@@ -37,4 +55,3 @@
     }
   }
 }
-
