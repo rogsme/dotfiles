@@ -94,6 +94,10 @@ primary, second, third = detect_outputs()
 for w in i3.get_workspaces():
     move_workspace_if_needed(w.name, primary, second, third)
 
+# Always open workspace 11 on third screen at startup
+if third:
+    i3.command(f'workspace 11; move workspace to output {third}')
+
 
 def on_ws(conn, ev):
     """Workspace events: focus, init, empty, rename, move, etc."""
