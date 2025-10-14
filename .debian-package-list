@@ -199,6 +199,7 @@ exim4-daemon-light
 exo-utils
 eza
 fakeroot
+fastfetch
 fcitx-config-common
 fcitx-config-gtk
 fcitx-frontend-all
@@ -2010,6 +2011,7 @@ libxml-parser-perl
 libxml-twig-perl
 libxml-xpathengine-perl
 libxml2:amd64
+libxml2-utils
 libxmlb2:amd64
 libxmlsec1t64:amd64
 libxmlsec1t64-nss:amd64
@@ -2038,6 +2040,7 @@ libyajl2:amd64
 libyaml-0-2:amd64
 libyelp0:amd64
 libyuv0:amd64
+libyyjson0:amd64
 libz3-4:amd64
 libzbar0t64:amd64
 libze1:amd64
@@ -2869,6 +2872,7 @@ usbmuxd
 util-linux
 util-linux-locales
 uuid-runtime
+uv
 va-driver-all:amd64
 vanta
 vdpau-driver-all:amd64
