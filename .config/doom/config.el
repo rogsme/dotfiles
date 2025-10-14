@@ -496,7 +496,6 @@ related notes or tasks."
 (defconst my/claude-opus-model "anthropic/claude-opus-4")
 (defconst my/ollama-model "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL")
 
-
 (defun my/setup-llm-env ()
   (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
