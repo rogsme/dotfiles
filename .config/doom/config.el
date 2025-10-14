@@ -494,7 +494,8 @@ related notes or tasks."
 (defconst my/qwen-model "qwen/qwen3-coder")
 (defconst my/claude-sonnet-model "anthropic/claude-sonnet-4")
 (defconst my/claude-opus-model "anthropic/claude-opus-4")
-(defconst my/ollama-model "gemma3:12b")
+(defconst my/ollama-model "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL")
+
 
 (defun my/setup-llm-env ()
   (setenv "OLLAMA_API_BASE" ollama-api-base)
