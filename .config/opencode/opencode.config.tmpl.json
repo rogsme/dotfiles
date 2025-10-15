@@ -18,6 +18,13 @@
       "type": "local",
       "command": ["uvx", "consult7", "openrouter", "${OPENROUTER_API_KEY}"],
       "enabled": true
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer ${GITHUB_PAT}"
+      }
     }
   },
   "provider": {
