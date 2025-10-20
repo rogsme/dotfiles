@@ -25,6 +25,15 @@
       "headers": {
         "Authorization": "Bearer ${GITHUB_PAT}"
       }
+    },
+    "zen": {
+      "type": "local",
+      "command": [
+        "/home/roger/.config/opencode/zen-mcp-server/.zen_venv/bin/python",
+        "/home/roger/.config/opencode/zen-mcp-server/server.py"
+      ],
+      "cwd": "/home/roger/.config/opencode/zen-mcp-server",
+      "enabled": true
     }
   },
   "provider": {
