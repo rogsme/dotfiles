@@ -7,3 +7,8 @@ i3-msg restart
 # Restore wallpaper right away
 sleep 1
 nitrogen --restore &
+
+# Restart autotiling
+sleep 1
+killall autotiling
+autotiling &
