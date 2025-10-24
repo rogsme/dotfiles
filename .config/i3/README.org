@@ -70,7 +70,6 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 exec --no-startup-id nm-applet
 
 exec_always --no-startup-id sleep 2; autorandr --change
-# bindsym $mod+Shift+x exec sh -c 'autorandr --change && ~/.config/i3/place-workspaces.sh'
 #+end_src
 
 ** Audio Controls
@@ -318,15 +317,9 @@ To ensure workspaces always land on the correct monitor across different machine
 - =ws_router.py= is a small Python daemon (using i3ipc) that listens to workspace, window, and output
   events. Whenever a workspace is created or an app opens, it moves the workspace to the correct
   output based on predefined rules (odd → primary, even → second, 11 → third).
-- =place-workspaces.sh= is a helper script that does an immediate placement pass. It runs at startup,
-  on i3 reloads, and after autorandr switches profiles, so that even if workspaces are empty they will
-  be created and placed.
-- An autorandr =postswitch= hook is also installed to call =place-workspaces.sh= whenever the monitor
-  layout changes.
 
 #+begin_src conf
 exec_always --no-startup-id ~/.config/i3/scripts/ws_router.py
-# exec_always --no-startup-id ~/.config/i3/scripts/place-workspaces.sh
 #+end_src
 
 

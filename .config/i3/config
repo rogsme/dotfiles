@@ -16,7 +16,6 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 exec --no-startup-id nm-applet
 
 exec_always --no-startup-id sleep 2; autorandr --change
-# bindsym $mod+Shift+x exec sh -c 'autorandr --change && ~/.config/i3/place-workspaces.sh'
 
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -156,7 +155,6 @@ bindsym $mod+Shift+0 move container to workspace number $ws10
 bindsym $mod+$aux+Shift+0 move container to workspace number $ws11
 
 exec_always --no-startup-id ~/.config/i3/scripts/ws_router.py
-# exec_always --no-startup-id ~/.config/i3/scripts/place-workspaces.sh
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
