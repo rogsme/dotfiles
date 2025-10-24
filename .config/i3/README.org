@@ -70,7 +70,7 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 exec --no-startup-id nm-applet
 
 exec_always --no-startup-id sleep 2; autorandr --change
-bindsym $mod+Shift+x exec sh -c 'autorandr --change && ~/.config/i3/place-workspaces.sh'
+# bindsym $mod+Shift+x exec sh -c 'autorandr --change && ~/.config/i3/place-workspaces.sh'
 #+end_src
 
 ** Audio Controls
@@ -326,7 +326,7 @@ To ensure workspaces always land on the correct monitor across different machine
 
 #+begin_src conf
 exec_always --no-startup-id ~/.config/i3/scripts/ws_router.py
-exec_always --no-startup-id ~/.config/i3/scripts/place-workspaces.sh
+# exec_always --no-startup-id ~/.config/i3/scripts/place-workspaces.sh
 #+end_src
 
 
@@ -555,7 +555,8 @@ startup of some applications, potentially reducing initial resource load or wait
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
-exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
+# exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
+exec --no-startup-id sleep 20; exec firefox
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
