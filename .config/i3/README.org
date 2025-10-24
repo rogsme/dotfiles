@@ -555,8 +555,7 @@ startup of some applications, potentially reducing initial resource load or wait
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
-# exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
-exec --no-startup-id sleep 20; exec firefox
+exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
@@ -571,6 +570,7 @@ exec_always --no-startup-id autotiling
 exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
+exec --no-startup-id xfsettingsd --replace
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
 #+end_src
 
