@@ -30,6 +30,14 @@
         "/home/roger/.config/opencode/zen-mcp-server/server.py"
       ],
       "enabled": true
+    },
+    "firecrawl-mcp": {
+        "type": "local",
+        "command": ["npx", "-y", "firecrawl-mcp"],
+        "environment": {
+          "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+        },
+        "enabled": true
     }
   },
   "provider": {
