@@ -32,12 +32,20 @@
       "enabled": true
     },
     "firecrawl-mcp": {
-        "type": "local",
-        "command": ["npx", "-y", "firecrawl-mcp"],
-        "environment": {
-          "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
-        },
-        "enabled": true
+      "type": "local",
+      "command": ["npx", "-y", "firecrawl-mcp"],
+      "environment": {
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
+      },
+      "enabled": true
+    },
+    "nexus": {
+      "type": "local",
+      "command": ["npx", "-y", "nexus-mcp"],
+      "environment": {
+        "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
+      },
+      "enabled": true
     }
   },
   "provider": {
