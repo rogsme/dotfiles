@@ -60,16 +60,17 @@ This section configures integration with system services and utilities.
   inhibitors. You can manually lock the screen using =loginctl lock-session=.
 - =nm-applet=: Starts the NetworkManager applet, providing a system tray icon for managing network
   connections (especially useful for Wi-Fi).
- - =autorandr=: Manages display configurations. =exec_always= ensures it runs on startup and i3 restart.
+- =autorandr=: Manages display configurations. =exec_always= ensures it runs on startup and i3 restart.
   The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
   (=$mod+Shift+x=) is also set to manually trigger a display profile change.
-
 #+begin_src conf
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
+# Screen resolution
 exec_always --no-startup-id sleep 2; autorandr --change
+bindsym $mod+Shift+x exec autorandr --change
 #+end_src
 
 ** Audio Controls
@@ -307,21 +308,21 @@ bindsym $mod+Shift+8 move container to workspace number $ws8
 bindsym $mod+Shift+9 move container to workspace number $ws9
 bindsym $mod+Shift+0 move container to workspace number $ws10
 bindsym $mod+$aux+Shift+0 move container to workspace number $ws11
+
+workspace $ws1 output primary
+workspace $ws3 output primary
+workspace $ws5 output primary
+workspace $ws7 output primary
+workspace $ws9 output primary
+
+workspace $ws2 output DP-2-1
+workspace $ws4 output DP-2-1
+workspace $ws6 output DP-2-1
+workspace $ws8 output DP-2-1
+workspace $ws10 output DP-2-1
+
+workspace $ws11 output DP-2-2
 #+end_src
-
-*** Hook that moves the apps to the right screen
-:PROPERTIES:
-:ID:       211e732f-6e68-4ac5-b00b-b5416dc9e513
-:END:
-To ensure workspaces always land on the correct monitor across different machines:
-- =ws_router.py= is a small Python daemon (using i3ipc) that listens to workspace, window, and output
-  events. Whenever a workspace is created or an app opens, it moves the workspace to the correct
-  output based on predefined rules (odd → primary, even → second, 11 → third).
-
-#+begin_src conf
-exec_always --no-startup-id ~/.config/i3/scripts/ws_router.py
-#+end_src
-
 
 ** System Commands
 :PROPERTIES:
@@ -548,7 +549,7 @@ startup of some applications, potentially reducing initial resource load or wait
 # Autostarts
 exec --no-startup-id sleep 20; exec /usr/bin/thunderbird
 exec --no-startup-id sleep 10; exec emacsclient -c -a emacs
-exec --no-startup-id sh -c "sleep 20 && (/usr/bin/zen-browser || /usr/local/bin/zen)"
+exec --no-startup-id sleep 20; exec /usr/bin/zen-browser
 exec --no-startup-id sleep 5; exec $terminal
 exec --no-startup-id sleep 10; exec nitrogen --restore
 exec --no-startup-id blueman-applet
