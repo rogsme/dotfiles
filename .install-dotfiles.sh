@@ -56,9 +56,9 @@ detect_distro() {
 # Install packages based on distro
 install_packages() {
     local distro=$(detect_distro)
-    
+
     log_info "Detected distribution: $distro"
-    
+
     case "$distro" in
         manjaro)
             log_info "Installing packages from .new-package-list..."
@@ -67,7 +67,7 @@ install_packages() {
             else
                 log_warn ".new-package-list not found, skipping pacman packages"
             fi
-            
+
             log_info "Installing AUR packages from .new-aur-package-list..."
             if [ -f "$HOME/.new-aur-package-list" ]; then
                 # Check if yay is installed
@@ -80,11 +80,11 @@ install_packages() {
                 log_warn ".new-aur-package-list not found, skipping AUR packages"
             fi
             ;;
-            
+
         debian)
             log_info "Updating package lists..."
             sudo apt update
-            
+
             log_info "Installing packages from .debian-package-list..."
             if [ -f "$HOME/.debian-package-list" ]; then
                 sudo apt install -y $(cat "$HOME/.debian-package-list" | tr '\n' ' ')
@@ -98,7 +98,7 @@ install_packages() {
 # Setup fish shell
 setup_fish() {
     log_info "Setting up fish shell..."
-    
+
     # Change default shell to fish
     if [ "$SHELL" != "$(which fish)" ]; then
         log_info "Changing default shell to fish..."
@@ -107,7 +107,7 @@ setup_fish() {
     else
         log_info "Fish is already the default shell"
     fi
-    
+
     # Install Oh My Fish
     if [ ! -d "$HOME/.local/share/omf" ]; then
         log_info "Installing Oh My Fish..."
@@ -115,18 +115,18 @@ setup_fish() {
     else
         log_info "Oh My Fish is already installed"
     fi
-    
+
     # Install Tide theme
     log_info "Installing Tide theme..."
     fish -c "omf install tide" || log_warn "Tide installation failed or already installed"
-    
+
     log_info "Fish shell setup complete (Tide not configured yet)"
 }
 
 # Install fonts
 install_fonts() {
     log_info "Installing Nerd Fonts..."
-    
+
     if [ -f "$HOME/.config/fontconfig/install-fonts.sh" ]; then
         bash "$HOME/.config/fontconfig/install-fonts.sh"
     else
@@ -137,7 +137,7 @@ install_fonts() {
 # Install Doom Emacs
 install_doom_emacs() {
     log_info "Installing Doom Emacs..."
-    
+
     if [ -d "$HOME/.config/emacs" ]; then
         log_warn "Doom Emacs directory already exists at $HOME/.config/emacs"
         read -p "Do you want to remove it and reinstall? (y/N): " -n 1 -r
@@ -149,20 +149,23 @@ install_doom_emacs() {
             return
         fi
     fi
-    
+
     log_info "Cloning Doom Emacs..."
     git clone --depth 1 https://github.com/doomemacs/doomemacs ~/.config/emacs
-    
+
     log_info "Running Doom install..."
     ~/.config/emacs/bin/doom install
-    
+
+    log_info "Syncing Doom configuration..."
+    ~/.config/emacs/bin/doom sync
+
     log_info "Doom Emacs installation complete"
 }
 
 # Install OpenCode
 install_opencode() {
     log_info "Installing OpenCode..."
-    
+
     if command -v opencode &> /dev/null; then
         log_warn "OpenCode is already installed"
         read -p "Do you want to reinstall? (y/N): " -n 1 -r
@@ -172,17 +175,17 @@ install_opencode() {
             return
         fi
     fi
-    
+
     log_info "Downloading and installing OpenCode..."
     curl -fsSL https://opencode.ai/install | bash
-    
+
     log_info "OpenCode installation complete"
 }
 
 # Install Aider
 install_aider() {
     log_info "Installing Aider..."
-    
+
     if command -v aider &> /dev/null; then
         log_warn "Aider is already installed"
         read -p "Do you want to reinstall? (y/N): " -n 1 -r
@@ -192,17 +195,17 @@ install_aider() {
             return
         fi
     fi
-    
+
     log_info "Downloading and installing Aider..."
     curl -LsSf https://aider.chat/install.sh | sh
-    
+
     log_info "Aider installation complete"
 }
 
 # Clone and setup dotfiles
 setup_dotfiles() {
     log_info "Cloning bare repo into $GIT_DIR..."
-    
+
     if [ -d "$GIT_DIR" ]; then
         log_warn "Git directory $GIT_DIR already exists"
         read -p "Do you want to remove it and re-clone? (y/N): " -n 1 -r
@@ -214,16 +217,16 @@ setup_dotfiles() {
             return
         fi
     fi
-    
+
     git clone --bare "$REPO_URL" "$GIT_DIR"
-    
+
     config() {
         /usr/bin/git --git-dir="$GIT_DIR" --work-tree="$WORK_TREE" "$@"
     }
-    
+
     log_info "Attempting initial checkout..."
     mkdir -p "$HOME/.config-backup"
-    
+
     if config checkout; then
         log_info "Checked out dotfiles successfully."
     else
@@ -233,51 +236,126 @@ setup_dotfiles() {
             mv "$HOME/$f" "$HOME/.config-backup/$f"
             log_info "Backed up: $f"
         done
-        
+
         log_info "Retrying checkout..."
         config checkout
     fi
-    
+
     config config status.showUntrackedFiles no
     log_info "Dotfiles setup complete"
+}
+
+# Verify installations
+verify_installations() {
+    log_info "Verifying installations..."
+    echo
+
+    local all_good=true
+
+    # Check Fish
+    if command -v fish &> /dev/null; then
+        log_info "✓ Fish shell: $(fish --version)"
+    else
+        log_error "✗ Fish shell not found"
+        all_good=false
+    fi
+
+    # Check Oh My Fish
+    if [ -d "$HOME/.local/share/omf" ]; then
+        log_info "✓ Oh My Fish installed"
+    else
+        log_warn "✗ Oh My Fish not found"
+        all_good=false
+    fi
+
+    # Check Doom Emacs
+    if [ -f "$HOME/.config/emacs/bin/doom" ]; then
+        log_info "✓ Doom Emacs installed"
+        if [ -d "$HOME/.config/doom" ]; then
+            log_info "✓ Doom configuration synced"
+        else
+            log_warn "✗ Doom configuration not found"
+        fi
+    else
+        log_warn "✗ Doom Emacs not found"
+        all_good=false
+    fi
+
+    # Check OpenCode
+    if command -v opencode &> /dev/null; then
+        log_info "✓ OpenCode: $(opencode --version 2>&1 | head -1)"
+    else
+        log_warn "✗ OpenCode not found"
+        all_good=false
+    fi
+
+    # Check Aider
+    if command -v aider &> /dev/null; then
+        log_info "✓ Aider: $(aider --version 2>&1 | head -1)"
+    else
+        log_warn "✗ Aider not found"
+        all_good=false
+    fi
+
+    # Check Nerd Fonts
+    if fc-list 2>/dev/null | grep -i "nerd font" &> /dev/null; then
+        log_info "✓ Nerd Fonts installed"
+    else
+        log_warn "✗ Nerd Fonts not detected"
+        all_good=false
+    fi
+
+    echo
+    if [ "$all_good" = true ]; then
+        log_info "All installations verified successfully!"
+    else
+        log_warn "Some installations may have issues. Review the warnings above."
+    fi
 }
 
 # Main installation flow
 main() {
     log_info "Starting dotfiles installation and system setup..."
     echo
-    
+
     # Step 1: Clone and setup dotfiles first
     setup_dotfiles
     echo
-    
+
     # Step 2: Install packages
     install_packages
     echo
-    
+
     # Step 3: Setup fish shell
     setup_fish
     echo
-    
+
     # Step 4: Install fonts
     install_fonts
     echo
-    
+
     # Step 5: Install Doom Emacs
     install_doom_emacs
     echo
-    
+
     # Step 6: Install OpenCode
     install_opencode
     echo
-    
+
     # Step 7: Install Aider
     install_aider
     echo
-    
+
+    # Step 8: Verify installations
+    verify_installations
+    echo
+
     log_info "Installation complete!"
-    log_info "You can use the 'config' function to manage your dotfiles."
-    log_info "Please log out and log back in for shell changes to take effect."
+    log_info ""
+    log_info "Next steps:"
+    log_info "  1. Log out and log back in for shell changes to take effect"
+    log_info "  2. Run 'tide configure' to customize your prompt"
+    log_info "  3. Use the 'config' command to manage your dotfiles"
 }
 
 # Run main installation
