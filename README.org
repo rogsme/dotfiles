@@ -35,6 +35,146 @@ file when saved.
 | [[./.config/fish/README.org][Fish Shell]]    | User-friendly shell               | =.config/fish/README.org=      |
 | [[./.config/ghostty/README.org][Ghostty]]       | Modern terminal emulator          | =.config/ghostty/README.org=   |
 
+** Installation
+:PROPERTIES:
+:ID:       a7b8c9d0-1234-5678-90ab-cdef12345678
+:END:
+
+*** Automated Installation (Recommended)
+:PROPERTIES:
+:ID:       b8c9d0e1-2345-6789-01bc-def123456789
+:END:
+
+The repository includes an automated installation script that sets up everything you need on a fresh
+Manjaro or Debian system.
+
+**** What Gets Installed
+:PROPERTIES:
+:ID:       c9d0e1f2-3456-7890-12cd-ef1234567890
+:END:
+
+The installation script automatically handles:
+
+- *Dotfiles Management*: Clones and sets up the bare repository
+- *Package Installation*:
+  - Manjaro: Installs packages via =pacman= and =yay= (AUR)
+  - Debian: Installs packages via =apt=
+- *Fish Shell*: Sets as default shell, installs Oh My Fish and Tide theme
+- *Nerd Fonts*: Downloads and installs MesloLGS Nerd Font
+- *Doom Emacs*: Clones, installs, and syncs with your configuration
+- *OpenCode*: AI-powered code editor
+- *Aider*: AI pair programming assistant
+- *Verification*: Checks all installations completed successfully
+
+**** Prerequisites
+:PROPERTIES:
+:ID:       d0e1f2g3-4567-8901-23de-f12345678901
+:END:
+
+- A fresh Manjaro or Debian installation
+- =git= installed
+- =sudo= privileges
+- For Manjaro: =yay= installed (for AUR packages)
+
+**** Running the Installer
+:PROPERTIES:
+:ID:       e1f2g3h4-5678-9012-34ef-123456789012
+:END:
+
+Run the following command to start the automated installation:
+
+#+begin_src bash
+bash <(curl -L https://git.rogs.me/rogs/dotfiles/raw/branch/master/.install-dotfiles.sh)
+#+end_src
+
+Or clone and run manually:
+
+#+begin_src bash
+git clone --bare https://git.rogs.me/rogs/dotfiles ~/.cfg
+~/.cfg/.install-dotfiles.sh
+#+end_src
+
+**** Post-Installation Steps
+:PROPERTIES:
+:ID:       f2g3h4i5-6789-0123-45fg-234567890123
+:END:
+
+After the installation completes:
+
+1. *Log out and log back in* - Required for Fish shell to become your default
+2. *Configure Tide prompt* - Run =tide configure= to customize your prompt appearance
+3. *Review backed up files* - Check =~/.config-backup/= for any conflicting files that were backed up
+
+**** Manual Configuration
+:PROPERTIES:
+:ID:       g3h4i5j6-7890-1234-56gh-345678901234
+:END:
+
+Some configurations may need manual adjustment based on your hardware:
+
+- *Display Setup*: Configure =autorandr= profiles for your monitor setup
+- *Logitech Devices*: Adjust =logid.cfg= for your specific Logitech hardware
+- *i3 Window Manager*: Customize keybindings and workspace layouts in =.config/i3/config=
+
+*** Manual Installation
+:PROPERTIES:
+:ID:       h4i5j6k7-8901-2345-67hi-456789012345
+:END:
+
+If you prefer to set things up manually, follow these steps:
+
+**** 1. Clone the Bare Repository
+:PROPERTIES:
+:ID:       i5j6k7l8-9012-3456-78ij-567890123456
+:END:
+
+#+begin_src bash
+git clone --bare https://git.rogs.me/rogs/dotfiles ~/.cfg
+#+end_src
+
+**** 2. Define the Config Alias
+:PROPERTIES:
+:ID:       j6k7l8m9-0123-4567-89jk-678901234567
+:END:
+
+#+begin_src bash
+alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+#+end_src
+
+**** 3. Checkout the Dotfiles
+:PROPERTIES:
+:ID:       k7l8m9n0-1234-5678-90kl-789012345678
+:END:
+
+#+begin_src bash
+config checkout
+#+end_src
+
+If you get errors about existing files, back them up:
+
+#+begin_src bash
+mkdir -p ~/.config-backup
+config checkout 2>&1 | grep -E "\s+\." | awk '{print $1}' | \
+  xargs -I{} mv {} ~/.config-backup/{}
+config checkout
+#+end_src
+
+**** 4. Set Show Untracked Files to No
+:PROPERTIES:
+:ID:       l8m9n0o1-2345-6789-01lm-890123456789
+:END:
+
+#+begin_src bash
+config config status.showUntrackedFiles no
+#+end_src
+
+**** 5. Install Additional Software
+:PROPERTIES:
+:ID:       m9n0o1p2-3456-7890-12mn-901234567890
+:END:
+
+Install the remaining tools manually based on your distribution.
+
 ** Who Am I?
 :PROPERTIES:
 :ID:       eb1fa4e2-77fb-4a7f-ae31-e2413ad634e0
