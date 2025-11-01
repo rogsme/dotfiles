@@ -226,6 +226,55 @@ setup_syncthing() {
     log_info "Syncthing setup complete"
 }
 
+# Setup logid (Logitech device configuration daemon)
+setup_logid() {
+    log_info "Setting up logid for Logitech devices..."
+
+    if ! command -v logid &> /dev/null; then
+        log_warn "logid is not installed. Skipping logid setup."
+        return 0
+    fi
+
+    if [ ! -f "$HOME/.config/logid.cfg" ]; then
+        log_warn "logid configuration file not found at $HOME/.config/logid.cfg. Skipping logid setup."
+        return 0
+    fi
+
+    log_info "Creating systemd service file for logid..."
+    sudo tee /etc/systemd/system/logid.service > /dev/null <<EOF
+[Unit]
+Description=Logitech Configuration Daemon
+Documentation=https://github.com/PixlOne/logiops
+After=network.target systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/logid -c $HOME/.config/logid.cfg
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+    log_info "Reloading systemd daemon..."
+    sudo systemctl daemon-reload
+
+    log_info "Enabling and starting logid service..."
+    sudo systemctl enable logid.service
+    sudo systemctl start logid.service
+
+    if sudo systemctl is-active --quiet logid.service; then
+        log_info "logid service is running"
+    else
+        log_error "Failed to start logid service"
+        return 1
+    fi
+
+    log_info "logid setup complete"
+}
+
 # Clone and setup dotfiles
 setup_dotfiles() {
     log_info "Cloning bare repo into $GIT_DIR..."
@@ -343,6 +392,24 @@ verify_installations() {
         all_good=false
     fi
 
+    # Check logid
+    if command -v logid &> /dev/null; then
+        log_info "✓ logid installed"
+        if [ -f "$HOME/.config/logid.cfg" ]; then
+            log_info "✓ logid configuration found"
+            if sudo systemctl is-active --quiet logid.service; then
+                log_info "✓ logid service is running"
+            else
+                log_warn "✗ logid service is not running"
+                all_good=false
+            fi
+        else
+            log_warn "✗ logid configuration not found"
+        fi
+    else
+        log_warn "✗ logid not found"
+    fi
+
     echo
     if [ "$all_good" = true ]; then
         log_info "All installations verified successfully!"
@@ -388,7 +455,11 @@ main() {
     setup_syncthing
     echo
 
-    # Step 9: Verify installations
+    # Step 9: Setup logid
+    setup_logid
+    echo
+
+    # Step 10: Verify installations
     verify_installations
     echo
 

@@ -65,6 +65,7 @@ The installation script automatically handles:
 - *OpenCode*: AI-powered code editor
 - *Aider*: AI pair programming assistant
 - *Syncthing*: Enables and starts the file synchronization service
+- *logid*: Configures and enables Logitech device customization daemon
 - *Verification*: Checks all installations completed successfully
 
 **** Prerequisites
@@ -115,7 +116,7 @@ After the installation completes:
 Some configurations may need manual adjustment based on your hardware:
 
 - *Display Setup*: Configure =autorandr= profiles for your monitor setup
-- *Logitech Devices*: Adjust =logid.cfg= for your specific Logitech hardware
+- *Logitech Devices*: The installer automatically sets up =logid= with your =.config/logid.cfg= configuration. Adjust this file for your specific Logitech hardware if needed
 - *i3 Window Manager*: Customize keybindings and workspace layouts in =.config/i3/config=
 
 *** Manual Installation
