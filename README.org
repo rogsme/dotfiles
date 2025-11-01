@@ -64,6 +64,7 @@ The installation script automatically handles:
 - *Doom Emacs*: Clones, installs, and syncs with your configuration
 - *OpenCode*: AI-powered code editor
 - *Aider*: AI pair programming assistant
+- *Syncthing*: Enables and starts the file synchronization service
 - *Verification*: Checks all installations completed successfully
 
 **** Prerequisites
@@ -103,7 +104,8 @@ After the installation completes:
 
 1. *Log out and log back in* - Required for Fish shell to become your default
 2. *Configure Tide prompt* - Run =tide configure= to customize your prompt appearance
-3. *Review backed up files* - Check =~/.config-backup/= for any conflicting files that were backed up
+3. *Configure Syncthing* - Visit =http://127.0.0.1:8384= to set up file synchronization
+4. *Review backed up files* - Check =~/.config-backup/= for any conflicting files that were backed up
 
 **** Manual Configuration
 :PROPERTIES:

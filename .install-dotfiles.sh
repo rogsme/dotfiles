@@ -202,6 +202,30 @@ install_aider() {
     log_info "Aider installation complete"
 }
 
+# Setup Syncthing
+setup_syncthing() {
+    log_info "Setting up Syncthing for user $USER..."
+
+    if ! command -v syncthing &> /dev/null; then
+        log_error "Syncthing is not installed. This should have been installed during package installation."
+        return 1
+    fi
+
+    log_info "Enabling and starting Syncthing service for user $USER..."
+    sudo systemctl enable syncthing@$USER.service
+    sudo systemctl start syncthing@$USER.service
+
+    if sudo systemctl is-active --quiet syncthing@$USER.service; then
+        log_info "Syncthing service is running"
+        log_info "Web UI available at: http://127.0.0.1:8384"
+    else
+        log_error "Failed to start Syncthing service"
+        return 1
+    fi
+
+    log_info "Syncthing setup complete"
+}
+
 # Clone and setup dotfiles
 setup_dotfiles() {
     log_info "Cloning bare repo into $GIT_DIR..."
@@ -305,6 +329,20 @@ verify_installations() {
         all_good=false
     fi
 
+    # Check Syncthing
+    if command -v syncthing &> /dev/null; then
+        log_info "✓ Syncthing: $(syncthing --version | head -1)"
+        if sudo systemctl is-active --quiet syncthing@$USER.service; then
+            log_info "✓ Syncthing service is running"
+        else
+            log_warn "✗ Syncthing service is not running"
+            all_good=false
+        fi
+    else
+        log_warn "✗ Syncthing not found"
+        all_good=false
+    fi
+
     echo
     if [ "$all_good" = true ]; then
         log_info "All installations verified successfully!"
@@ -346,7 +384,11 @@ main() {
     install_aider
     echo
 
-    # Step 8: Verify installations
+    # Step 8: Setup Syncthing
+    setup_syncthing
+    echo
+
+    # Step 9: Verify installations
     verify_installations
     echo
 
@@ -356,6 +398,7 @@ main() {
     log_info "  1. Log out and log back in for shell changes to take effect"
     log_info "  2. Run 'tide configure' to customize your prompt"
     log_info "  3. Use the 'config' command to manage your dotfiles"
+    log_info "  4. Configure Syncthing by visiting http://127.0.0.1:8384"
 }
 
 # Run main installation
