@@ -94,7 +94,7 @@ label = %percentage_used:02%%
 
 [module/wireless-network]
 type = internal/network
-interface = wlp0s20f3
+interface = wlp7s0
 interval = 2.0
 format-connected = 📶 <label-connected>
 format-disconnected = <label-disconnected>

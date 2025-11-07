@@ -88,7 +88,7 @@ font-5 = Noto Color Emoji:scale=12;0
 
 modules-left = i3 music
 modules-center = xwindow
-modules-right = pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
+modules-right = crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
 #+end_src
 
 ** i3 Module
@@ -145,7 +145,7 @@ interval = 0.5
 warn-percentage = 95
 format-prefix = "🎛 "
 format-underline = ${colors.highlight}
-label = %percentage:2%%
+label = %percentage:02%%
 #+end_src
 
 ** Memory Module
@@ -162,7 +162,7 @@ interval = 3
 warn-percentage = 90
 format-prefix = " 📊 "
 format-underline = ${colors.accent}
-label = %percentage_used%%
+label = %percentage_used:02%%
 #+end_src
 
 ** Network Module
@@ -175,7 +175,7 @@ Includes a blinking animation (⚠/📶) to indicate packet loss.
 #+begin_src conf
 [module/wireless-network]
 type = internal/network
-interface = wlp0s20f3
+interface = wlp7s0
 interval = 2.0
 format-connected = 📶 <label-connected>
 format-disconnected = <label-disconnected>
@@ -377,7 +377,7 @@ seconds.
 #+begin_src conf
 [module/crypto]
 type = custom/script
-exec = python ~/.config/polybar/pcrypto.py --base USD --coins btc
+exec = ~/.config/polybar/btc.sh
 interval = 60
 #+end_src
 
