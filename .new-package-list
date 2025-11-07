@@ -79,6 +79,8 @@ gst-plugins-ugly
 gufw
 gvfs
 gvfs-afc
+gvfs-goa
+gvfs-google
 gvfs-gphoto2
 gvfs-mtp
 gvfs-nfs
@@ -143,6 +145,7 @@ matcha-gtk-theme
 mdadm
 memtest86+
 memtest86+-efi
+memtester
 menulibre
 mesa-utils
 mhwd
@@ -176,6 +179,7 @@ numlockx
 openssh
 os-prober
 pamac-gtk3
+patch
 pavucontrol
 perl
 perl-file-mimeinfo
@@ -221,6 +225,7 @@ timeshift
 timeshift-autosnap-manjaro
 ttf-dejavu
 ttf-droid
+ttf-font-awesome-4
 ttf-inconsolata
 ttf-indic-otf
 ttf-liberation
