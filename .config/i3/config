@@ -15,9 +15,10 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
-# Screen resolution
-exec_always --no-startup-id sleep 2; autorandr --change
-bindsym $mod+Shift+x exec autorandr --change
+# Screen resolution UNCOMMENT IF USING A LAPTOP!
+
+#exec_always --no-startup-id sleep 2; autorandr --change
+#bindsym $mod+Shift+x exec autorandr --change
 
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
@@ -162,13 +163,13 @@ workspace $ws5 output primary
 workspace $ws7 output primary
 workspace $ws9 output primary
 
-workspace $ws2 output DP-2-1
-workspace $ws4 output DP-2-1
-workspace $ws6 output DP-2-1
-workspace $ws8 output DP-2-1
-workspace $ws10 output DP-2-1
+workspace $ws2 output DisplayPort-0
+workspace $ws4 output DisplayPort-0
+workspace $ws6 output DisplayPort-0
+workspace $ws8 output DisplayPort-0
+workspace $ws10 output DisplayPort-0
 
-workspace $ws11 output DP-2-2
+workspace $ws11 output DisplayPort-1
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
