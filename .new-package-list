@@ -24,6 +24,7 @@ btrfs-progs
 catfish
 chaotic-keyring
 chaotic-mirrorlist
+cheese
 cmake
 cmatrix
 cowsay
@@ -63,6 +64,7 @@ garcon
 gcolor3
 ghostty
 gimp
+git-delta
 glibc-locales
 gnome-firmware
 gnome-keyring
@@ -210,6 +212,7 @@ simple-scan
 snapd
 snapd-glib
 sof-firmware
+speedtest-cli
 sudo
 syncthing
 sysfsutils
