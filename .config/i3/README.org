@@ -72,6 +72,7 @@ exec --no-startup-id nm-applet
 
 #exec_always --no-startup-id sleep 2; autorandr --change
 #bindsym $mod+Shift+x exec autorandr --change
+#exec --no-startup-id python /home/roger/.config/i3/scripts/ws_router.py
 #+end_src
 
 ** Audio Controls

@@ -19,6 +19,7 @@ exec --no-startup-id nm-applet
 
 #exec_always --no-startup-id sleep 2; autorandr --change
 #bindsym $mod+Shift+x exec autorandr --change
+#exec --no-startup-id python /home/roger/.config/i3/scripts/ws_router.py
 
 set $refresh_i3status killall -SIGUSR1 i3status
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +10% && $refresh_i3status
