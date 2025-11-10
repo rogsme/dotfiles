@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "theme": "matrix",
+  "theme": "everforest",
   "model": "anthropic/claude-sonnet-4-5-20250929",
   "tools": {
     "webfetch": true
