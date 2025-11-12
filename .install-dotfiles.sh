@@ -111,14 +111,14 @@ setup_fish() {
     # Install Oh My Fish
     if [ ! -d "$HOME/.local/share/omf" ]; then
         log_info "Installing Oh My Fish..."
-        curl -L https://get.oh-my.fish | fish
+        curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
     else
         log_info "Oh My Fish is already installed"
     fi
 
     # Install Tide theme
     log_info "Installing Tide theme..."
-    fish -c "omf install tide" || log_warn "Tide installation failed or already installed"
+    fish -c "fisher install IlanCosman/tide@v6" || log_warn "Tide installation failed or already installed"
 
     log_info "Fish shell setup complete (Tide not configured yet)"
 }
