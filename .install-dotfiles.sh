@@ -311,7 +311,13 @@ setup_dotfiles() {
         done
 
         log_info "Retrying checkout..."
-        config checkout
+        if config checkout; then
+            log_info "Checkout successful after backup."
+        else
+            log_error "Checkout failed even after backing up conflicting files."
+            log_error "Please check the errors above and manually resolve any issues."
+            exit 1
+        fi
     fi
 
     config config status.showUntrackedFiles no
