@@ -39,6 +39,7 @@ dmidecode
 dmraid
 dnsmasq
 docker
+docker-compose
 dosfstools
 e2fsprogs
 ecryptfs-utils
@@ -88,6 +89,7 @@ gvfs-mtp
 gvfs-nfs
 gvfs-smb
 htop
+hugo
 hunspell-en_us
 hunspell-es_es
 hunspell-es_uy
@@ -227,6 +229,7 @@ thunar-volman
 thunderbird
 timeshift
 timeshift-autosnap-manjaro
+tree
 ttf-dejavu
 ttf-droid
 ttf-font-awesome-4
