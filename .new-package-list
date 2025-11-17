@@ -24,6 +24,7 @@ btrfs-progs
 catfish
 chaotic-keyring
 chaotic-mirrorlist
+cheese
 cmake
 cmatrix
 cowsay
@@ -38,6 +39,7 @@ dmidecode
 dmraid
 dnsmasq
 docker
+docker-compose
 dosfstools
 e2fsprogs
 ecryptfs-utils
@@ -63,6 +65,7 @@ garcon
 gcolor3
 ghostty
 gimp
+git-delta
 glibc-locales
 gnome-firmware
 gnome-keyring
@@ -79,11 +82,14 @@ gst-plugins-ugly
 gufw
 gvfs
 gvfs-afc
+gvfs-goa
+gvfs-google
 gvfs-gphoto2
 gvfs-mtp
 gvfs-nfs
 gvfs-smb
 htop
+hugo
 hunspell-en_us
 hunspell-es_es
 hunspell-es_uy
@@ -143,6 +149,7 @@ matcha-gtk-theme
 mdadm
 memtest86+
 memtest86+-efi
+memtester
 menulibre
 mesa-utils
 mhwd
@@ -155,6 +162,7 @@ mpv
 mtpfs
 mugshot
 mupdf
+mupdf-tools
 nano
 nano-syntax-highlighting
 network-manager-applet
@@ -176,6 +184,7 @@ numlockx
 openssh
 os-prober
 pamac-gtk3
+patch
 pavucontrol
 perl
 perl-file-mimeinfo
@@ -206,6 +215,7 @@ simple-scan
 snapd
 snapd-glib
 sof-firmware
+speedtest-cli
 sudo
 syncthing
 sysfsutils
@@ -219,8 +229,10 @@ thunar-volman
 thunderbird
 timeshift
 timeshift-autosnap-manjaro
+tree
 ttf-dejavu
 ttf-droid
+ttf-font-awesome-4
 ttf-inconsolata
 ttf-indic-otf
 ttf-liberation
@@ -309,6 +321,7 @@ xorg-twm
 xorg-xinit
 xorg-xkill
 xsettingsd
+xss-lock
 xviewer
 yay
 yelp

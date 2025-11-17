@@ -68,9 +68,11 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
 
 exec --no-startup-id nm-applet
 
-# Screen resolution
-exec_always --no-startup-id sleep 2; autorandr --change
-bindsym $mod+Shift+x exec autorandr --change
+# Screen resolution UNCOMMENT IF USING A LAPTOP!
+
+#exec_always --no-startup-id sleep 2; autorandr --change
+#bindsym $mod+Shift+x exec autorandr --change
+#exec --no-startup-id python /home/roger/.config/i3/scripts/ws_router.py
 #+end_src
 
 ** Audio Controls
@@ -315,13 +317,13 @@ workspace $ws5 output primary
 workspace $ws7 output primary
 workspace $ws9 output primary
 
-workspace $ws2 output DP-2-1
-workspace $ws4 output DP-2-1
-workspace $ws6 output DP-2-1
-workspace $ws8 output DP-2-1
-workspace $ws10 output DP-2-1
+workspace $ws2 output DisplayPort-0
+workspace $ws4 output DisplayPort-0
+workspace $ws6 output DisplayPort-0
+workspace $ws8 output DisplayPort-0
+workspace $ws10 output DisplayPort-0
 
-workspace $ws11 output DP-2-2
+workspace $ws11 output DisplayPort-1
 #+end_src
 
 ** System Commands
