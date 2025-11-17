@@ -492,8 +492,8 @@ related notes or tasks."
 (defconst my/gemini-pro-model "google/gemini-2.5-pro")
 (defconst my/qwen3-code-model "qwen/qwen3-coder")
 (defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
-(defconst my/claude-sonnet-model "anthropic/claude-sonnet-4")
-(defconst my/claude-opus-model "anthropic/claude-opus-4")
+(defconst my/claude-sonnet-model "anthropic/claude-sonnet-4.5")
+(defconst my/claude-opus-model "anthropic/claude-opus-4.1")
 
 (defun my/setup-llm-env ()
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
@@ -536,7 +536,7 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3 Code", "Qwen3 Code Small"))))
+                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
