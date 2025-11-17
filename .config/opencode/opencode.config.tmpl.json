@@ -13,7 +13,7 @@
     },
     "consult7": {
       "type": "local",
-      "command": ["uvx", "consult7", "openrouter", "${OPENROUTER_API_KEY}"],
+      "command": ["uvx", "consult7", "${OPENROUTER_API_KEY}"],
       "enabled": true
     },
     "github": {
