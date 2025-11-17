@@ -871,8 +871,7 @@ This section configures various AI assistants and Large Language Model integrati
 my workflow by providing code suggestions, helping with documentation, and automating repetitive tasks
 like writing commit messages.
 
-I use a combination of local models (via Ollama) and cloud services (OpenAI, Anthropic) depending on the
-task requirements and privacy considerations:
+I use the following cloud services:
 
 - GitHub Copilot: For real-time code suggestions while typing
 - ChatGPT Shell: For general programming assistance and problem-solving
@@ -896,8 +895,7 @@ in a helper allows for easy reuse and potential lazy-loading in the future.
 (defun my/require-llm-backends ()
   "Load all LLM backends used in my config."
   (require 'llm-claude)
-  (require 'llm-openai)
-  (require 'llm-ollama))
+  (require 'llm-openai))
 
 (my/require-llm-backends)
 #+end_src
@@ -920,10 +918,10 @@ It helps me avoid hardcoding the same model names in different places.
 #+begin_src emacs-lisp
 (defconst my/gemini-flash-model "google/gemini-2.5-flash")
 (defconst my/gemini-pro-model "google/gemini-2.5-pro")
-(defconst my/qwen-model "qwen/qwen3-coder")
+(defconst my/qwen3-code-model "qwen/qwen3-coder")
+(defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
 (defconst my/claude-sonnet-model "anthropic/claude-sonnet-4")
 (defconst my/claude-opus-model "anthropic/claude-opus-4")
-(defconst my/ollama-model "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL")
 #+end_src
 
 *** API key environment setup
@@ -936,7 +934,6 @@ I call it in places like Aider or Forge where shell commands or HTTP requests de
 
 #+begin_src emacs-lisp
 (defun my/setup-llm-env ()
-  (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
   (setenv "OPENAI_API_BASE" openai-api-base)
   (setenv "OPENAI_API_KEY" openai-api-key))
@@ -976,8 +973,8 @@ Both Magit GPT and Forge LLM call this to set their active model.
     ("Gemini 2.5 Pro" (make-llm-openrouter-compatible my/gemini-pro-model))
     ("Claude Sonnet" (make-llm-openrouter-compatible my/claude-sonnet-model))
     ("Claude Opus" (make-llm-openrouter-compatible my/claude-opus-model))
-    ("Qwen"   (make-llm-openrouter-compatible my/qwen-model))
-    ("Ollama" (make-llm-ollama :scheme "http" :host ollama-api-base :chat-model my/ollama-model))))
+    ("Qwen3 Code"   (make-llm-openrouter-compatible my/qwen3-code-model))
+    ("Qwen3 Code Small"   (make-llm-openrouter-compatible my/qwen3-code-small-model))))
 #+end_src
 
 ** LLM Menu
@@ -1053,11 +1050,10 @@ shell-style UX inside Emacs.
 :END:
 
 This section configures =magit-gptcommit=, an integration that uses an LLM to automatically generate
-well-written Git commit messages based on the current file diffs. I’m using a local model via Ollama (in
-this case, =gemma3:12b=) to keep everything offline and fast.
+well-written Git commit messages based on the current file diffs.
 
 To make switching models easier, I also added =my/set-magit-gptcommit-provider=, an interactive command
-that lets me choose the active LLM provider (Gemini, Claude, Qwen, or Ollama) on the fly. This is super
+that lets me choose the active LLM provider (Gemini, Claude, Qwen, or other) on the fly. This is super
 handy when I want to test different models' output or switch between local and cloud-based models
 depending on the context.
 
@@ -1075,11 +1071,11 @@ This gives me consistent, clean, and useful commit messages without having to wr
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen" "Ollama"))))
+                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3 Code", "Qwen3 Code Small"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-(setq magit-gptcommit-llm-provider (my/llm-provider "Ollama"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Qwen3 Code Small"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
@@ -1139,7 +1135,7 @@ context when generating PR descriptions.
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM: " '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen"))))
+   (list (completing-read "Choose LLM: " '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3-Code"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 

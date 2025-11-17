@@ -484,20 +484,18 @@ related notes or tasks."
 (defun my/require-llm-backends ()
   "Load all LLM backends used in my config."
   (require 'llm-claude)
-  (require 'llm-openai)
-  (require 'llm-ollama))
+  (require 'llm-openai))
 
 (my/require-llm-backends)
 
 (defconst my/gemini-flash-model "google/gemini-2.5-flash")
 (defconst my/gemini-pro-model "google/gemini-2.5-pro")
-(defconst my/qwen-model "qwen/qwen3-coder")
+(defconst my/qwen3-code-model "qwen/qwen3-coder")
+(defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
 (defconst my/claude-sonnet-model "anthropic/claude-sonnet-4")
 (defconst my/claude-opus-model "anthropic/claude-opus-4")
-(defconst my/ollama-model "hf.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF:UD-Q4_K_XL")
 
 (defun my/setup-llm-env ()
-  (setenv "OLLAMA_API_BASE" ollama-api-base)
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
   (setenv "OPENAI_API_BASE" openai-api-base)
   (setenv "OPENAI_API_KEY" openai-api-key))
@@ -517,8 +515,8 @@ related notes or tasks."
     ("Gemini 2.5 Pro" (make-llm-openrouter-compatible my/gemini-pro-model))
     ("Claude Sonnet" (make-llm-openrouter-compatible my/claude-sonnet-model))
     ("Claude Opus" (make-llm-openrouter-compatible my/claude-opus-model))
-    ("Qwen"   (make-llm-openrouter-compatible my/qwen-model))
-    ("Ollama" (make-llm-ollama :scheme "http" :host ollama-api-base :chat-model my/ollama-model))))
+    ("Qwen3 Code"   (make-llm-openrouter-compatible my/qwen3-code-model))
+    ("Qwen3 Code Small"   (make-llm-openrouter-compatible my/qwen3-code-small-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -538,11 +536,11 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen" "Ollama"))))
+                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3 Code", "Qwen3 Code Small"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-(setq magit-gptcommit-llm-provider (my/llm-provider "Ollama"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Qwen3 Code Small"))
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
@@ -584,7 +582,7 @@ Now, write the commit message in this exact format:
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM: " '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen"))))
+   (list (completing-read "Choose LLM: " '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3-Code"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
