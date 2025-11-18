@@ -1258,14 +1258,14 @@ The configuration below sets up Clipmon to check the clipboard every second and 
 accessible through M-y with helm integration.
 
 #+begin_src emacs-lisp
-(require 'clipmon)
+;; (require 'clipmon)
 
-(after! clipmon
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (add-to-list 'after-init-hook 'clipmon-mode-start)
-  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
-    (let ((interprogram-cut-function nil)) ad-do-it))
-  (setq clipmon-timer-interval 1))
+;; (after! clipmon
+;;   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;;   (add-to-list 'after-init-hook 'clipmon-mode-start)
+;;   (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
+;;     (let ((interprogram-cut-function nil)) ad-do-it))
+;;   (setq clipmon-timer-interval 1))
 
 #+end_src
 

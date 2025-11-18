@@ -625,14 +625,14 @@ Now, write the commit message in this exact format:
   (setq opencode-terminal-type 'vterm
         opencode-split-direction 'vertical))
 
-(require 'clipmon)
+;; (require 'clipmon)
 
-(after! clipmon
-  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
-  (add-to-list 'after-init-hook 'clipmon-mode-start)
-  (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
-    (let ((interprogram-cut-function nil)) ad-do-it))
-  (setq clipmon-timer-interval 1))
+;; (after! clipmon
+;;   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+;;   (add-to-list 'after-init-hook 'clipmon-mode-start)
+;;   (defadvice clipmon--on-clipboard-change (around stop-clipboard-parsing activate)
+;;     (let ((interprogram-cut-function nil)) ad-do-it))
+;;   (setq clipmon-timer-interval 1))
 
 (add-hook 'magit-mode-hook (lambda () (magit-delta-mode +1)))
 
