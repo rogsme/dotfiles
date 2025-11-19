@@ -81,8 +81,6 @@
 (package! claude-code
   :recipe (:host github :repo "stevemolitor/claude-code.el" :branch "main"
            :files ("*.el" (:exclude "images/*"))))
-(package! opencode
-  :recipe (:host gitlab :repo "rogs/opencode.el"))
 (unpin! magit forge ghub)   ;; let these float past Doom's pins
 (package! magit :pin nil)
 (package! forge :pin nil)
