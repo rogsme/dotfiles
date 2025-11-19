@@ -63,7 +63,8 @@
         "groq/moonshotai/kimi-k2-instruct-0905": { "name": "Kimi K2 Instruct" },
         "xai/grok-code-fast": { "name": "Grok Code Fast" },
         "anthropic/claude-sonnet-4-5": { "name": "Claude Sonnet 4.5" },
-        "anthropic/claude-3-5-haiku-latest": { "name": "Claude 3.5 Haiku" }
+        "anthropic/claude-3-5-haiku-latest": { "name": "Claude 3.5 Haiku" },
+        "gemini/gemini-3-pro-preview": { "name": "Gemini 3 Pro Preview" }
       }
     }
   },
