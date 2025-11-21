@@ -46,6 +46,11 @@
         "OPENROUTER_API_KEY": "${OPENROUTER_API_KEY}"
       },
       "enabled": true
+    },
+    "jira": {
+      "type": "local",
+      "command": ["npx", "-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
+      "enabled": true
     }
   },
   "provider": {
