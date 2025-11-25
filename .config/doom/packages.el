@@ -58,8 +58,6 @@
 (package! dashboard)
 (package! clipmon)
 (package! butler)
-(package! copilot
-  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))
 (package! plantuml-mode)
 (package! chatgpt-shell)
 (package! ob-chatgpt-shell)

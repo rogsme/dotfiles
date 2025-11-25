@@ -1145,34 +1145,6 @@ context when generating PR descriptions.
 (setq forge-llm-max-diff-size nil)
 #+end_src
 
-** Github Copilot
-:PROPERTIES:
-:ID:       7f88ce20-846c-47e4-aeed-d853212c9db5
-:END:
-
-This section enables GitHub Copilot for real-time AI-assisted code completions inside Emacs.
-
-The =prog-mode-hook= ensures Copilot is active in all programming buffers. The keybindings are also
-customized to improve the editing experience:
-
-- =<tab>= and =TAB=: Accept the current Copilot suggestion.
-- =C-TAB=: Accept the suggestion word by word (helpful for partial completions or fine-tuning).
-
-This setup makes Copilot feel more natural and responsive while coding, without getting in the way of
-other completions or keybindings.
-
-#+begin_src emacs-lisp
-(require 'copilot)
-
-(after! copilot
-  (add-hook 'prog-mode-hook #'copilot-mode)
-  (map! :map copilot-completion-map
-        "<tab>" #'copilot-accept-completion
-        "TAB" #'copilot-accept-completion
-        "C-TAB" #'copilot-accept-completion-by-word
-        "C-<tab>" #'copilot-accept-completion-by-word))
-#+end_src
-
 ** Aider
 :PROPERTIES:
 :ID:       42318f75-3a25-44ad-bfeb-d83338045385

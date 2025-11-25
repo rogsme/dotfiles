@@ -591,16 +591,6 @@ Now, write the commit message in this exact format:
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
 
-(require 'copilot)
-
-(after! copilot
-  (add-hook 'prog-mode-hook #'copilot-mode)
-  (map! :map copilot-completion-map
-        "<tab>" #'copilot-accept-completion
-        "TAB" #'copilot-accept-completion
-        "C-TAB" #'copilot-accept-completion-by-word
-        "C-<tab>" #'copilot-accept-completion-by-word))
-
 (after! aidermacs
   (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash")
   (setq aidermacs-auto-commits nil)
