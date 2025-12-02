@@ -20,3 +20,7 @@
     conflictStyle = zdiff3
 [pull]
 	rebase = false
+[github]
+	user = rogsme
+[github "api.github.com"]
+	user = rogsme
