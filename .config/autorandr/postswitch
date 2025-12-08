@@ -1,4 +1,5 @@
 #!/bin/bash
 
 i3-msg restart
-
+sleep 5
+nitrogen --restore
