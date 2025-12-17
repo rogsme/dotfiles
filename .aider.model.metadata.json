@@ -81,7 +81,7 @@
     "non_thinking_only": true,
     "tokens_per_second": 400
   },
-  "openai/xai/grok-code-fast": {
+  "openai/xai/grok-code-fast-1": {
     "max_tokens": 256000,
     "max_input_tokens": 256000,
     "max_output_tokens": 256000,
