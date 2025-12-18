@@ -488,8 +488,8 @@ related notes or tasks."
 
 (my/require-llm-backends)
 
-(defconst my/gemini-flash-model "google/gemini-2.5-flash")
-(defconst my/gemini-pro-model "google/gemini-2.5-pro")
+(defconst my/gemini-flash-model "google/gemini-3-flash-preview")
+(defconst my/gemini-pro-model "google/gemini-3-pro-preview")
 (defconst my/qwen3-code-model "qwen/qwen3-coder")
 (defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
 (defconst my/claude-sonnet-model "anthropic/claude-sonnet-4.5")
@@ -511,8 +511,8 @@ related notes or tasks."
 (defun my/llm-provider (name)
   "Return a configured LLM provider instance by NAME."
   (pcase name
-    ("Gemini 2.5 Flash" (make-llm-openrouter-compatible my/gemini-flash-model))
-    ("Gemini 2.5 Pro" (make-llm-openrouter-compatible my/gemini-pro-model))
+    ("Gemini 3 Flash Preview" (make-llm-openrouter-compatible my/gemini-flash-model))
+    ("Gemini 3 Pro Preview" (make-llm-openrouter-compatible my/gemini-pro-model))
     ("Claude Sonnet" (make-llm-openrouter-compatible my/claude-sonnet-model))
     ("Claude Opus" (make-llm-openrouter-compatible my/claude-opus-model))
     ("Qwen3 Code"   (make-llm-openrouter-compatible my/qwen3-code-model))
@@ -536,7 +536,7 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
+                          '("Gemini 3 Flash Preview" "Gemini 3 Pro Preview" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
@@ -582,17 +582,17 @@ Now, write the commit message in this exact format:
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM: " '("Gemini 2.5 Flash" "Gemini 2.5 Pro" "Claude Sonnet" "Claude Opus" "Qwen3-Code"))))
+   (list (completing-read "Choose LLM: " '("Gemini 3 Flash Preview" "Gemini 3 Pro Preview" "Claude Sonnet" "Claude Opus" "Qwen3-Code"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-(setq forge-llm-llm-provider (my/llm-provider "Gemini 2.5 Flash"))
+(setq forge-llm-llm-provider (my/llm-provider "Gemini 3 Flash Preview"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
 
 (after! aidermacs
-  (setq aidermacs-default-model "openrouter/google/gemini-2.5-flash")
+  (setq aidermacs-default-model "openrouter/google/gemini-3-flash-preview")
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
