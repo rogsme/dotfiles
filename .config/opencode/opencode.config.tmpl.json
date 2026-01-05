@@ -9,14 +9,7 @@
     "context7": {
       "type": "local",
       "command": ["npx", "-y", "@upstash/context7-mcp", "--api-key", "${CONTEXT7_API_KEY}"],
-      "enabled": true
-    },
-    "github": {
-      "type": "remote",
-      "url": "https://api.githubcopilot.com/mcp/",
-      "headers": {
-        "Authorization": "Bearer ${GITHUB_PAT}"
-      }
+      "enabled": false
     },
     "pal-mcp": {
       "type": "local",
@@ -26,18 +19,10 @@
       ],
       "enabled": true
     },
-    "firecrawl-mcp": {
-      "type": "local",
-      "command": ["npx", "-y", "firecrawl-mcp"],
-      "environment": {
-        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
-      },
-      "enabled": true
-    },
     "jira": {
       "type": "local",
       "command": ["npx", "-y", "mcp-remote", "https://mcp.atlassian.com/v1/sse"],
-      "enabled": true
+      "enabled": false
     }
   },
   "provider": {
