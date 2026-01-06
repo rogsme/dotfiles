@@ -40,8 +40,8 @@
       anthropic-beta: prompt-caching-2024-07-31,pdfs-2024-09-25
   cache_control: true
 
-# Gemini 2.5 Flash — mirrors upstream settings
-- name: openai/gemini/gemini-2.5-flash
+# Gemini 3 Flash — mirrors upstream settings
+- name: openai/gemini/gemini-3-flash-preview
   edit_format: diff-fenced
   weak_model_name: openai/gemini/gemini-2.0-flash
   use_repo_map: true
@@ -54,21 +54,6 @@
 - name: openai/gemini/gemini-2.0-flash
   edit_format: diff
   use_repo_map: true
-
-# Qwen 3 Coder 480B — mirrors upstream defaults
-- name: openai/cerebras/qwen-3-coder-480b
-  edit_format: diff
-  weak_model_name: openai/gemini/gemini-2.0-flash
-  use_repo_map: true
-
-# Kimi K2 Instruct — mirrors upstream defaults
-- name: openai/groq/moonshotai/kimi-k2-instruct-0905
-  edit_format: diff
-  weak_model_name: openai/gemini/gemini-2.0-flash
-  use_repo_map: true
-  examples_as_sys_msg: true
-  extra_params:
-    temperature: 0.6
 
 # Grok Code Fast — mirrors upstream defaults for Grok 4
 - name: openai/xai/grok-code-fast-1
