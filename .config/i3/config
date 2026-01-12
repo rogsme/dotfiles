@@ -297,7 +297,7 @@ exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 exec_always --no-startup-id sleep 5; exec picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
-exec_always --no-startup-id autotiling
+exec_always --no-startup-id sh -c "autotiling || autotiling-rs"
 exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
