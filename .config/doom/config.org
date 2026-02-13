@@ -973,7 +973,7 @@ single API key. I use this for models that aren't covered by my Claude Max subsc
 [[https://github.com/router-for-me/CLIProxyAPI][CLIProxyAPI]] exposes my Claude Max subscription as an OpenAI-compatible API on =localhost:8317=. This
 means I can use Claude models (Haiku, Sonnet, Opus) through the =llm= package without paying for
 separate API access. No API key needed since the proxy runs locally and handles OAuth authentication
-with my subscription. See [[https://rogs.me/posts/use-your-claude-max-subscription-as-an-api-with-cliproxyapi][my blog post]] for the full setup.
+with my subscription. See [[https://rogs.me/2026/02/use-your-claude-max-subscription-as-an-api-with-cliproxyapi/][my blog post]] for the full setup.
 
 #+begin_src emacs-lisp
 (defun make-llm-cliproxyapi (chat-model)
