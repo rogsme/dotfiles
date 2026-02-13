@@ -488,12 +488,11 @@ related notes or tasks."
 
 (my/require-llm-backends)
 
-(defconst my/gemini-flash-model "google/gemini-3-flash-preview")
-(defconst my/gemini-pro-model "google/gemini-3-pro-preview")
 (defconst my/qwen3-code-model "qwen/qwen3-coder")
 (defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
-(defconst my/claude-sonnet-model "anthropic/claude-sonnet-4.5")
-(defconst my/claude-opus-model "anthropic/claude-opus-4.1")
+(defconst my/claude-haiku-model "claude-haiku-4-5-20251001")
+(defconst my/claude-sonnet-model "claude-sonnet-4-5-20250929")
+(defconst my/claude-opus-model "claude-opus-4-6")
 
 (defun my/setup-llm-env ()
   (setenv "OPENROUTER_API_KEY" openrouter-api-key)
@@ -508,15 +507,21 @@ related notes or tasks."
    :chat-model chat-model
    :key openrouter-api-key))
 
+(defun make-llm-cliproxyapi (chat-model)
+  "Return a CLIProxyAPI-compatible LLM config for CHAT-MODEL."
+  (make-llm-openai-compatible
+   :url "http://localhost:8317/v1"
+   :chat-model chat-model
+   :key "not-needed"))
+
 (defun my/llm-provider (name)
   "Return a configured LLM provider instance by NAME."
   (pcase name
-    ("Gemini 3 Flash Preview" (make-llm-openrouter-compatible my/gemini-flash-model))
-    ("Gemini 3 Pro Preview" (make-llm-openrouter-compatible my/gemini-pro-model))
-    ("Claude Sonnet" (make-llm-openrouter-compatible my/claude-sonnet-model))
-    ("Claude Opus" (make-llm-openrouter-compatible my/claude-opus-model))
-    ("Qwen3 Code"   (make-llm-openrouter-compatible my/qwen3-code-model))
-    ("Qwen3 Code Small"   (make-llm-openrouter-compatible my/qwen3-code-small-model))))
+    ("Claude Haiku"     (make-llm-cliproxyapi my/claude-haiku-model))
+    ("Claude Sonnet"    (make-llm-cliproxyapi my/claude-sonnet-model))
+    ("Claude Opus"      (make-llm-cliproxyapi my/claude-opus-model))
+    ("Qwen3 Code"       (make-llm-openrouter-compatible my/qwen3-code-model))
+    ("Qwen3 Code Small" (make-llm-openrouter-compatible my/qwen3-code-small-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -536,11 +541,13 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Gemini 3 Flash Preview" "Gemini 3 Pro Preview" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
+                          '("Claude Haiku" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-(setq magit-gptcommit-llm-provider (my/llm-provider "Qwen3 Code Small"))
+;; Default to Claude Haiku (fast + free via subscription, good for commit msgs)
+(setq magit-gptcommit-llm-provider (my/llm-provider "Claude Haiku"))
+
 (setq llm-warn-on-nonfree nil)
 
 (after! magit
@@ -582,11 +589,13 @@ Now, write the commit message in this exact format:
 (defun my/set-forge-llm-provider (provider)
   "Set the Forge LLM provider dynamically."
   (interactive
-   (list (completing-read "Choose LLM: " '("Gemini 3 Flash Preview" "Gemini 3 Pro Preview" "Claude Sonnet" "Claude Opus" "Qwen3-Code"))))
+   (list (completing-read "Choose LLM: "
+                          '("Claude Haiku" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-(setq forge-llm-llm-provider (my/llm-provider "Gemini 3 Flash Preview"))
+;; Default to Claude Sonnet (good balance for PR descriptions)
+(setq forge-llm-llm-provider (my/llm-provider "Claude Sonnet"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
