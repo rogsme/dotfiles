@@ -3,7 +3,27 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/roger/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      }
+    ],
     "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/roger/.claude/hooks/gsd-prompt-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      },
       {
         "matcher": "AskUserQuestion",
         "hooks": [
@@ -12,6 +32,18 @@
             "command": "~/.claude/hooks/notify.sh question"
           }
         ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ],
+        "matcher": "Bash|Edit|Write|MultiEdit|Agent|Task"
       }
     ],
     "Stop": [
@@ -25,7 +57,11 @@
       }
     ]
   },
-   "permissions": {
+  "statusLine": {
+    "type": "command",
+    "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
+  },
+  "permissions": {
     "deny": [
       "Read(.env)",
       "Read(.env.*)",
@@ -34,5 +70,6 @@
       "Read(**/*.pem)",
       "Read(**/*.key)"
     ]
-  }
+  },
+  "skipDangerousModePermissionPrompt": true
 }
