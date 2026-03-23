@@ -12,6 +12,8 @@ android-udev
 apparmor
 audacious
 audacity
+autoconf
+automake
 autorandr
 autotiling-rs
 avahi
@@ -26,6 +28,7 @@ btrfs-progs
 catfish
 chaotic-keyring
 chaotic-mirrorlist
+clamav
 cmake
 cmatrix
 cowsay
@@ -49,12 +52,14 @@ efibootmgr
 emacs
 engrampa
 evince
+ex-vi-compat
 exfatprogs
 exo
 eza
 f2fs-tools
 fakeroot
 feishin-git
+ferdium-bin
 ffmpeg
 ffmpegthumbnailer
 firefox
@@ -199,6 +204,7 @@ playerctl
 plocate
 plymouth
 plymouth-theme-manjaro
+pnpm
 polybar
 poppler-data
 poppler-glib
@@ -254,7 +260,6 @@ update-grub
 usb_modeswitch
 usbutils
 uv
-vi
 viewnior
 vim
 vulkan-intel
@@ -273,6 +278,7 @@ xcursor-vanilla-dmz-aa
 xdg-desktop-portal-gtk
 xdg-user-dirs
 xdg-utils
+xdotool
 xf86-input-elographics
 xf86-input-evdev
 xf86-input-libinput
