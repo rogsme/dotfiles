@@ -1,0 +1,135 @@
+#+TITLE: Claude Code Configuration
+#+AUTHOR: Roger González
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+
+* Claude Code Configuration
+:PROPERTIES:
+:ID:       c1a2b3d4-5e6f-7890-abcd-ef1234567890
+:END:
+This directory contains my personal configuration for [[https://docs.anthropic.com/en/docs/claude-code][Claude Code]], Anthropic's CLI-based AI coding
+assistant. The setup is designed for a remote, async workflow — giving Claude tasks from a phone over SSH
+and getting notified when it needs attention.
+
+For the full writeup on how this fits into my remote coding setup, see my blog post: [[https://rogs.me/2026/02/claude-code-from-the-beach-my-remote-coding-setup-with-mosh-tmux-and-ntfy/][Claude Code from the
+Beach: My Remote Coding Setup with Mosh, tmux, and ntfy]].
+
+* Settings
+:PROPERTIES:
+:ID:       a2b3c4d5-6e7f-8901-bcde-f12345678901
+:END:
+The =settings.json= file configures Claude Code's behavior, including experimental features, hook
+definitions, and permission rules.
+
+** Experimental Features
+
+#+begin_src json
+"env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+}
+#+end_src
+
+Enables the experimental agent teams feature, which allows spawning multiple Claude agents that
+coordinate on tasks together.
+
+** Hooks
+
+Hooks let you run shell commands in response to Claude Code lifecycle events. Two hooks are configured:
+
+- =PreToolUse= with matcher =AskUserQuestion=: Fires when Claude wants to ask the user a question,
+  triggering a push notification so I can respond from my phone.
+- =Stop=: Fires when Claude finishes a task, notifying me that work is complete.
+
+#+begin_src json
+"hooks": {
+    "PreToolUse": [
+        {
+            "matcher": "AskUserQuestion",
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "~/.claude/hooks/notify.sh question"
+                }
+            ]
+        }
+    ],
+    "Stop": [
+        {
+            "hooks": [
+                {
+                    "type": "command",
+                    "command": "~/.claude/hooks/notify.sh stop"
+                }
+            ]
+        }
+    ]
+}
+#+end_src
+
+** Permissions
+
+Sensitive files are denied from being read by Claude to prevent accidental exposure of secrets:
+
+#+begin_src json
+"permissions": {
+    "deny": [
+        "Read(.env)",
+        "Read(.env.*)",
+        "Read(**/secrets/*)",
+        "Read(**/*credential*)",
+        "Read(**/*.pem)",
+        "Read(**/*.key)"
+    ]
+}
+#+end_src
+
+* Notification Hook
+:PROPERTIES:
+:ID:       b3c4d5e6-7f80-9012-cdef-123456789012
+:END:
+The =hooks/notify.sh= script sends push notifications via a self-hosted [[https://ntfy.sh][ntfy]] instance. It's the
+key piece that makes the async phone workflow possible.
+
+** How It Works
+
+1. *SSH detection*: The script first checks if the current tmux session originated from an SSH connection.
+   If not (i.e., working locally), it exits silently — no need for notifications when you're sitting at
+   the machine.
+
+2. *Event routing*: Based on the event type passed as an argument (=question=, =stop=, =error=), it sets
+   an appropriate title, priority, and extracts a meaningful message from the JSON event data piped via
+   stdin.
+
+3. *Notification dispatch*: Sends the notification to ntfy with the project name as context, so you know
+   which project Claude is working on.
+
+** Event Types
+
+| Event      | Title                   | Priority  | Description                          |
+|------------+-------------------------+-----------+--------------------------------------|
+| =question= | Claude needs input      | high      | Extracts the question text from JSON |
+| =stop=     | Claude finished         | default   | Simple "Task complete" message       |
+| =error=    | Claude hit an error     | high      | Extracts error details from JSON     |
+
+** Setup
+
+To use this hook, replace the placeholder values in =notify.sh=:
+
+#+begin_src bash
+NTFY_URL="my-ntfy-url"     # Your ntfy topic URL
+NTFY_TOKEN="my-ntfy-token" # Your ntfy auth token
+#+end_src
+
+* Remote Workflow Overview
+:PROPERTIES:
+:ID:       c4d5e6f7-8091-0123-def0-234567890123
+:END:
+This configuration is part of a broader remote development setup:
+
+- *Phone → Home Server*: [[https://mosh.org][Mosh]] over [[https://www.wireguard.com][WireGuard]] handles unreliable mobile connections
+- *Home Server → Work PC*: SSH over LAN keeps everything employer-friendly
+- *Notifications*: [[https://ntfy.sh][ntfy]] via HTTPS pushes alerts back to the phone
+- *Session persistence*: [[https://github.com/tmux/tmux][tmux]] keeps Claude running between connections
+
+The result: type one command, give Claude a task, pocket the phone. Get a notification when Claude needs
+input or finishes, respond, and pocket the phone again.
