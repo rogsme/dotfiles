@@ -259,6 +259,8 @@ assign [class="Element"] $ws4
 assign [class="Evolution"] $ws5
 assign [class="thunderbird"] $ws5
 assign [class="Mailspring"] $ws5
+assign [class="Mail"] $ws5
+assign [class="org.mozilla.Thunderbird"] $ws5
 
 # 6: Music
 for_window [class = "Spotify"] move to workspace $ws6
