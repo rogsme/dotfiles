@@ -393,6 +393,9 @@ Custom keybindings to launch frequently used applications and perform specific a
 - Do Not Disturb: =$mod+m= toggles a Do Not Disturb mode via a custom script.
 - Custom Shortcuts: Bindings using =$aux= to open specific LibreOffice Calc spreadsheets (=loffice=) and
   the Feishin music player.
+- - =$mod+o=: Toggles Handy local speech-to-text transcription on/off, showing a notification on
+  start/stop. The toggle script uses a state file to track session state. Handy starts hidden on login
+  (see [[*Autostart Applications][Autostart Applications]]).
 #+begin_src conf
 # Hotkeys for opening programs
 bindsym $aux+f exec /usr/bin/thunar
@@ -419,6 +422,11 @@ bindsym $mod+m exec "~/.config/i3/scripts/toggle_dnd.sh"
 bindsym $aux+g exec loffice ~/Documents/Gastos/Gastos\ USD.ods
 bindsym $aux+b exec loffice ~/Documents/Gastos/BTC.ods
 bindsym $aux+l exec feishin
+
+# Handy (local speech-to-text)
+# Toggles transcription on/off with a desktop notification for state changes.
+# Handy itself starts hidden on login (see Autostart Applications).
+bindsym $mod+o exec --no-startup-id ~/.config/i3/scripts/handy-toggle.sh
 #+end_src
 
 ** Focus Behavior
@@ -562,12 +570,13 @@ exec --no-startup-id xfce4-power-manager
 exec --no-startup-id pamac-tray
 exec_always --no-startup-id sleep 5; exec picom
 exec --no-startup-id /usr/lib/xfce4/notifyd/xfce4-notifyd
-exec_always --no-startup-id autotiling
+exec_always --no-startup-id sh -c "autotiling || autotiling-rs"
 exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec --no-startup-id xfsettingsd --replace
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
+exec /usr/bin/handy --start-hidden
 #+end_src
 
 ** Scripts
