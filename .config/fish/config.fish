@@ -15,9 +15,9 @@ set -g theme_display_date no
 # Set the terminal type for compatibility (ensures colors and features work correctly)
 set -x TERM xterm-256color
 # Set the default command-line editor to Vim
-set -x EDITOR vim
+set -x EDITOR nvim
 # Set the default visual editor (often used by programs like git) to Vim
-set -x VISUAL vim
+set -x VISUAL nvim
 
 # Alias for managing dotfiles using a bare Git repository
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
@@ -43,6 +43,10 @@ alias dock="xrandr --output DP-2-3 --auto --primary --left-of DP-2-1 --output DP
 alias cmatrix="cmatrix -a -r"
 # Open a quick webserver at point
 alias s="python -m http.server 8000"
+
+# VIM
+alias vim nvim
+alias vi nvim
 
 # Source a separate file containing custom Fish shell abbreviations
 source "$HOME/.config/fish/abbreviations.fish"
