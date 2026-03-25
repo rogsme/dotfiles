@@ -61,44 +61,82 @@ Once the config is tangled and TPM is cloned:
 To update plugins later, press =C-Space U= (capital U). To remove plugins you've deleted from the
 config, press =C-Space alt-u=.
 
-** Quick Reference
+** Getting Started
 :PROPERTIES:
-:ID:       b6eaa8e5-7dbf-8be6-acd3-5e1f6d2b4a8c
+:ID:       a2b4c6d8-e0f2-4a3b-8c5d-7e9f1a2b4c6d
 :END:
-Cheat sheet for the keybindings defined in this config. Not tangled.
+A quick primer on how tmux works and the keybindings in this config.
+
+*** Core Concepts
+:PROPERTIES:
+:ID:       b3c5d7e9-f1a3-4b5c-8d7e-0f2a4b6c8d0e
+:END:
+tmux organizes things in three layers:
+
+- *Sessions*: Top-level containers. You might have one per project ("my-project", "yams", "dotfiles"). Sessions
+  persist even if you close your terminal; reattach with =tmux attach -t name=.
+- *Windows*: Tabs within a session. Shown in the status bar at the bottom. Switch with =C-b 1=, =C-b 2=,
+  etc.
+- *Panes*: Splits within a window. A single window can have multiple panes side by side or stacked.
+
+The *prefix key* is =C-b= (the default). Every tmux command starts with the prefix, then a second key.
+For example, =C-b c= means: press =Ctrl+b=, release, then press =c=.
+
+*** Workflow Example
+:PROPERTIES:
+:ID:       c4d6e8f0-a2b4-4c6d-8e8f-1a3b5c7d9e1f
+:END:
+A typical session might look like this:
+
+1. Start tmux: =tmux new -s myproject=
+2. You're in window 1. Open a split: =C-b |= (vertical) or =C-b -= (horizontal).
+3. Navigate between panes: =C-b h/j/k/l=.
+4. Open a new window: =C-b c=. Now you have two tabs in the status bar.
+5. Switch between windows: =C-b 1=, =C-b 2=.
+6. Detach (leave everything running): =C-b d=.
+7. Come back later: =tmux attach -t myproject=. Everything is exactly where you left it.
+
+*** Quick Reference
+:PROPERTIES:
+:ID:       d5e7f9a1-b3c5-4d7e-8f9a-2b4c6d8e0f2a
+:END:
+Cheat sheet for all keybindings defined in this config.
 
 #+begin_example
-PREFIX = C-Space
+PREFIX = C-b
 
 Sessions:
-  C-Space d         Detach from session
-  C-Space $         Rename session
+  C-b d             Detach from session
+  C-b $             Rename session
+  C-b s             List sessions (built-in)
 
 Windows:
-  C-Space c         New window (in current dir)
-  C-Space 1-9       Switch to window N
-  C-Space ,         Rename window
-  C-Space &         Close window
+  C-b c             New window (in current dir)
+  C-b 1-9           Switch to window N
+  C-b ,             Rename window
+  C-b &             Close window
+  C-b n / p         Next / previous window (built-in)
 
 Panes:
-  C-Space |         Split vertically
-  C-Space -         Split horizontally
-  C-Space h/j/k/l   Navigate panes
-  C-Space H/J/K/L   Resize panes (repeatable)
-  C-Space x         Close pane
-  C-Space z         Toggle pane zoom (fullscreen)
+  C-b |             Split vertically
+  C-b -             Split horizontally
+  C-b h/j/k/l       Navigate panes
+  C-b H/J/K/L       Resize panes (repeatable)
+  C-b x             Close pane (built-in)
+  C-b z             Toggle pane zoom/fullscreen (built-in)
+  C-b q             Show pane numbers, press number to jump (built-in)
 
 Copy Mode:
-  C-Space [         Enter copy mode
+  C-b [             Enter copy mode (navigate with vim keys)
   v                 Start selection (in copy mode)
-  y                 Yank selection (in copy mode)
+  y                 Yank to system clipboard (in copy mode)
+  q                 Exit copy mode
 
 Management:
-  C-Space r         Reload config
-  C-Space I         Install plugins (TPM)
-  C-Space U         Update plugins (TPM)
+  C-b r             Reload config
+  C-b I             Install plugins (TPM)
+  C-b U             Update plugins (TPM)
 #+end_example
-
 ** Philosophy
 :PROPERTIES:
 :ID:       b2e4a7c1-3d5f-4b82-a6c9-1e7f2d8b0a4c
@@ -233,17 +271,15 @@ set -g detach-on-destroy off
 :ID:       f2ce4b61-3bfd-4fc2-ea69-1c7d2b8f0e4a
 :END:
 The prefix key is how you tell tmux "the next keypress is a tmux command, not input for the terminal
-program." The default =C-b= is awkward: =b= is hard to reach, and =C-b= conflicts with "page up" in
-shells and pagers.
+program." The default is =C-b=, and this config keeps it. While some people remap to =C-a= (from GNU
+screen) or =C-Space=, the default is fine and means one less thing to explain when pair programming or
+SSHing into a machine with a stock tmux.
 
-=C-Space= is ergonomic (both keys under your thumbs/left hand), doesn't conflict with common shell
-bindings, and feels natural as a "leader" key. The =send-prefix= binding means pressing =C-Space C-Space=
-sends a literal =C-Space= through to the underlying program, just in case anything needs it.
+The =send-prefix= binding means pressing =C-b C-b= sends a literal =C-b= through to the underlying
+program, in case anything needs it (some shells use =C-b= for cursor movement).
 #+begin_src conf
-# Prefix: C-Space
-unbind C-b
-set -g prefix C-Space
-bind C-Space send-prefix
+# Prefix: C-b (default, keeping it standard)
+bind C-b send-prefix
 #+end_src
 
 ** Key Bindings
