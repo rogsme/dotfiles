@@ -1,0 +1,451 @@
+#+TITLE: tmux Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:conf :tangle tmux.conf :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* tmux Configuration
+:PROPERTIES:
+:ID:       a1f3c8d2-7e4b-4a91-b5e0-8c2d1f6a9b3e
+:END:
+This is my personal configuration for tmux. It's written using Org Mode's literate programming features,
+which allows embedding documentation directly alongside the code. This file is configured to automatically
+"tangle" the code blocks into the actual tmux configuration file (named =tmux.conf= in the same directory)
+whenever this Org file is saved in Emacs (see the [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]] section). This approach keeps the
+configuration well-documented and easier to manage.
+
+The config lives at =~/.config/tmux/tmux.conf= (XDG-compliant). Plugins are managed by TPM (Tmux Plugin
+Manager) and installed under =~/.config/tmux/plugins/=.
+
+** Installation
+:PROPERTIES:
+:ID:       a5b7c9d1-e3f5-4a7b-8c9d-2e4f6a8b0c1d
+:END:
+Steps to get this configuration up and running from scratch.
+
+*** Install TPM
+:PROPERTIES:
+:ID:       b6c8d0e2-f4a6-4b8c-8d0e-3f5a7b9c1d2e
+:END:
+Clone the Tmux Plugin Manager into the XDG-compliant plugins directory:
+
+#+begin_example
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+#+end_example
+
+*** Tangle the Config
+:PROPERTIES:
+:ID:       c7d9e1f3-a5b7-4c9d-8e1f-4a6b8c0d2e3f
+:END:
+If you have auto-tangle set up (see [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]]), just save this file in Emacs and the
+=tmux.conf= will be generated automatically. Otherwise, open this file in Emacs and run:
+
+#+begin_example
+M-x org-babel-tangle
+#+end_example
+
+This produces =tmux.conf= in the same directory as this =README.org= file. Make sure both live inside
+=~/.config/tmux/=.
+
+*** Install Plugins
+:PROPERTIES:
+:ID:       d8e0f2a4-b6c8-4d0e-8f2a-5b7c9d1e3f4a
+:END:
+Once the config is tangled and TPM is cloned:
+
+1. Start a new tmux session (or reload the config in an existing one with =C-Space r=).
+2. Press =C-Space I= (capital I). TPM will clone and install all plugins listed in the config.
+3. You should see a message confirming the installation. Press =Enter= to dismiss it.
+
+To update plugins later, press =C-Space U= (capital U). To remove plugins you've deleted from the
+config, press =C-Space alt-u=.
+
+** Quick Reference
+:PROPERTIES:
+:ID:       b6eaa8e5-7dbf-8be6-acd3-5e1f6d2b4a8c
+:END:
+Cheat sheet for the keybindings defined in this config. Not tangled.
+
+#+begin_example
+PREFIX = C-Space
+
+Sessions:
+  C-Space d         Detach from session
+  C-Space $         Rename session
+
+Windows:
+  C-Space c         New window (in current dir)
+  C-Space 1-9       Switch to window N
+  C-Space ,         Rename window
+  C-Space &         Close window
+
+Panes:
+  C-Space |         Split vertically
+  C-Space -         Split horizontally
+  C-Space h/j/k/l   Navigate panes
+  C-Space H/J/K/L   Resize panes (repeatable)
+  C-Space x         Close pane
+  C-Space z         Toggle pane zoom (fullscreen)
+
+Copy Mode:
+  C-Space [         Enter copy mode
+  v                 Start selection (in copy mode)
+  y                 Yank selection (in copy mode)
+
+Management:
+  C-Space r         Reload config
+  C-Space I         Install plugins (TPM)
+  C-Space U         Update plugins (TPM)
+#+end_example
+
+** Philosophy
+:PROPERTIES:
+:ID:       b2e4a7c1-3d5f-4b82-a6c9-1e7f2d8b0a4c
+:END:
+This is a lightweight, kickstart-style tmux config. Every line is documented and meant to be read,
+understood, and modified. Doom Emacs is the IDE; this is the terminal multiplexer. The goals are:
+- Sensible defaults that don't fight you
+- Vim-style navigation
+- Minimal plugins (only what earns its place)
+- Visual consistency with the Neovim setup (carbonfox/catppuccin mocha)
+
+** Header
+:PROPERTIES:
+:ID:       c3f5b8d2-4e6a-5c93-b7d0-2f8a3e9c1b5d
+:END:
+Simple header block with personal information, which will appear at the top of the tangled =tmux.conf=.
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+#
+# tmux configuration
+# Tangled from README.org
+#
+#+end_src
+
+** Terminal & Color
+:PROPERTIES:
+:ID:       d4a6c9e3-5f7b-6da4-c8e1-3a9b4f0d2c6e
+:END:
+True color support is essential for Neovim themes (like carbonfox) to render correctly inside tmux.
+Without these settings, colors fall back to 256-color approximations and look washed out.
+- =default-terminal=: Sets the =$TERM= value inside tmux sessions. =tmux-256color= is the correct terminfo
+  entry for modern tmux.
+- =terminal-features=: Appends RGB (true color) capability to =xterm-256color= terminals. This is the
+  modern way to enable 24-bit color in tmux 3.2+.
+
+If colors still look wrong, check that your terminal emulator (alacritty, ghostty, kitty, etc.) also
+reports true color support.
+#+begin_src conf
+# True color support
+set -g default-terminal "tmux-256color"
+set -as terminal-features ",xterm-256color:RGB"
+#+end_src
+
+** General Settings
+:PROPERTIES:
+:ID:       e5b7daf4-6a8c-7eb5-d9f2-4b0c5a1e3d7f
+:END:
+Core settings that make tmux behave sanely.
+
+*** Escape Time
+:PROPERTIES:
+:ID:       f6c8eb05-7b9d-8fc6-ea03-5c1d6b2f4e8a
+:END:
+When you press Escape, tmux waits to see if it's the start of a terminal escape sequence (like an arrow
+key code). The default wait is 500ms, which makes Neovim feel sluggish when leaving insert mode with
+Escape. Setting this to 0 makes mode switching instant. If you ever see weird behavior with function keys
+or arrow keys, bump this to 10.
+#+begin_src conf
+# Eliminate ESC delay (critical for nvim inside tmux)
+set -sg escape-time 0
+#+end_src
+
+*** Scrollback Buffer
+:PROPERTIES:
+:ID:       a7d9fc16-8cae-9ad7-fb14-6d2e7c3a5f9b
+:END:
+The scrollback buffer stores output history per pane. The default (2000 lines) runs out fast when tailing
+logs or running builds. 50000 is generous without eating significant memory.
+#+begin_src conf
+# Bigger scrollback
+set -g history-limit 50000
+#+end_src
+
+*** Indexing
+:PROPERTIES:
+:ID:       b8ea0d27-9dbf-0be8-ac25-7e3f8d4b6a0c
+:END:
+By default, windows and panes are numbered starting at 0. On a keyboard, 0 is on the far right while 1
+is directly above the left hand. Starting at 1 makes =C-Space 1= reach the first window without
+stretching. =renumber-windows= ensures that closing a middle window renumbers the rest sequentially (no
+gaps like [1, 3, 4]).
+#+begin_src conf
+# Start numbering at 1 (0 is across the keyboard)
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+#+end_src
+
+*** Mouse Support
+:PROPERTIES:
+:ID:       c9fb1e38-0eca-1cf9-bd36-8f4a9e5c7b1d
+:END:
+Enables clicking to select panes, dragging to resize them, and scrolling with the mouse wheel. This is
+purely additive; all keyboard workflows still work. Useful when you're lazy or forget a shortcut.
+#+begin_src conf
+# Mouse support
+set -g mouse on
+#+end_src
+
+*** Focus Events
+:PROPERTIES:
+:ID:       d0ac2f49-1fdb-2da0-ce47-9a5b0f6d8c2e
+:END:
+Forwards terminal focus/unfocus events to programs running inside tmux. This lets Neovim detect when you
+switch back to it and trigger =autoread= (reload files changed on disk). Without this, nvim inside tmux
+won't know you tabbed away and came back.
+#+begin_src conf
+# Focus events (lets nvim detect focus for autoread, etc.)
+set -g focus-events on
+#+end_src
+
+*** Session Destroy Behavior
+:PROPERTIES:
+:ID:       e1bd3a50-2aec-3eb1-df58-0b6c1a7e9d3f
+:END:
+Normally, destroying the last window in a session detaches you from tmux entirely, dumping you back to
+the shell. With this off, tmux switches you to the next available session instead. Prevents accidental
+disconnects when you run multiple sessions.
+#+begin_src conf
+# Don't detach when you destroy a session
+set -g detach-on-destroy off
+#+end_src
+
+** Prefix Key
+:PROPERTIES:
+:ID:       f2ce4b61-3bfd-4fc2-ea69-1c7d2b8f0e4a
+:END:
+The prefix key is how you tell tmux "the next keypress is a tmux command, not input for the terminal
+program." The default =C-b= is awkward: =b= is hard to reach, and =C-b= conflicts with "page up" in
+shells and pagers.
+
+=C-Space= is ergonomic (both keys under your thumbs/left hand), doesn't conflict with common shell
+bindings, and feels natural as a "leader" key. The =send-prefix= binding means pressing =C-Space C-Space=
+sends a literal =C-Space= through to the underlying program, just in case anything needs it.
+#+begin_src conf
+# Prefix: C-Space
+unbind C-b
+set -g prefix C-Space
+bind C-Space send-prefix
+#+end_src
+
+** Key Bindings
+:PROPERTIES:
+:ID:       a3df5c72-4cae-5ad3-fb70-2d8e3c9a1f5b
+:END:
+Custom keybindings for common operations.
+
+*** Config Reload
+:PROPERTIES:
+:ID:       b4ea6d83-5dbf-6be4-ac81-3e9f4d0b2a6c
+:END:
+Reloads the tmux config without restarting. Essential while iterating on configuration. The =display=
+part flashes a confirmation message so you know it worked.
+#+begin_src conf
+# Reload config
+bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded!"
+#+end_src
+
+*** Splits
+:PROPERTIES:
+:ID:       c5fb7e94-6eca-7cf5-bd92-4f0a5e1c3b7d
+:END:
+The default split bindings (="= and =%=) are unintuitive. These visual mnemonics are easier to remember:
+=|= looks like a vertical divider, =-= looks like a horizontal one. Both open the new pane in the current
+working directory instead of =$HOME=.
+
+Note on tmux naming: =split-window -h= creates a horizontal split, meaning panes are side by side
+(divided by a vertical line). It's backwards from what you'd expect, but the =|= binding makes the intent
+clear.
+#+begin_src conf
+# Splits: | for vertical, - for horizontal (in current path)
+bind | split-window -h -c "#{pane_current_path}"
+bind - split-window -v -c "#{pane_current_path}"
+unbind '"'
+unbind %
+#+end_src
+
+*** New Window
+:PROPERTIES:
+:ID:       d6ac8fa5-7fdb-8da6-cea3-5a1b6f2d4c8e
+:END:
+New windows open in the current directory instead of =$HOME=.
+#+begin_src conf
+# New window in current path
+bind c new-window -c "#{pane_current_path}"
+#+end_src
+
+*** Pane Navigation
+:PROPERTIES:
+:ID:       e7bd9ab6-8aec-9eb7-dfb4-6b2c7a3e5d9f
+:END:
+Vim-style pane navigation using h/j/k/l. Muscle memory carries over from Neovim. The defaults (arrow
+keys) still work; these are additions, not replacements.
+#+begin_src conf
+# Vim-style pane navigation
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+#+end_src
+
+*** Pane Resizing
+:PROPERTIES:
+:ID:       f8ceb0c7-9bfd-0fc8-eac5-7c3d8b4f6e0a
+:END:
+Same directions as navigation but uppercase for resizing. The =-r= flag means "repeatable": after
+pressing =C-Space H= once, you can keep pressing =H= to keep resizing without hitting the prefix again
+(within a short timeout window). The =5= is cells per press; adjust if it feels too coarse or too fine.
+#+begin_src conf
+# Resize panes with prefix + H/J/K/L (repeatable)
+bind -r H resize-pane -L 5
+bind -r J resize-pane -D 5
+bind -r K resize-pane -U 5
+bind -r L resize-pane -R 5
+#+end_src
+
+*** Copy Mode (Vi)
+:PROPERTIES:
+:ID:       a9dfb1d8-0cae-1ad9-fbd6-8d4e9c5a7f1b
+:END:
+Makes copy mode (entered with =C-Space [=) use vi-style navigation. Once in copy mode: =v= starts a
+visual selection, =y= yanks it to the system clipboard (via the =tmux-yank= plugin). Without these
+bindings, you'd use Space to start selection and Enter to copy, which is less intuitive for vim users.
+#+begin_src conf
+# Vi copy mode
+setw -g mode-keys vi
+bind -T copy-mode-vi v send-keys -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-selection-and-cancel
+#+end_src
+
+** Status Bar
+:PROPERTIES:
+:ID:       b0eac2e9-1dbf-2be0-acd7-9e5f0d6b8a2c
+:END:
+Minimal status bar configuration. The actual theming is handled by the catppuccin plugin below. The
+status bar sits at the bottom and refreshes every 5 seconds (default is 15). Don't go below 1 or you
+waste CPU on redraws.
+#+begin_src conf
+# Status bar position and refresh
+set -g status-position bottom
+set -g status-interval 5
+#+end_src
+
+** Plugins
+:PROPERTIES:
+:ID:       c1fbd3f0-2eca-3cf1-bde8-0f6a1e7c9b3d
+:END:
+Plugins are managed by TPM (Tmux Plugin Manager). Install TPM first:
+#+begin_example
+git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+#+end_example
+
+After saving and tangling this file, open tmux and press =C-Space I= (capital I) to install all plugins.
+Press =C-Space U= (capital U) to update them later.
+
+*** Plugin Manager Path
+:PROPERTIES:
+:ID:       d2acd4a1-3fdb-4da2-cef9-1a7b2f8d0c4e
+:END:
+Tells TPM to install plugins under the XDG-compliant path instead of the default =~/.tmux/plugins/=.
+#+begin_src conf
+# XDG-compliant plugin path
+set-environment -g TMUX_PLUGIN_MANAGER_PATH '~/.config/tmux/plugins'
+#+end_src
+
+*** Core Plugins
+:PROPERTIES:
+:ID:       e3bde5b2-4aec-5eb3-dfa0-2b8c3a9e1d5f
+:END:
+Three plugins, each earning its place:
+- *tpm*: The plugin manager itself. Must be listed so it can manage its own updates.
+- *tmux-sensible*: A set of "obviously correct" defaults that fill gaps without overriding anything set
+  explicitly. Covers utf-8, better key handling, =emacs= keybindings in the command prompt (which is what
+  you want even as a vim user; it means =C-a=/=C-e= work when typing tmux commands), and other small
+  sanity fixes.
+- *tmux-yank*: System clipboard integration for copy mode. When you yank text, it goes to the OS
+  clipboard. On Linux it uses =xclip= or =xsel= (make sure one is installed). On macOS it uses =pbcopy=.
+#+begin_src conf
+# Plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-yank'
+#+end_src
+
+*** Theme: Catppuccin
+:PROPERTIES:
+:ID:       f4cee6c3-5bfd-6fc4-eab1-3c9d4b0f2e6a
+:END:
+Catppuccin mocha provides a warm, dark color palette that pairs well with the carbonfox Neovim theme.
+=rounded= gives the window tabs rounded separators using Nerd Font characters. The status line is
+intentionally lean: nothing on the left, just the session name on the right.
+
+To add more modules later, append to =status-right= using =set -ag=:
+#+begin_example
+set -ag status-right "#{E:@catppuccin_status_directory}"
+set -ag status-right "#{E:@catppuccin_status_date_time}"
+#+end_example
+
+Available modules include: =application=, =session=, =directory=, =date_time=, =battery= (requires
+=tmux-battery= plugin), =cpu= (requires =tmux-cpu= plugin), =uptime=, and others.
+#+begin_src conf
+# Catppuccin theme
+set -g @plugin 'catppuccin/tmux#v2.1.3'
+set -g @catppuccin_flavor 'mocha'
+set -g @catppuccin_window_status_style 'rounded'
+
+# Status line modules
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+set -g status-right "#{E:@catppuccin_status_session}"
+#+end_src
+
+** Initialize TPM
+:PROPERTIES:
+:ID:       a5dff7d4-6cae-7ad5-fbc2-4d0e5c1a3f7b
+:END:
+This *must* be the last line in the config. It initializes TPM, which loads all plugins. Anything added
+after this line might not take effect.
+#+begin_src conf
+# Initialize TPM (KEEP THIS AT THE VERY BOTTOM)
+run '~/.config/tmux/plugins/tpm/tpm'
+#+end_src
+
+* Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       c7fbb9f6-8eca-9cf7-bde4-6f2a7e3c5b9d
+:END:
+To enable automatic tangling when this file is saved in Emacs, add the following to your Emacs
+configuration. This checks for the =#+auto_tangle: t= property and runs =org-babel-tangle= on save.
+If you already have this in your Emacs config from the i3 setup, you don't need to add it again.
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
