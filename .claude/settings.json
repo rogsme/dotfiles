@@ -12,6 +12,7 @@
       "Read(**/*.key)"
     ]
   },
+  "model": "opus[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -72,5 +73,7 @@
     "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
   },
   "skipDangerousModePermissionPrompt": true,
-  "model": "opus[1m]"
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": true
+  }
 }
