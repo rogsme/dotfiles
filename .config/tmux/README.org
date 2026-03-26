@@ -240,6 +240,9 @@ purely additive; all keyboard workflows still work. Useful when you're lazy or f
 #+begin_src conf
 # Mouse support
 set -g mouse on
+
+bind-key -T copy-mode-vi WheelUpPane send-keys -X -N 2 scroll-up
+bind-key -T copy-mode-vi WheelDownPane send-keys -X -N 2 scroll-down
 #+end_src
 
 *** Focus Events
