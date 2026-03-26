@@ -54,12 +54,12 @@ This produces =tmux.conf= in the same directory as this =README.org= file. Make 
 :END:
 Once the config is tangled and TPM is cloned:
 
-1. Start a new tmux session (or reload the config in an existing one with =C-Space r=).
-2. Press =C-Space I= (capital I). TPM will clone and install all plugins listed in the config.
+1. Start a new tmux session (or reload the config in an existing one with =C-b r=).
+2. Press =C-b I= (capital I). TPM will clone and install all plugins listed in the config.
 3. You should see a message confirming the installation. Press =Enter= to dismiss it.
 
-To update plugins later, press =C-Space U= (capital U). To remove plugins you've deleted from the
-config, press =C-Space alt-u=.
+To update plugins later, press =C-b U= (capital U). To remove plugins you've deleted from the
+config, press =C-b alt-u=.
 
 ** Getting Started
 :PROPERTIES:
@@ -88,14 +88,17 @@ For example, =C-b c= means: press =Ctrl+b=, release, then press =c=.
 :END:
 A typical session might look like this:
 
-1. Start tmux: =tmux new -s myproject=
-2. You're in window 1. Open a split: =C-b |= (vertical) or =C-b -= (horizontal).
-3. Navigate between panes: =C-b h/j/k/l=.
-4. Open a new window: =C-b c=. Now you have two tabs in the status bar.
-5. Switch between windows: =C-b 1=, =C-b 2=.
-6. Detach (leave everything running): =C-b d=.
-7. Come back later: =tmux attach -t myproject=. Everything is exactly where you left it.
-
+1. Start tmux: =tmux new -s icp=
+2. You're in window 1. Rename it: =C-b ,=, type "front", press Enter.
+3. Open a new window: =C-b c=. Rename it: =C-b ,=, type "back", press Enter.
+4. In the "back" window, open a split: =C-b |= (vertical) or =C-b -= (horizontal).
+5. Navigate between panes: =C-b h/j/k/l=.
+6. Switch between windows: =C-b 1=, =C-b 2=.
+7. Save your layout: =C-b Ctrl-s=. Now it survives reboots.
+8. Detach (leave everything running): =C-b d=.
+9. Come back later: =tmux attach -t icp=. Everything is where you left it.
+10. After a reboot: start tmux, press =C-b Ctrl-r= to restore your saved layout.
+11. See a URL in build output? =C-b u= to pick and open it in your browser.
 *** Quick Reference
 :PROPERTIES:
 :ID:       d5e7f9a1-b3c5-4d7e-8f9a-2b4c6d8e0f2a
@@ -109,11 +112,13 @@ Sessions:
   C-b d             Detach from session
   C-b $             Rename session
   C-b s             List sessions (built-in)
+  C-b Ctrl-s        Save session layout (resurrect)
+  C-b Ctrl-r        Restore saved layout (resurrect)
 
 Windows:
   C-b c             New window (in current dir)
-  C-b 1-9           Switch to window N
   C-b ,             Rename window
+  C-b 1-9           Switch to window N
   C-b &             Close window
   C-b n / p         Next / previous window (built-in)
 
@@ -132,8 +137,11 @@ Copy Mode:
   y                 Yank to system clipboard (in copy mode)
   q                 Exit copy mode
 
-Management:
+Utilities:
+  C-b u             Pick and open URLs from current pane (fzf-url)
   C-b r             Reload config
+
+Plugin Management:
   C-b I             Install plugins (TPM)
   C-b U             Update plugins (TPM)
 #+end_example
@@ -221,7 +229,7 @@ set -g history-limit 50000
 :ID:       b8ea0d27-9dbf-0be8-ac25-7e3f8d4b6a0c
 :END:
 By default, windows and panes are numbered starting at 0. On a keyboard, 0 is on the far right while 1
-is directly above the left hand. Starting at 1 makes =C-Space 1= reach the first window without
+is directly above the left hand. Starting at 1 makes =C-b 1= reach the first window without
 stretching. =renumber-windows= ensures that closing a middle window renumbers the rest sequentially (no
 gaps like [1, 3, 4]).
 #+begin_src conf
@@ -229,6 +237,10 @@ gaps like [1, 3, 4]).
 set -g base-index 1
 setw -g pane-base-index 1
 set -g renumber-windows on
+
+# Don't let tmux auto-rename windows after you've named them
+set -g allow-rename off
+setw -g automatic-rename off
 #+end_src
 
 *** Mouse Support
@@ -241,8 +253,8 @@ purely additive; all keyboard workflows still work. Useful when you're lazy or f
 # Mouse support
 set -g mouse on
 
-bind-key -T copy-mode-vi WheelUpPane send-keys -X -N 2 scroll-up
-bind-key -T copy-mode-vi WheelDownPane send-keys -X -N 2 scroll-down
+# Copy mouse selection to system clipboard automatically
+bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel
 #+end_src
 
 *** Focus Events
@@ -275,7 +287,7 @@ set -g detach-on-destroy off
 :END:
 The prefix key is how you tell tmux "the next keypress is a tmux command, not input for the terminal
 program." The default is =C-b=, and this config keeps it. While some people remap to =C-a= (from GNU
-screen) or =C-Space=, the default is fine and means one less thing to explain when pair programming or
+screen) or =C-b=, the default is fine and means one less thing to explain when pair programming or
 SSHing into a machine with a stock tmux.
 
 The =send-prefix= binding means pressing =C-b C-b= sends a literal =C-b= through to the underlying
@@ -350,7 +362,7 @@ bind l select-pane -R
 :ID:       f8ceb0c7-9bfd-0fc8-eac5-7c3d8b4f6e0a
 :END:
 Same directions as navigation but uppercase for resizing. The =-r= flag means "repeatable": after
-pressing =C-Space H= once, you can keep pressing =H= to keep resizing without hitting the prefix again
+pressing =C-b H= once, you can keep pressing =H= to keep resizing without hitting the prefix again
 (within a short timeout window). The =5= is cells per press; adjust if it feels too coarse or too fine.
 #+begin_src conf
 # Resize panes with prefix + H/J/K/L (repeatable)
@@ -364,7 +376,7 @@ bind -r L resize-pane -R 5
 :PROPERTIES:
 :ID:       a9dfb1d8-0cae-1ad9-fbd6-8d4e9c5a7f1b
 :END:
-Makes copy mode (entered with =C-Space [=) use vi-style navigation. Once in copy mode: =v= starts a
+Makes copy mode (entered with =C-b [=) use vi-style navigation. Once in copy mode: =v= starts a
 visual selection, =y= yanks it to the system clipboard (via the =tmux-yank= plugin). Without these
 bindings, you'd use Space to start selection and Enter to copy, which is less intuitive for vim users.
 #+begin_src conf
@@ -396,8 +408,8 @@ Plugins are managed by TPM (Tmux Plugin Manager). Install TPM first:
 git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 #+end_example
 
-After saving and tangling this file, open tmux and press =C-Space I= (capital I) to install all plugins.
-Press =C-Space U= (capital U) to update them later.
+After saving and tangling this file, open tmux and press =C-b I= (capital I) to install all plugins.
+Press =C-b U= (capital U) to update them later.
 
 *** Plugin Manager Path
 :PROPERTIES:
@@ -428,6 +440,61 @@ set -g @plugin 'tmux-plugins/tmux-sensible'
 set -g @plugin 'tmux-plugins/tmux-yank'
 #+end_src
 
+*** Smooth Scrolling
+:PROPERTIES:
+:ID:       a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d
+:END:
+The =tmux-smooth-scroll= plugin animates scroll events with easing, making scrolling inside tmux feel
+closer to native terminal scrolling (like Alacritty's). Without it, tmux scrolls in jarring 5-line jumps
+per wheel tick.
+
+Configuration is tuned to match Alacritty's =multiplier = 3= setting:
+- *speed*: Animation duration per scroll event (0-1000, lower = faster). 80 feels close to Alacritty.
+- *easing*: =sine= gives a natural deceleration curve. Also available: =linear=, =quad=.
+- *normal*: Lines per scroll tick. Set to 3 to match Alacritty's multiplier.
+- *mouse*: Enables smooth scrolling on mouse wheel events. This takes over wheel handling, so don't
+  add manual =WheelUpPane=/=WheelDownPane= bindings elsewhere in the config.
+
+#+begin_src conf
+# Smooth scrolling (tuned to match Alacritty multiplier = 3)
+set -g @plugin 'azorng/tmux-smooth-scroll'
+set -g @smooth-scroll-speed "80"
+set -g @smooth-scroll-easing "sine"
+set -g @smooth-scroll-normal "3"
+set -g @smooth-scroll-mouse "true"
+#+end_src
+*** Session Persistence
+:PROPERTIES:
+:ID:       b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d6e
+:END:
+=tmux-resurrect= saves your entire tmux environment (sessions, windows, panes, layout, working
+directories) and restores it after a reboot or tmux restart. No more rebuilding your "icp" session with
+"front" and "back" windows every time you reboot.
+
+- =C-b Ctrl-s=: Save the current environment.
+- =C-b Ctrl-r=: Restore the last saved environment.
+
+Note: it restores layout and directories, not running processes. After restoring, you'll be in the right
+directories but need to restart your dev servers, watchers, etc. Saves are stored in =~/.tmux/resurrect/=.
+#+begin_src conf
+# Session persistence (save: C-b Ctrl-s, restore: C-b Ctrl-r)
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+#+end_src
+
+*** URL Picker
+:PROPERTIES:
+:ID:       c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e7f
+:END:
+=tmux-fzf-url= scans the current pane for URLs and opens an fzf picker to select one. The selected URL
+opens in your default browser. Useful when looking at build output, git logs, or anything with links.
+
+Requires =fzf= to be installed (=pacman -S fzf= or =apt install fzf=).
+
+- =C-b u=: Open the URL picker for the current pane.
+#+begin_src conf
+# URL picker (C-b u to pick URLs from current pane)
+set -g @plugin 'wfxr/tmux-fzf-url'
+#+end_src
 *** Theme: Catppuccin
 :PROPERTIES:
 :ID:       f4cee6c3-5bfd-6fc4-eab1-3c9d4b0f2e6a
@@ -450,11 +517,20 @@ set -g @plugin 'catppuccin/tmux#v2.1.3'
 set -g @catppuccin_flavor 'mocha'
 set -g @catppuccin_window_status_style 'rounded'
 
+# Show window name (#W) instead of path for both active and inactive windows
+set -g @catppuccin_window_default_text "#W"
+set -g @catppuccin_window_current_text "#W"
+set -g @catppuccin_window_text "#W"
+
 # Status line modules
 set -g status-right-length 100
 set -g status-left-length 100
 set -g status-left ""
 set -g status-right "#{E:@catppuccin_status_session}"
+
+# Test
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'wfxr/tmux-fzf-url'
 #+end_src
 
 ** Initialize TPM
