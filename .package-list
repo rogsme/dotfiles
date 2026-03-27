@@ -58,6 +58,7 @@ exo
 eza
 f2fs-tools
 fakeroot
+fd
 feishin-git
 ferdium-bin
 ffmpeg
@@ -135,6 +136,7 @@ linux612
 logiops
 logrotate
 lolcat
+lsof
 lvm2
 lxappearance
 make
@@ -175,6 +177,7 @@ mupdf
 mupdf-tools
 nano
 nano-syntax-highlighting
+neovim
 network-manager-applet
 networkmanager
 networkmanager-openconnect
@@ -190,6 +193,8 @@ nss-mdns
 ntfs-3g
 ntp
 numlockx
+nvtop
+openresolv
 openssh
 os-prober
 pamac-gtk3
@@ -238,9 +243,12 @@ thunar-archive-plugin
 thunar-media-tags-plugin
 thunar-volman
 thunderbird
+tigervnc
 timeshift
 timeshift-autosnap-manjaro
+tmux
 tree
+tree-sitter-cli
 ttf-dejavu
 ttf-droid
 ttf-font-awesome-4
