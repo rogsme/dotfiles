@@ -1,45 +1,5 @@
 # Defaults: https://github.com/Aider-AI/aider/blob/32faf82b31c54d6f19c5c3d63bc294f748bd3e72/aider/resources/model-settings.yml
 
-# Claude Sonnet 4 — mirrors upstream settings
-- name: openai/anthropic/claude-sonnet-4-20250514
-  edit_format: diff
-  weak_model_name: openai/anthropic/claude-3-5-haiku-20241022
-  use_repo_map: true
-  extra_params:
-    extra_headers:
-      anthropic-beta: "prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19"
-    max_tokens: 64000
-  cache_control: true
-  editor_model_name: openai/anthropic/claude-sonnet-4-20250514
-  editor_edit_format: editor-diff
-  accepts_settings:
-    - thinking_tokens
-
-# Claude Sonnet 4.5 — mirrors upstream settings
-- name: openai/anthropic/claude-sonnet-4-5
-  edit_format: diff
-  weak_model_name: openai/anthropic/claude-3-5-haiku-20241022
-  use_repo_map: true
-  extra_params:
-    extra_headers:
-      anthropic-beta: "prompt-caching-2024-07-31,pdfs-2024-09-25,output-128k-2025-02-19"
-    max_tokens: 64000
-  cache_control: true
-  editor_model_name: openai/anthropic/claude-sonnet-4-5
-  editor_edit_format: editor-diff
-  accepts_settings:
-    - thinking_tokens
-
-# Claude 3.5 Haiku — mirrors upstream settings
-- name: openai/anthropic/claude-3-5-haiku-20241022
-  edit_format: diff
-  weak_model_name: anthropic/claude-3-5-haiku-20241022
-  use_repo_map: true
-  extra_params:
-    extra_headers:
-      anthropic-beta: prompt-caching-2024-07-31,pdfs-2024-09-25
-  cache_control: true
-
 # Gemini 3 Flash — mirrors upstream settings
 - name: openai/gemini/gemini-3-flash-preview
   edit_format: diff-fenced
@@ -62,3 +22,59 @@
   weak_model_name: openai/gemini/gemini-2.0-flash
   accepts_settings:
     - reasoning_effort
+
+# Gemini 3.1 Pro Preview — mirrors upstream Gemini 3 Pro settings
+- name: openai/gemini/gemini-3.1-pro-preview
+  overeager: true
+  edit_format: diff-fenced
+  use_repo_map: true
+  weak_model_name: openai/gemini/gemini-2.5-flash
+  use_temperature: false
+  accepts_settings:
+    - thinking_tokens
+
+# OpenAI GPT-5.3 Codex
+- name: openai/openai/gpt-5.3-codex
+  edit_format: diff
+  use_repo_map: true
+  use_temperature: false
+  accepts_settings:
+    - reasoning_effort
+
+# OpenAI GPT-5.4
+- name: openai/openai/gpt-5.4
+  edit_format: diff
+  use_repo_map: true
+  use_temperature: false
+  accepts_settings:
+    - reasoning_effort
+
+# DeepInfra Qwen3 235B
+- name: openai/deepinfra/Qwen/Qwen3-235B-A22B-Instruct-2507
+  edit_format: diff
+  use_repo_map: true
+
+# DeepInfra Qwen3 Coder 480B
+- name: openai/deepinfra/Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo
+  edit_format: diff
+  use_repo_map: true
+
+# DeepInfra Kimi K2.5
+- name: openai/deepinfra/moonshotai/Kimi-K2.5
+  edit_format: diff
+  use_repo_map: true
+
+# DeepInfra MiniMax M2.5
+- name: openai/deepinfra/MiniMaxAI/MiniMax-M2.5
+  edit_format: diff
+  use_repo_map: true
+
+# DeepInfra GPT-OSS 120B Turbo
+- name: openai/deepinfra/openai/gpt-oss-120b-Turbo
+  edit_format: diff
+  use_repo_map: true
+
+# DeepInfra GLM-5
+- name: openai/deepinfra/zai-org/GLM-5
+  edit_format: diff
+  use_repo_map: true
