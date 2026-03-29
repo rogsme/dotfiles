@@ -120,6 +120,72 @@ NTFY_URL="my-ntfy-url"     # Your ntfy topic URL
 NTFY_TOKEN="my-ntfy-token" # Your ntfy auth token
 #+end_src
 
+* Skills
+:PROPERTIES:
+:ID:       d5e6f708-9102-3456-ef01-345678901234
+:END:
+Global skills live in =~/.claude/skills/<name>/SKILL.md= and are available across all projects. They
+replace per-project command files by reading project-specific configuration at runtime.
+
+** Simple Skills (read commands from CLAUDE.md)
+
+These follow a generic "run tool → fix errors → repeat → commit" loop. They discover the correct
+command by parsing the =## Commands= section of each project's =CLAUDE.md=.
+
+| Skill        | When to use                                                                   |
+|--------------+-------------------------------------------------------------------------------|
+| =/lint=      | Fix all lint errors/warnings, pass linting before commit/PR, CI lint failures |
+| =/test=      | Fix failing tests, get the suite green, resolve CI test failures              |
+| =/typecheck= | Fix type errors, pass type checking before commit/PR, CI type failures        |
+
+** Complex Skills (read config from =.claude/skills.md=)
+
+These orchestrate multi-phase workflows with parallel sub-agents. They read project-specific
+configuration (scope groups, doc maps, exceptions, commands) from a per-project =.claude/skills.md=
+file on-demand when invoked — keeping =CLAUDE.md= lean.
+
+| Skill                   | When to use                                                             |
+|-------------------------+-------------------------------------------------------------------------|
+| =/generate-conventions= | Create/update CONVENTIONS.md, document coding standards for the team    |
+| =/review-conventions=   | Check code against conventions, enforce standards before PR/merge       |
+| =/update-docs=          | Sync docs with codebase after changes, refresh stale READMEs            |
+| =/audit-tests=          | Check test suite health, find orphaned/bad tests, clean up structure    |
+| =/fill-test-gaps=       | Increase coverage, write missing tests, coverage-driven test generation |
+
+** Pre-installed Skills
+
+| Skill              | Purpose                                              |
+|--------------------+------------------------------------------------------|
+| =/find-docs=       | Retrieve up-to-date library docs via Context7 CLI    |
+| =/playwright-cli=  | Browser automation for web testing and data extraction|
+
+** Per-Project Config (=.claude/skills.md=)
+
+Complex skills require a =.claude/skills.md= file in each project. Each section is named after the
+skill it configures (e.g., =## Review Conventions=, =## Audit Tests=). The file is only read when a
+skill that needs it is invoked.
+
+Example structure:
+
+#+begin_src markdown
+# Skill Config
+
+## Review Conventions
+### Scope Groups
+- services: `src/services/**/*.py`
+- routes: `src/routes/**/*.py`
+### Verification Command
+uv run ruff check . --fix && uv run mypy src
+
+## Audit Tests
+### Test Structure
+mirrored (src/tests/<dir>/test_<file>.py)
+### Known Exceptions
+- `src/schemas/` — Pydantic models, no tests needed
+### Verification Command
+uv run pytest src/tests/ -v --co -q
+#+end_src
+
 * Remote Workflow Overview
 :PROPERTIES:
 :ID:       c4d5e6f7-8091-0123-def0-234567890123
