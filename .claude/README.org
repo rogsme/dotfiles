@@ -186,6 +186,38 @@ mirrored (src/tests/<dir>/test_<file>.py)
 uv run pytest src/tests/ -v --co -q
 #+end_src
 
+* Get Shit Done (GSD)
+:PROPERTIES:
+:ID:       e6f70819-0234-5678-f012-456789012345
+:END:
+[[https://github.com/gsd-build/get-shit-done][GSD]] is a workflow orchestration layer for Claude Code that adds structured project management —
+roadmaps, phased execution, parallel agents, verification, and more.
+
+** Installation
+
+#+begin_src bash
+npx get-shit-done-cc@latest
+#+end_src
+
+Select *Claude Code* as the runtime and *global* for the installation scope. Verify with =/gsd:help=.
+
+** How It Fits Here
+
+GSD installs itself into =~/.claude/get-shit-done/=, which gets *wiped on every update*. Never treat
+files inside it as permanent. Custom patches are backed up to =~/.claude/gsd-patch-backups/= and
+documented in =~/.claude/gsd-customizations.md=. See =~/.claude/CLAUDE.md= for the full patching
+workflow.
+
+** Current Patches
+
+| Patched file     | What changed                                                      |
+|------------------+-------------------------------------------------------------------|
+| =review.md=      | 6-model adversarial review (5 OpenCode models + Claude Opus)      |
+| =ui-review.md=   | Cross-AI UI perspectives, score comparison, severity-based routing |
+| =verify-work.md= | =--auto= flag for playwright/curl automated testing before UAT    |
+
+After a =/gsd:update=, run =/gsd:reapply-patches= or restore manually from =gsd-patch-backups/=.
+
 * Remote Workflow Overview
 :PROPERTIES:
 :ID:       c4d5e6f7-8091-0123-def0-234567890123
