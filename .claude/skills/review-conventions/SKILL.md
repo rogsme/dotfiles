@@ -61,11 +61,11 @@ Group the in-scope files by the scope groups defined in `.claude/skills.md`. Dis
 
 ### Phase 1: Parallel Convention Review
 
-Launch one **general-purpose sub-agent per non-empty scope group simultaneously in the background** using `run_in_background: true`. Each agent receives:
+Launch one **general-purpose agent per non-empty scope group simultaneously** using `mode: "bypassPermissions"` and `model: "sonnet"`. Each agent receives:
 1. The exact list of files it must check (only the in-scope files in its scope group)
 2. Instructions to **read `CONVENTIONS.md` first** as the source of truth for all conventions
 3. If the config specifies convention sections per scope, tell the agent which sections to focus on
-4. The **full agent workflow** (Steps 1-5 below, copied verbatim into the agent prompt)
+4. The **agent workflow** (Steps 1-5 below, summarized in the agent prompt)
 
 **File conflict rules** (critical for parallel safety):
 - Each agent owns its files exclusively — verify no overlap before dispatching
@@ -75,7 +75,7 @@ Launch one **general-purpose sub-agent per non-empty scope group simultaneously 
 
 ### Phase 2: Final Verification
 
-After all background agents complete, run the **verification command** from `.claude/skills.md` to catch any cross-scope issues. If failures remain, fix them and create a single commit: `style: fix remaining convention issues`. Do NOT push.
+After all agents complete, run the **verification command** from `.claude/skills.md` to catch any cross-scope issues. If failures remain, fix them and create a single commit: `style: fix remaining convention issues`. Do NOT push.
 
 ### Phase 3: Report
 

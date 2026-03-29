@@ -45,12 +45,12 @@ Match `$ARGUMENTS` against the scope aliases from `.claude/skills.md`:
 
 ## Execution
 
-Launch **parallel sub-agents** based on the selected scope. One agent per documentation group (or one agent for a single file).
+Launch **parallel general-purpose agents** based on the selected scope, using `mode: "bypassPermissions"` and `model: "sonnet"`. One agent per documentation group (or one agent for a single file).
 
 ### Agent Workflow
 
 Each agent prompt MUST include:
-- The full text of this agent workflow
+- The agent workflow steps (summarized below)
 - The specific doc file(s) to update
 - The specific source code file paths to read (from the Documentation Map)
 - "Preserve the existing document structure, tone, and style. Only change what needs updating."

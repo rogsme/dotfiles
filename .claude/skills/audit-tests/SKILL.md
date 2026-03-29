@@ -59,7 +59,7 @@ If scope groups are defined in config, group files accordingly. Otherwise, group
 Launch **one Explore sub-agent per scope group** (or per test directory) in parallel. Each agent audits source files and their corresponding test files. Each sub-agent runs ALL audits below and reports findings (no fixes yet).
 
 Each sub-agent prompt MUST include:
-- The full anti-patterns section from `TEST_PATTERNS.md` (copy verbatim)
+- Instructions to read `TEST_PATTERNS.md` as the first step for anti-pattern definitions
 - The known exceptions list from config
 - The test structure pattern (colocated vs mirrored) so it knows where to look for test files
 
@@ -103,7 +103,7 @@ Check against the anti-patterns defined in `TEST_PATTERNS.md`:
 
 ## Phase 2: Fix Orphaned and Misnamed Files
 
-After all sub-agents complete, review reports. For fixable issues, launch **general-purpose sub-agents**:
+After all sub-agents complete, review reports. For fixable issues, launch **general-purpose agents** using `mode: "bypassPermissions"`:
 
 ### Fixable (apply changes):
 - **Orphaned test files** (Audit 2): Merge contents into correct test file, delete orphan via `git rm`

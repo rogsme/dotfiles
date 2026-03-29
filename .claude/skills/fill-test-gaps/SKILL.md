@@ -112,12 +112,12 @@ Determine agents to dispatch (minimum 3, max 6). Each batch must be fully indepe
 - If a fixture is needed but doesn't exist, define it locally within the test file
 - Each agent owns its test files exclusively
 
-Dispatch all agents **simultaneously in the background**. Each agent receives:
+Dispatch all agents **simultaneously** using `mode: "bypassPermissions"`. Each agent receives:
 1. Specific uncovered functions and branches (from coverage data)
 2. Exact list of files allowed to create/modify
 3. Whether each test file is new or an extension
 4. Conventions summary from Phase 1
-5. **Full contents of `TEST_PATTERNS.md`** (copy verbatim)
+5. Instructions to read `TEST_PATTERNS.md` before writing any tests
 
 Each agent MUST follow this workflow:
 
@@ -158,7 +158,7 @@ Each agent MUST follow this workflow:
 
 ## Phase 4: Fixture Consolidation
 
-After all agents complete, dispatch a **general-purpose agent in foreground**:
+After all agents complete, dispatch a **general-purpose agent** using `mode: "bypassPermissions"` and `model: "sonnet"`:
 1. Scan ALL test files for locally defined fixtures/helpers/mocks
 2. Identify duplicates across 2+ files or broadly useful utilities
 3. Promote to shared location
