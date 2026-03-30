@@ -208,49 +208,47 @@ Write to temp file: `/tmp/gsd-ui-review-prompt-{phase}.md`
 
 ### 4d. Invoke reviewers
 
-For each selected reviewer, invoke in sequence:
+Invoke all selected reviewers in parallel using separate Bash tool calls in a single message.
 
-**GPT-5.4 (via OpenCode):**
-```bash
-opencode run -m lazer/openai/gpt-5.4 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-gpt-5.4-{phase}.md
-```
+IMPORTANT: Do NOT use `2>/dev/null` on opencode or claude commands — suppressing stderr
+causes opencode to hang indefinitely. Stderr output is harmless and gets discarded by the
+stdout redirect.
 
-**Gemini 3.1 Pro (via OpenCode):**
-```bash
-opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-gemini-pro-{phase}.md
-```
+IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > file` only.
 
-**MiniMax M2.5 (via OpenCode):**
-```bash
-opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
-```
+**All reviewers run in parallel** — use one Bash tool call per reviewer, all in the same message:
 
-**Kimi K2.5 (via OpenCode):**
 ```bash
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
-```
+# GPT-5.4
+opencode run -m lazer/openai/gpt-5.4 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gpt-5.4-{phase}.md
 
-**GLM-5 (via OpenCode):**
-```bash
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-glm-5-{phase}.md
-```
+# Gemini 3.1 Pro
+opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gemini-pro-{phase}.md
 
-**Claude Opus (separate session):**
-```bash
-claude -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" --no-input 2>/dev/null > /tmp/gsd-ui-review-claude-{phase}.md
+# MiniMax M2.5
+opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-minimax-{phase}.md
+
+# Kimi K2.5
+opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
+
+# GLM-5
+opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
+
+# Claude Opus
+claude -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
 ```
 
 If a reviewer fails, log the error and continue with remaining reviewers.
+After all complete, check each output file has content (> 0 lines). Report status:
 
-Display progress:
 ```
 ◆ Cross-AI UI perspectives...
-  ◆ GPT-5.4...                    done ✓
-  ◆ Gemini 3.1 Pro...             done ✓
-  ◆ MiniMax M2.5...               done ✓
-  ◆ Kimi K2.5...                  done ✓
-  ◆ GLM-5...                      done ✓
-  ◆ Claude Opus...                done ✓
+  ◆ GPT-5.4...                    done ✓ (N lines)
+  ◆ Gemini 3.1 Pro...             done ✓ (N lines)
+  ◆ MiniMax M2.5...               done ✓ (N lines)
+  ◆ Kimi K2.5...                  done ✓ (N lines)
+  ◆ GLM-5...                      done ✓ (N lines)
+  ◆ Claude Opus...                done ✓ (N lines)
 ```
 
 ### 4e. Append cross-AI section to UI-REVIEW.md

@@ -7,6 +7,37 @@ recreated if needed.
 
 ---
 
+## 2026-03-30 — Fix opencode hangs (remove 2>/dev/null), run reviewers in parallel
+
+**GSD version:** 1.30.0
+**Files modified:** `get-shit-done/workflows/review.md`, `get-shit-done/workflows/ui-review.md`
+
+### What changed
+
+- **Both `review.md` and `ui-review.md`:**
+  - Removed `2>/dev/null` from all `opencode run` and `claude -p` invocation commands
+  - Removed `--no-input` flag from `claude -p` (not a valid flag)
+  - Changed reviewer invocation from **sequential** to **parallel** (all 6 reviewers run
+    simultaneously via separate Bash tool calls in a single message)
+  - Updated progress display to show line counts per reviewer
+  - Added IMPORTANT comments warning against `2>/dev/null` and `--no-input`
+
+### Why
+
+Suppressing stderr with `2>/dev/null` caused `opencode run` to hang indefinitely — opencode
+needs stderr for progress output and/or terminal detection. Removing the redirect fixed the
+hangs immediately. With the reliability fix in place, reviewers can now safely run in parallel,
+reducing total review time from ~6 minutes (sequential) to ~1-2 minutes (parallel).
+
+The `--no-input` flag was also invalid for `claude -p` and caused the Claude reviewer to fail
+silently (exit code 1, empty output).
+
+Note: The `2>/dev/null` on non-opencode commands (e.g., `ls ... 2>/dev/null`, `node ... 2>/dev/null`,
+`git log ... 2>/dev/null`) is fine and was left unchanged — only the `opencode run` and `claude -p`
+redirects cause hangs.
+
+---
+
 ## 2026-03-28 — Replace GPT-5.3 Codex with GPT-5.4, add GLM-5 reviewer, sync command files
 
 **GSD version:** 1.30.0
