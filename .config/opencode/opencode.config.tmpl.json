@@ -14,16 +14,9 @@
   "tools": {
     "webfetch": true
   },
-  "mcp": {
-    "pal-mcp": {
-      "type": "local",
-      "command": [
-        "/home/roger/.config/opencode/pal-mcp-server/.pal_venv/bin/python",
-        "/home/roger/.config/opencode/pal-mcp-server/server.py"
-      ],
-      "enabled": true
-    }
-  },
+  "instructions": [
+    "~/.config/opencode/plugin/shell-strategy/shell_strategy.md"
+  ],
   "provider": {
     "lazer": {
       "npm": "@ai-sdk/openai-compatible",
@@ -58,5 +51,11 @@
     "app_exit": "ctrl+c,<leader>q",
     "editor_open": "<leader>e",
     "theme_list": "<leader>t"
-  }
+  },
+  "plugin": [
+    "@tarquinen/opencode-dcp@latest",
+    "opentmux",
+    "opencode-snip@latest",
+    "@franlol/opencode-md-table-formatter@latest"
+  ]
 }
