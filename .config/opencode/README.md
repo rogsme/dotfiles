@@ -23,7 +23,6 @@ The top-level config here defines:
 | `dcp.jsonc` | Dynamic Context Pruning plugin config |
 | `agents/` | Custom OpenCode agents |
 | `instructions/` | Local instruction content |
-| `pal-mcp-server/` | Separate MCP server project used alongside OpenCode |
 
 ## Main Config
 
