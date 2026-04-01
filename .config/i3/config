@@ -11,7 +11,7 @@ set $aux Mod1
 
 font pango:DejaVu Sans Mono
 
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
+exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/.config/i3/scripts/locker.sh
 
 exec --no-startup-id nm-applet
 
@@ -179,7 +179,7 @@ bindsym $mod+Shift+r restart
 
 set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_power" {
-    bindsym l exec --no-startup-id i3lock-fancy -p, mode "default"
+    bindsym l exec --no-startup-id ~/.config/i3/scripts/locker.sh, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
     bindsym s exec --no-startup-id systemctl suspend, mode "default"
     bindsym h exec --no-startup-id systemctl hibernate, mode "default"
@@ -309,12 +309,12 @@ exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec --no-startup-id xfsettingsd --replace
-exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
+exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY
 exec_always /usr/bin/handy --start-hidden
 
 # Small scripts
-# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
-exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh &
+# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh
+exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard

@@ -64,7 +64,7 @@ This section configures integration with system services and utilities.
   The =sleep 2= might be necessary to wait for monitors to be fully detected. A keybinding
   (=$mod+Shift+x=) is also set to manually trigger a display profile change.
 #+begin_src conf
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock-fancy -p
+exec --no-startup-id xss-lock --transfer-sleep-lock -- ~/.config/i3/scripts/locker.sh
 
 exec --no-startup-id nm-applet
 
@@ -346,7 +346,7 @@ bindsym $mod+Shift+r restart
 
 set $mode_power System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_power" {
-    bindsym l exec --no-startup-id i3lock-fancy -p, mode "default"
+    bindsym l exec --no-startup-id ~/.config/i3/scripts/locker.sh, mode "default"
     bindsym e exec --no-startup-id i3-msg exit, mode "default"
     bindsym s exec --no-startup-id systemctl suspend, mode "default"
     bindsym h exec --no-startup-id systemctl hibernate, mode "default"
@@ -577,7 +577,7 @@ exec --no-startup-id xinput set-prop 14 345 1
 exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec --no-startup-id xfsettingsd --replace
-exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY &
+exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY
 exec_always /usr/bin/handy --start-hidden
 #+end_src
 
@@ -591,8 +591,8 @@ Execution of custom scripts and miscellaneous bindings.
   copies it to the clipboard using =xclip=, and sends a notification.
 #+begin_src conf
 # Small scripts
-# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh &
-exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh &
+# exec --no-startup-id ~/.config/i3/scripts/internet_check.sh
+exec --no-startup-id ~/.config/i3/scripts/weather_notify.sh
 
 # Random scripts
 ## Generate a random password and copy it to the clipboard
