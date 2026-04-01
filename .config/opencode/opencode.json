@@ -15,7 +15,7 @@
     "webfetch": true
   },
   "instructions": [
-    "~/.config/opencode/plugin/shell-strategy/shell_strategy.md"
+    "~/.config/opencode/instructions/shell-strategy/shell_strategy.md"
   ],
   "provider": {
     "lazer": {
