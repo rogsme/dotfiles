@@ -12,6 +12,7 @@ set -euo pipefail
 REPO_URL="https://git.rogs.me/rogs/dotfiles"
 GIT_DIR="$HOME/.cfg"
 WORK_TREE="$HOME"
+OS="$(uname -s)" # "Darwin" on macOS, "Linux" on Linux
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,6 +34,11 @@ log_error() {
 
 # Detect distribution
 detect_distro() {
+    if [ "$OS" = "Darwin" ]; then
+        echo "macos"
+        return
+    fi
+
     if [ -f /etc/os-release ]; then
         . /etc/os-release
         case "$ID" in
@@ -92,6 +98,26 @@ install_packages() {
                 log_warn ".debian-package-list not found, skipping apt packages"
             fi
             ;;
+
+        macos)
+            if ! command -v brew &> /dev/null; then
+                log_info "Installing Homebrew..."
+                /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+                # Add brew to PATH for this session
+                if [ -f /opt/homebrew/bin/brew ]; then
+                    eval "$(/opt/homebrew/bin/brew shellenv)"
+                else
+                    eval "$(/usr/local/bin/brew shellenv)"
+                fi
+            fi
+
+            log_info "Installing packages from .Brewfile..."
+            if [ -f "$HOME/.Brewfile" ]; then
+                brew bundle --file="$HOME/.Brewfile"
+            else
+                log_warn ".Brewfile not found, skipping brew packages"
+            fi
+            ;;
     esac
 }
 
@@ -101,6 +127,15 @@ setup_fish() {
 
     # Change default shell to fish
     if [ "$SHELL" != "$(which fish)" ]; then
+        # On macOS, fish must be in /etc/shells before chsh will accept it
+        if [ "$OS" = "Darwin" ]; then
+            local fish_path
+            fish_path="$(which fish)"
+            if ! grep -qx "$fish_path" /etc/shells; then
+                log_info "Adding $fish_path to /etc/shells..."
+                echo "$fish_path" | sudo tee -a /etc/shells > /dev/null
+            fi
+        fi
         log_info "Changing default shell to fish..."
         chsh -s $(which fish)
         log_info "Default shell changed. Please log out and log back in for changes to take effect."
@@ -211,16 +246,29 @@ setup_syncthing() {
         return 1
     fi
 
-    log_info "Enabling and starting Syncthing service for user $USER..."
-    sudo systemctl enable syncthing@$USER.service
-    sudo systemctl start syncthing@$USER.service
+    if [ "$OS" = "Darwin" ]; then
+        log_info "Starting Syncthing via Homebrew services..."
+        brew services start syncthing
 
-    if sudo systemctl is-active --quiet syncthing@$USER.service; then
-        log_info "Syncthing service is running"
-        log_info "Web UI available at: http://127.0.0.1:8384"
+        if brew services list | grep syncthing | grep -q started; then
+            log_info "Syncthing service is running"
+            log_info "Web UI available at: http://127.0.0.1:8384"
+        else
+            log_error "Failed to start Syncthing service"
+            return 1
+        fi
     else
-        log_error "Failed to start Syncthing service"
-        return 1
+        log_info "Enabling and starting Syncthing service for user $USER..."
+        sudo systemctl enable syncthing@$USER.service
+        sudo systemctl start syncthing@$USER.service
+
+        if sudo systemctl is-active --quiet syncthing@$USER.service; then
+            log_info "Syncthing service is running"
+            log_info "Web UI available at: http://127.0.0.1:8384"
+        else
+            log_error "Failed to start Syncthing service"
+            return 1
+        fi
     fi
 
     log_info "Syncthing setup complete"
@@ -229,6 +277,12 @@ setup_syncthing() {
 # Setup logid (Logitech device configuration daemon)
 setup_logid() {
     log_info "Setting up logid for Logitech devices..."
+
+    if [ "$OS" = "Darwin" ]; then
+        log_info "logid/logiops is not supported on macOS."
+        log_info "Use Logitech Options+ for Logitech device configuration on macOS."
+        return 0
+    fi
 
     if ! command -v logid &> /dev/null; then
         log_warn "logid is not installed. Skipping logid setup."
@@ -377,43 +431,63 @@ verify_installations() {
     fi
 
     # Check Nerd Fonts
-    if fc-list 2>/dev/null | grep -i "nerd font" &> /dev/null; then
-        log_info "✓ Nerd Fonts installed"
+    if [ "$OS" = "Darwin" ]; then
+        if ls "$HOME/Library/Fonts" 2>/dev/null | grep -qi "meslo"; then
+            log_info "✓ Nerd Fonts installed"
+        else
+            log_warn "✗ Nerd Fonts not detected"
+            all_good=false
+        fi
     else
-        log_warn "✗ Nerd Fonts not detected"
-        all_good=false
+        if fc-list 2>/dev/null | grep -i "nerd font" &> /dev/null; then
+            log_info "✓ Nerd Fonts installed"
+        else
+            log_warn "✗ Nerd Fonts not detected"
+            all_good=false
+        fi
     fi
 
     # Check Syncthing
     if command -v syncthing &> /dev/null; then
         log_info "✓ Syncthing: $(syncthing --version | head -1)"
-        if sudo systemctl is-active --quiet syncthing@$USER.service; then
-            log_info "✓ Syncthing service is running"
+        if [ "$OS" = "Darwin" ]; then
+            if brew services list 2>/dev/null | grep syncthing | grep -q started; then
+                log_info "✓ Syncthing service is running"
+            else
+                log_warn "✗ Syncthing service is not running"
+                all_good=false
+            fi
         else
-            log_warn "✗ Syncthing service is not running"
-            all_good=false
+            if sudo systemctl is-active --quiet syncthing@$USER.service; then
+                log_info "✓ Syncthing service is running"
+            else
+                log_warn "✗ Syncthing service is not running"
+                all_good=false
+            fi
         fi
     else
         log_warn "✗ Syncthing not found"
         all_good=false
     fi
 
-    # Check logid
-    if command -v logid &> /dev/null; then
-        log_info "✓ logid installed"
-        if [ -f "$HOME/.config/logid.cfg" ]; then
-            log_info "✓ logid configuration found"
-            if sudo systemctl is-active --quiet logid.service; then
-                log_info "✓ logid service is running"
+    # Check logid (Linux only)
+    if [ "$OS" != "Darwin" ]; then
+        if command -v logid &> /dev/null; then
+            log_info "✓ logid installed"
+            if [ -f "$HOME/.config/logid.cfg" ]; then
+                log_info "✓ logid configuration found"
+                if sudo systemctl is-active --quiet logid.service; then
+                    log_info "✓ logid service is running"
+                else
+                    log_warn "✗ logid service is not running"
+                    all_good=false
+                fi
             else
-                log_warn "✗ logid service is not running"
-                all_good=false
+                log_warn "✗ logid configuration not found"
             fi
         else
-            log_warn "✗ logid configuration not found"
+            log_warn "✗ logid not found"
         fi
-    else
-        log_warn "✗ logid not found"
     fi
 
     echo
@@ -476,6 +550,9 @@ main() {
     log_info "  2. Run 'tide configure' to customize your prompt"
     log_info "  3. Use the 'config' command to manage your dotfiles"
     log_info "  4. Configure Syncthing by visiting http://127.0.0.1:8384"
+    if [ "$OS" = "Darwin" ]; then
+        log_info "  5. Install Logitech Options+ for Logitech device configuration"
+    fi
 }
 
 # Run main installation
