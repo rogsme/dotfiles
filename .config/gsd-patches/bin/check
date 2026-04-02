@@ -63,15 +63,12 @@ case "$MODE" in
   all)
     check_claude
     check_opencode
-    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
     ;;
   claude)
     check_claude
-    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
     ;;
   opencode)
     check_opencode
-    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
     ;;
   *)
     printf 'Usage: %s [all|claude|opencode]\n' "$0" >&2

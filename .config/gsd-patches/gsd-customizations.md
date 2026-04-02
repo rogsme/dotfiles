@@ -181,31 +181,22 @@ in the loop for things that need human judgment.
 
 ---
 
-## Backups
+## Canonical storage
 
-Full copies of patched files are stored in `~/.claude/gsd-patch-backups/`. This directory
-is outside `get-shit-done/` so it survives updates. After a `/gsd:update`, restore with:
+All patch source files now live under `~/.config/gsd-patches/` and are synchronized to runtime installs.
+
+After a `/gsd:update`, re-apply canonical patches with:
 
 ```bash
-cp ~/.claude/gsd-patch-backups/review.md ~/.claude/get-shit-done/workflows/review.md
-cp ~/.claude/gsd-patch-backups/ui-review.md ~/.claude/get-shit-done/workflows/ui-review.md
-cp ~/.claude/gsd-patch-backups/verify-work.md ~/.claude/get-shit-done/workflows/verify-work.md
-cp ~/.claude/gsd-patch-backups/commands-gsd-review.md ~/.claude/commands/gsd/review.md
-cp ~/.claude/gsd-patch-backups/commands-gsd-verify-work.md ~/.claude/commands/gsd/verify-work.md
+~/.config/gsd-patches/bin/sync all
+~/.config/gsd-patches/bin/check all
 ```
 
-**Current backups (2026-03-28, GSD 1.30.0):**
-- `gsd-patch-backups/review.md` — workflow
-- `gsd-patch-backups/ui-review.md` — workflow
-- `gsd-patch-backups/verify-work.md` — workflow
-- `gsd-patch-backups/commands-gsd-review.md` — command
-- `gsd-patch-backups/commands-gsd-verify-work.md` — command
-
-When making new patches, copy the updated file to `gsd-patch-backups/` and update this list.
+Legacy `~/.claude/gsd-patch-backups/` files were retired in favor of the canonical directory.
 
 ## Notes
 
 - All patches use `opencode run -m <model> "<prompt>"` syntax for OpenCode invocation
 - The 5 OpenCode models can be updated by editing the model strings in review.md and ui-review.md
 - playwright-cli install: `npm install -g @playwright/cli@latest && playwright-cli install --skills`
-- After a `/gsd:update`, first try `/gsd:reapply-patches`. If that fails, restore from `~/.claude/gsd-patch-backups/` using the commands above
+- After a `/gsd:update`, runtime-native reapply commands are optional fallback (`/gsd:reapply-patches`, `/gsd-reapply-patches`), then run canonical sync/check commands above

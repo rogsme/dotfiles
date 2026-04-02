@@ -28,23 +28,16 @@ sync_opencode() {
   copy_file "$ROOT/opencode/command/gsd-verify-work.md" "$HOME/.config/opencode/command/gsd-verify-work.md"
 }
 
-mirror_changelog() {
-  copy_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
-}
-
 case "$MODE" in
   all)
     sync_claude
     sync_opencode
-    mirror_changelog
     ;;
   claude)
     sync_claude
-    mirror_changelog
     ;;
   opencode)
     sync_opencode
-    mirror_changelog
     ;;
   *)
     printf 'Usage: %s [all|claude|opencode]\n' "$0" >&2
