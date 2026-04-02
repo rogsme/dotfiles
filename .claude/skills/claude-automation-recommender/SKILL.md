@@ -208,7 +208,7 @@ disable-model-invocation: true  # for user-only
 
 **Want more?** Ask for additional recommendations for any specific category (e.g., "show me more MCP server options" or "what other hooks would help?").
 
-**Want help implementing any of these?** Just ask and I can help you set up any of the recommendations above.
+**Want help implementing any of these?** Ask to implement any of the recommendations above.
 ```
 
 ## Decision Framework

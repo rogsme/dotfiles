@@ -5,7 +5,7 @@ description: >-
   "open a PR to main", "submit a PR", "make a pull request to X", "PR to X branch",
   or any variation of creating a pull request targeting a specific branch. Also triggers
   on "/create-pr".
-argument_hint: "<target-branch>"
+argument-hint: "<target-branch>"
 ---
 
 # Create Pull Request

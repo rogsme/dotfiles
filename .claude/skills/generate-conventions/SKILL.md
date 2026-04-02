@@ -26,7 +26,7 @@ Before starting analysis, check if the output path already exists:
 1. Try to read the file at the output path.
 2. If the file **exists**, switch to **update mode**:
    - Read the entire existing file and keep its contents available for Phase 2.
-   - In Phase 2, you will merge new findings INTO the existing document rather than generating from scratch.
+   - In Phase 2, merge new findings INTO the existing document rather than generating from scratch.
 3. If the file **does not exist**, proceed in **create mode** (generate from scratch).
 
 ---
@@ -182,11 +182,11 @@ Return a structured report with examples from actual files.
 
 ## Phase 2: Synthesis
 
-After ALL agents complete, you have 7 structured reports. Now synthesize them into CONVENTIONS.md. The approach depends on the mode determined in Phase 0.
+After ALL agents complete, 7 structured reports are available. Now synthesize them into CONVENTIONS.md. The approach depends on the mode determined in Phase 0.
 
 ### If UPDATE mode (existing CONVENTIONS.md found)
 
-You have both the existing file contents and the 7 agent reports. Your job is to **update** the existing document — not replace it.
+Both the existing file contents and the 7 agent reports are available. **Update** the existing document — do not replace it.
 
 **Before making any changes**, present the user with a summary of proposed changes:
 
