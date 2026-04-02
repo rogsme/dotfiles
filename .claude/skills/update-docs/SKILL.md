@@ -76,11 +76,7 @@ Each agent prompt MUST include:
 
 ## After All Agents Complete
 
-1. Create an atomic commit for all documentation changes:
-   - Stage only the doc files that were modified — never use `git add -A` or `git add .`
-   - Commit message: `docs: update documentation to reflect current codebase`
-   - If no files were changed, do not create a commit
-   - Check CLAUDE.md for commit rules (e.g., some projects forbid `Co-Authored-By` lines)
+1. Invoke the `commit` skill to stage and commit the documentation changes. If no files were changed, do not commit.
 2. Summarize what was updated across all doc files:
    - Files modified vs files already up-to-date
    - Key additions (new endpoints, models, services documented)

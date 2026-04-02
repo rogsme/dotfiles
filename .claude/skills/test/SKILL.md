@@ -43,10 +43,6 @@ Based on the project files and CLAUDE.md, determine:
 - Do NOT use skip/xfail directives unless the user explicitly asks.
 - Keep fixes minimal — only change what's needed to make the tests pass.
 
-## Step 4: Atomic commit
+## Step 4: Commit
 
-After all tests pass, create an atomic commit:
-- Stage only the files you modified — never use `git add -A` or `git add .`
-- Commit message: `fix: resolve test failures`
-- If no files were changed, do not create a commit
-- Check CLAUDE.md for commit rules (e.g., some projects forbid `Co-Authored-By` lines)
+After all tests pass, invoke the `commit` skill to stage and commit the changes. If no files were changed, do not commit.

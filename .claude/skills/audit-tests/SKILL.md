@@ -122,8 +122,8 @@ After all sub-agents complete, review reports. For fixable issues, launch **gene
 Each fix agent MUST:
 1. Read all involved files before making changes
 2. Run the project's linter on modified files
-3. Create atomic commits with descriptive messages
-4. Check CLAUDE.md for commit rules
+3. Invoke the `commit` skill to commit the changes
+4. Do NOT push
 
 ---
 

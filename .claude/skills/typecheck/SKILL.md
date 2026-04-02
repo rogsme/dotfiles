@@ -39,10 +39,6 @@ Based on the project files and CLAUDE.md, determine:
 - Do NOT change the type checker configuration to be more lenient.
 - Keep fixes minimal — only change what's needed to satisfy the type checker.
 
-## Step 4: Atomic commit
+## Step 4: Commit
 
-After all type errors are resolved, create an atomic commit:
-- Stage only the files you modified — never use `git add -A` or `git add .`
-- Commit message: `fix: resolve type errors`
-- If no files were changed, do not create a commit
-- Check CLAUDE.md for commit rules (e.g., some projects forbid `Co-Authored-By` lines)
+After all type errors are resolved, invoke the `commit` skill to stage and commit the changes. If no files were changed, do not commit.

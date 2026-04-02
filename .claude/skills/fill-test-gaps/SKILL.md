@@ -164,7 +164,7 @@ After all agents complete, dispatch a **general-purpose agent** using `mode: "by
 3. Promote to shared location
 4. Update imports in test files
 5. Run full test suite to verify
-6. Commit: `Consolidate shared fixtures and test utilities`
+6. Invoke the `commit` skill to commit the consolidation changes
 
 Skip if no duplicates found.
 
@@ -176,7 +176,7 @@ Compare against baseline:
 - If coverage didn't increase for target files, flag for review (tests may be tautological)
 - Verify overall coverage meets CI threshold if applicable
 
-If tests fail, dispatch agent to fix, create separate commit.
+If tests fail, dispatch agent to fix, then invoke the `commit` skill to commit the fixes.
 
 ## Phase 6: Report
 

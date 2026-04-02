@@ -75,7 +75,7 @@ Launch one **general-purpose agent per non-empty scope group simultaneously** us
 
 ### Phase 2: Final Verification
 
-After all agents complete, run the **verification command** from `.claude/skills.md` to catch any cross-scope issues. If failures remain, fix them and create a single commit: `style: fix remaining convention issues`. Do NOT push.
+After all agents complete, run the **verification command** from `.claude/skills.md` to catch any cross-scope issues. If failures remain, fix them and invoke the `commit` skill to commit the fixes. Do NOT push.
 
 ### Phase 3: Report
 

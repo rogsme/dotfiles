@@ -245,13 +245,9 @@ Write the synthesized CONVENTIONS.md to the determined output path. The file sho
 - Use bullet points for rules
 - Be comprehensive but not redundant with itself
 
-### Atomic Commit (both modes)
+### Commit (both modes)
 
-After writing/updating the file, create an atomic commit:
-- Stage only the CONVENTIONS.md file (or the custom output path) — never use `git add -A` or `git add .`
-- Commit message: `docs: generate CONVENTIONS.md from codebase analysis` (create mode) or `docs: update CONVENTIONS.md from codebase analysis` (update mode)
-- If no changes were made, do not create a commit
-- Check CLAUDE.md for commit rules (e.g., some projects forbid `Co-Authored-By` lines)
+After writing/updating the file, invoke the `commit` skill to stage and commit the changes. If no changes were made, do not commit.
 
 ### Final Report (both modes)
 
