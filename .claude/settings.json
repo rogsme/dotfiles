@@ -72,8 +72,6 @@
     "type": "command",
     "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
   },
-  "skipDangerousModePermissionPrompt": true,
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true
-  }
+  "enabledPlugins": {},
+  "skipDangerousModePermissionPrompt": true
 }
