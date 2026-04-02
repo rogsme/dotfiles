@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODE="${1:-all}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HAS_DRIFT=0
+
+print_version() {
+  local label="$1"
+  local path="$2"
+  if [[ -f "$path" ]]; then
+    printf 'VERSION %-8s %s\n' "$label" "$(tr -d '\n' < "$path")"
+  else
+    printf 'VERSION %-8s MISSING (%s)\n' "$label" "$path"
+    HAS_DRIFT=1
+  fi
+}
+
+check_file() {
+  local src="$1"
+  local dst="$2"
+
+  if [[ ! -f "$src" ]]; then
+    printf 'SOURCE_MISSING %s\n' "$src"
+    HAS_DRIFT=1
+    return
+  fi
+
+  if [[ ! -f "$dst" ]]; then
+    printf 'MISSING %s\n' "$dst"
+    HAS_DRIFT=1
+    return
+  fi
+
+  if cmp -s "$src" "$dst"; then
+    printf 'OK      %s\n' "$dst"
+  else
+    printf 'DIFF    %s\n' "$dst"
+    HAS_DRIFT=1
+  fi
+}
+
+check_claude() {
+  check_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
+  check_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
+  check_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
+  check_file "$ROOT/claude/commands/review.md" "$HOME/.claude/commands/gsd/review.md"
+  check_file "$ROOT/claude/commands/verify-work.md" "$HOME/.claude/commands/gsd/verify-work.md"
+}
+
+check_opencode() {
+  check_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/get-shit-done/workflows/review.md"
+  check_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/get-shit-done/workflows/ui-review.md"
+  check_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/get-shit-done/workflows/verify-work.md"
+  check_file "$ROOT/opencode/command/gsd-review.md" "$HOME/.config/opencode/command/gsd-review.md"
+  check_file "$ROOT/opencode/command/gsd-verify-work.md" "$HOME/.config/opencode/command/gsd-verify-work.md"
+}
+
+print_version "claude" "$HOME/.claude/get-shit-done/VERSION"
+print_version "opencode" "$HOME/.config/opencode/get-shit-done/VERSION"
+
+case "$MODE" in
+  all)
+    check_claude
+    check_opencode
+    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
+    ;;
+  claude)
+    check_claude
+    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
+    ;;
+  opencode)
+    check_opencode
+    check_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
+    ;;
+  *)
+    printf 'Usage: %s [all|claude|opencode]\n' "$0" >&2
+    exit 2
+    ;;
+esac
+
+if [[ "$HAS_DRIFT" -eq 0 ]]; then
+  printf 'Status: clean\n'
+else
+  printf 'Status: drift detected\n'
+  exit 1
+fi

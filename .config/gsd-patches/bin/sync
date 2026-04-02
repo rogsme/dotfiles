@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MODE="${1:-all}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+copy_file() {
+  local src="$1"
+  local dst="$2"
+  mkdir -p "$(dirname "$dst")"
+  cp -f "$src" "$dst"
+  printf 'SYNC  %s -> %s\n' "$src" "$dst"
+}
+
+sync_claude() {
+  copy_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
+  copy_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
+  copy_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
+  copy_file "$ROOT/claude/commands/review.md" "$HOME/.claude/commands/gsd/review.md"
+  copy_file "$ROOT/claude/commands/verify-work.md" "$HOME/.claude/commands/gsd/verify-work.md"
+}
+
+sync_opencode() {
+  copy_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/get-shit-done/workflows/review.md"
+  copy_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/get-shit-done/workflows/ui-review.md"
+  copy_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/get-shit-done/workflows/verify-work.md"
+  copy_file "$ROOT/opencode/command/gsd-review.md" "$HOME/.config/opencode/command/gsd-review.md"
+  copy_file "$ROOT/opencode/command/gsd-verify-work.md" "$HOME/.config/opencode/command/gsd-verify-work.md"
+}
+
+mirror_changelog() {
+  copy_file "$ROOT/gsd-customizations.md" "$HOME/.claude/gsd-customizations.md"
+}
+
+case "$MODE" in
+  all)
+    sync_claude
+    sync_opencode
+    mirror_changelog
+    ;;
+  claude)
+    sync_claude
+    mirror_changelog
+    ;;
+  opencode)
+    sync_opencode
+    mirror_changelog
+    ;;
+  *)
+    printf 'Usage: %s [all|claude|opencode]\n' "$0" >&2
+    exit 2
+    ;;
+esac
+
+printf 'Done.\n'
