@@ -4,11 +4,11 @@
   "agent": {
     "plan": {
       "model": "openai/gpt-5.4",
-      "reasoningEffort": "high"
+      "reasoningEffort": "xhigh"
     },
     "build": {
       "model": "openai/gpt-5.3-codex",
-      "reasoningEffort": "high"
+      "reasoningEffort": "xhigh"
     }
   },
   "tools": {

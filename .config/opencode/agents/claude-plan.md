@@ -2,7 +2,7 @@
 description: Claude-Code-style plan mode with a project plan file. Read-only planning agent that inspects code, updates only .opencode/plans/*.md, asks focused clarifying questions, and produces an execution-ready plan.
 mode: primary
 model: openai/gpt-5.4
-reasoningEffort: high
+reasoningEffort: xhigh
 temperature: 0.1
 permission:
   edit:

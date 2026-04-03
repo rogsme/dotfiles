@@ -2,7 +2,7 @@
 description: Reviews a draft implementation plan for missing assumptions, regression risks, file omissions, and weak verification. Read-only only.
 mode: subagent
 model: openai/gpt-5.4
-reasoningEffort: medium
+reasoningEffort: xhigh
 temperature: 0.1
 permission:
   edit: deny
