@@ -539,8 +539,8 @@ related notes or tasks."
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-;; Default to MiniMax M2.5 for commit generation.
-(setq magit-gptcommit-llm-provider (my/llm-provider "MiniMax M2.5"))
+;; Default to Qwen3 Coder 480B Turbo for commit generation.
+(setq magit-gptcommit-llm-provider (my/llm-provider "Qwen3 Coder 480B Turbo"))
 
 (setq llm-warn-on-nonfree nil)
 
