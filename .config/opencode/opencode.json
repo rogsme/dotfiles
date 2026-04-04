@@ -44,7 +44,12 @@
           "name": "DeepSeek V3.2"
         },
         "deepinfra/moonshotai/Kimi-K2.5": {
-          "name": "Kimi K2.5"
+          "name": "Kimi K2.5",
+          "reasoning": true,
+          "interleaved": { "field": "reasoning_content" },
+          "options": {
+            "reasoningEffort": "high"
+          }
         },
         "deepinfra/openai/gpt-oss-120b": {
           "name": "GPT OSS 120B"

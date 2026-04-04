@@ -483,45 +483,38 @@ related notes or tasks."
 
 (defun my/require-llm-backends ()
   "Load all LLM backends used in my config."
-  (require 'llm-claude)
   (require 'llm-openai))
 
 (my/require-llm-backends)
 
-(defconst my/qwen3-code-model "qwen/qwen3-coder")
-(defconst my/qwen3-code-small-model "qwen/qwen3-coder-30b-a3b-instruct")
-(defconst my/claude-haiku-model "claude-haiku-4-5-20251001")
-(defconst my/claude-sonnet-model "claude-sonnet-4-5-20250929")
-(defconst my/claude-opus-model "claude-opus-4-6")
+(defconst my/glm5-model "deepinfra/zai-org/GLM-5")
+(defconst my/gpt54-model "openai/gpt-5.4")
+(defconst my/gpt54-mini-model "openai/gpt-5.4-mini")
+(defconst my/minimax-m25-model "deepinfra/MiniMaxAI/MiniMax-M2.5")
+(defconst my/kimi-k25-turbo-model "deepinfra/moonshotai/Kimi-K2.5-Turbo")
+(defconst my/qwen3-coder-480b-model "deepinfra/Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo")
 
 (defun my/setup-llm-env ()
-  (setenv "OPENROUTER_API_KEY" openrouter-api-key)
   (setenv "OPENAI_API_BASE" openai-api-base)
   (setenv "OPENAI_API_KEY" openai-api-key))
 (my/setup-llm-env)
 
-(defun make-llm-openrouter-compatible (chat-model)
-  "Return an OpenRouter-compatible LLM config for CHAT-MODEL."
+(defun make-llm-lazer-compatible (chat-model)
+  "Return a Lazer-compatible LLM config for CHAT-MODEL."
   (make-llm-openai-compatible
-   :url "https://openrouter.ai/api/v1"
+   :url openai-api-base
    :chat-model chat-model
-   :key openrouter-api-key))
-
-(defun make-llm-cliproxyapi (chat-model)
-  "Return a CLIProxyAPI-compatible LLM config for CHAT-MODEL."
-  (make-llm-openai-compatible
-   :url "http://localhost:8317/v1"
-   :chat-model chat-model
-   :key "not-needed"))
+   :key openai-api-key))
 
 (defun my/llm-provider (name)
   "Return a configured LLM provider instance by NAME."
   (pcase name
-    ("Claude Haiku"     (make-llm-cliproxyapi my/claude-haiku-model))
-    ("Claude Sonnet"    (make-llm-cliproxyapi my/claude-sonnet-model))
-    ("Claude Opus"      (make-llm-cliproxyapi my/claude-opus-model))
-    ("Qwen3 Code"       (make-llm-openrouter-compatible my/qwen3-code-model))
-    ("Qwen3 Code Small" (make-llm-openrouter-compatible my/qwen3-code-small-model))))
+    ("GLM-5"                 (make-llm-lazer-compatible my/glm5-model))
+    ("GPT-5.4"               (make-llm-lazer-compatible my/gpt54-model))
+    ("GPT-5.4 Mini"          (make-llm-lazer-compatible my/gpt54-mini-model))
+    ("MiniMax M2.5"          (make-llm-lazer-compatible my/minimax-m25-model))
+    ("Kimi K2.5 Turbo"       (make-llm-lazer-compatible my/kimi-k25-turbo-model))
+    ("Qwen3 Coder 480B Turbo" (make-llm-lazer-compatible my/qwen3-coder-480b-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -532,21 +525,22 @@ related notes or tasks."
        :desc "Claude Code (menu)"       "C" #'claude-code-transient
        :desc "OpenCode"                 "o" #'opencode-menu))
 
-(setq chatgpt-shell-model-version "qwen/qwen-2.5-coder-32b-instruct")
+(setq chatgpt-shell-model-version my/gpt54-model)
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
-(setq chatgpt-shell-openrouter-key openrouter-api-key)
+(setq chatgpt-shell-api-url-base openai-api-base)
+(setq chatgpt-shell-openai-key openai-api-key)
 
 (defun my/set-magit-gptcommit-provider (provider)
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("Claude Haiku" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
+                          '("GLM-5" "GPT-5.4" "GPT-5.4 Mini" "MiniMax M2.5" "Kimi K2.5 Turbo" "Qwen3 Coder 480B Turbo"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-;; Default to Claude Haiku (fast + free via subscription, good for commit msgs)
-(setq magit-gptcommit-llm-provider (my/llm-provider "Claude Haiku"))
+;; Default to MiniMax M2.5 for commit generation.
+(setq magit-gptcommit-llm-provider (my/llm-provider "MiniMax M2.5"))
 
 (setq llm-warn-on-nonfree nil)
 
@@ -590,18 +584,18 @@ Now, write the commit message in this exact format:
   "Set the Forge LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM: "
-                          '("Claude Haiku" "Claude Sonnet" "Claude Opus" "Qwen3 Code" "Qwen3 Code Small"))))
+                          '("GLM-5" "GPT-5.4" "GPT-5.4 Mini" "MiniMax M2.5" "Kimi K2.5 Turbo" "Qwen3 Coder 480B Turbo"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-;; Default to Claude Sonnet (good balance for PR descriptions)
-(setq forge-llm-llm-provider (my/llm-provider "Claude Sonnet"))
+;; Default to GLM-5 for PR descriptions.
+(setq forge-llm-llm-provider (my/llm-provider "GLM-5"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
 
 (after! aidermacs
-  (setq aidermacs-default-model "openrouter/google/gemini-3-flash-preview")
+  (setq aidermacs-default-model my/qwen3-coder-480b-model)
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
