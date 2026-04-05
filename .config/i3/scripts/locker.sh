@@ -1,4 +1,4 @@
 #!/bin/sh
 i3lock-fancy -p &
-sleep 5
+sleep 30
 xset dpms force off
