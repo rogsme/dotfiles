@@ -23,7 +23,7 @@ Available OpenCode reviewer models:
 - `gpt-5.4` → `lazer/openai/gpt-5.4`
 - `gemini-pro` → `lazer/gemini/gemini-3.1-pro-preview`
 - `minimax` → `lazer/deepinfra/MiniMaxAI/MiniMax-M2.5`
-- `kimi` → `lazer/deepinfra/moonshotai/Kimi-K2.5`
+- `kimi` → `lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo`
 - `glm-5` → `lazer/deepinfra/zai-org/GLM-5`
 
 Parse flags from `$ARGUMENTS`:
@@ -189,7 +189,7 @@ opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-review-promp
 opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-minimax-{phase}.md
 
 # Kimi K2.5
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-kimi-{phase}.md
+opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-kimi-{phase}.md
 
 # GLM-5
 opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-glm-5-{phase}.md

@@ -81,7 +81,7 @@ both `get-shit-done/workflows/` and `commands/gsd/` when patching.
   - `lazer/openai/gpt-5.3-codex` (flag: `--gpt-codex`)
   - `lazer/gemini/gemini-3.1-pro-preview` (flag: `--gemini-pro`)
   - `lazer/deepinfra/MiniMaxAI/MiniMax-M2.5` (flag: `--minimax`)
-  - `lazer/deepinfra/moonshotai/Kimi-K2.5` (flag: `--kimi`)
+  - `lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo` (flag: `--kimi`)
 - Kept Claude Opus as 5th reviewer via `claude -p ... --no-input` (flag: `--claude`)
 - Replaced the shallow 5-point review checklist with an 8-dimension adversarial review framework:
   1. Goal Alignment

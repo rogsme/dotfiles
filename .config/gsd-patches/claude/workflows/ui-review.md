@@ -229,7 +229,7 @@ opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-ui-review-pr
 opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-minimax-{phase}.md
 
 # Kimi K2.5
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
+opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
 
 # GLM-5
 opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
