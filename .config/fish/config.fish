@@ -90,3 +90,4 @@ fish_add_path /home/roger/.opencode/bin
 
 # Go
 fish_add_path /home/roger/go/bin
+export PATH="$HOME/.local/bin:$PATH"
