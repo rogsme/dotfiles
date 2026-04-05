@@ -195,7 +195,7 @@ opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-revie
 opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-glm-5-{phase}.md
 
 # Claude Opus
-claude -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
+claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
 ```
 
 If a reviewer fails, log the error and continue with remaining reviewers.
