@@ -95,16 +95,25 @@ Analyze each concrete use case:
 
 ### Step 3: Create Structure
 
+Before creating files, ask the user where the skill should live using the AskUserQuestion tool:
+
+- **User-level** (`~/.claude/skills/skill-name/`) — available in all projects for this user
+- **Project-level** (`.claude/skills/skill-name/`) — scoped to the current repo, shared with collaborators
+
+Ask: "Should this skill be user-level (available in all your projects) or project-level (scoped to this repo and shared with collaborators)?"
+
+Default recommendation: project-level, unless the skill is clearly personal workflow (not repo-specific).
+
+Then create the structure in the chosen location:
+
 ```bash
 mkdir -p skills/skill-name/{references,scripts,assets}
 touch skills/skill-name/SKILL.md
 ```
 
-**Directory conventions:**
+**Other directory conventions (less common):**
 - Plugin skills: `plugin-name/skills/skill-name/`
 - Cross-client: `.agents/skills/skill-name/` (widely adopted standard)
-- Claude Code user-level: `~/.claude/skills/skill-name/`
-- Claude Code project-level: `.claude/skills/skill-name/`
 
 Create only the subdirectories actually needed.
 
