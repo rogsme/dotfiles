@@ -415,7 +415,17 @@
   ],
   "permission": {
     "read": {
-      "~/.config/opencode/get-shit-done/*": "allow"
+      "~/.config/opencode/get-shit-done/*": "allow",
+      "/tmp": "allow"
+    },
+    "edit": {
+      "/tmp": "allow"
+    },
+    "glob": {
+      "/tmp": "allow"
+    },
+    "grep": {
+      "/tmp": "allow"
     },
     "external_directory": {
       "~/.config/opencode/get-shit-done/*": "allow"
