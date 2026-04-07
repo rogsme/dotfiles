@@ -232,8 +232,8 @@ opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review
 # Kimi K2.5
 opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
 
-# GLM-5.1
-opencode run -m lazer/deepinfra/zai-org/GLM-5.1 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
+# GLM-5
+opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
@@ -248,7 +248,7 @@ After all complete, check each output file has content (> 0 lines). Report statu
   ◆ Codex CLI...                  done ✓ (N lines)
   ◆ MiniMax M2.5...               done ✓ (N lines)
   ◆ Kimi K2.5...                  done ✓ (N lines)
-  ◆ GLM-5.1...                    done ✓ (N lines)
+  ◆ GLM-5...                      done ✓ (N lines)
   ◆ Claude Opus...                done ✓ (N lines)
 ```
 
@@ -289,7 +289,7 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ---
 
-## GLM-5.1
+## GLM-5
 
 {glm-5 review content}
 
@@ -305,7 +305,7 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ### Score Comparison
 
-| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Claude | Avg |
+| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5 | Claude | Avg |
 |--------|---------|--------|-------|---------|------|-------|--------|-----|
 | Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
 | Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |

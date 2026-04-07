@@ -7,6 +7,24 @@ recreated if needed.
 
 ---
 
+## 2026-04-07 — Roll back GLM reviewer from 5.1 to 5 (Claude + OpenCode)
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `claude/commands/review.md`, `opencode/workflows/review.md`, `opencode/workflows/ui-review.md`, `opencode/command/gsd-review.md`
+
+### What changed
+
+- Reverted GLM model ID from `lazer/deepinfra/zai-org/GLM-5.1` to `lazer/deepinfra/zai-org/GLM-5`
+- Reverted reviewer labels in workflow docs and output templates from `GLM-5.1` to `GLM-5`
+- Reverted reviewer flag from `--glm-5.1` back to `--glm-5`
+
+### Why
+
+OpenCode currently has a bug with GLM-5.1 in this workflow path. Rolling back to GLM-5 restores
+stable reviewer execution while keeping the same reviewer slot and output structure.
+
+---
+
 ## 2026-04-07 — Upgrade GLM reviewer from 5 to 5.1 (Claude + OpenCode)
 
 **GSD version:** 1.30.0
