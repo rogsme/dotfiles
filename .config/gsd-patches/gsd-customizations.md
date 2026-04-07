@@ -7,6 +7,88 @@ recreated if needed.
 
 ---
 
+## 2026-04-07 — Upgrade GLM reviewer from 5 to 5.1 (Claude + OpenCode)
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `claude/commands/review.md`, `opencode/workflows/review.md`, `opencode/workflows/ui-review.md`, `opencode/command/gsd-review.md`
+
+### What changed
+
+- Updated GLM model ID from `lazer/deepinfra/zai-org/GLM-5` to `lazer/deepinfra/zai-org/GLM-5.1`
+- Updated reviewer labels in workflow docs and output templates from `GLM-5` to `GLM-5.1`
+- Renamed reviewer flag from `--glm-5` to `--glm-5.1`
+
+### Why
+
+GLM-5.1 supersedes GLM-5. This keeps both Claude and OpenCode adversarial-review flows aligned
+to the new model and updates reviewer flag naming for clarity.
+
+---
+
+## 2026-04-07 — Mirror reviewer set changes to Claude canonical files
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `claude/commands/review.md`
+
+### What changed
+
+- Removed GPT-5.4 reviewer references from Claude-side `/gsd:review` and `/gsd:ui-review`
+- Replaced OpenCode Gemini reviewer slot with standalone `gemini` CLI invocations
+- Added standalone `codex` CLI reviewer invocations and output sections
+- Updated Claude command flag docs to `--gemini` and `--codex`
+- Kept OpenCode model reviewers on Claude side: `minimax`, `kimi`, `glm-5`
+
+### Why
+
+Claude and OpenCode canonical workflows should stay aligned for reviewer composition. This
+keeps reviewer provenance consistent and avoids duplicate OpenAI coverage now that Codex
+is the dedicated OpenAI reviewer.
+
+---
+
+## 2026-04-07 — Remove GPT-5.4 reviewer from OpenCode workflows
+
+**GSD version:** 1.30.0
+**Files modified:** `get-shit-done/workflows/review.md`, `get-shit-done/workflows/ui-review.md`, `commands/gsd/review.md`
+
+### What changed
+
+- Removed GPT-5.4 as an OpenCode reviewer in `/gsd-review`
+- Removed `--gpt-5.4` flag from OpenCode `gsd-review` command docs
+- Updated review output templates and UI score comparison tables to drop GPT-5.4 columns/sections
+- Kept separate `gemini` and `codex` CLI reviewers and the OpenCode model reviewers (`minimax`, `kimi`, `glm-5`)
+
+### Why
+
+Codex already covers the OpenAI review role. Removing the separate GPT-5.4 reviewer reduces
+duplication while keeping broad adversarial coverage across independent CLIs and non-OpenAI
+OpenCode models.
+
+---
+
+## 2026-04-07 — Add Gemini CLI and Codex CLI alongside OpenCode adversarial reviewers
+
+**GSD version:** 1.30.0
+**Files modified:** `get-shit-done/workflows/review.md`, `get-shit-done/workflows/ui-review.md`, `commands/gsd/review.md`
+
+### What changed
+
+- Kept the added OpenCode reviewers: `gpt-5.4`, `minimax`, `kimi`, and `glm-5`
+- Added `gemini` as a separate Gemini CLI reviewer instead of routing Gemini through `opencode run`
+- Added `codex` as a separate Codex CLI reviewer instead of treating OpenCode-hosted models as the Codex slot
+- Updated `review.md` CLI detection, flags, invocation examples, progress output, and `REVIEWS.md` template
+- Updated `ui-review.md` cross-AI reviewer detection, invocation examples, progress output, appended sections, and score comparison table
+- Updated `commands/gsd/review.md` flags and objective text to match the new reviewer set
+
+### Why
+
+Upstream GSD uses dedicated Gemini and Codex CLIs for those reviewer roles. Keeping the extra
+OpenCode reviewers provides broader adversarial coverage, but restoring Gemini and Codex as their
+own CLIs aligns the workflow with the original tool boundaries and makes reviewer provenance
+clearer in the output.
+
+---
+
 ## 2026-03-30 — Fix opencode hangs (remove 2>/dev/null), run reviewers in parallel
 
 **GSD version:** 1.30.0

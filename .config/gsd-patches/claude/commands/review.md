@@ -1,7 +1,7 @@
 ---
 name: gsd:review
 description: Request cross-AI peer review of phase plans from external AI CLIs
-argument-hint: "--phase N [--gpt-5.4] [--gemini-pro] [--minimax] [--kimi] [--glm-5] [--claude] [--all]"
+argument-hint: "--phase N [--gemini] [--codex] [--minimax] [--kimi] [--glm-5.1] [--claude] [--all]"
 allowed-tools:
   - Read
   - Write
@@ -11,7 +11,7 @@ allowed-tools:
 ---
 
 <objective>
-Invoke external AI CLIs (GPT-5.4, Gemini 3.1 Pro, MiniMax M2.5, Kimi K2.5, GLM-5, Claude Opus) to independently review phase plans.
+Invoke external AI CLIs (Gemini, Codex, MiniMax M2.5, Kimi K2.5, GLM-5.1, Claude Opus) to independently review phase plans.
 Produces a structured REVIEWS.md with per-reviewer feedback that can be fed back into
 planning via /gsd:plan-phase --reviews.
 
@@ -26,11 +26,11 @@ planning via /gsd:plan-phase --reviews.
 Phase number: extracted from $ARGUMENTS (required)
 
 **Flags:**
-- `--gpt-5.4` — Include GPT-5.4 via OpenCode
-- `--gemini-pro` — Include Gemini 3.1 Pro via OpenCode
+- `--gemini` — Include Gemini via Gemini CLI
+- `--codex` — Include Codex via Codex CLI
 - `--minimax` — Include MiniMax M2.5 via OpenCode
 - `--kimi` — Include Kimi K2.5 via OpenCode
-- `--glm-5` — Include GLM-5 via OpenCode
+- `--glm-5.1` — Include GLM-5.1 via OpenCode
 - `--claude` — Include Claude Opus (separate session)
 - `--all` — Include all available reviewers
 </context>

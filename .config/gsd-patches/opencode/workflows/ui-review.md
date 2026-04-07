@@ -112,6 +112,8 @@ After the gsd-ui-auditor writes UI-REVIEW.md, invoke external models for indepen
 ### 4a. Check CLI availability
 
 ```bash
+command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
+command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
 command -v opencode >/dev/null 2>&1 && echo "opencode:available" || echo "opencode:missing"
 command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:missing"
 ```
@@ -210,20 +212,19 @@ Write to temp file: `/tmp/gsd-ui-review-prompt-{phase}.md`
 
 Invoke all selected reviewers in parallel using separate Bash tool calls in a single message.
 
-IMPORTANT: Do NOT use `2>/dev/null` on opencode or claude commands — suppressing stderr
-causes opencode to hang indefinitely. Stderr output is harmless and gets discarded by the
-stdout redirect.
+IMPORTANT: Do NOT use `2>/dev/null` on reviewer commands. Some CLIs emit useful progress on
+stderr, and suppressing it caused hangs in prior OpenCode-based reviewers.
 
 IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > file` only.
 
 **All reviewers run in parallel** — use one Bash tool call per reviewer, all in the same message:
 
 ```bash
-# GPT-5.4
-opencode run -m lazer/openai/gpt-5.4 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gpt-5.4-{phase}.md
+# Gemini CLI
+gemini -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gemini-{phase}.md
 
-# Gemini 3.1 Pro
-opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gemini-pro-{phase}.md
+# Codex CLI
+codex exec --skip-git-repo-check "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-codex-{phase}.md
 
 # MiniMax M2.5
 opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-minimax-{phase}.md
@@ -231,8 +232,8 @@ opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review
 # Kimi K2.5
 opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
 
-# GLM-5
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
+# GLM-5.1
+opencode run -m lazer/deepinfra/zai-org/GLM-5.1 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
@@ -243,11 +244,11 @@ After all complete, check each output file has content (> 0 lines). Report statu
 
 ```
 ◆ Cross-AI UI perspectives...
-  ◆ GPT-5.4...                    done ✓ (N lines)
-  ◆ Gemini 3.1 Pro...             done ✓ (N lines)
+  ◆ Gemini CLI...                 done ✓ (N lines)
+  ◆ Codex CLI...                  done ✓ (N lines)
   ◆ MiniMax M2.5...               done ✓ (N lines)
   ◆ Kimi K2.5...                  done ✓ (N lines)
-  ◆ GLM-5...                      done ✓ (N lines)
+  ◆ GLM-5.1...                    done ✓ (N lines)
   ◆ Claude Opus...                done ✓ (N lines)
 ```
 
@@ -264,15 +265,15 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 > Independent assessments from {count} additional AI models.
 > These reviews challenge and supplement the primary 6-pillar audit above.
 
-## GPT-5.4
+## Gemini
 
-{gpt-5.4 review content}
+{gemini review content}
 
 ---
 
-## Gemini 3.1 Pro
+## Codex
 
-{gemini-pro review content}
+{codex review content}
 
 ---
 
@@ -288,7 +289,7 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ---
 
-## GLM-5
+## GLM-5.1
 
 {glm-5 review content}
 
@@ -304,8 +305,8 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ### Score Comparison
 
-| Pillar | Primary | GPT-5.4 | Gemini Pro | MiniMax | Kimi | GLM-5 | Claude | Avg |
-|--------|---------|---------|------------|---------|------|-------|--------|-----|
+| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Claude | Avg |
+|--------|---------|--------|-------|---------|------|-------|--------|-----|
 | Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
 | Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
 | Color | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |

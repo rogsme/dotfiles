@@ -5,7 +5,7 @@ produces structured feedback. Results are combined into REVIEWS.md for the plann
 to incorporate via --reviews flag.
 
 This implements adversarial review: different AI models catch different blind spots.
-A plan that survives review from 3-5 independent AI systems is more robust.
+A plan that survives review from 3-6 independent AI systems is more robust.
 </purpose>
 
 <process>
@@ -15,23 +15,23 @@ Check which AI CLIs are available on the system:
 
 ```bash
 # Check each CLI
+command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
+command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
 command -v opencode >/dev/null 2>&1 && echo "opencode:available" || echo "opencode:missing"
 command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:missing"
 ```
 
 Available OpenCode reviewer models:
-- `gpt-5.4` → `lazer/openai/gpt-5.4`
-- `gemini-pro` → `lazer/gemini/gemini-3.1-pro-preview`
 - `minimax` → `lazer/deepinfra/MiniMaxAI/MiniMax-M2.5`
 - `kimi` → `lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo`
-- `glm-5` → `lazer/deepinfra/zai-org/GLM-5`
+- `glm-5` → `lazer/deepinfra/zai-org/GLM-5.1`
 
 Parse flags from `$ARGUMENTS`:
-- `--gpt-5.4` → include GPT-5.4 via OpenCode
-- `--gemini-pro` → include Gemini 3.1 Pro via OpenCode
+- `--gemini` → include Gemini via Gemini CLI
+- `--codex` → include Codex via Codex CLI
 - `--minimax` → include MiniMax M2.5 via OpenCode
 - `--kimi` → include Kimi K2.5 via OpenCode
-- `--glm-5` → include GLM-5 via OpenCode
+- `--glm-5.1` → include GLM-5.1 via OpenCode
 - `--claude` → include Claude Opus (separate session)
 - `--all` → include all available reviewers
 - No flags → include all available reviewers
@@ -39,6 +39,8 @@ Parse flags from `$ARGUMENTS`:
 If no CLIs are available:
 ```
 No external AI CLIs found. Install at least one:
+- gemini: https://github.com/google-gemini/gemini-cli
+- codex: https://github.com/openai/codex
 - opencode: https://github.com/sst/opencode
 - claude: https://github.com/anthropics/claude-code
 
@@ -170,20 +172,19 @@ Write to a temp file: `/tmp/gsd-review-prompt-{phase}.md`
 <step name="invoke_reviewers">
 Invoke all selected reviewers in parallel using separate Bash tool calls in a single message.
 
-IMPORTANT: Do NOT use `2>/dev/null` on opencode or claude commands — suppressing stderr
-causes opencode to hang indefinitely. Stderr output (progress lines, model name) is harmless
-and gets discarded by the stdout redirect anyway.
+IMPORTANT: Do NOT use `2>/dev/null` on reviewer commands. Some CLIs emit useful progress on
+stderr, and suppressing it caused hangs in prior OpenCode-based reviewers.
 
 IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > file` only.
 
 **All reviewers run in parallel** — use one Bash tool call per reviewer, all in the same message:
 
 ```bash
-# GPT-5.4
-opencode run -m lazer/openai/gpt-5.4 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-gpt-5.4-{phase}.md
+# Gemini CLI
+gemini -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-gemini-{phase}.md
 
-# Gemini 3.1 Pro
-opencode run -m lazer/gemini/gemini-3.1-pro-preview "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-gemini-pro-{phase}.md
+# Codex CLI
+codex exec --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-codex-{phase}.md
 
 # MiniMax M2.5
 opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-minimax-{phase}.md
@@ -191,8 +192,8 @@ opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-review-pr
 # Kimi K2.5
 opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-kimi-{phase}.md
 
-# GLM-5
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-glm-5-{phase}.md
+# GLM-5.1
+opencode run -m lazer/deepinfra/zai-org/GLM-5.1 "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
@@ -206,11 +207,11 @@ After all complete, check each output file has content (> 0 lines). Report statu
  GSD ► CROSS-AI REVIEW — Phase {N}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-◆ GPT-5.4...            done ✓ (N lines)
-◆ Gemini 3.1 Pro...     done ✓ (N lines)
+◆ Gemini CLI...         done ✓ (N lines)
+◆ Codex CLI...          done ✓ (N lines)
 ◆ MiniMax M2.5...       done ✓ (N lines)
 ◆ Kimi K2.5...          done ✓ (N lines)
-◆ GLM-5...              done ✓ (N lines)
+◆ GLM-5.1...            done ✓ (N lines)
 ◆ Claude Opus...        done ✓ (N lines)
 ```
 </step>
@@ -221,22 +222,22 @@ Combine all review responses into `{phase_dir}/{padded_phase}-REVIEWS.md`:
 ```markdown
 ---
 phase: {N}
-reviewers: [gpt-5.4, gemini-pro, minimax, kimi, glm-5, claude]
+reviewers: [gemini, codex, minimax, kimi, glm-5, claude]
 reviewed_at: {ISO timestamp}
 plans_reviewed: [{list of PLAN.md files}]
 ---
 
 # Cross-AI Plan Review — Phase {N}
 
-## GPT-5.4 Review
+## Gemini Review
 
-{gpt-5.4 review content}
+{gemini review content}
 
 ---
 
-## Gemini 3.1 Pro Review
+## Codex Review
 
-{gemini-pro review content}
+{codex review content}
 
 ---
 
@@ -252,7 +253,7 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
-## GLM-5 Review
+## GLM-5.1 Review
 
 {glm-5 review content}
 
