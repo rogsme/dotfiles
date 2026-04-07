@@ -180,6 +180,31 @@
             ]
           }
         },
+        "deepinfra/zai-org/GLM-5.1": {
+          "name": "GLM-5.1",
+          "family": "glm",
+          "release_date": "2026-04-03",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "cost": {
+            "input": 1.4,
+            "output": 4.4,
+            "cache_read": 0.26
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
         "gemini/gemini-3-flash-preview": {
           "name": "Gemini 3 Flash Preview",
           "family": "gemini-flash",
