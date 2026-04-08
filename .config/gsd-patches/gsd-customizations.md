@@ -7,6 +7,31 @@ recreated if needed.
 
 ---
 
+## 2026-04-08 — Make reviewer waiting strategy runtime-specific
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `opencode/workflows/review.md`, `opencode/workflows/ui-review.md`
+
+### What changed
+
+- Added explicit waiting instructions after reviewer CLI launch examples in both review workflows
+- Documented Claude-specific waiting: background Bash calls with `run_in_background: true`, then wait for completion notifications before reading outputs
+- Documented OpenCode-specific waiting: launch reviewer Bash calls in one `multi_tool_use.parallel` batch, then read each output file once after the batch returns
+- Replaced the old `> 0 lines` success check with guidance to validate meaningful output and treat line count as a secondary signal
+
+### Why
+
+Claude Code and OpenCode expose different shell execution models.
+
+- Claude Code guidance can rely on background Bash jobs and completion notifications
+- OpenCode guidance should rely on `multi_tool_use.parallel`, which already waits for all Bash calls to finish
+
+The workflows should describe the correct non-polling waiting pattern for each runtime so agents
+do not waste tool calls polling partial files or using runtime-specific features in the wrong
+environment.
+
+---
+
 ## 2026-04-08 — Re-enable quiet reviewer commands after CLI regression testing
 
 **GSD version:** 1.30.0

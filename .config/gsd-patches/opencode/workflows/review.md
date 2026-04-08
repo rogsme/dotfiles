@@ -202,7 +202,23 @@ claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-rev
 ```
 
 If a reviewer fails, log the error and continue with remaining reviewers.
-After all complete, check each output file has content (> 0 lines). Report status:
+
+Waiting strategy (OpenCode):
+
+Launch all reviewer commands as separate Bash tool calls in a single `multi_tool_use.parallel`
+call, each with `timeout: 300000` (5 minutes).
+
+Do not poll. Do not check file sizes in a loop. Do not call `wc -l` repeatedly. The
+`multi_tool_use.parallel` call already waits for all reviewer Bash calls to finish.
+
+After the parallel call returns, read each output file once with the Read tool.
+
+Validate meaningful content against the prompt's requested output format. Use line count only as
+a secondary signal. If a reviewer produced no output, fewer than 3 lines, or obviously incomplete
+content, log it as failed and continue with the reviewers that succeeded. Do not retry
+automatically.
+
+After validation, report status:
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
