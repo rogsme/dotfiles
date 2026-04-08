@@ -7,6 +7,32 @@ recreated if needed.
 
 ---
 
+## 2026-04-08 — Re-enable quiet reviewer commands after CLI regression testing
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `opencode/workflows/review.md`, `opencode/workflows/ui-review.md`
+
+### What changed
+
+- Replaced the stale "do not use `2>/dev/null`" warning in review and UI-review workflows
+- Restored `2>/dev/null` on `gemini`, `codex`, and `opencode` reviewer commands so reviewer output files stay clean
+- Left the `claude -p` reviewer command unchanged pending separate validation
+
+### Why
+
+Current local CLI versions no longer reproduce the old stderr-suppression hang:
+
+- `gemini 0.36.0`
+- `codex-cli 0.118.0`
+- `opencode 1.4.0`
+
+Both smoke tests and realistic review-prompt runs completed successfully with `2>/dev/null` and
+with `2>file`. Stdout stayed clean markdown while stderr contained only startup/progress noise.
+
+This supersedes the older 2026-03-30 guidance for these reviewer CLIs.
+
+---
+
 ## 2026-04-07 — Roll back GLM reviewer from 5.1 to 5 (Claude + OpenCode)
 
 **GSD version:** 1.30.0

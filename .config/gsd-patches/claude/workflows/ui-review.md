@@ -212,8 +212,10 @@ Write to temp file: `/tmp/gsd-ui-review-prompt-{phase}.md`
 
 Invoke all selected reviewers in parallel using separate Bash tool calls in a single message.
 
-IMPORTANT: Do NOT use `2>/dev/null` on reviewer commands. Some CLIs emit useful progress on
-stderr, and suppressing it caused hangs in prior OpenCode-based reviewers.
+IMPORTANT: `gemini`, `codex`, and `opencode` reviewer commands may use `2>/dev/null` to keep
+stdout clean. Local regression tests with `gemini 0.36.0`, `codex-cli 0.118.0`, and
+`opencode 1.4.0` completed successfully with stderr suppressed on both smoke-test and realistic
+review prompts.
 
 IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > file` only.
 
@@ -221,19 +223,19 @@ IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > fil
 
 ```bash
 # Gemini CLI
-gemini -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-gemini-{phase}.md
+gemini -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-gemini-{phase}.md
 
 # Codex CLI
-codex exec --skip-git-repo-check "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-codex-{phase}.md
+codex exec --skip-git-repo-check "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-codex-{phase}.md
 
 # MiniMax M2.5
-opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-minimax-{phase}.md
+opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
 
 # Kimi K2.5
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-kimi-{phase}.md
+opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
 
 # GLM-5
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-glm-5-{phase}.md
+opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
