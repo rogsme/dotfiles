@@ -79,3 +79,5 @@
 (package! claude-code
   :recipe (:host github :repo "stevemolitor/claude-code.el" :branch "main"
            :files ("*.el" (:exclude "images/*"))))
+(package! justl :recipe (:host github :repo "psibi/justl.el"))
+(package! just-mode)
