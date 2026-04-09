@@ -14,6 +14,12 @@ Analyze a git repository's history to produce a structured health diagnostic rep
 Run a data collection script, interpret the results, and write `GIT-ARCHAEOLOGY.md`
 to the repository root with findings, analysis, and recommendations.
 
+## Origin
+
+Based on: https://piechowski.io/post/git-commands-before-reading-code/
+"The Git Commands I Run Before Reading Any Code" by Ally Piechowski (Apr 2026).
+Extended with churn velocity, deleted files tracking, and cross-reference analysis.
+
 ## Arguments
 
 The skill accepts optional arguments in this order:
