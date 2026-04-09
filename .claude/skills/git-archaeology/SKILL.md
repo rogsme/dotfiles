@@ -6,6 +6,7 @@ description: >-
   "bus factor", "churn analysis", "bug hotspots", or wants to understand a codebase's
   history, health, and risk areas before reading source code. Also triggers on
   "/git-archaeology". Generates a structured GIT-ARCHAEOLOGY.md report.
+argument-hint: "[path] [timeframe]"
 ---
 
 # Git Archaeology
