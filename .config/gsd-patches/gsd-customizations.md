@@ -7,6 +7,28 @@ recreated if needed.
 
 ---
 
+## 2026-04-11 — Remap OpenCode reviewer models to new lazer IDs
+
+**GSD version:** 1.30.0
+**Files modified:** `claude/workflows/review.md`, `claude/workflows/ui-review.md`, `claude/commands/review.md`, `opencode/workflows/review.md`, `opencode/workflows/ui-review.md`, `opencode/command/gsd-review.md`, `gsd-customizations.md`
+
+### What changed
+
+- Updated the OpenCode reviewer model IDs from DeepInfra-prefixed IDs to the newer direct lazer IDs:
+  - `minimax` → `lazer/minimax-m2.5`
+  - `kimi` → `lazer/kimi-2.5`
+  - `glm-5` → `lazer/glm-5.1`
+- Refreshed review and UI-review labels to mention `Kimi 2.5` and `GLM-5.1`
+- Kept reviewer flags stable (`--minimax`, `--kimi`, `--glm-5`) so existing commands do not change
+
+### Why
+
+OpenCode now exposes these reviewer slots under the newer lazer model IDs. Updating the canonical
+patches keeps both runtimes aligned with the current model naming while preserving the existing
+workflow interface.
+
+---
+
 ## 2026-04-08 — Make reviewer waiting strategy runtime-specific
 
 **GSD version:** 1.30.0

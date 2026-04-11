@@ -22,16 +22,16 @@ command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:mis
 ```
 
 Available OpenCode reviewer models:
-- `minimax` → `lazer/deepinfra/MiniMaxAI/MiniMax-M2.5`
-- `kimi` → `lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo`
-- `glm-5` → `lazer/deepinfra/zai-org/GLM-5`
+- `minimax` → `lazer/minimax-m2.5`
+- `kimi` → `lazer/kimi-2.5`
+- `glm-5` → `lazer/glm-5.1`
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini via Gemini CLI
 - `--codex` → include Codex via Codex CLI
 - `--minimax` → include MiniMax M2.5 via OpenCode
-- `--kimi` → include Kimi K2.5 via OpenCode
-- `--glm-5` → include GLM-5 via OpenCode
+- `--kimi` → include Kimi 2.5 via OpenCode
+- `--glm-5` → include GLM-5.1 via OpenCode
 - `--claude` → include Claude Opus (separate session)
 - `--all` → include all available reviewers
 - No flags → include all available reviewers
@@ -190,13 +190,13 @@ gemini -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-revi
 codex exec --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
 
 # MiniMax M2.5
-opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
+opencode run -m lazer/minimax-m2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
 
-# Kimi K2.5
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
+# Kimi 2.5
+opencode run -m lazer/kimi-2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
 
-# GLM-5
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-glm-5-{phase}.md
+# GLM-5.1
+opencode run -m lazer/glm-5.1 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
@@ -227,8 +227,8 @@ After validation, report status:
 ◆ Gemini CLI...         done ✓ (N lines)
 ◆ Codex CLI...          done ✓ (N lines)
 ◆ MiniMax M2.5...       done ✓ (N lines)
-◆ Kimi K2.5...          done ✓ (N lines)
-◆ GLM-5...              done ✓ (N lines)
+◆ Kimi 2.5...           done ✓ (N lines)
+◆ GLM-5.1...            done ✓ (N lines)
 ◆ Claude Opus...        done ✓ (N lines)
 ```
 </step>
@@ -264,13 +264,13 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
-## Kimi K2.5 Review
+## Kimi 2.5 Review
 
 {kimi review content}
 
 ---
 
-## GLM-5 Review
+## GLM-5.1 Review
 
 {glm-5 review content}
 

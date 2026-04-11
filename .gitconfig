@@ -24,3 +24,5 @@
 	user = rogsme
 [github "api.github.com"]
 	user = rogsme
+[init]
+	defaultBranch = master

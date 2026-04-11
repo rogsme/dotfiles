@@ -229,13 +229,13 @@ gemini -p "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-u
 codex exec --skip-git-repo-check "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-codex-{phase}.md
 
 # MiniMax M2.5
-opencode run -m lazer/deepinfra/MiniMaxAI/MiniMax-M2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
+opencode run -m lazer/minimax-m2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
 
-# Kimi K2.5
-opencode run -m lazer/deepinfra/moonshotai/Kimi-K2.5-Turbo "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
+# Kimi 2.5
+opencode run -m lazer/kimi-2.5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
 
-# GLM-5
-opencode run -m lazer/deepinfra/zai-org/GLM-5 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-glm-5-{phase}.md
+# GLM-5.1
+opencode run -m lazer/glm-5.1 "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
@@ -265,8 +265,8 @@ After validation, report status:
   ◆ Gemini CLI...                 done ✓ (N lines)
   ◆ Codex CLI...                  done ✓ (N lines)
   ◆ MiniMax M2.5...               done ✓ (N lines)
-  ◆ Kimi K2.5...                  done ✓ (N lines)
-  ◆ GLM-5...                      done ✓ (N lines)
+  ◆ Kimi 2.5...                   done ✓ (N lines)
+  ◆ GLM-5.1...                    done ✓ (N lines)
   ◆ Claude Opus...                done ✓ (N lines)
 ```
 
@@ -301,13 +301,13 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ---
 
-## Kimi K2.5
+## Kimi 2.5
 
 {kimi review content}
 
 ---
 
-## GLM-5
+## GLM-5.1
 
 {glm-5 review content}
 
@@ -323,7 +323,7 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ### Score Comparison
 
-| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5 | Claude | Avg |
+| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Claude | Avg |
 |--------|---------|--------|-------|---------|------|-------|--------|-----|
 | Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
 | Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
