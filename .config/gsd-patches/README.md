@@ -38,8 +38,8 @@ Claude targets:
 - `~/.claude/get-shit-done/workflows/review.md`
 - `~/.claude/get-shit-done/workflows/ui-review.md`
 - `~/.claude/get-shit-done/workflows/verify-work.md`
-- `~/.claude/commands/gsd/review.md`
-- `~/.claude/commands/gsd/verify-work.md`
+- `~/.claude/skills/gsd-review/SKILL.md`
+- `~/.claude/skills/gsd-verify-work/SKILL.md`
 
 OpenCode targets:
 

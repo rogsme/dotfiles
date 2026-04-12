@@ -396,6 +396,7 @@ Legacy `~/.claude/gsd-patch-backups/` files were retired in favor of the canonic
 ## Notes
 
 - All patches use `opencode run -m <model> "<prompt>"` syntax for OpenCode invocation
-- The 5 OpenCode models can be updated by editing the model strings in review.md and ui-review.md
+- The 3 OpenCode reviewer models (minimax, kimi, glm-5) can be updated by editing the model strings in review.md and ui-review.md
 - playwright-cli install: `npm install -g @playwright/cli@latest && playwright-cli install --skills`
-- After a `/gsd:update`, runtime-native reapply commands are optional fallback (`/gsd:reapply-patches`, `/gsd-reapply-patches`), then run canonical sync/check commands above
+- After a `/gsd-update`, runtime-native reapply commands are optional fallback (`/gsd-reapply-patches`), then run canonical sync/check commands above
+- Claude commands use skills format (`skills/gsd-*/SKILL.md`), OpenCode uses flat commands (`command/gsd-*.md`)
