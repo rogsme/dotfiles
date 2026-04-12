@@ -37,6 +37,8 @@ AGENT_SKILLS_CHECKER=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.
 ```
 
 Parse JSON for: `planner_model`, `checker_model`, `commit_docs`, `phase_found`, `phase_dir`, `phase_number`, `phase_name`, `has_verification`, `uat_path`.
+
+**Text mode (`workflow.text_mode: true` in config or `--text` flag):** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `AskUserQuestion` call with a plain-text numbered list and ask the user to type their choice number. This is required for non-Claude runtimes (OpenAI Codex, Gemini CLI, etc.) where `AskUserQuestion` is not available.
 </step>
 
 <step name="check_active_session">
@@ -570,11 +572,47 @@ Present summary:
 **If issues > 0:** Proceed to `diagnose_issues`
 
 **If issues == 0:**
+
+```bash
+SECURITY_CFG=$(node "$HOME/.config/opencode/get-shit-done/bin/gsd-tools.cjs" config-get workflow.security_enforcement --raw 2>/dev/null || echo "true")
+SECURITY_FILE=$(ls "${PHASE_DIR}"/*-SECURITY.md 2>/dev/null | head -1)
 ```
+
+If `SECURITY_CFG` is `true` AND `SECURITY_FILE` is empty:
+```
+⚠ Security enforcement enabled — /gsd-secure-phase {phase} has not run.
+Run before advancing to the next phase.
+
 All tests passed. Ready to continue.
+
+- `/gsd-secure-phase {phase}` — security review (required before advancing)
+- `/gsd-plan-phase {next}` — Plan next phase
+- `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd-ui-review {phase}` — visual quality audit (if frontend files were modified)
+```
+
+If `SECURITY_CFG` is `true` AND `SECURITY_FILE` exists: check frontmatter `threats_open`. If > 0:
+```
+⚠ Security gate: {threats_open} threats open
+  /gsd-secure-phase {phase} — resolve before advancing
+```
+
+If `SECURITY_CFG` is `false` OR (`SECURITY_FILE` exists AND `threats_open` is `0`):
+
+**Auto-transition: mark phase complete in ROADMAP.md and STATE.md**
+
+Execute the transition workflow inline (do NOT use Task — the orchestrator context already holds the UAT results and phase data needed for accurate transition):
+
+Read and follow `~/.config/opencode/get-shit-done/workflows/transition.md`.
+
+After transition completes, present next-step options to the user:
+
+```
+All tests passed. Phase {phase} marked complete.
 
 - `/gsd-plan-phase {next}` — Plan next phase
 - `/gsd-execute-phase {next}` — Execute next phase
+- `/gsd-secure-phase {phase}` — security review
 - `/gsd-ui-review {phase}` — visual quality audit (if frontend files were modified)
 ```
 </step>

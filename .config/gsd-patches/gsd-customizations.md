@@ -7,6 +7,32 @@ recreated if needed.
 
 ---
 
+## 2026-04-11 — Rebase patches on GSD v1.35.0 + migrate to skills
+
+**GSD version:** 1.35.0
+**Files modified:** All patch files, bin/sync, bin/check
+
+### What changed
+
+- Migrated Claude commands from `commands/gsd/*.md` to `skills/gsd-*/SKILL.md` format
+  - `gsd:review` → `gsd-review`, `gsd:verify-work` → `gsd-verify-work`
+  - Sync targets: `~/.claude/skills/gsd-*/SKILL.md` instead of `~/.claude/commands/gsd/`
+- Removed create-cli workflow and command (deleted from project)
+- Added security enforcement gate (SECURITY.md + auto-transition) to verify-work complete_session
+- Added text mode support (plain-text AskUserQuestion fallback) to all workflows for both runtimes
+- Preserved: 8-dim adversarial review, parallel execution, cross-AI UI perspectives,
+  CLI-based auto-verify, custom reviewer set, minimum-reviewer guard
+- Intentionally kept Claude as reviewer when running inside Claude Code (no SELF_CLI skip)
+
+### Why
+
+GSD v1.35.0 moved Claude commands to the skills system (skills/gsd-*/SKILL.md). Our patches
+must follow to avoid conflicts with the upstream installer. Also adopted security gates and
+text mode support. Skipped Playwright-MCP (our playwright-cli is better), SELF_CLI skip
+(we want Claude's external perspective), and new CLI flags (not needed for our reviewer set).
+
+---
+
 ## 2026-04-11 — Remap OpenCode reviewer models to new lazer IDs
 
 **GSD version:** 1.30.0

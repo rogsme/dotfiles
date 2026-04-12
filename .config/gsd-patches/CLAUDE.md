@@ -7,7 +7,7 @@ This file is the canonical instruction set for local GSD customizations.
 These instructions apply only to patching GSD assets managed by `~/.config/gsd-patches/`:
 
 - `claude/workflows/*`
-- `claude/commands/*`
+- `claude/skills/gsd-*/SKILL.md`
 - `opencode/workflows/*`
 - `opencode/command/*`
 - `gsd-customizations.md`

@@ -13,11 +13,14 @@ copy_file() {
 }
 
 sync_claude() {
+  # Workflows
   copy_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
   copy_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
   copy_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
-  copy_file "$ROOT/claude/commands/review.md" "$HOME/.claude/commands/gsd/review.md"
-  copy_file "$ROOT/claude/commands/verify-work.md" "$HOME/.claude/commands/gsd/verify-work.md"
+
+  # Skills (replaces old commands/gsd/ targets)
+  copy_file "$ROOT/claude/skills/gsd-review/SKILL.md" "$HOME/.claude/skills/gsd-review/SKILL.md"
+  copy_file "$ROOT/claude/skills/gsd-verify-work/SKILL.md" "$HOME/.claude/skills/gsd-verify-work/SKILL.md"
 }
 
 sync_opencode() {

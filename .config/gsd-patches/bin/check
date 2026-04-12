@@ -44,8 +44,8 @@ check_claude() {
   check_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
   check_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
   check_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
-  check_file "$ROOT/claude/commands/review.md" "$HOME/.claude/commands/gsd/review.md"
-  check_file "$ROOT/claude/commands/verify-work.md" "$HOME/.claude/commands/gsd/verify-work.md"
+  check_file "$ROOT/claude/skills/gsd-review/SKILL.md" "$HOME/.claude/skills/gsd-review/SKILL.md"
+  check_file "$ROOT/claude/skills/gsd-verify-work/SKILL.md" "$HOME/.claude/skills/gsd-verify-work/SKILL.md"
 }
 
 check_opencode() {

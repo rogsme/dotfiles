@@ -50,6 +50,8 @@ Exit.
 
 If only `claude` is available and we are already running inside Claude, at least `opencode`
 must also be available to ensure independence.
+
+**Text mode:** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `AskUserQuestion` call with a plain-text numbered list and ask the user to type their choice number.
 </step>
 
 <step name="gather_context">
