@@ -14,17 +14,16 @@
   },
   "model": "opus[1m]",
   "hooks": {
-    "SessionStart": [
+    "PreToolUse": [
       {
+        "matcher": "AskUserQuestion",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-check-update.js\""
+            "command": "~/.claude/hooks/notify.sh question"
           }
         ]
-      }
-    ],
-    "PreToolUse": [
+      },
       {
         "matcher": "Write|Edit",
         "hooks": [
@@ -36,11 +35,60 @@
         ]
       },
       {
-        "matcher": "AskUserQuestion",
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/notify.sh question"
+            "command": "node \"/home/roger/.claude/hooks/gsd-read-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/roger/.claude/hooks/gsd-workflow-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/roger/.claude/hooks/gsd-validate-commit.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh stop"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/home/roger/.claude/hooks/gsd-check-update.js\""
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /home/roger/.claude/hooks/gsd-session-state.sh"
           }
         ]
       }
@@ -55,23 +103,23 @@
             "timeout": 10
           }
         ]
-      }
-    ],
-    "Stop": [
+      },
       {
+        "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/notify.sh stop"
+            "command": "bash /home/roger/.claude/hooks/gsd-phase-boundary.sh",
+            "timeout": 5
           }
         ]
       }
     ]
   },
+  "enabledPlugins": {},
+  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
     "type": "command",
     "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
-  },
-  "enabledPlugins": {},
-  "skipDangerousModePermissionPrompt": true
+  }
 }
