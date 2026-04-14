@@ -41,6 +41,7 @@ check_file() {
 }
 
 check_claude() {
+  check_file "$ROOT/claude/workflows/execute-phase.md" "$HOME/.claude/get-shit-done/workflows/execute-phase.md"
   check_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
   check_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
   check_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
@@ -49,6 +50,7 @@ check_claude() {
 }
 
 check_opencode() {
+  check_file "$ROOT/opencode/workflows/execute-phase.md" "$HOME/.config/opencode/get-shit-done/workflows/execute-phase.md"
   check_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/get-shit-done/workflows/review.md"
   check_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/get-shit-done/workflows/ui-review.md"
   check_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/get-shit-done/workflows/verify-work.md"

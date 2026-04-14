@@ -393,10 +393,52 @@ After a `/gsd:update`, re-apply canonical patches with:
 
 Legacy `~/.claude/gsd-patch-backups/` files were retired in favor of the canonical directory.
 
+---
+
+## 2026-04-13 — Remove intrusive execute-phase gates
+
+**GSD version:** 1.35.0 (runtime: 1.34.2)
+**Files modified:** claude/workflows/execute-phase.md, opencode/workflows/execute-phase.md
+
+### What changed
+
+- Removed `code_review_gate` as a mandatory inline step in execute-phase workflow
+- Changed `human_needed` verification from blocking (waits for user approval) to non-blocking (creates UAT file, proceeds to completion)
+- Added `/gsd-code-review` (recommended) and `/gsd-verify-work` as suggested next actions in `offer_next`
+
+### Why
+
+The auto-invoked code review is intrusive — spawns a full review subagent on every phase execution
+regardless of need. The human_needed block stops the entire workflow waiting for manual approval
+when `/gsd-verify-work` already handles this purpose. Both are better as explicit user choices
+after seeing execution results. The stricter v1.35.0 verifier triggers `human_needed` far more
+often than v1.30.0, making the blocking behavior especially painful.
+
+---
+
+## 2026-04-13 — Replace Gemini CLI with OpenCode, add model variants, bump timeout
+
+**GSD version:** 1.35.0 (runtime: 1.34.2)
+**Files modified:** claude/workflows/review.md, claude/workflows/ui-review.md, opencode/workflows/review.md, opencode/workflows/ui-review.md
+
+### What changed
+
+- Replaced Gemini CLI (`gemini -p`) with OpenCode (`opencode run -m lazer/gemini-3.1-pro --variant high`)
+- Added `--variant high` to all OpenCode reviewer models (minimax, kimi, glm-5)
+- Bumped reviewer timeout from 5 minutes (300000ms) to 10 minutes (600000ms)
+- Removed `command -v gemini` availability check (gemini now goes through opencode)
+
+### Why
+
+Gemini CLI only offers the Flash model which is too weak for meaningful code review. Gemini Pro
+via OpenCode is significantly better. Model variants (`--variant high`) increase reasoning effort
+for all reviewers. The 5-minute timeout was killing slower models mid-response, especially with
+high variants, producing empty output that got falsely marked as "failed."
+
 ## Notes
 
-- All patches use `opencode run -m <model> "<prompt>"` syntax for OpenCode invocation
-- The 3 OpenCode reviewer models (minimax, kimi, glm-5) can be updated by editing the model strings in review.md and ui-review.md
+- All patches use `opencode run -m <model> --variant <level> "<prompt>"` syntax for OpenCode invocation
+- The 4 OpenCode reviewer models (gemini, minimax, kimi, glm-5) can be updated by editing the model strings in review.md and ui-review.md
 - playwright-cli install: `npm install -g @playwright/cli@latest && playwright-cli install --skills`
 - After a `/gsd-update`, runtime-native reapply commands are optional fallback (`/gsd-reapply-patches`), then run canonical sync/check commands above
 - Claude commands use skills format (`skills/gsd-*/SKILL.md`), OpenCode uses flat commands (`command/gsd-*.md`)

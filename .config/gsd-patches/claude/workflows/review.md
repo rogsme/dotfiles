@@ -15,19 +15,19 @@ Check which AI CLIs are available on the system:
 
 ```bash
 # Check each CLI
-command -v gemini >/dev/null 2>&1 && echo "gemini:available" || echo "gemini:missing"
 command -v codex >/dev/null 2>&1 && echo "codex:available" || echo "codex:missing"
 command -v opencode >/dev/null 2>&1 && echo "opencode:available" || echo "opencode:missing"
 command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:missing"
 ```
 
 Available OpenCode reviewer models:
-- `minimax` → `lazer/minimax-m2.5`
-- `kimi` → `lazer/kimi-2.5`
-- `glm-5` → `lazer/glm-5.1`
+- `gemini` → `lazer/gemini-3.1-pro` (variant: high)
+- `minimax` → `lazer/minimax-m2.5` (variant: high)
+- `kimi` → `lazer/kimi-2.5` (variant: high)
+- `glm-5` → `lazer/glm-5.1` (variant: high)
 
 Parse flags from `$ARGUMENTS`:
-- `--gemini` → include Gemini via Gemini CLI
+- `--gemini` → include Gemini Pro via OpenCode
 - `--codex` → include Codex via Codex CLI
 - `--minimax` → include MiniMax M2.5 via OpenCode
 - `--kimi` → include Kimi 2.5 via OpenCode
@@ -39,7 +39,6 @@ Parse flags from `$ARGUMENTS`:
 If no CLIs are available:
 ```
 No external AI CLIs found. Install at least one:
-- gemini: https://github.com/google-gemini/gemini-cli
 - codex: https://github.com/openai/codex
 - opencode: https://github.com/sst/opencode
 - claude: https://github.com/anthropics/claude-code
@@ -49,7 +48,7 @@ Then run /gsd:review again.
 Exit.
 
 If only `claude` is available and we are already running inside Claude, at least one
-non-claude reviewer CLI (`gemini`, `codex`, or `opencode`) must also be available to
+non-claude reviewer CLI (`codex` or `opencode`) must also be available to
 ensure independence.
 
 **Text mode:** Set `TEXT_MODE=true` if `--text` is present in `$ARGUMENTS` OR `text_mode` from init JSON is `true`. When TEXT_MODE is active, replace every `AskUserQuestion` call with a plain-text numbered list and ask the user to type their choice number.
@@ -175,8 +174,8 @@ Write to a temp file: `/tmp/gsd-review-prompt-{phase}.md`
 <step name="invoke_reviewers">
 Invoke all selected reviewers in parallel using separate Bash tool calls in a single message.
 
-IMPORTANT: `gemini`, `codex`, and `opencode` reviewer commands may use `2>/dev/null` to keep
-stdout clean. Local regression tests with `gemini 0.36.0`, `codex-cli 0.118.0`, and
+IMPORTANT: `codex` and `opencode` reviewer commands may use `2>/dev/null` to keep
+stdout clean. Local regression tests with `codex-cli 0.118.0` and
 `opencode 1.4.0` completed successfully with stderr suppressed on both smoke-test and realistic
 review prompts.
 
@@ -185,20 +184,20 @@ IMPORTANT: `claude -p` does NOT support `--no-input`. Use `claude -p "..." > fil
 **All reviewers run in parallel** — use one Bash tool call per reviewer, all in the same message:
 
 ```bash
-# Gemini CLI
-gemini -p "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
+# Gemini Pro via OpenCode
+opencode run -m lazer/gemini-3.1-pro --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-gemini-{phase}.md
 
 # Codex CLI
 codex exec --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
 
 # MiniMax M2.5
-opencode run -m lazer/minimax-m2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
+opencode run -m lazer/minimax-m2.5 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
 
 # Kimi 2.5
-opencode run -m lazer/kimi-2.5 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
+opencode run -m lazer/kimi-2.5 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
 
 # GLM-5.1
-opencode run -m lazer/glm-5.1 "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-glm-5-{phase}.md
+opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-glm-5-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
@@ -209,7 +208,7 @@ If a reviewer fails, log the error and continue with remaining reviewers.
 Waiting strategy (Claude Code):
 
 Launch all reviewer commands as separate Bash tool calls in a single message, each with
-`run_in_background: true` and `timeout: 300000` (5 minutes).
+`run_in_background: true` and `timeout: 600000` (10 minutes).
 
 Then stop. Do not poll. Do not check file sizes in a loop. Do not call `wc -l` repeatedly.
 Wait for the background command notifications to arrive, then read each output file once.

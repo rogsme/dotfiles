@@ -14,6 +14,7 @@ copy_file() {
 
 sync_claude() {
   # Workflows
+  copy_file "$ROOT/claude/workflows/execute-phase.md" "$HOME/.claude/get-shit-done/workflows/execute-phase.md"
   copy_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
   copy_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
   copy_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
@@ -24,6 +25,7 @@ sync_claude() {
 }
 
 sync_opencode() {
+  copy_file "$ROOT/opencode/workflows/execute-phase.md" "$HOME/.config/opencode/get-shit-done/workflows/execute-phase.md"
   copy_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/get-shit-done/workflows/review.md"
   copy_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/get-shit-done/workflows/ui-review.md"
   copy_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/get-shit-done/workflows/verify-work.md"
