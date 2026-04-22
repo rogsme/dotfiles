@@ -12,7 +12,7 @@
       "Read(**/*.key)"
     ]
   },
-  "model": "opus[1m]",
+  "model": "claude-opus-4-6[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -116,10 +116,10 @@
       }
     ]
   },
-  "enabledPlugins": {},
-  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
     "type": "command",
     "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
-  }
+  },
+  "enabledPlugins": {},
+  "skipDangerousModePermissionPrompt": true
 }
