@@ -26,6 +26,7 @@ Available OpenCode reviewer models:
 - `kimi` → `lazer/kimi-2.6` (variant: high)
 - `glm-5` → `lazer/glm-5.1` (variant: high)
 - `qwen` → `lazer/qwen-3.6-plus` (variant: high)
+- `deepseek` → `lazer/deepseek-v3.2` (variant: high)
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini Pro via OpenCode
@@ -34,6 +35,7 @@ Parse flags from `$ARGUMENTS`:
 - `--kimi` → include Kimi 2.6 via OpenCode
 - `--glm-5` → include GLM-5.1 via OpenCode
 - `--qwen` → include Qwen 3.6 Plus via OpenCode
+- `--deepseek` → include DeepSeek V3.2 via OpenCode
 - `--claude` → include Claude Opus (separate session)
 - `--all` → include all available reviewers
 - No flags → include all available reviewers
@@ -203,6 +205,9 @@ opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-review-prompt-{phas
 # Qwen 3.6 Plus
 opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-qwen-{phase}.md
 
+# DeepSeek V3.2
+opencode run -m lazer/deepseek-v3.2 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-deepseek-{phase}.md
+
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
 ```
@@ -237,6 +242,7 @@ After validation, report status:
 ◆ Kimi 2.6...           done ✓ (N lines)
 ◆ GLM-5.1...            done ✓ (N lines)
 ◆ Qwen 3.6 Plus...     done ✓ (N lines)
+◆ DeepSeek V3.2...     done ✓ (N lines)
 ◆ Claude Opus...        done ✓ (N lines)
 ```
 </step>
@@ -247,7 +253,7 @@ Combine all review responses into `{phase_dir}/{padded_phase}-REVIEWS.md`:
 ```markdown
 ---
 phase: {N}
-reviewers: [gemini, codex, minimax, kimi, glm-5, qwen, claude]
+reviewers: [gemini, codex, minimax, kimi, glm-5, qwen, deepseek, claude]
 reviewed_at: {ISO timestamp}
 plans_reviewed: [{list of PLAN.md files}]
 ---
@@ -287,6 +293,12 @@ plans_reviewed: [{list of PLAN.md files}]
 ## Qwen 3.6 Plus Review
 
 {qwen review content}
+
+---
+
+## DeepSeek V3.2 Review
+
+{deepseek review content}
 
 ---
 

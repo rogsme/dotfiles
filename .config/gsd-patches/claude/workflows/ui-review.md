@@ -241,6 +241,9 @@ opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-ui-review-prompt-{p
 # Qwen 3.6 Plus
 opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-qwen-{phase}.md
 
+# DeepSeek V3.2
+opencode run -m lazer/deepseek-v3.2 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-deepseek-{phase}.md
+
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
 ```
@@ -270,6 +273,7 @@ After validation, report status:
   ◆ Kimi 2.6...                   done ✓ (N lines)
   ◆ GLM-5.1...                    done ✓ (N lines)
   ◆ Qwen 3.6 Plus...             done ✓ (N lines)
+  ◆ DeepSeek V3.2...             done ✓ (N lines)
   ◆ Claude Opus...                done ✓ (N lines)
 ```
 
@@ -322,6 +326,12 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ---
 
+## DeepSeek V3.2
+
+{deepseek review content}
+
+---
+
 ## Claude Opus
 
 {claude review content}
@@ -332,15 +342,15 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ### Score Comparison
 
-| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Qwen | Claude | Avg |
-|--------|---------|--------|-------|---------|------|---------|------|--------|-----|
-| Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Color | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Typography | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Spacing | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Experience | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| **Total** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **avg** |
+| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Qwen | DeepSeek | Claude | Avg |
+|--------|---------|--------|-------|---------|------|---------|------|----------|--------|-----|
+| Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Color | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Typography | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Spacing | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Experience | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| **Total** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **avg** |
 
 ### Issues Missed by Primary Audit
 {issues flagged by 2+ cross-AI reviewers that the primary audit did not mention — highest priority}
