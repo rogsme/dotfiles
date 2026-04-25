@@ -22,16 +22,18 @@ command -v claude >/dev/null 2>&1 && echo "claude:available" || echo "claude:mis
 
 Available OpenCode reviewer models:
 - `gemini` → `lazer/gemini-3.1-pro` (variant: high)
-- `minimax` → `lazer/minimax-m2.5` (variant: high)
-- `kimi` → `lazer/kimi-2.5` (variant: high)
+- `minimax` → `lazer/minimax-m2.7` (variant: high)
+- `kimi` → `lazer/kimi-2.6` (variant: high)
 - `glm-5` → `lazer/glm-5.1` (variant: high)
+- `qwen` → `lazer/qwen-3.6-plus` (variant: high)
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini Pro via OpenCode
 - `--codex` → include Codex via Codex CLI
-- `--minimax` → include MiniMax M2.5 via OpenCode
-- `--kimi` → include Kimi 2.5 via OpenCode
+- `--minimax` → include MiniMax M2.7 via OpenCode
+- `--kimi` → include Kimi 2.6 via OpenCode
 - `--glm-5` → include GLM-5.1 via OpenCode
+- `--qwen` → include Qwen 3.6 Plus via OpenCode
 - `--claude` → include Claude Opus (separate session)
 - `--all` → include all available reviewers
 - No flags → include all available reviewers
@@ -190,14 +192,17 @@ opencode run -m lazer/gemini-3.1-pro --variant high "$(cat /tmp/gsd-review-promp
 # Codex CLI
 codex exec --skip-git-repo-check "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-codex-{phase}.md
 
-# MiniMax M2.5
-opencode run -m lazer/minimax-m2.5 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
+# MiniMax M2.7
+opencode run -m lazer/minimax-m2.7 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-minimax-{phase}.md
 
-# Kimi 2.5
-opencode run -m lazer/kimi-2.5 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
+# Kimi 2.6
+opencode run -m lazer/kimi-2.6 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-kimi-{phase}.md
 
 # GLM-5.1
 opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-glm-5-{phase}.md
+
+# Qwen 3.6 Plus
+opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-qwen-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
@@ -227,9 +232,10 @@ After validation, report status:
 
 ◆ Gemini CLI...         done ✓ (N lines)
 ◆ Codex CLI...          done ✓ (N lines)
-◆ MiniMax M2.5...       done ✓ (N lines)
-◆ Kimi 2.5...           done ✓ (N lines)
+◆ MiniMax M2.7...       done ✓ (N lines)
+◆ Kimi 2.6...           done ✓ (N lines)
 ◆ GLM-5.1...            done ✓ (N lines)
+◆ Qwen 3.6 Plus...     done ✓ (N lines)
 ◆ Claude Opus...        done ✓ (N lines)
 ```
 </step>
@@ -240,7 +246,7 @@ Combine all review responses into `{phase_dir}/{padded_phase}-REVIEWS.md`:
 ```markdown
 ---
 phase: {N}
-reviewers: [gemini, codex, minimax, kimi, glm-5, claude]
+reviewers: [gemini, codex, minimax, kimi, glm-5, qwen, claude]
 reviewed_at: {ISO timestamp}
 plans_reviewed: [{list of PLAN.md files}]
 ---
@@ -259,13 +265,13 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
-## MiniMax M2.5 Review
+## MiniMax M2.7 Review
 
 {minimax review content}
 
 ---
 
-## Kimi 2.5 Review
+## Kimi 2.6 Review
 
 {kimi review content}
 
@@ -274,6 +280,12 @@ plans_reviewed: [{list of PLAN.md files}]
 ## GLM-5.1 Review
 
 {glm-5 review content}
+
+---
+
+## Qwen 3.6 Plus Review
+
+{qwen review content}
 
 ---
 

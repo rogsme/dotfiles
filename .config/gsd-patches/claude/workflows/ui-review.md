@@ -229,14 +229,17 @@ opencode run -m lazer/gemini-3.1-pro --variant high "$(cat /tmp/gsd-ui-review-pr
 # Codex CLI
 codex exec --skip-git-repo-check "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-codex-{phase}.md
 
-# MiniMax M2.5
-opencode run -m lazer/minimax-m2.5 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
+# MiniMax M2.7
+opencode run -m lazer/minimax-m2.7 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-minimax-{phase}.md
 
-# Kimi 2.5
-opencode run -m lazer/kimi-2.5 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
+# Kimi 2.6
+opencode run -m lazer/kimi-2.6 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-kimi-{phase}.md
 
 # GLM-5.1
 opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-glm-5-{phase}.md
+
+# Qwen 3.6 Plus
+opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-qwen-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
@@ -263,9 +266,10 @@ After validation, report status:
 ◆ Cross-AI UI perspectives...
   ◆ Gemini CLI...                 done ✓ (N lines)
   ◆ Codex CLI...                  done ✓ (N lines)
-  ◆ MiniMax M2.5...               done ✓ (N lines)
-  ◆ Kimi 2.5...                   done ✓ (N lines)
+  ◆ MiniMax M2.7...               done ✓ (N lines)
+  ◆ Kimi 2.6...                   done ✓ (N lines)
   ◆ GLM-5.1...                    done ✓ (N lines)
+  ◆ Qwen 3.6 Plus...             done ✓ (N lines)
   ◆ Claude Opus...                done ✓ (N lines)
 ```
 
@@ -294,13 +298,13 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ---
 
-## MiniMax M2.5
+## MiniMax M2.7
 
 {minimax review content}
 
 ---
 
-## Kimi 2.5
+## Kimi 2.6
 
 {kimi review content}
 
@@ -309,6 +313,12 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 ## GLM-5.1
 
 {glm-5 review content}
+
+---
+
+## Qwen 3.6 Plus
+
+{qwen review content}
 
 ---
 
@@ -322,15 +332,15 @@ Read all successful review responses and append to the existing UI-REVIEW.md:
 
 ### Score Comparison
 
-| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Claude | Avg |
-|--------|---------|--------|-------|---------|------|-------|--------|-----|
-| Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Color | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Typography | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Spacing | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| Experience | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
-| **Total** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **avg** |
+| Pillar | Primary | Gemini | Codex | MiniMax | Kimi | GLM-5.1 | Qwen | Claude | Avg |
+|--------|---------|--------|-------|---------|------|---------|------|--------|-----|
+| Copywriting | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Visuals | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Color | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Typography | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Spacing | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| Experience | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {N}/4 | {avg} |
+| **Total** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **/24** | **avg** |
 
 ### Issues Missed by Primary Audit
 {issues flagged by 2+ cross-AI reviewers that the primary audit did not mention — highest priority}

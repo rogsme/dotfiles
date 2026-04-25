@@ -7,6 +7,25 @@ recreated if needed.
 
 ---
 
+## 2026-04-24 — Update adversarial reviewer models + add Qwen
+
+**GSD version:** 1.38.2
+**Files modified:** claude/workflows/review.md, claude/workflows/ui-review.md, opencode/workflows/review.md, opencode/workflows/ui-review.md, opencode/command/gsd-review.md
+
+### What changed
+
+- Upgraded MiniMax from `lazer/minimax-m2.5` to `lazer/minimax-m2.7`
+- Upgraded Kimi from `lazer/kimi-2.5` to `lazer/kimi-2.6`
+- Added new reviewer: Qwen 3.6 Plus (`lazer/qwen-3.6-plus`, flag: `--qwen`)
+- Now 7 total reviewers (5 OpenCode + Codex CLI + Claude Opus)
+- Updated all invocation blocks, status displays, output templates, reviewer lists, and score comparison tables across both runtimes
+
+### Why
+
+Model upgrades for MiniMax and Kimi. Qwen 3.6 Plus adds another independent perspective to the adversarial review set.
+
+---
+
 ## 2026-04-24 — Adopt upstream v1.38.2 infrastructure changes
 
 **GSD version:** 1.38.2
@@ -461,7 +480,7 @@ high variants, producing empty output that got falsely marked as "failed."
 ## Notes
 
 - All patches use `opencode run -m <model> --variant <level> "<prompt>"` syntax for OpenCode invocation
-- The 4 OpenCode reviewer models (gemini, minimax, kimi, glm-5) can be updated by editing the model strings in review.md and ui-review.md
+- The 5 OpenCode reviewer models (gemini, minimax, kimi, glm-5, qwen) can be updated by editing the model strings in review.md and ui-review.md
 - playwright-cli install: `npm install -g @playwright/cli@latest && playwright-cli install --skills`
 - After a `/gsd-update`, runtime-native reapply commands are optional fallback (`/gsd-reapply-patches`), then run canonical sync/check commands above
 - Claude commands use skills format (`skills/gsd-*/SKILL.md`), OpenCode uses flat commands (`command/gsd-*.md`)
