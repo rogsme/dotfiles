@@ -7,6 +7,29 @@ recreated if needed.
 
 ---
 
+## 2026-04-24 — Adopt upstream v1.38.2 infrastructure changes
+
+**GSD version:** 1.38.2
+**Files modified:** claude/workflows/review.md, claude/workflows/ui-review.md, claude/workflows/verify-work.md, opencode/workflows/review.md, opencode/workflows/ui-review.md, opencode/workflows/verify-work.md
+
+### What changed
+
+- Migrated all `node "$HOME/...gsd-tools.cjs"` calls to `gsd-sdk query` across all 6 workflow files
+  - `init phase-op` → `init.phase-op`, `init verify-work` → `init.verify-work`
+  - `agent-skills`, `resolve-model`, `config-get`, `uat render-checkpoint` → `gsd-sdk query` equivalents
+  - `commit "msg" --files path` → `commit "msg" path` (positional file args)
+- Removed `| head -5` truncation from UAT file listing in verify-work (bug fix #2172)
+- Added `scan_phase_artifacts` step to verify-work (both runtimes) — runs `audit-open` to surface open UAT/verification/context items before marking phase verified
+- Updated Next Up block in verify-work to include project identity: `[${PROJECT_CODE}] ${PROJECT_TITLE}`
+- Skipped: Cursor CLI self-detection ($CURSOR_SESSION_ID) — we don't use SELF_CLI
+- Skipped: Qwen/Cursor reviewer sections in REVIEWS.md template — we have our own reviewer set
+
+### Why
+
+GSD v1.36.0–v1.38.2 migrated all plumbing calls from raw `gsd-tools.cjs` to the typed `gsd-sdk query` CLI. Our patches needed to follow to stay compatible. The `audit-open` artifact scan and project identity in Next Up blocks are useful safety/UX improvements that don't conflict with our customizations.
+
+---
+
 ## 2026-04-11 — Rebase patches on GSD v1.35.0 + migrate to skills
 
 **GSD version:** 1.35.0
