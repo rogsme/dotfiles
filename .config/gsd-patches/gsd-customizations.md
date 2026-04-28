@@ -7,6 +7,23 @@ recreated if needed.
 
 ---
 
+## 2026-04-27 — Upgrade DeepSeek reviewer model to V4 Pro
+
+**GSD version:** 1.38.3
+**Files modified:** claude/workflows/review.md, claude/workflows/ui-review.md, opencode/workflows/review.md, opencode/workflows/ui-review.md, opencode/command/gsd-review.md
+
+### What changed
+
+- Upgraded DeepSeek from `lazer/deepseek-v3.2` to `lazer/deepseek-v4-pro`
+- Updated model ID and display name across review and ui-review workflows for both runtimes
+- Updated command help text in opencode/command/gsd-review.md
+
+### Why
+
+DeepSeek V4 Pro offers improved reasoning and code review capabilities over V3.2.
+
+---
+
 ## 2026-04-26 — Add decision-awareness guard to patch upgrade workflow
 
 **GSD version:** 1.38.3

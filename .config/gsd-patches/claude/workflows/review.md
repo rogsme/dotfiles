@@ -26,7 +26,7 @@ Available OpenCode reviewer models:
 - `kimi` → `lazer/kimi-2.6` (variant: high)
 - `glm-5` → `lazer/glm-5.1` (variant: high)
 - `qwen` → `lazer/qwen-3.6-plus` (variant: high)
-- `deepseek` → `lazer/deepseek-v3.2` (variant: high)
+- `deepseek` → `lazer/deepseek-v4-pro` (variant: high)
 
 Parse flags from `$ARGUMENTS`:
 - `--gemini` → include Gemini Pro via OpenCode
@@ -35,7 +35,7 @@ Parse flags from `$ARGUMENTS`:
 - `--kimi` → include Kimi 2.6 via OpenCode
 - `--glm-5` → include GLM-5.1 via OpenCode
 - `--qwen` → include Qwen 3.6 Plus via OpenCode
-- `--deepseek` → include DeepSeek V3.2 via OpenCode
+- `--deepseek` → include DeepSeek V4 Pro via OpenCode
 - `--claude` → include Claude Opus (separate session)
 - `--all` → include all available reviewers
 - No flags → include all available reviewers
@@ -206,8 +206,8 @@ opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-review-prompt-{phas
 # Qwen 3.6 Plus
 opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-qwen-{phase}.md
 
-# DeepSeek V3.2
-opencode run -m lazer/deepseek-v3.2 --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-deepseek-{phase}.md
+# DeepSeek V4 Pro
+opencode run -m lazer/deepseek-v4-pro --variant high "$(cat /tmp/gsd-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-review-deepseek-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-review-prompt-{phase}.md)" > /tmp/gsd-review-claude-{phase}.md
@@ -241,7 +241,7 @@ After validation, report status:
 ◆ Kimi 2.6...           done ✓ (N lines)
 ◆ GLM-5.1...            done ✓ (N lines)
 ◆ Qwen 3.6 Plus...     done ✓ (N lines)
-◆ DeepSeek V3.2...     done ✓ (N lines)
+◆ DeepSeek V4 Pro...     done ✓ (N lines)
 ◆ Claude Opus...        done ✓ (N lines)
 ```
 </step>
@@ -295,7 +295,7 @@ plans_reviewed: [{list of PLAN.md files}]
 
 ---
 
-## DeepSeek V3.2 Review
+## DeepSeek V4 Pro Review
 
 {deepseek review content}
 

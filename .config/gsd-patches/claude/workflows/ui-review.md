@@ -242,7 +242,7 @@ opencode run -m lazer/glm-5.1 --variant high "$(cat /tmp/gsd-ui-review-prompt-{p
 opencode run -m lazer/qwen-3.6-plus --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-qwen-{phase}.md
 
 # DeepSeek V3.2
-opencode run -m lazer/deepseek-v3.2 --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-deepseek-{phase}.md
+opencode run -m lazer/deepseek-v4-pro --variant high "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" 2>/dev/null > /tmp/gsd-ui-review-deepseek-{phase}.md
 
 # Claude Opus
 claude -p --model opus "$(cat /tmp/gsd-ui-review-prompt-{phase}.md)" > /tmp/gsd-ui-review-claude-{phase}.md
