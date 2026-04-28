@@ -9,6 +9,7 @@ Runtime install paths (`~/.claude/...`, `~/.config/opencode/...`) are deployment
 
 ### What we patch (and why we keep our versions)
 
+- **execute-phase.md** (workflow) — Removed intrusive gates: no mandatory inline `code_review_gate`, `human_needed` must not block or create UAT artifacts (UAT belongs to `/gsd-verify-work`), `/gsd-code-review` and `/gsd-verify-work` are suggested next actions only
 - **review.md** (workflow) — 8-dimension adversarial review framework (upstream has simpler 5-point), parallel reviewer execution (upstream is sequential), custom reviewer set (Gemini CLI, Codex CLI, MiniMax M2.5, Kimi 2.5, GLM-5.1, Claude Opus via OpenCode), runtime-specific waiting strategies
 - **ui-review.md** (workflow) — Cross-AI UI perspectives with score comparison tables and severity-based routing (upstream has none of this)
 - **verify-work.md** (workflow) — CLI-based auto-verify with `--auto` flag using playwright-cli + curl (upstream uses Playwright-MCP which is inferior), security enforcement gate, text mode support
@@ -34,11 +35,13 @@ Runtime install paths (`~/.claude/...`, `~/.config/opencode/...`) are deployment
 
 | Patch file | Upstream source | Claude target | OpenCode target |
 |---|---|---|---|
+| `claude/workflows/execute-phase.md` | `get-shit-done/workflows/execute-phase.md` | `~/.claude/get-shit-done/workflows/execute-phase.md` | — |
 | `claude/workflows/review.md` | `get-shit-done/workflows/review.md` | `~/.claude/get-shit-done/workflows/review.md` | — |
 | `claude/workflows/ui-review.md` | `get-shit-done/workflows/ui-review.md` | `~/.claude/get-shit-done/workflows/ui-review.md` | — |
 | `claude/workflows/verify-work.md` | `get-shit-done/workflows/verify-work.md` | `~/.claude/get-shit-done/workflows/verify-work.md` | — |
 | `claude/skills/gsd-review/SKILL.md` | `commands/gsd/review.md` (converted at install) | `~/.claude/skills/gsd-review/SKILL.md` | — |
 | `claude/skills/gsd-verify-work/SKILL.md` | `commands/gsd/verify-work.md` (converted at install) | `~/.claude/skills/gsd-verify-work/SKILL.md` | — |
+| `opencode/workflows/execute-phase.md` | `get-shit-done/workflows/execute-phase.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/execute-phase.md` |
 | `opencode/workflows/review.md` | `get-shit-done/workflows/review.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/review.md` |
 | `opencode/workflows/ui-review.md` | `get-shit-done/workflows/ui-review.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/ui-review.md` |
 | `opencode/workflows/verify-work.md` | `get-shit-done/workflows/verify-work.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/verify-work.md` |
@@ -60,11 +63,43 @@ Note: Upstream has a single source file per workflow/command. The install.js scr
 4. Detect the latest upstream version from `/tmp/get-shit-done/package.json` (field: `version`) or the latest git tag (`git describe --tags --abbrev=0`).
 5. If they match, report "Patches are up to date with upstream vX.Y.Z" and exit.
 
+### Phase 1.5: Load local decisions (MANDATORY)
+
+Before analyzing any upstream changes, read the full decision history:
+
+1. Read `~/.config/gsd-patches/gsd-customizations.md` end-to-end.
+2. Extract **active local decisions** — every "What changed" + "Why" that describes behavior we deliberately differ from upstream. Newer entries supersede older entries when they conflict.
+3. Summarize the active decisions relevant to the files being updated.
+
+**Critical rule:** Any upstream change that reverses an active local decision must be classified as CONFLICT (not ADOPT) and presented to the user before editing. The agent must never silently re-adopt upstream behavior we previously decided to remove.
+
+**Current active invariants (execute-phase):**
+- No mandatory inline `code_review_gate` in execute-phase
+- `human_needed` must not block for user approval
+- `human_needed` must not create or commit `*-HUMAN-UAT.md` — UAT belongs to `/gsd-verify-work`
+- `/gsd-code-review` and `/gsd-verify-work` are suggested next actions only, not automatic gates
+
+**Current active invariants (review/ui-review):**
+- 8-dimension adversarial review framework (not upstream's 5-point)
+- Parallel reviewer execution (not sequential)
+- Cross-AI UI perspectives with score comparison tables
+- Custom reviewer set via OpenCode (MiniMax, Kimi, GLM-5, Qwen, DeepSeek, Gemini Pro) + Codex CLI + Claude Opus
+- Claude always kept as reviewer even inside Claude Code (no SELF_CLI skip)
+- `--variant high` on all OpenCode reviewer models
+- 10-minute reviewer timeout (not 5-minute)
+
+**Current active invariants (verify-work):**
+- playwright-cli + curl auto-verify (not Playwright-MCP)
+- `--auto` flag support
+- Security enforcement gate
+- Text mode support
+
 ### Phase 2: Analyze upstream changes
 
 1. Run `git log --oneline v{current}...v{latest}` in `/tmp/get-shit-done` to get commit summary.
 2. Run `git diff --stat v{current}...v{latest}` for overall change scope.
 3. For each upstream file we patch, run `git diff v{current}...v{latest} -- {path}` to get the actual diff. The upstream files to check:
+   - `get-shit-done/workflows/execute-phase.md`
    - `get-shit-done/workflows/review.md`
    - `get-shit-done/workflows/ui-review.md`
    - `get-shit-done/workflows/verify-work.md`
@@ -82,6 +117,10 @@ For each upstream file that changed, read both the upstream v{latest} version an
 - **CONFLICT** — Same section changed differently; needs manual decision
 
 **Rules for classification:**
+- **Decision-awareness rule:** Any upstream change that reverses an active local decision from `gsd-customizations.md` must be classified as CONFLICT and presented to the user. Never silently re-adopt removed behavior.
+- No mandatory inline `code_review_gate` in execute-phase — upstream's auto-invoked review is intrusive.
+- `human_needed` must not block for user approval — `/gsd-verify-work` handles this.
+- `human_needed` must not create or commit `*-HUMAN-UAT.md` — UAT creation belongs to `/gsd-verify-work`.
 - Our 8-dimension adversarial review framework always wins over upstream's simpler review format.
 - Our parallel reviewer execution always wins over upstream's sequential approach.
 - Our cross-AI UI perspectives are always kept (upstream has nothing equivalent).

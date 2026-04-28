@@ -35,6 +35,7 @@ Edit files in this directory only. Do not directly edit runtime files unless rec
 
 Claude targets:
 
+- `~/.claude/get-shit-done/workflows/execute-phase.md`
 - `~/.claude/get-shit-done/workflows/review.md`
 - `~/.claude/get-shit-done/workflows/ui-review.md`
 - `~/.claude/get-shit-done/workflows/verify-work.md`
@@ -43,6 +44,7 @@ Claude targets:
 
 OpenCode targets:
 
+- `~/.config/opencode/get-shit-done/workflows/execute-phase.md`
 - `~/.config/opencode/get-shit-done/workflows/review.md`
 - `~/.config/opencode/get-shit-done/workflows/ui-review.md`
 - `~/.config/opencode/get-shit-done/workflows/verify-work.md`

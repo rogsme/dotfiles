@@ -961,46 +961,18 @@ grep "^status:" "$PHASE_DIR"/*-VERIFICATION.md | cut -d: -f2 | tr -d ' '
 | Status | Action |
 |--------|--------|
 | `passed` | → update_roadmap |
-| `human_needed` | Present items for human testing, get approval or feedback |
-| `gaps_found` | Present gap summary, offer `/gsd-plan-phase {phase} --gaps ${GSD_WS}` |
+| `human_needed` | Note items, proceed to completion (UAT is `/gsd-verify-work`'s job) |
 
 **If human_needed:**
 
-**Step A: Persist human verification items as UAT file.**
+Proceed to update_roadmap. Do NOT create a UAT file — that is `/gsd-verify-work`'s responsibility. The human verification items remain listed in `{phase_num}-VERIFICATION.md` and will surface in `/gsd-progress` and `/gsd-audit-uat`.
 
-Create `{phase_dir}/{phase_num}-HUMAN-UAT.md` using UAT template format:
+Display:
+```
+## ✓ Phase {X}: {Name} — Human Verification Items
 
-```markdown
----
-status: partial
-phase: {phase_num}-{phase_name}
-source: [{phase_num}-VERIFICATION.md]
-started: [now ISO]
-updated: [now ISO]
----
-
-## Current Test
-
-[awaiting human testing]
-
-## Tests
-
-{For each human_verification item from VERIFICATION.md:}
-
-### {N}. {item description}
-expected: {expected behavior from VERIFICATION.md}
-result: [pending]
-
-## Summary
-
-total: {count}
-passed: 0
-issues: 0
-pending: {count}
-skipped: 0
-blocked: 0
-
-## Gaps
+All automated checks passed. {N} items need manual testing (listed in VERIFICATION.md).
+Run `/gsd-verify-work {X}` when ready to test them.
 ```
 
 Commit the file:

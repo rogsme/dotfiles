@@ -4,11 +4,13 @@ Use this map when copying behavior between runtimes or investigating drift.
 
 ## Canonical Source
 
+- `~/.config/gsd-patches/claude/workflows/execute-phase.md`
 - `~/.config/gsd-patches/claude/workflows/review.md`
 - `~/.config/gsd-patches/claude/workflows/ui-review.md`
 - `~/.config/gsd-patches/claude/workflows/verify-work.md`
 - `~/.config/gsd-patches/claude/skills/gsd-review/SKILL.md`
 - `~/.config/gsd-patches/claude/skills/gsd-verify-work/SKILL.md`
+- `~/.config/gsd-patches/opencode/workflows/execute-phase.md`
 - `~/.config/gsd-patches/opencode/workflows/review.md`
 - `~/.config/gsd-patches/opencode/workflows/ui-review.md`
 - `~/.config/gsd-patches/opencode/workflows/verify-work.md`
@@ -18,6 +20,7 @@ Use this map when copying behavior between runtimes or investigating drift.
 
 ## Claude Runtime Targets
 
+- `~/.claude/get-shit-done/workflows/execute-phase.md`
 - `~/.claude/get-shit-done/workflows/review.md`
 - `~/.claude/get-shit-done/workflows/ui-review.md`
 - `~/.claude/get-shit-done/workflows/verify-work.md`
@@ -26,6 +29,7 @@ Use this map when copying behavior between runtimes or investigating drift.
 
 ## OpenCode Runtime Targets
 
+- `~/.config/opencode/get-shit-done/workflows/execute-phase.md`
 - `~/.config/opencode/get-shit-done/workflows/review.md`
 - `~/.config/opencode/get-shit-done/workflows/ui-review.md`
 - `~/.config/opencode/get-shit-done/workflows/verify-work.md`

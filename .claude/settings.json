@@ -12,7 +12,6 @@
       "Read(**/*.key)"
     ]
   },
-  "model": "claude-opus-4-6[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -131,5 +130,6 @@
     "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
   },
   "enabledPlugins": {},
-  "skipDangerousModePermissionPrompt": true
+  "skipDangerousModePermissionPrompt": true,
+  "skipAutoPermissionPrompt": true
 }

@@ -7,6 +7,29 @@ recreated if needed.
 
 ---
 
+## 2026-04-26 — Add decision-awareness guard to patch upgrade workflow
+
+**GSD version:** 1.38.3
+**Files modified:** .claude/skills/gsd-patch-upgrade/references/patch-update-workflow.md, README.md, references/file-map.md
+
+### What changed
+
+- Added Phase 1.5 (mandatory) to patch-update-workflow: read `gsd-customizations.md` end-to-end before analyzing upstream changes, extract active local decisions, summarize them for context
+- Added "Decision-awareness rule": any upstream change that reverses an active local decision must be classified as CONFLICT (not ADOPT) and presented to the user
+- Added `execute-phase.md` to "What we patch" section, upstream diff checklist, and mapping table
+- Added execute-phase active invariants: no mandatory `code_review_gate`, `human_needed` must not block or create UAT artifacts, UAT belongs to `/gsd-verify-work`
+- Added review/ui-review/verify-work active invariants for completeness
+- Added execute-phase to README.md managed files and file-map.md canonical/runtime targets
+
+### Why
+
+The 2026-04-26 UAT regression happened because the patch upgrade process had no step to read
+local decisions before applying upstream changes. The agent adopted upstream's `human_needed`
+UAT-creation behavior without checking that we had explicitly removed it. Making decision-loading
+mandatory before diff analysis prevents this class of regression.
+
+---
+
 ## 2026-04-24 — Update adversarial reviewer models + add Qwen, DeepSeek
 
 **GSD version:** 1.38.2
@@ -438,6 +461,29 @@ Legacy `~/.claude/gsd-patch-backups/` files were retired in favor of the canonic
 
 ---
 
+## 2026-04-26 — Remove UAT creation from execute-phase human_needed
+
+**GSD version:** 1.35.0+
+**Files modified:** claude/workflows/execute-phase.md, opencode/workflows/execute-phase.md
+
+### What changed
+
+- Removed `*-HUMAN-UAT.md` file creation and commit from the `human_needed` branch in execute-phase
+- `human_needed` now simply notes the items (they remain in VERIFICATION.md) and proceeds to `update_roadmap`
+- UAT creation is `/gsd-verify-work`'s sole responsibility — execute-phase no longer creates UAT artifacts
+- Updated status table: `human_needed` action column changed from "Present items for human testing, get approval or feedback" to "Note items, proceed to completion (UAT is `/gsd-verify-work`'s job)"
+
+### Why
+
+The previous 2026-04-13 patch made `human_needed` non-blocking but still created a `*-HUMAN-UAT.md`
+file during execute-phase. This duplicated the UAT creation that `/gsd-verify-work` already performs,
+and the two UAT sources caused confusion in `/gsd-progress` and `/gsd-audit-uat`. Execute-phase
+should only verify the goal — it should not create testing artifacts. VERIFICATION.md already
+lists the human-needed items; the user runs `/gsd-verify-work` to create the UAT and do manual
+testing on their own schedule.
+
+---
+
 ## 2026-04-13 — Remove intrusive execute-phase gates
 
 **GSD version:** 1.35.0 (runtime: 1.34.2)
@@ -446,7 +492,7 @@ Legacy `~/.claude/gsd-patch-backups/` files were retired in favor of the canonic
 ### What changed
 
 - Removed `code_review_gate` as a mandatory inline step in execute-phase workflow
-- Changed `human_needed` verification from blocking (waits for user approval) to non-blocking (creates UAT file, proceeds to completion)
+- Changed `human_needed` verification from blocking (waits for user approval) to non-blocking (proceeds to completion)
 - Added `/gsd-code-review` (recommended) and `/gsd-verify-work` as suggested next actions in `offer_next`
 
 ### Why
