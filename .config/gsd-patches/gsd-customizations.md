@@ -7,6 +7,22 @@ recreated if needed.
 
 ---
 
+## 2026-04-27 — Enforce immutable changelog entries, append-only
+
+**GSD version:** 1.38.3
+**Files modified:** CLAUDE.md
+
+### What changed
+
+- Added explicit rule to Edit Rules section: new changelog entries must always be appended at the top; existing entries are immutable history and must never be edited or altered.
+- Added format guidance referencing the existing entry convention (date heading, GSD version, files modified, What changed, Why).
+
+### Why
+
+A past edit mistakenly changed an old changelog entry's text instead of adding a new one, corrupting the historical record. The instruction was implied but not stated, so models without explicit guidance defaulted to modifying rather than appending.
+
+---
+
 ## 2026-04-27 — Upgrade DeepSeek reviewer model to V4 Pro
 
 **GSD version:** 1.38.3

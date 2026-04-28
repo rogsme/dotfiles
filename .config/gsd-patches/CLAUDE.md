@@ -19,6 +19,8 @@ Runtime install paths (`~/.claude/get-shit-done`, `~/.config/opencode/get-shit-d
 1. Edit canonical files in `~/.config/gsd-patches/` only.
 2. Do not edit runtime files directly except emergency recovery.
 3. Log patch changes in `~/.config/gsd-patches/gsd-customizations.md`.
+   - **ALWAYS append new entries to the top of the changelog.** Never edit or alter existing entries — they are immutable history.
+   - Use the existing entry format: date heading, GSD version, files modified, What changed, Why.
 4. Re-sync both runtimes after edits:
 
 ```bash
