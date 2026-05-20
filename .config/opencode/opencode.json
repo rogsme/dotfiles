@@ -249,6 +249,51 @@
             }
           }
         },
+        "gemini-3.5-flash": {
+          "name": "Gemini 3.5 Flash",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1048576,
+            "output": 65536
+          },
+          "family": "gemini-flash",
+          "release_date": "2026-05-19",
+          "cost": {
+            "input": 1.5,
+            "output": 9,
+            "cache_read": 0.15
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "video",
+              "audio",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "off": {
+              "reasoningEffort": "minimal"
+            }
+          }
+        },
         "gemini-3.1-pro": {
           "name": "Gemini 3.1 Pro",
           "attachment": true,
