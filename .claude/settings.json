@@ -12,6 +12,7 @@
       "Read(**/*.key)"
     ]
   },
+  "model": "claude-opus-4-6[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -131,5 +132,6 @@
   },
   "enabledPlugins": {},
   "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
