@@ -12,7 +12,7 @@ These instructions apply only to patching GSD assets managed by `~/.config/gsd-p
 - `opencode/command/*`
 - `gsd-customizations.md`
 
-Runtime install paths (`~/.claude/get-shit-done`, `~/.config/opencode/get-shit-done`) are deployment targets, not source of truth.
+Runtime install paths (`~/.claude/gsd-core`, `~/.config/opencode/gsd-core`) are deployment targets, not source of truth.
 
 ## Edit Rules
 
@@ -50,7 +50,7 @@ Runtime install paths (`~/.claude/get-shit-done`, `~/.config/opencode/get-shit-d
 
 ## Version Tracking
 
-- Claude GSD version file: `~/.claude/get-shit-done/VERSION`
-- OpenCode GSD version file: `~/.config/opencode/get-shit-done/VERSION`
+- Claude GSD version file: `~/.claude/gsd-core/VERSION`
+- OpenCode GSD version file: `~/.config/opencode/gsd-core/VERSION`
 
 When upstream versions diverge or major files change, update canonical patch files and document the migration in `gsd-customizations.md`.

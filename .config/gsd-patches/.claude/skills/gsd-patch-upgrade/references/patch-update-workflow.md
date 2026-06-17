@@ -2,6 +2,11 @@
 
 Update local GSD patches to align with a new upstream version while preserving custom features.
 
+> **2026-06-17 migration — upstream rebranded to GSD Core (rebase to v1.4.5 COMPLETED).** The project moved from `gsd-build/get-shit-done` to `open-gsd/gsd-core`, the runtime install dir was renamed `get-shit-done/` → `gsd-core/` (upstream #604), and **versioning reset** (old line ended at v1.38.3; GSD Core restarts at v1.4.5). All patches were rebased onto v1.4.5 on this date. Notes for future upgrades:
+> - **Upstream source layout CONFIRMED** (verified against a fresh clone): workflows live at `gsd-core/workflows/*.md`, commands at `commands/gsd/*.md` (install.js converts commands → Claude skills `skills/gsd-*/SKILL.md` and OpenCode `command/gsd-*.md`). The source/runtime paths in the mapping table below are correct. The `/tmp/get-shit-done` clone-dir name is arbitrary and left as-is.
+> - **The git HEAD of the repo may be an unreleased RC** (e.g. main was `1.5.0-rc.5` while npm latest was `1.4.5`). Rebase against the INSTALLED runtime version (`gsd-core/VERSION`) / the matching tag, not raw HEAD.
+> - **The rebrand boundary is not git-comparable.** v1.38.3 (old repo) and v1.4.x (new repo) are not comparable tags, so the original v1.38.3→v1.4.5 rebase was done by diffing rebased output against the pristine installed v1.4.5 files and the `gsd-local-patches/` backup, not via `git log`. Upgrades FROM v1.4.x onward follow the normal `v{current}...v{latest}` progression in Phase 2.
+
 ## Architecture
 
 Canonical patch files live in `~/.config/gsd-patches/`. They are the single source of truth.
@@ -35,16 +40,16 @@ Runtime install paths (`~/.claude/...`, `~/.config/opencode/...`) are deployment
 
 | Patch file | Upstream source | Claude target | OpenCode target |
 |---|---|---|---|
-| `claude/workflows/execute-phase.md` | `get-shit-done/workflows/execute-phase.md` | `~/.claude/get-shit-done/workflows/execute-phase.md` | — |
-| `claude/workflows/review.md` | `get-shit-done/workflows/review.md` | `~/.claude/get-shit-done/workflows/review.md` | — |
-| `claude/workflows/ui-review.md` | `get-shit-done/workflows/ui-review.md` | `~/.claude/get-shit-done/workflows/ui-review.md` | — |
-| `claude/workflows/verify-work.md` | `get-shit-done/workflows/verify-work.md` | `~/.claude/get-shit-done/workflows/verify-work.md` | — |
+| `claude/workflows/execute-phase.md` | `gsd-core/workflows/execute-phase.md` | `~/.claude/gsd-core/workflows/execute-phase.md` | — |
+| `claude/workflows/review.md` | `gsd-core/workflows/review.md` | `~/.claude/gsd-core/workflows/review.md` | — |
+| `claude/workflows/ui-review.md` | `gsd-core/workflows/ui-review.md` | `~/.claude/gsd-core/workflows/ui-review.md` | — |
+| `claude/workflows/verify-work.md` | `gsd-core/workflows/verify-work.md` | `~/.claude/gsd-core/workflows/verify-work.md` | — |
 | `claude/skills/gsd-review/SKILL.md` | `commands/gsd/review.md` (converted at install) | `~/.claude/skills/gsd-review/SKILL.md` | — |
 | `claude/skills/gsd-verify-work/SKILL.md` | `commands/gsd/verify-work.md` (converted at install) | `~/.claude/skills/gsd-verify-work/SKILL.md` | — |
-| `opencode/workflows/execute-phase.md` | `get-shit-done/workflows/execute-phase.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/execute-phase.md` |
-| `opencode/workflows/review.md` | `get-shit-done/workflows/review.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/review.md` |
-| `opencode/workflows/ui-review.md` | `get-shit-done/workflows/ui-review.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/ui-review.md` |
-| `opencode/workflows/verify-work.md` | `get-shit-done/workflows/verify-work.md` (path-adapted) | — | `~/.config/opencode/get-shit-done/workflows/verify-work.md` |
+| `opencode/workflows/execute-phase.md` | `gsd-core/workflows/execute-phase.md` (path-adapted) | — | `~/.config/opencode/gsd-core/workflows/execute-phase.md` |
+| `opencode/workflows/review.md` | `gsd-core/workflows/review.md` (path-adapted) | — | `~/.config/opencode/gsd-core/workflows/review.md` |
+| `opencode/workflows/ui-review.md` | `gsd-core/workflows/ui-review.md` (path-adapted) | — | `~/.config/opencode/gsd-core/workflows/ui-review.md` |
+| `opencode/workflows/verify-work.md` | `gsd-core/workflows/verify-work.md` (path-adapted) | — | `~/.config/opencode/gsd-core/workflows/verify-work.md` |
 | `opencode/command/gsd-review.md` | `commands/gsd/review.md` (frontmatter-converted) | — | `~/.config/opencode/command/gsd-review.md` |
 | `opencode/command/gsd-verify-work.md` | `commands/gsd/verify-work.md` (frontmatter-converted) | — | `~/.config/opencode/command/gsd-verify-work.md` |
 
@@ -57,7 +62,7 @@ Note: Upstream has a single source file per workflow/command. The install.js scr
 1. Remove `/tmp/get-shit-done` if it exists.
 2. Clone the upstream repo:
    ```bash
-   git clone --quiet git@github.com:gsd-build/get-shit-done.git /tmp/get-shit-done
+   git clone --quiet git@github.com:open-gsd/gsd-core.git /tmp/get-shit-done
    ```
 3. Detect the current patch base version from the first `**GSD version:**` line in `~/.config/gsd-patches/gsd-customizations.md`.
 4. Detect the latest upstream version from `/tmp/get-shit-done/package.json` (field: `version`) or the latest git tag (`git describe --tags --abbrev=0`).
@@ -99,10 +104,10 @@ Before analyzing any upstream changes, read the full decision history:
 1. Run `git log --oneline v{current}...v{latest}` in `/tmp/get-shit-done` to get commit summary.
 2. Run `git diff --stat v{current}...v{latest}` for overall change scope.
 3. For each upstream file we patch, run `git diff v{current}...v{latest} -- {path}` to get the actual diff. The upstream files to check:
-   - `get-shit-done/workflows/execute-phase.md`
-   - `get-shit-done/workflows/review.md`
-   - `get-shit-done/workflows/ui-review.md`
-   - `get-shit-done/workflows/verify-work.md`
+   - `gsd-core/workflows/execute-phase.md`
+   - `gsd-core/workflows/review.md`
+   - `gsd-core/workflows/ui-review.md`
+   - `gsd-core/workflows/verify-work.md`
    - `commands/gsd/review.md`
    - `commands/gsd/verify-work.md`
    - `commands/gsd/ui-review.md`
@@ -210,7 +215,7 @@ Wait for user approval. Go back and forth if the user has questions, concerns, o
 | Aspect | Claude | OpenCode |
 |--------|--------|----------|
 | Skill/command format | `skills/gsd-*/SKILL.md` with `name: gsd-xxx` | `command/gsd-*.md` with flat frontmatter |
-| Paths | `$HOME/.claude/get-shit-done/...` | `$HOME/.config/opencode/get-shit-done/...` |
+| Paths | `$HOME/.claude/gsd-core/...` | `$HOME/.config/opencode/gsd-core/...` |
 | Agent paths | `$HOME/.claude/agents/...` | `$HOME/.config/opencode/agents/...` |
 | Parallel execution | `run_in_background: true` on Bash calls | `multi_tool_use.parallel` batch |
 | AskUserQuestion | Native tool | `question` tool (or text mode fallback) |

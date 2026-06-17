@@ -1,6 +1,7 @@
 ---
 description: Request cross-AI peer review of phase plans from external AI CLIs
 argument-hint: "--phase N [--gemini] [--codex] [--minimax] [--kimi] [--glm-5] [--qwen] [--deepseek] [--claude] [--all]"
+requires: [config, phase, plan-phase]
 tools:
   read: true
   write: true
@@ -18,7 +19,7 @@ planning via /gsd-plan-phase --reviews.
 </objective>
 
 <execution_context>
-@$HOME/.config/opencode/get-shit-done/workflows/review.md
+@$HOME/.config/opencode/gsd-core/workflows/review.md
 </execution_context>
 
 <context>
@@ -37,5 +38,5 @@ Phase number: extracted from $ARGUMENTS (required)
 </context>
 
 <process>
-Execute the review workflow from @$HOME/.config/opencode/get-shit-done/workflows/review.md end-to-end.
+Execute the review workflow from @$HOME/.config/opencode/gsd-core/workflows/review.md end-to-end.
 </process>

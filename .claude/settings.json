@@ -9,7 +9,15 @@
       "Read(**/secrets/*)",
       "Read(**/*credential*)",
       "Read(**/*.pem)",
-      "Read(**/*.key)"
+      "Read(**/*.key)",
+      "Read(.secrets)"
+    ],
+    "allow": [
+      "Bash(npx gsd-core *)",
+      "Read(.planning/*)",
+      "Write(.planning/*)",
+      "Read(STATE.md)",
+      "Write(STATE.md)"
     ]
   },
   "model": "claude-opus-4-8[1m]",
@@ -29,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-prompt-guard.js\"",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-prompt-guard.js\"",
             "timeout": 5
           }
         ]
@@ -39,17 +47,27 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-read-guard.js\"",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-read-guard.js\"",
             "timeout": 5
           }
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Bash|Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-workflow-guard.js\"",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-workflow-guard.js\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-worktree-path-guard.js\"",
             "timeout": 5
           }
         ]
@@ -59,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /home/roger/.claude/hooks/gsd-validate-commit.sh",
+            "command": "bash \"/home/roger/.claude/hooks/gsd-validate-commit.sh\"",
             "timeout": 5
           }
         ]
@@ -73,6 +91,15 @@
             "command": "~/.claude/hooks/notify.sh stop"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -80,7 +107,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-check-update.js\""
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-check-update.js\""
           }
         ]
       },
@@ -88,7 +115,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash /home/roger/.claude/hooks/gsd-session-state.sh"
+            "command": "bash \"/home/roger/.claude/hooks/gsd-session-state.sh\""
           }
         ]
       }
@@ -99,18 +126,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
             "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash /home/roger/.claude/hooks/gsd-phase-boundary.sh",
-            "timeout": 5
           }
         ]
       },
@@ -119,19 +136,73 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/home/roger/.claude/hooks/gsd-read-injection-scanner.js\"",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-read-injection-scanner.js\"",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"/home/roger/.claude/hooks/gsd-graphify-update.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"/home/roger/.claude/hooks/gsd-phase-boundary.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-context-monitor.js\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "FileChanged": [
+      {
+        "matcher": "config.json",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-config-reload.js\"",
+            "timeout": 8
           }
         ]
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "node \"/home/roger/.claude/hooks/gsd-statusline.js\""
-  },
   "enabledPlugins": {},
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "statusLine": {
+    "type": "command",
+    "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-statusline.js\""
+  }
 }

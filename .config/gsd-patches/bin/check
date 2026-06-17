@@ -41,25 +41,25 @@ check_file() {
 }
 
 check_claude() {
-  check_file "$ROOT/claude/workflows/execute-phase.md" "$HOME/.claude/get-shit-done/workflows/execute-phase.md"
-  check_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/get-shit-done/workflows/review.md"
-  check_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/get-shit-done/workflows/ui-review.md"
-  check_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/get-shit-done/workflows/verify-work.md"
+  check_file "$ROOT/claude/workflows/execute-phase.md" "$HOME/.claude/gsd-core/workflows/execute-phase.md"
+  check_file "$ROOT/claude/workflows/review.md" "$HOME/.claude/gsd-core/workflows/review.md"
+  check_file "$ROOT/claude/workflows/ui-review.md" "$HOME/.claude/gsd-core/workflows/ui-review.md"
+  check_file "$ROOT/claude/workflows/verify-work.md" "$HOME/.claude/gsd-core/workflows/verify-work.md"
   check_file "$ROOT/claude/skills/gsd-review/SKILL.md" "$HOME/.claude/skills/gsd-review/SKILL.md"
   check_file "$ROOT/claude/skills/gsd-verify-work/SKILL.md" "$HOME/.claude/skills/gsd-verify-work/SKILL.md"
 }
 
 check_opencode() {
-  check_file "$ROOT/opencode/workflows/execute-phase.md" "$HOME/.config/opencode/get-shit-done/workflows/execute-phase.md"
-  check_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/get-shit-done/workflows/review.md"
-  check_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/get-shit-done/workflows/ui-review.md"
-  check_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/get-shit-done/workflows/verify-work.md"
+  check_file "$ROOT/opencode/workflows/execute-phase.md" "$HOME/.config/opencode/gsd-core/workflows/execute-phase.md"
+  check_file "$ROOT/opencode/workflows/review.md" "$HOME/.config/opencode/gsd-core/workflows/review.md"
+  check_file "$ROOT/opencode/workflows/ui-review.md" "$HOME/.config/opencode/gsd-core/workflows/ui-review.md"
+  check_file "$ROOT/opencode/workflows/verify-work.md" "$HOME/.config/opencode/gsd-core/workflows/verify-work.md"
   check_file "$ROOT/opencode/command/gsd-review.md" "$HOME/.config/opencode/command/gsd-review.md"
   check_file "$ROOT/opencode/command/gsd-verify-work.md" "$HOME/.config/opencode/command/gsd-verify-work.md"
 }
 
-print_version "claude" "$HOME/.claude/get-shit-done/VERSION"
-print_version "opencode" "$HOME/.config/opencode/get-shit-done/VERSION"
+print_version "claude" "$HOME/.claude/gsd-core/VERSION"
+print_version "opencode" "$HOME/.config/opencode/gsd-core/VERSION"
 
 case "$MODE" in
   all)

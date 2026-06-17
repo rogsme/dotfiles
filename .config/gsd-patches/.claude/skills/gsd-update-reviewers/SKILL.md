@@ -107,7 +107,7 @@ For score table (T10): remove the column from header, separator, all data rows, 
 
 Read current GSD version:
 ```bash
-cat ~/.claude/get-shit-done/VERSION
+cat ~/.claude/gsd-core/VERSION
 ```
 
 Add entry to top of `gsd-customizations.md` (after the header, before first existing entry).

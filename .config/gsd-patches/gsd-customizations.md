@@ -7,6 +7,72 @@ recreated if needed.
 
 ---
 
+## 2026-06-17 — Rebase all patches onto GSD Core v1.4.5
+
+**GSD version:** 1.4.5
+**Files modified:** claude/workflows/{execute-phase,review,ui-review,verify-work}.md, opencode/workflows/{execute-phase,review,ui-review,verify-work}.md, claude/skills/gsd-review/SKILL.md, claude/skills/gsd-verify-work/SKILL.md, opencode/command/gsd-review.md, opencode/command/gsd-verify-work.md, bin/sync, bin/check, .claude/skills/gsd-patch-upgrade/references/patch-update-workflow.md
+
+### What changed
+
+Re-ported all customizations onto fresh v1.4.5 upstream (the v1.38.3 base was gone — reconstructed each customization from our prior canonical files + the gsd-local-patches backup, then re-applied onto v1.4.5).
+
+- **execute-phase.md** — re-applied gate-softening onto v1.4.5: `code_review_gate` made non-mandatory (suggested next action only); `human_needed` now non-blocking and does NOT create a UAT artifact; `/gsd-code-review` + `/gsd-verify-work` offered as optional next actions. Diff vs v1.4.5 is localized to those gates (+16/-91); all v1.4.5 scaffolding (gsd-tools shim, wave/checkpoint logic) preserved.
+- **review.md** — re-applied 8-dimension adversarial framework, parallel reviewer execution (Claude: `run_in_background`; OpenCode: `multi_tool_use.parallel`), self-CLI independence logic, and the current reviewer set with verified model IDs: `lazer/gemini-3.1-pro`, `lazer/minimax-m2.7`, `lazer/kimi-2.6`, `lazer/glm-5.1`, `lazer/qwen-3.6-plus`, `lazer/deepseek-v4-pro`, plus Codex CLI and Claude Opus (8 total). v1.4.5's gsd-tools shim/scaffolding kept.
+- **ui-review.md** — re-grafted cross-AI UI perspectives (CLI availability, independent-perspective prompt, score comparison + score-disagreement routing) additively onto v1.4.5; all original sections preserved.
+- **verify-work.md** — replaced v1.4.5's Playwright-MCP verification (0 MCP refs remain) with our `--auto` CLI auto-verify (playwright-cli + curl), kept the security enforcement gate and text-mode support; runtime variants correctly diverge (Claude AskUserQuestion vs OpenCode `question`).
+- **skills/commands** — rebased gsd-review + gsd-verify-work onto v1.4.5 conventions: adopted `requires:` frontmatter, `Task`→`Agent` tool (claude) / `task:`→`agent:` (opencode), `--ws` flag, and gsd-core execution_context paths. Brought the Claude gsd-review skill up to the current reviewer set (added `--qwen`/`--deepseek`, updated M2.7/Kimi 2.6/Qwen 3.6 Plus/DeepSeek V4 Pro labels — it had lagged the OpenCode command since April 11). Kept `--auto` on gsd-verify-work.
+- **patch-update-workflow.md** — confirmed the upstream repo layout assumption (source is `gsd-core/workflows/*` + `commands/gsd/*`); updated the migration note.
+- `bin/sync` + `bin/check`: no path changes here (done in the prior entry); update.md/quick.md entries already removed.
+
+### Why
+
+GSD Core v1.4.5 rebranded with a renamed runtime dir and reset versioning, and substantially rewrote the patched files (execute-phase ~doubled, review ~tripled), so the prior v1.38.3 patches could not be synced as-is without reverting upstream improvements. Each customization was re-applied onto the v1.4.5 base. Verified per file by diffing the rebased output against pristine v1.4.5 (isolating exactly the re-applied customization) and against the April-24 gsd-local-patches backup (confirming no customization was lost). `bin/sync all` + `bin/check all` → clean. Patch base is now v1.4.5; future upgrades follow the normal version-progression path.
+
+---
+
+## 2026-06-17 — Migrate runtime paths to gsd-core (GSD Core v1.4.5 rebrand)
+
+**GSD version:** 1.38.3 (patch content base — workflow patches NOT yet rebased onto v1.4.5)
+**Files modified:** bin/sync, bin/check, CLAUDE.md, .claude/skills/gsd-update-reviewers/SKILL.md, .claude/skills/gsd-patch-upgrade/references/patch-update-workflow.md
+
+### What changed
+
+- GSD Core v1.4.5 renamed the runtime install directory `get-shit-done/` → `gsd-core/` (upstream #604) for both runtimes. Repointed all deploy targets accordingly:
+  - `bin/sync` + `bin/check`: 12 workflow targets and the 2 VERSION-file paths now point at `~/.claude/gsd-core/...` and `~/.config/opencode/gsd-core/...`.
+  - `CLAUDE.md`: runtime install paths and Version Tracking paths updated to `gsd-core`.
+  - `gsd-update-reviewers/SKILL.md`: VERSION cat path updated to `gsd-core`.
+  - `patch-upgrade/references/patch-update-workflow.md`: runtime-target paths updated (verified on disk); upstream-source paths repointed `get-shit-done/…` → `gsd-core/…` on assumption (flagged for verification); added a migration callout. The `/tmp/get-shit-done` clone-dir name left as-is (arbitrary temp path).
+- Removed the stale, empty `~/.config/opencode/get-shit-done/` directory tree the installer left behind (Claude's old dir was already fully removed; 0 files in either).
+- Skills/command deploy targets (`~/.claude/skills/gsd-*`, `~/.config/opencode/command/gsd-*`) were unchanged by the rebrand and need no path edits.
+
+### Why
+
+The installer (`npx @opengsd/gsd-core@latest`, v1.4.5) renamed the runtime dir and deleted the old `get-shit-done/` tree. Our sync/check targeted the old paths, so a sync would have recreated a ghost `get-shit-done/` dir the runtime no longer reads. Paths now point at the live `gsd-core/` tree.
+
+**NOT done — workflow patch content rebase is still pending.** GSD Core v1.4.5 is a rebrand with reset versioning (old line ended v1.38.3; new line restarts v1.4.5) and the 6 patched workflow files diverge from our v1.38.3 canonical versions by 297–1059 lines each. Running `bin/sync` now would overwrite v1.4.5 upstream content with stale v1.38.3 content. The patches must be re-ported onto v1.4.5 via the gsd-patch-upgrade flow (which itself needs updating — see the migration callout in patch-update-workflow.md) before any sync. The `**GSD version:**` field above is intentionally kept at 1.38.3 so the patch-upgrade base detection still triggers a rebase.
+
+---
+
+## 2026-06-17 — Repoint GSD upstream repo to open-gsd/gsd-core
+
+**GSD version:** 1.38.3
+**Files modified:** .claude/skills/gsd-patch-upgrade/references/patch-update-workflow.md, claude/workflows/update.md (new patch), opencode/workflows/update.md (new patch), claude/workflows/quick.md (new patch), opencode/workflows/quick.md (new patch), bin/sync, bin/check
+
+### What changed
+
+- Updated the upstream clone URL in the gsd-patch-upgrade reference from `git@github.com:gsd-build/get-shit-done.git` to `git@github.com:open-gsd/gsd-core.git`.
+- Added `workflows/update.md` to the canonical patch set for both runtimes (separate Claude/OpenCode variants, snapshotted from current runtime), with the "View full changelog" link repointed to `https://github.com/open-gsd/gsd-core/blob/main/CHANGELOG.md`.
+- Added `workflows/quick.md` to the canonical patch set for both runtimes, replacing the old SDK install command `npm install -g @gsd-build/sdk` with `npx @opengsd/gsd-core@latest` (note: npm scope is `@opengsd`, distinct from the `open-gsd` GitHub org).
+- Registered the four new overlays (`update.md` + `quick.md`, both runtimes) in `bin/sync` and `bin/check`.
+
+### Why
+
+GSD's upstream moved from `gsd-build/get-shit-done` to `open-gsd/gsd-core` (the previous maintainer abandoned the project). The clone URL in the patch-upgrade tooling is functional and would otherwise fail; the changelog link in update.md is now patched so it survives future updates rather than pointing users at the dead repo.
+
+Note: `references/thinking-models-*.md` still cite `github.com/mattnowdev/thinking-partner` — intentionally left unchanged, as that is a third-party model catalog attribution, not GSD's repository.
+
+---
+
 ## 2026-04-27 — Enforce immutable changelog entries, append-only
 
 **GSD version:** 1.38.3
