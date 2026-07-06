@@ -57,8 +57,6 @@ term = xterm-256color
 confirm-close-surface = false
 # Disable window decorations managed by the window manager. Useful for tiling WMs.
 window-decoration = none
-# Adjust the speed of scrolling with the mouse wheel.
-mouse-scroll-multiplier = 2
 
 # Set the default font size.
 font-size = 12
