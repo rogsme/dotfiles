@@ -7,6 +7,30 @@ recreated if needed.
 
 ---
 
+## 2026-07-06 — Retired: superseded by Roger's GSD fork
+
+**GSD version:** n/a (stock GSD uninstalled from both runtimes)
+**Files modified:** none (closing entry)
+
+### What changed
+
+This patch set is retired. All customizations now live as first-class behavior in
+**Roger's GSD** — a simplified personal fork rebuilt as plain Claude Code skills at
+`~/.config/gsd/` (deployed via `~/.config/gsd/bin/sync`, verified with `bin/check`).
+Every invariant recorded in this changelog was carried over: the 8-dimension parallel
+adversarial review (10-min timeouts, `--variant high`, no `--no-input`, Claude kept on
+the panel), `--auto` verify via playwright-cli + curl with confidence classification,
+cross-AI UI review with severity routing, and the softened execute-phase gates
+(non-blocking `human_needed`, no UAT artifact, no mandatory code-review gate).
+The reviewer panel is now a single registry file (`~/.config/gsd/shared/reviewers.md`)
+instead of the 14 touch-points documented in gsd-update-reviewers.
+
+Do NOT run `bin/sync` from this directory anymore — its targets no longer exist and it
+would clobber the fork's generated OpenCode wrappers (`gsd-review.md`,
+`gsd-verify-work.md` in `~/.config/opencode/command/`). Kept for history only.
+
+---
+
 ## 2026-06-17 — Rebase all patches onto GSD Core v1.4.5
 
 **GSD version:** 1.4.5

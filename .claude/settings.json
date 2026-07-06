@@ -11,7 +11,7 @@
       "Read(**/*.key)"
     ]
   },
-  "model": "claude-opus-4-8[1m]",
+  "model": "claude-fable-5[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -20,16 +20,6 @@
           {
             "type": "command",
             "command": "~/.claude/hooks/notify.sh question"
-          }
-        ]
-      },
-      {
-        "matcher": "Write|Edit|MultiEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "\"/usr/bin/node\" \"/home/roger/.claude/hooks/gsd-worktree-path-guard.js\"",
-            "timeout": 5
           }
         ]
       }
@@ -43,23 +33,17 @@
           }
         ]
       }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"/home/roger/.claude/hooks/gsd-graphify-update.sh\"",
-            "timeout": 5
-          }
-        ]
-      }
     ]
   },
   "enabledPlugins": {},
+  "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "tui": "fullscreen"
+  "statusLine": {
+    "type": "command",
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0,
+    "refreshInterval": 10
+  }
 }
