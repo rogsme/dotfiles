@@ -147,8 +147,8 @@ bindsym $mod+Shift+z gaps outer current minus 5
 Core bindings for managing windows.
 - =floating_modifier $mod=: Allows dragging floating windows by holding the =$mod= key (Super) and
   clicking/dragging with the mouse.
-- =$terminal= / =$auxTerminal=: Defines variables for the preferred terminal emulator (=alacritty=) and
-  an auxiliary one (=ghostty=).
+- =$terminal= / =$auxTerminal=: Defines variables for the preferred terminal emulator (=ghostty=) and
+  an auxiliary one (=alacritty=).
 - =$mod+Return=: Opens a new instance of the default terminal (=$terminal=).
 - =$mod+Shift+q=: Kills the currently focused window.
 - =$mod+d=: Launches =rofi= in =combi= mode, allowing searching for and launching applications (=drun=)
@@ -158,8 +158,8 @@ Core bindings for managing windows.
 floating_modifier $mod
 
 # start a terminal
-set $terminal alacritty
-set $auxTerminal ghostty
+set $terminal ghostty
+set $auxTerminal alacritty
 bindsym $mod+Return exec $terminal
 
 # kill focused window
