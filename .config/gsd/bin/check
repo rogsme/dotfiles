@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# Verify the deployed state: every canonical skill is symlinked into ~/.claude/skills,
+# no foreign gsd-* directories exist there, and the reviewer registry parses.
+set -uo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET="$HOME/.claude/skills"
+drift=0
+
+# 1. Every canonical skill is linked and points at us.
+for src in "$ROOT"/skills/gsd-*/; do
+  name="$(basename "$src")"
+  dest="$TARGET/$name"
+  if [[ ! -e "$dest" ]]; then
+    echo "MISSING  $name"
+    drift=1
+  elif [[ ! -L "$dest" ]]; then
+    echo "FOREIGN  $name — real directory, not our symlink"
+    drift=1
+  elif [[ "$(readlink -f "$dest")" != "$(readlink -f "${src%/}")" ]]; then
+    echo "WRONG    $name — links to $(readlink "$dest")"
+    drift=1
+  else
+    echo "OK       $name"
+  fi
+done
+
+# 2. No gsd-* in ~/.claude/skills that we don't own.
+for dest in "$TARGET"/gsd-*/; do
+  [[ -e "$dest" ]] || continue
+  name="$(basename "$dest")"
+  if [[ ! -d "$ROOT/skills/$name" ]]; then
+    echo "FOREIGN  $name — exists in ~/.claude/skills but not in canonical source"
+    drift=1
+  fi
+done
+
+# 3. Every SKILL.md has valid frontmatter.
+for f in "$ROOT"/skills/gsd-*/SKILL.md; do
+  name="$(basename "$(dirname "$f")")"
+  if [[ "$(head -1 "$f")" != "---" ]] || ! grep -q '^name: ' "$f" || ! grep -q '^description: ' "$f"; then
+    echo "INVALID  $name/SKILL.md — missing frontmatter (---, name:, description:)"
+    drift=1
+  fi
+done
+
+# 4. Every referenced subagent prompt and shared file exists on disk.
+missing="$(
+  grep -rhoE '\$HOME/(\.claude/skills/[a-z-]+/references/[a-z-]+\.md|\.config/gsd/shared/(templates/[a-z.-]+\.(md|json)|[a-z]+\.md))' \
+    --include="*.md" "$ROOT/skills" 2>/dev/null | sort -u | \
+  while read -r p; do
+    f="${p/\$HOME/$HOME}"
+    [[ -f "$f" ]] || echo "MISSING  referenced file: $p"
+  done
+)"
+if [[ -n "$missing" ]]; then
+  echo "$missing"
+  drift=1
+fi
+
+# 5. No hardcoded reviewer models in the three review skills (registry-only invariant).
+if grep -rlE 'lazer/|opencode run -m [a-z]' \
+    "$ROOT/skills/gsd-review" "$ROOT/skills/gsd-code-review" "$ROOT/skills/gsd-ui-review" 2>/dev/null; then
+  echo "INVALID  hardcoded reviewer model/command in a review skill (must derive from reviewers.md)"
+  drift=1
+fi
+
+# 6. No legacy GSD engine references anywhere.
+if grep -rlE 'gsd_run|gsd-tools|gsd-sdk' --include="*.md" "$ROOT/skills" "$ROOT/shared" 2>/dev/null; then
+  echo "INVALID  legacy gsd_run/gsd-tools reference found"
+  drift=1
+fi
+
+# 7. Core shared docs exist.
+for doc in conventions.md reviewers.md invariants.md seams.md; do
+  [[ -f "$ROOT/shared/$doc" ]] || { echo "MISSING  shared/$doc"; drift=1; }
+done
+
+# 8. Reviewer registry parses: settings + at least one panel row with 4 columns.
+REG="$ROOT/shared/reviewers.md"
+if [[ ! -f "$REG" ]]; then
+  echo "MISSING  shared/reviewers.md"
+  drift=1
+else
+  rows=$(grep -E '^\| [a-z0-9-]+ +\|' "$REG" | grep -cv '^| slug' || true)
+  if [[ "$rows" -lt 1 ]]; then
+    echo "INVALID  reviewers.md — no panel rows found"
+    drift=1
+  else
+    grep -qE '^- timeout_ms: [0-9]+' "$REG" || { echo "INVALID  reviewers.md — missing timeout_ms"; drift=1; }
+    # Each row's CLI (first token of the command column) should exist, warn-only.
+    while IFS='|' read -r _ slug _ _ cmd _; do
+      cli=$(echo "$cmd" | awk '{print $1}')
+      [[ -z "$cli" ]] && continue
+      command -v "$cli" >/dev/null 2>&1 || echo "WARN     reviewer '$(echo "$slug" | xargs)' CLI not installed: $cli"
+    done < <(grep -E '^\| [a-z0-9-]+ +\|' "$REG" | grep -v '^| slug')
+    echo "OK       reviewers.md ($rows panel rows)"
+  fi
+fi
+
+if [[ $drift -eq 0 ]]; then
+  echo "Status: clean"
+else
+  echo "Status: drift detected"
+fi
+exit $drift

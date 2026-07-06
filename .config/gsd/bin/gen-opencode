@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Generate thin OpenCode command wrappers so /gsd-* works as slash commands in OpenCode.
+# OpenCode already discovers the skills themselves from ~/.claude/skills (model-invoked);
+# these wrappers add explicit slash invocation.
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TARGET="$HOME/.config/opencode/command"
+mkdir -p "$TARGET"
+
+frontmatter_field() { # $1=file $2=field — first single-line occurrence, stripped
+  awk -v f="$2" 'BEGIN{FS=": "} $1==f {sub($1 FS, ""); gsub(/^"|"$/, ""); print; exit}' "$1"
+}
+
+for src in "$ROOT"/skills/gsd-*/SKILL.md; do
+  name="$(basename "$(dirname "$src")")"
+  desc="$(frontmatter_field "$src" description)"
+  hint="$(frontmatter_field "$src" argument-hint)"
+  short="${desc%%. *}" # first sentence (period + space); full description if none
+  [[ "$short" != "$desc" ]] && short="$short."
+  out="$TARGET/$name.md"
+  {
+    echo "---"
+    echo "description: $short"
+    [[ -n "$hint" ]] && echo "argument-hint: \"$hint\""
+    echo "tools: { read: true, bash: true, glob: true, grep: true, edit: true, write: true, agent: true }"
+    echo "---"
+    echo "Read \$HOME/.claude/skills/$name/SKILL.md and execute it end-to-end with arguments: \$ARGUMENTS"
+  } > "$out"
+  echo "WROTE    $out"
+done

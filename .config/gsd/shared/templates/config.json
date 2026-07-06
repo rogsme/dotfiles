@@ -1,0 +1,16 @@
+{
+  "mode": "interactive",
+  "planning": {
+    "commit_docs": true
+  },
+  "parallelization": {
+    "enabled": true
+  },
+  "workflow": {
+    "use_worktrees": true
+  },
+  "git": {
+    "create_tag": false
+  },
+  "branching": "none"
+}
