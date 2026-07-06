@@ -3,6 +3,21 @@
 Append new entries to the top. Never edit or alter existing entries — they are
 immutable history. Format: date heading, files modified, What changed, Why.
 
+## 2026-07-06 — Swap codex row from Codex CLI to GPT-5.5 via OpenCode
+
+**Files modified:** shared/reviewers.md
+
+### What changed
+Updated the `codex` reviewer row: `codex exec --skip-git-repo-check …` (Codex CLI) →
+`opencode run -m lazer/gpt-5.5 --variant high …` (standard OpenCode template);
+display name Codex → GPT-5.5. Live probe passed (replied "OK"; first attempt failed
+server-side, succeeded on retry once lazer exposed the model).
+Still 8 total reviewers (7 via OpenCode + Claude Opus).
+
+### Why
+Codex is no longer used via `codex exec`; the lazer provider now hosts GPT-5.5,
+so this reviewer runs through OpenCode like the rest of the panel.
+
 ## 2026-07-06 — Maintenance skills + refresh stale reviewer models
 
 **Files modified:** skills/gsd-update-reviewers/, skills/gsd-modify/, skills/gsd-doctor/,

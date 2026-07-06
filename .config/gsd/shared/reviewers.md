@@ -19,7 +19,7 @@ Log model swaps in `~/.config/gsd/CHANGELOG.md`.
 | slug     | display         | default | command                                                                     |
 |----------|-----------------|---------|-----------------------------------------------------------------------------|
 | gemini   | Gemini 3.1 Pro  | yes     | opencode run -m lazer/gemini-3.1-pro --variant high "$(cat {prompt})" 2>/dev/null > {out} |
-| codex    | Codex           | yes     | codex exec --skip-git-repo-check "$(cat {prompt})" 2>/dev/null > {out}      |
+| codex    | GPT-5.5         | yes     | opencode run -m lazer/gpt-5.5 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | minimax  | MiniMax M3      | yes     | opencode run -m lazer/minimax-m3 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | kimi     | Kimi 2.7 Code   | yes     | opencode run -m lazer/kimi-2.7-code --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | glm-5    | GLM-5.2         | yes     | opencode run -m lazer/glm-5.2 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
