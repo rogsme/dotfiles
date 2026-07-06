@@ -487,12 +487,12 @@ related notes or tasks."
 
 (my/require-llm-backends)
 
-(defconst my/glm5-model "deepinfra/zai-org/GLM-5")
-(defconst my/gpt54-model "openai/gpt-5.4")
-(defconst my/gpt54-mini-model "openai/gpt-5.4-mini")
-(defconst my/minimax-m25-model "deepinfra/MiniMaxAI/MiniMax-M2.5")
-(defconst my/kimi-k25-turbo-model "deepinfra/moonshotai/Kimi-K2.5-Turbo")
-(defconst my/qwen3-coder-480b-model "deepinfra/Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo")
+(defconst my/glm5-model "glm-5.2")
+(defconst my/gpt5-model "gpt-5.5")
+(defconst my/gpt5-mini-model "gpt-5.4-mini ")
+(defconst my/minimax-model "minimax-m3")
+(defconst my/kimi-model "kimi-2.7-code")
+(defconst my/qwen-model "qwen-3.7-plus")
 
 (defun my/setup-llm-env ()
   (setenv "OPENAI_API_BASE" openai-api-base)
@@ -509,12 +509,12 @@ related notes or tasks."
 (defun my/llm-provider (name)
   "Return a configured LLM provider instance by NAME."
   (pcase name
-    ("GLM-5"                 (make-llm-lazer-compatible my/glm5-model))
-    ("GPT-5.4"               (make-llm-lazer-compatible my/gpt54-model))
-    ("GPT-5.4 Mini"          (make-llm-lazer-compatible my/gpt54-mini-model))
-    ("MiniMax M2.5"          (make-llm-lazer-compatible my/minimax-m25-model))
-    ("Kimi K2.5 Turbo"       (make-llm-lazer-compatible my/kimi-k25-turbo-model))
-    ("Qwen3 Coder 480B Turbo" (make-llm-lazer-compatible my/qwen3-coder-480b-model))))
+    ("GLM-5.2"              (make-llm-lazer-compatible my/glm5-model))
+    ("GPT-5.5"              (make-llm-lazer-compatible my/gpt5-model))
+    ("GPT-5.4 Mini"         (make-llm-lazer-compatible my/gpt5-mini-model))
+    ("MiniMax M3"           (make-llm-lazer-compatible my/minimax-model))
+    ("Kimi K2.7 Code"       (make-llm-lazer-compatible my/kimi-model))
+    ("Qwen 3.7 Plus"        (make-llm-lazer-compatible my/qwen-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -525,7 +525,7 @@ related notes or tasks."
        :desc "Claude Code (menu)"       "C" #'claude-code-transient
        :desc "OpenCode"                 "o" #'opencode-menu))
 
-(setq chatgpt-shell-model-version my/gpt54-model)
+(setq chatgpt-shell-model-version my/gpt5-model)
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-api-url-base openai-api-base)
@@ -535,12 +535,12 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("GLM-5" "GPT-5.4" "GPT-5.4 Mini" "MiniMax M2.5" "Kimi K2.5 Turbo" "Qwen3 Coder 480B Turbo"))))
+                          '("GLM-5.2" "GPT-5.5" "GPT-5.5 Mini" "MiniMax M3" "Kimi K2.7 Code" "Qwen 3.7 Plus"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
 ;; Default to Qwen3 Coder 480B Turbo for commit generation.
-(setq magit-gptcommit-llm-provider (my/llm-provider "Qwen3 Coder 480B Turbo"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Kimi K.27 Code"))
 
 (setq llm-warn-on-nonfree nil)
 
@@ -584,18 +584,18 @@ Now, write the commit message in this exact format:
   "Set the Forge LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM: "
-                          '("GLM-5" "GPT-5.4" "GPT-5.4 Mini" "MiniMax M2.5" "Kimi K2.5 Turbo" "Qwen3 Coder 480B Turbo"))))
+                          '("GLM-5.2" "GPT-5.5" "GPT-5.4 Mini" "MiniMax M3" "Kimi K2.7 Code" "Qwen 3.7 Plus"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
 ;; Default to GLM-5 for PR descriptions.
-(setq forge-llm-llm-provider (my/llm-provider "GLM-5"))
+(setq forge-llm-llm-provider (my/llm-provider "GLM-5.2"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
 
 (after! aidermacs
-  (setq aidermacs-default-model my/qwen3-coder-480b-model)
+  (setq aidermacs-default-model my/qwen-model)
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
