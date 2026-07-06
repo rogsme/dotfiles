@@ -73,49 +73,6 @@
             }
           }
         },
-        "claude-sonnet-4.6": {
-          "name": "Claude Sonnet 4.6",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "limit": {
-            "context": 1000000,
-            "output": 64000
-          },
-          "family": "claude-sonnet",
-          "release_date": "2026-02-17",
-          "cost": {
-            "input": 3,
-            "output": 15
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "max": {
-              "reasoningEffort": "max"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "minimal": {
-              "reasoningEffort": "minimal"
-            }
-          }
-        },
         "deepseek-v4-pro": {
           "name": "DeepSeek V4 Pro",
           "attachment": false,
@@ -761,6 +718,246 @@
             },
             "max": {
               "reasoningEffort": "max"
+            }
+          }
+        },
+        "claude-sonnet-5": {
+          "name": "Claude Sonnet 5",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          },
+          "family": "claude-sonnet",
+          "release_date": "2026-06-29",
+          "cost": {
+            "input": 3,
+            "output": 15,
+            "cache_read": 0.3,
+            "cache_write": 3.75
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
+          }
+        },
+        "claude-fable-5": {
+          "name": "Claude Fable 5",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          },
+          "family": "claude-fable",
+          "release_date": "2026-06-07",
+          "cost": {
+            "input": 10,
+            "output": 50,
+            "cache_read": 1,
+            "cache_write": 12.5
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
+          }
+        },
+        "gpt-5.5": {
+          "name": "GPT-5.5",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          },
+          "family": "gpt",
+          "release_date": "2026-04-23",
+          "cost": {
+            "input": 5,
+            "output": 30,
+            "cache_read": 0.5,
+            "context_over_200k": {
+              "input": 10,
+              "output": 45,
+              "cache_read": 1
+            }
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "minimal": {
+              "reasoningEffort": "minimal"
+            },
+            "none": {
+              "reasoningEffort": "none"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
+          }
+        },
+        "claude-haiku-4.5": {
+          "name": "Claude Haiku 4.5",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          },
+          "family": "claude-haiku",
+          "release_date": "2025-10-15",
+          "cost": {
+            "input": 1,
+            "output": 5,
+            "cache_read": 0.1,
+            "cache_write": 1.25
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "minimal": {
+              "reasoningEffort": "minimal"
+            }
+          }
+        },
+        "deepseek-v4-flash": {
+          "name": "DeepSeek V4 Flash",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1048576,
+            "output": 16384
+          },
+          "family": "deepseek-flash",
+          "release_date": "2026-04-24",
+          "cost": {
+            "input": 0.1,
+            "output": 0.2,
+            "cache_read": 0.02
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
             }
           }
         }
