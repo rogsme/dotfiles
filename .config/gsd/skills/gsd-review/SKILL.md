@@ -27,10 +27,9 @@ planner to incorporate via `/gsd-plan-phase N --reviews`.
    Run /gsd-plan-phase {N} first."
 2. Select reviewers per the registry's Invocation contract: rows with
    `default: yes`, unless `--only` was passed (then exactly those slugs — unknown
-   slugs are an error naming the valid slugs). Apply the registry Settings:
-   `keep_host_model`, and require at least `min_independent` reviewer(s) whose CLI
-   differs from the host runtime — if none is available, tell the user which CLIs
-   to install and stop.
+   slugs are an error naming the valid slugs). Apply the registry Settings
+   (`keep_host_model`); every reviewer row counts as independent. If no reviewer's
+   CLI is available at all, tell the user which CLIs to install and stop.
 3. Availability-check each selected reviewer (`command -v` on the first word of its
    command). Missing CLI → skip that reviewer with a note; never fail the whole review.
 

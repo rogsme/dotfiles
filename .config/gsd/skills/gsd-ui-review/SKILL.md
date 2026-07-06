@@ -59,8 +59,8 @@ report it and stop — do not fabricate an audit.
 ## Step 3 — Cross-AI panel
 
 Select and availability-check reviewers per the registry's Invocation contract
-(defaults; `keep_host_model`; `min_independent`; skip missing CLIs with a note).
-If no independent reviewer is available, skip to Step 5 — the primary audit is
+(defaults; `keep_host_model`; skip missing CLIs with a note).
+If no reviewer is available, skip to Step 5 — the primary audit is
 still valuable on its own; note that the cross-AI stage was skipped.
 
 Gather context:

@@ -3,6 +3,42 @@
 Append new entries to the top. Never edit or alter existing entries — they are
 immutable history. Format: date heading, files modified, What changed, Why.
 
+## 2026-07-06 — Retire min_independent setting
+
+**Files modified:** shared/reviewers.md, skills/gsd-review/SKILL.md,
+skills/gsd-code-review/SKILL.md, skills/gsd-ui-review/SKILL.md
+
+### What changed
+Removed `min_independent: 1` from the registry Settings and rewrote Invocation
+contract rule 1: every reviewer row now counts as independent, since each runs
+in its own session. Updated the three review skills' references to the setting
+so the S4 seam stays consistent (gsd-review's stop condition is now "no
+reviewer CLI available at all"; gsd-ui-review's skip condition likewise).
+Panel unchanged — still 8 reviewers, all via OpenCode.
+
+### Why
+With every reviewer (including Claude) now running through OpenCode, a
+CLI-differs-from-host independence test is meaningless — separate OpenCode
+sessions are independent, so the guard only created a false failure mode when
+reviews run inside OpenCode.
+
+## 2026-07-06 — Swap claude row from claude -p to Claude Fable 5 via OpenCode
+
+**Files modified:** shared/reviewers.md
+
+### What changed
+Updated the `claude` reviewer row: `claude -p --model opus …` (Claude CLI) →
+`opencode run -m lazer/claude-fable-5 --variant high …` (standard OpenCode
+template); display name Claude Opus → Claude Fable 5. Live probe passed
+(replied "OK"). Moved the now-dormant `claude -p` caveats in Invocation
+contract rule 6 into a parenthetical. Claude stays on the panel and last
+(invariant preserved). Still 8 total reviewers (all 8 via OpenCode — no
+non-OpenCode CLI remains on the panel).
+
+### Why
+Panel unification: run the Claude reviewer through OpenCode on the lazer
+provider like every other row, upgrading it to Fable 5.
+
 ## 2026-07-06 — Swap codex row from Codex CLI to GPT-5.5 via OpenCode
 
 **Files modified:** shared/reviewers.md

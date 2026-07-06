@@ -25,7 +25,7 @@ Resolve the phase directory, `{N}`, and `{PADDED}` per conventions. Require at
 least one `{NN}-*-SUMMARY.md` in the phase directory — if none, stop: "Phase {N}
 has not been executed. Run /gsd-execute-phase {N} first." Select and
 availability-check reviewers per the registry's Invocation contract (defaults
-unless `--only`; `keep_host_model`; `min_independent`; skip missing CLIs with a note).
+unless `--only`; `keep_host_model`; skip missing CLIs with a note).
 
 ## Step 1 — Collect the diff
 

@@ -11,7 +11,6 @@ Log model swaps in `~/.config/gsd/CHANGELOG.md`.
                             # shorter timeouts killed models mid-response and produced
                             # empty output falsely marked as "failed"
 - execution: parallel       # launch every reviewer in one message; wait, never poll
-- min_independent: 1        # at least one reviewer whose CLI differs from the host runtime
 - keep_host_model: true     # Claude stays on the panel even when running inside Claude Code
 
 ## Panel
@@ -25,16 +24,16 @@ Log model swaps in `~/.config/gsd/CHANGELOG.md`.
 | glm-5    | GLM-5.2         | yes     | opencode run -m lazer/glm-5.2 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | qwen     | Qwen 3.6 Plus   | yes     | opencode run -m lazer/qwen-3.6-plus --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | deepseek | DeepSeek V4 Pro | yes     | opencode run -m lazer/deepseek-v4-pro --variant high "$(cat {prompt})" 2>/dev/null > {out} |
-| claude   | Claude Opus     | yes     | claude -p --model opus "$(cat {prompt})" > {out}                            |
+| claude   | Claude Fable 5  | yes     | opencode run -m lazer/claude-fable-5 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 
 ## Invocation contract
 
 Review skills MUST follow these rules; nothing about the panel is hardcoded in any skill.
 
 1. **Selection:** rows with `default: yes`, unless the user passed `--only slug1,slug2`.
-   Apply Settings: keep the host model on the panel (`keep_host_model`), but require at
-   least `min_independent` reviewer(s) whose CLI differs from the host runtime — if none
-   is available, tell the user and stop.
+   Apply Settings: keep the host model on the panel (`keep_host_model`). Every reviewer
+   row counts as independent — each runs in its own session, even when its CLI matches
+   the host runtime.
 2. **Availability:** the required CLI is the first word of `command`. `command -v` it;
    if missing, skip that reviewer with a note in the output — never fail the whole review.
 3. **Substitution:** replace `{prompt}` with the skill's prompt file
@@ -48,9 +47,9 @@ Review skills MUST follow these rules; nothing about the panel is hardcoded in a
 5. **Validation:** output counts as valid only if it contains ≥3 lines of meaningful
    content matching the requested format. Otherwise mark that reviewer failed, note it,
    continue with the rest. Never auto-retry.
-6. **Hard rules:** NEVER add `--no-input` to `claude -p` (unsupported, fails silently).
-   The stderr redirection is part of each command cell — do not add or strip
-   `2>/dev/null` per-row (`claude` intentionally keeps stderr).
+6. **Hard rules:** the stderr redirection is part of each command cell — do not add
+   or strip `2>/dev/null` per-row. (If a `claude -p` row ever returns: never add
+   `--no-input` to it — unsupported, fails silently.)
 7. **Dynamic output:** per-reviewer sections, status lines, and score-table columns are
    generated from the `display` column of the rows actually invoked (and marked
    failed/skipped as appropriate).
