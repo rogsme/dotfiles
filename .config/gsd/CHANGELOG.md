@@ -3,6 +3,17 @@
 Append new entries to the top. Never edit or alter existing entries — they are
 immutable history. Format: date heading, files modified, What changed, Why.
 
+## 2026-07-06 — Swap qwen reviewer to qwen-3.7-plus
+
+**Files modified:** shared/reviewers.md
+
+### What changed
+Updated the `qwen` reviewer row from `lazer/qwen-3.6-plus` → `lazer/qwen-3.7-plus`
+and its display label from "Qwen 3.6 Plus" → "Qwen 3.7 Plus".
+
+### Why
+Model upgrade — newer qwen variant available.
+
 ## 2026-07-06 — Retire min_independent setting
 
 **Files modified:** shared/reviewers.md, skills/gsd-review/SKILL.md,

@@ -22,7 +22,7 @@ Log model swaps in `~/.config/gsd/CHANGELOG.md`.
 | minimax  | MiniMax M3      | yes     | opencode run -m lazer/minimax-m3 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | kimi     | Kimi 2.7 Code   | yes     | opencode run -m lazer/kimi-2.7-code --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | glm-5    | GLM-5.2         | yes     | opencode run -m lazer/glm-5.2 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
-| qwen     | Qwen 3.6 Plus   | yes     | opencode run -m lazer/qwen-3.6-plus --variant high "$(cat {prompt})" 2>/dev/null > {out} |
+| qwen     | Qwen 3.7 Plus   | yes     | opencode run -m lazer/qwen-3.7-plus --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | deepseek | DeepSeek V4 Pro | yes     | opencode run -m lazer/deepseek-v4-pro --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 | claude   | Claude Fable 5  | yes     | opencode run -m lazer/claude-fable-5 --variant high "$(cat {prompt})" 2>/dev/null > {out} |
 
