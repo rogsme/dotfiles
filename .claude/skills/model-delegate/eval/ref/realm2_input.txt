@@ -1,0 +1,6 @@
+1783087500 INFO user login ok
+1783088520 ERROR payment declined
+1783090080 INFO cache warmed
+1783092600 INFO healthcheck ping
+1783095000 ERROR db timeout
+1783097700 ERROR db timeout retry failed
