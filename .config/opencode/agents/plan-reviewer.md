@@ -1,7 +1,7 @@
 ---
 description: Reviews a draft implementation plan for missing assumptions, regression risks, file omissions, and weak verification. Read-only only.
 mode: subagent
-model: openai/gpt-5.5
+model: lazer/gpt-5.5
 reasoningEffort: xhigh
 temperature: 0.1
 permission:
