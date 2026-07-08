@@ -3,7 +3,6 @@ description: Reviews a draft implementation plan for missing assumptions, regres
 mode: subagent
 model: lazer/gpt-5.5
 reasoningEffort: xhigh
-temperature: 0.1
 permission:
   edit: deny
   bash:
