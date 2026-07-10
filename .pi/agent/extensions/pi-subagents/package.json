@@ -3,6 +3,10 @@
   "version": "0.13.0-local",
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "npm run typecheck && node --import tsx src/ui/viewer-tools.test.ts",
+    "typecheck": "tsc"
+  },
   "dependencies": {
     "@sinclair/typebox": "^0.34.49",
     "croner": "^10.0.1",
@@ -14,8 +18,19 @@
     "@earendil-works/pi-tui": ">=0.74.0"
   },
   "peerDependenciesMeta": {
-    "@earendil-works/pi-ai": { "optional": true },
-    "@earendil-works/pi-coding-agent": { "optional": true },
-    "@earendil-works/pi-tui": { "optional": true }
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "@earendil-works/pi-tui": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.5",
+    "tsx": "^4.20.0",
+    "typescript": "^6.0.3"
   }
 }

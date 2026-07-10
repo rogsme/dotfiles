@@ -13,6 +13,7 @@ import { getLifetimeTotal, getSessionContextPercent } from "../usage.js";
 import type { Theme } from "./agent-widget.js";
 import { type AgentActivity, buildInvocationTags, describeActivity, formatDuration, formatSessionTokens, getDisplayName, getPromptModeLabel } from "./agent-widget.js";
 import { createViewerKeys, type ViewerKeybindings, type ViewerKeys } from "./viewer-keys.js";
+import { serializeToolArguments, toolResultText } from "./viewer-tools.js";
 
 /** Base lines consumed by chrome: top border + header + header sep + footer sep + footer + bottom border. */
 const CHROME_LINES_BASE = 6;
@@ -31,6 +32,9 @@ export class ConversationViewer implements Component {
   private keys: ViewerKeys;
   /** Steering composer — present while the user is typing a message to the agent. */
   private composer: Input | undefined;
+  /** Selected tool call and results expanded beyond the normal preview. */
+  private selectedToolId: string | undefined;
+  private expandedToolIds = new Set<string>();
 
   constructor(
     private tui: TUI,
@@ -93,11 +97,27 @@ export class ConversationViewer implements Component {
     }
     if (this.stopArmed) this.stopArmed = false;
 
-    const totalLines = this.buildContentLines(this.lastInnerW).length;
+    const content = this.buildContent(this.lastInnerW);
+    const totalLines = content.lines.length;
     const viewportHeight = this.viewportHeight();
     const maxScroll = Math.max(0, totalLines - viewportHeight);
 
-    if (this.keys.scrollUp(data)) {
+    if (matchesKey(data, "tab") || matchesKey(data, "shift+tab")) {
+      if (content.tools.length === 0) return;
+      const current = content.tools.findIndex(tool => tool.id === this.selectedToolId);
+      const direction = matchesKey(data, "shift+tab") ? -1 : 1;
+      const next = current < 0
+        ? (direction > 0 ? 0 : content.tools.length - 1)
+        : (current + direction + content.tools.length) % content.tools.length;
+      this.selectedToolId = content.tools[next].id;
+      this.autoScroll = false;
+      this.scrollOffset = Math.min(maxScroll, Math.max(0, content.tools[next].line - 1));
+      this.tui.requestRender();
+    } else if (matchesKey(data, "space") && this.selectedToolId) {
+      if (this.expandedToolIds.has(this.selectedToolId)) this.expandedToolIds.delete(this.selectedToolId);
+      else this.expandedToolIds.add(this.selectedToolId);
+      this.tui.requestRender();
+    } else if (this.keys.scrollUp(data)) {
       this.scrollOffset = Math.max(0, this.scrollOffset - 1);
       this.autoScroll = this.scrollOffset >= maxScroll;
     } else if (this.keys.scrollDown(data)) {
@@ -166,7 +186,7 @@ export class ConversationViewer implements Component {
     lines.push(hrMid);
 
     // Content area — rebuild every render (live data, no cache needed)
-    const contentLines = this.buildContentLines(innerW);
+    const contentLines = this.buildContent(innerW).lines;
     const viewportHeight = this.viewportHeight();
     const maxScroll = Math.max(0, contentLines.length - viewportHeight);
 
@@ -200,7 +220,7 @@ export class ConversationViewer implements Component {
       if (this.isStoppable()) {
         actions.push(this.stopArmed ? th.fg("error", "x again to STOP") : th.fg("dim", "x stop"));
       }
-      const footerRight = th.fg("dim", "↑↓ scroll · PgUp/PgDn or Shift+↑↓ · Esc close");
+      const footerRight = th.fg("dim", "Tab tool · Space expand · ↑↓ scroll · Esc close");
 
       // Prepend the line-count/scroll-% readout only when there's spare width —
       // it's the first thing dropped so it never crowds out the hints.
@@ -280,16 +300,17 @@ export class ConversationViewer implements Component {
     return this.theme.fg("dim", `  ↳ ${parts.join(" · ")}`);
   }
 
-  private buildContentLines(width: number): string[] {
-    if (width <= 0) return [];
+  private buildContent(width: number): { lines: string[]; tools: { id: string; line: number }[] } {
+    if (width <= 0) return { lines: [], tools: [] };
 
     const th = this.theme;
     const messages = this.session.messages;
     const lines: string[] = [];
+    const tools: { id: string; line: number }[] = [];
 
     if (messages.length === 0) {
       lines.push(th.fg("dim", "(waiting for first message...)"));
-      return lines;
+      return { lines, tools };
     }
 
     let needsSeparator = false;
@@ -306,11 +327,11 @@ export class ConversationViewer implements Component {
         }
       } else if (msg.role === "assistant") {
         const textParts: string[] = [];
-        const toolCalls: string[] = [];
+        const toolCalls: { id: string; name: string; arguments: Record<string, unknown> }[] = [];
         for (const c of msg.content) {
           if (c.type === "text" && c.text) textParts.push(c.text);
           else if (c.type === "toolCall") {
-            toolCalls.push((c as any).name ?? (c as any).toolName ?? "unknown");
+            toolCalls.push({ id: c.id, name: c.name, arguments: c.arguments });
           }
         }
         if (needsSeparator) lines.push(th.fg("dim", "───"));
@@ -320,16 +341,23 @@ export class ConversationViewer implements Component {
             lines.push(line);
           }
         }
-        for (const name of toolCalls) {
-          lines.push(truncateToWidth(th.fg("muted", `  [Tool: ${name}]`), width));
+        for (const call of toolCalls) {
+          const selected = call.id === this.selectedToolId;
+          tools.push({ id: call.id, line: lines.length });
+          const marker = selected ? th.fg("accent", "▶") : " ";
+          const args = serializeToolArguments(call.arguments);
+          lines.push(truncateToWidth(`${marker} ${th.fg(selected ? "accent" : "muted", `[Tool: ${call.name}]`)} ${th.fg("dim", args)}`, width));
         }
       } else if (msg.role === "toolResult") {
         const text = extractText(msg.content);
-        const truncated = text.length > 500 ? text.slice(0, 500) + "... (truncated)" : text;
-        if (!truncated.trim()) continue;
+        const expanded = this.expandedToolIds.has(msg.toolCallId);
+        const shown = toolResultText(text, expanded);
+        if (!shown.trim()) continue;
         if (needsSeparator) lines.push(th.fg("dim", "───"));
-        lines.push(th.fg("dim", "[Result]"));
-        for (const line of wrapTextWithAnsi(truncated.trim(), width)) {
+        const selected = msg.toolCallId === this.selectedToolId;
+        const marker = selected ? th.fg("accent", "▶") : " ";
+        lines.push(`${marker} ${th.fg(selected ? "accent" : "dim", `[Result: ${msg.toolName}${expanded ? " · expanded" : ""}]`)}`);
+        for (const line of wrapTextWithAnsi(shown.trim(), width)) {
           lines.push(th.fg("dim", line));
         }
       } else if ((msg as any).role === "bashExecution") {
@@ -357,6 +385,6 @@ export class ConversationViewer implements Component {
       lines.push(truncateToWidth(th.fg("accent", "▍ ") + th.fg("dim", act), width));
     }
 
-    return lines.map(l => truncateToWidth(l, width));
+    return { lines: lines.map(l => truncateToWidth(l, width)), tools };
   }
 }

@@ -244,7 +244,7 @@ export class FleetList {
       return { consume: true };
     }
     if (matchesKey(data, "escape")) { this.deactivate(); return { consume: true }; }
-    if (matchesKey(data, Key.enter)) { this.openSelected(); return { consume: true }; }
+    if (matchesKey(data, Key.enter)) { void this.openSelected(); return { consume: true }; }
 
     // Any other key cancels navigation and flows to the editor.
     this.deactivate();
@@ -257,14 +257,23 @@ export class FleetList {
     this.update();
   }
 
-  private openSelected(): void {
+  private async openSelected(): Promise<void> {
     const entry = this.roster()[this.selectedIndex];
     if (!entry || entry.kind === "main") {
       // `main` = return to the prompt; the native transcript is already shown.
       this.deactivate();
       return;
     }
-    const record = entry.record;
+    await this.openAgent(entry.record.id);
+  }
+
+  /** Open an agent by id from FleetView, /agents, or /agent. */
+  async openAgent(id: string): Promise<void> {
+    const record = this.manager.getRecord(id);
+    if (!record) {
+      this.ui?.notify(`Agent not found: ${id}`, "warning");
+      return;
+    }
     if (!this.ui) return;
     if (!record.session) {
       this.ui.notify(`Agent is ${record.status} — no session available.`, "info");
@@ -274,28 +283,32 @@ export class FleetList {
     const activity = this.agentActivity.get(record.id);
     this.viewingAgentId = record.id;
 
-    void this.ui.custom<undefined>(
-      (tui, theme, keybindings, done) => {
-        this.viewerClose = () => done(undefined);
-        return new ConversationViewer(
-          tui,
-          session,
-          record,
-          activity,
-          theme,
-          done,
-          () => {
-            if (this.manager.abort(record.id)) this.ui?.notify(`Stopped "${record.description}".`, "info");
-          },
-          keybindings,
-          (message: string) => this.manager.steer(record.id, message),
-        );
-      },
-      {
-        overlay: true,
-        overlayOptions: { anchor: "center", width: "90%", maxHeight: `${VIEWPORT_HEIGHT_PCT}%` },
-      },
-    ).then(() => this.clearViewer(), () => this.clearViewer());
+    try {
+      await this.ui.custom<undefined>(
+        (tui, theme, keybindings, done) => {
+          this.viewerClose = () => done(undefined);
+          return new ConversationViewer(
+            tui,
+            session,
+            record,
+            activity,
+            theme,
+            done,
+            () => {
+              if (this.manager.abort(record.id)) this.ui?.notify(`Stopped "${record.description}".`, "info");
+            },
+            keybindings,
+            (message: string) => this.manager.steer(record.id, message),
+          );
+        },
+        {
+          overlay: true,
+          overlayOptions: { anchor: "center", width: "90%", maxHeight: `${VIEWPORT_HEIGHT_PCT}%` },
+        },
+      );
+    } finally {
+      this.clearViewer();
+    }
   }
 
   /** Reset overlay state and return to the list (on close, auto-close, or error). */

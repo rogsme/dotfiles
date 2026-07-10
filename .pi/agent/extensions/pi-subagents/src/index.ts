@@ -1643,34 +1643,10 @@ Terse command-style prompts produce shallow, generic work.
     if (idx < 0) return;
     const record = agents[idx];
 
-    await viewAgentConversation(ctx, record);
+    fleet.setUICtx(ctx.ui as unknown as FleetUICtx);
+    await fleet.openAgent(record.id);
     // Back-navigation: re-show the list
     await showRunningAgents(ctx);
-  }
-
-  async function viewAgentConversation(ctx: ExtensionCommandContext, record: AgentRecord) {
-    if (!record.session) {
-      ctx.ui.notify(`Agent is ${record.status === "queued" ? "queued" : "expired"} — no session available.`, "info");
-      return;
-    }
-
-    const { ConversationViewer, VIEWPORT_HEIGHT_PCT } = await import("./ui/conversation-viewer.js");
-    const session = record.session;
-    const activity = agentActivity.get(record.id);
-
-    await ctx.ui.custom<undefined>(
-      (tui, theme, keybindings, done) => {
-        return new ConversationViewer(tui, session, record, activity, theme, done, () => {
-          if (manager.abort(record.id)) {
-            ctx.ui.notify(`Stopped "${record.description}".`, "info");
-          }
-        }, keybindings, (message: string) => manager.steer(record.id, message));
-      },
-      {
-        overlay: true,
-        overlayOptions: { anchor: "center", width: "90%", maxHeight: `${VIEWPORT_HEIGHT_PCT}%` },
-      },
-    );
   }
 
   async function showAgentDetail(ctx: ExtensionCommandContext, name: string) {
@@ -2268,6 +2244,19 @@ ${systemPrompt}
     );
     ctx.ui.notify(message, level);
   }
+
+  pi.registerCommand("agent", {
+    description: "View a subagent execution by ID",
+    handler: async (args, ctx) => {
+      const id = args.trim();
+      if (!id) {
+        ctx.ui.notify("Usage: /agent <id>", "info");
+        return;
+      }
+      fleet.setUICtx(ctx.ui as unknown as FleetUICtx);
+      await fleet.openAgent(id);
+    },
+  });
 
   pi.registerCommand("agents", {
     description: "Manage agents",
