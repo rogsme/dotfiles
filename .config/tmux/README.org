@@ -211,6 +211,8 @@ or arrow keys, bump this to 10.
 #+begin_src conf
 # Eliminate ESC delay (critical for nvim inside tmux)
 set -sg escape-time 0
+set -g extended-keys on
+set -g extended-keys-format csi-u
 #+end_src
 
 *** Scrollback Buffer
