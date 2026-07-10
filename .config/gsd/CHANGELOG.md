@@ -3,6 +3,20 @@
 Append new entries to the top. Never edit or alter existing entries — they are
 immutable history. Format: date heading, files modified, What changed, Why.
 
+## 2026-07-10 — Refresh Grok and GPT adversarial reviewers
+
+**Files modified:** shared/reviewers.md
+
+### What changed
+Replaced the `gemini` reviewer (`lazer/gemini-3.1-pro`, "Gemini 3.1 Pro") with
+`grok` (`lazer/grok-4.5`, "Grok 4.5"), and replaced the `codex` reviewer
+(`lazer/gpt-5.5`, "GPT-5.5") with `gpt` (`lazer/gpt-5.6-sol`, "GPT-5.6 Sol").
+Both live probes passed with "OK". Now 8 total reviewers, all via OpenCode.
+
+### Why
+Use Grok 4.5 instead of Gemini 3.1 Pro and upgrade the GPT reviewer to the
+GPT-5.6 Sol model under a matching `gpt` slug.
+
 ## 2026-07-06 — Swap qwen reviewer to qwen-3.7-plus
 
 **Files modified:** shared/reviewers.md
