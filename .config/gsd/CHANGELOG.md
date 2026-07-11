@@ -3,6 +3,19 @@
 Append new entries to the top. Never edit or alter existing entries — they are
 immutable history. Format: date heading, files modified, What changed, Why.
 
+## 2026-07-11 — Fix gsd-fast YAML frontmatter
+
+**Files modified:** skills/gsd-fast/SKILL.md, generated OpenCode wrappers
+
+### What changed
+Quoted the gsd-fast YAML description so its colon-space sequence is treated as
+text. The description text and behavior are unchanged.
+
+### Why
+The plain scalar contained `Hard triviality gate: at most`, whose colon-space
+sequence was parsed as a nested compact mapping and prevented pi from loading
+the skill.
+
 ## 2026-07-10 — Refresh Grok and GPT adversarial reviewers
 
 **Files modified:** shared/reviewers.md

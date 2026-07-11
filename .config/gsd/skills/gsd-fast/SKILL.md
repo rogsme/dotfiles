@@ -1,6 +1,6 @@
 ---
 name: gsd-fast
-description: Executes a trivial task inline — no subagents, no planning docs, just understand, do, commit, log. Use when the user says "gsd fast", "quick fix", "just fix this typo", or asks for a tiny out-of-band change like updating a config value, adding a missing import, renaming a variable, adding a .gitignore entry, or bumping a version number. Hard triviality gate: at most 3 file edits, about a minute of work, no research — anything bigger gets redirected to /gsd-quick. Commits with a conventional message and appends to STATE.md's Quick Tasks table if one exists.
+description: "Executes a trivial task inline — no subagents, no planning docs, just understand, do, commit, log. Use when the user says \"gsd fast\", \"quick fix\", \"just fix this typo\", or asks for a tiny out-of-band change like updating a config value, adding a missing import, renaming a variable, adding a .gitignore entry, or bumping a version number. Hard triviality gate: at most 3 file edits, about a minute of work, no research — anything bigger gets redirected to /gsd-quick. Commits with a conventional message and appends to STATE.md's Quick Tasks table if one exists."
 argument-hint: <task description>
 ---
 
