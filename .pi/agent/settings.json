@@ -12,5 +12,8 @@
     "npm:pi-simplify",
     "npm:@narumitw/pi-goal",
     "npm:@juicesharp/rpiv-btw"
+  ],
+  "skills": [
+    "~/.claude/skills"
   ]
 }

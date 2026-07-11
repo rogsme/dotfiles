@@ -168,17 +168,19 @@ export default function planMode(pi: ExtensionAPI): void {
       const planPath = state.planPath;
       leave(ctx);
       if (!pi.getSessionName()) pi.setSessionName(slug(approvedPlan));
-      pi.sendUserMessage(`Implement the approved plan below.\n\n${approvedPlan}\n\nPlan file: ${planPath}`);
+      pi.sendUserMessage(`Implement the approved plan below.\n\n${approvedPlan}\n\nPlan file: ${planPath}`, {
+        deliverAs: "followUp",
+      });
     } else if (choice === "Keep planning with feedback") {
       const feedback = await ctx.ui.editor("Plan feedback", "");
-      if (feedback?.trim()) pi.sendUserMessage(feedback.trim());
+      if (feedback?.trim()) pi.sendUserMessage(feedback.trim(), { deliverAs: "followUp" });
     } else if (choice === "Edit plan") {
       const edited = await ctx.ui.editor("Edit plan", state.plan);
       if (edited?.trim()) {
         state.plan = edited.trim();
         state.planPath = await savePlan(state.plan);
         persist();
-        pi.sendUserMessage(`Use this edited plan as the current proposal:\n\n${state.plan}`);
+        pi.sendUserMessage(`Use this edited plan as the current proposal:\n\n${state.plan}`, { deliverAs: "followUp" });
       }
     }
   });
