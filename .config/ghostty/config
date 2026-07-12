@@ -95,11 +95,3 @@ shell-integration-features = no-cursor
 # Note: 'cursor-invert-fg-bg' is not a valid Ghostty option and has been removed.
 # To invert instead of using fixed colors, drop cursor-color/cursor-text above and
 # set: cursor-color = cell-foreground  and  cursor-text = cell-background
-
-##############
-# Scrolling  #
-##############
-
-# Slow down mouse/touchpad scrolling (Alacritty used multiplier 3; Ghostty
-# defaults to discrete:3, precision:1, which feels too fast on a touchpad).
-mouse-scroll-multiplier = precision:0.5,discrete:1

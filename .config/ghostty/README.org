@@ -164,32 +164,6 @@ shell-integration-features = no-cursor
 # set: cursor-color = cell-foreground  and  cursor-text = cell-background
 #+end_src
 
-** Scrolling
-:PROPERTIES:
-:ID:       a1b2c3d4-1111-4aaa-9bbb-cccc22222222
-:END:
-Controls mouse-wheel and touchpad scrolling behavior.
-
-Ghostty reports wheel events to mouse-aware TUIs (like OpenCode) and sends
-=mouse-scroll-multiplier= wheel events per tick. Alacritty, by contrast, ignores
-its =scrolling.multiplier= while an app captures the mouse, so the same app can
-feel much faster in Ghostty. Keep =discrete= low (1) for TUIs and tune =precision=
-for touchpad feel.
-
-- =mouse-scroll-multiplier=: =precision:<float>,discrete:<int>=. Defaults are
-  =precision:1,discrete:3=. =discrete:1= sends one event per wheel tick;
-  =precision:0.5= halves touchpad sensitivity.
-
-#+begin_src conf
-##############
-# Scrolling  #
-##############
-
-# Slow down mouse/touchpad scrolling (Alacritty used multiplier 3; Ghostty
-# defaults to discrete:3, precision:1, which feels too fast on a touchpad).
-mouse-scroll-multiplier = precision:0.5,discrete:1
-#+end_src
-
 * Setting Up Auto-Tangle
 :PROPERTIES:
 :ID:       fae42d41-2163-436c-b0ed-7601e6682929
