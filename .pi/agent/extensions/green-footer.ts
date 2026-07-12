@@ -40,9 +40,12 @@ export default function greenFooter(pi: ExtensionAPI): void {
 
         const context = `${contextBar(percent, barWidth)} ${rgb(74, 222, 128, percentText)}`;
         const divider = rgb(34, 120, 70, " • ");
+        const mode = footerData.getExtensionStatuses().has("plan-mode")
+          ? rgb(234, 179, 8, "plan")
+          : rgb(74, 222, 128, "normal");
         const branch = footerData.getGitBranch();
         const git = branch ? divider + rgb(45, 150, 85, `git:${branch}`) : "";
-        const reserved = visibleWidth(context) + visibleWidth(git) + visibleWidth(divider) * 2;
+        const reserved = visibleWidth(mode) + visibleWidth(context) + visibleWidth(git) + visibleWidth(divider) * 3;
         const remaining = Math.max(0, width - reserved);
         const cwdWidth = Math.min(40, Math.floor(remaining * 0.42));
         const modelWidth = Math.max(0, remaining - cwdWidth);
@@ -56,7 +59,7 @@ export default function greenFooter(pi: ExtensionAPI): void {
           ? rgb(52, 180, 100, modelText)
           : rgb(52, 180, 100, modelText.slice(0, split + 3)) + rgb(74, 222, 128, modelText.slice(split + 3));
 
-        return [truncateToWidth(cwd + divider + styledModel + divider + context + git, width, "")];
+        return [truncateToWidth(mode + divider + cwd + divider + styledModel + divider + context + git, width, "")];
       },
     }));
   });
