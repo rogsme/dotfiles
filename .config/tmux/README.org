@@ -462,7 +462,7 @@ Configuration is tuned to match Alacritty's =multiplier = 3= setting:
 set -g @plugin 'azorng/tmux-smooth-scroll'
 set -g @smooth-scroll-speed "80"
 set -g @smooth-scroll-easing "sine"
-set -g @smooth-scroll-normal "3"
+set -g @smooth-scroll-normal "1"
 set -g @smooth-scroll-mouse "true"
 #+end_src
 *** Session Persistence
