@@ -79,7 +79,7 @@ description: >-
 
   </example>
 
-model: lazer/gemini-3-flash
+model: lazer/gemini-3.5-flash
 permission:
   edit: ask
 mode: primary

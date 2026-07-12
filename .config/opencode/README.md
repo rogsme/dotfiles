@@ -32,7 +32,7 @@ The main configuration lives in `opencode.json`.
 
 - Default chat model: `openai/gpt-5.6-sol`
 - Planning agent model: `openai/gpt-5.6-sol`
-- Build agent model: `openai/gpt-5.3-codex`
+- Build agent model: `lazer/glm-5.2`
 
 Both configured agents currently use `reasoningEffort: "medium"`.
 
@@ -72,10 +72,8 @@ The `lazer` provider currently exposes these model IDs:
 - `gemini/gemini-2.0-flash`
 - `gemini/gemini-2.5-flash`
 - `gemini/gemini-2.5-pro`
-- `gemini/gemini-3-flash-preview`
+- `gemini/gemini-3.5-flash`
 - `gemini/gemini-3.1-pro-preview`
-- `openai/gpt-5.3-codex`
-- `openai/gpt-5.6-sol`
 - `xai/grok-code-fast-1`
 
 These are presented in OpenCode with friendlier display names via the provider config.
@@ -128,7 +126,7 @@ This agent is a specialized OpenCode helper for:
 
 Current agent characteristics:
 
-- model: `lazer/gemini/gemini-3-flash-preview`
+- model: `lazer/gemini-3.5-flash`
 - mode: `primary`
 - edit permission: `ask`
 
