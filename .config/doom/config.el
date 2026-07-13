@@ -540,7 +540,7 @@ related notes or tasks."
   (message "Magit GPT provider set to %s" provider))
 
 ;; Default to Qwen3 Coder 480B Turbo for commit generation.
-(setq magit-gptcommit-llm-provider (my/llm-provider "Kimi K.27 Code"))
+(setq magit-gptcommit-llm-provider (my/llm-provider "Kimi K2.7 Code"))
 
 (setq llm-warn-on-nonfree nil)
 
