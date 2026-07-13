@@ -25,5 +25,6 @@
 -
 
 ## Notes
-- This file is a template used by `claude-plan` to bootstrap new plan files.
-- New plans should be created in the project at `.opencode/plans/<three-words>.md`.
+- This structure is used by `claude-plan` for finalized, explicitly approved plans.
+- Drafts stay in the planning conversation and must not be written to disk.
+- Approved plans are created in the project at `.opencode/plans/<three-words>.md`.
