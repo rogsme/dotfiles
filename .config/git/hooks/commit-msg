@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Global commit-msg hook for all repos — and every agent harness.
+# Wired via [core] hooksPath = ~/.config/git/hooks in .gitconfig, so it fires on
+# every `git commit` regardless of who runs it (Claude, Codex, Gemini, opencode,
+# or a human). Enforces the "never add Co-Authored-By / Signed-off-by / AI
+# attribution trailers" rule at the git layer instead of by instruction alone.
+#
+# Skip (emergencies only): SKIP_HOOKS=1 git commit ...   (or git commit --no-verify)
+
+set -euo pipefail
+
+[[ "${SKIP_HOOKS:-0}" == "1" ]] && exit 0
+
+msg_file="$1"
+
+# Scan only the real message: strip the `git commit -v` scissors diff and comment
+# lines, so a trailer that appears inside a diff or a template can't false-positive.
+body=$(sed '/^#.*>8/,$d' "$msg_file" | grep -v '^#' || true)
+
+# Forbidden co-author / AI-attribution markers (case-insensitive).
+pattern='co-authored-by:|signed-off-by:|noreply@anthropic|generated with \[?claude|claude\.com/claude-code'
+
+if printf '%s\n' "$body" | grep -qiE "$pattern"; then
+  echo "[commit-msg] Blocked: co-author / AI-attribution trailer in commit message." >&2
+  printf '%s\n' "$body" | grep -niE "$pattern" | sed 's/^/[commit-msg]   /' >&2
+  echo "[commit-msg] Remove the offending trailer line(s) and recommit." >&2
+  echo "[commit-msg] Emergency bypass: SKIP_HOOKS=1 git commit ..." >&2
+  exit 1
+fi
+
+exit 0
