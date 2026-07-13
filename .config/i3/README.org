@@ -387,8 +387,8 @@ Custom keybindings to launch frequently used applications and perform specific a
 - =$mod+Shift+b=: Opens the auxiliary terminal (=$auxTerminal=, ghostty) running a script named `bmenu`.
 - Language Switching: =$aux+Shift+e= sets the keyboard layout to Spanish (es), =$aux+Shift+u= sets it to
   US English (us) using =setxkbmap=.
-- Screenshots: Various bindings using =scrot= and =flameshot= for capturing the full screen, a selected
-  area (saving to file or clipboard), or launching the Flameshot GUI. The =--release= flag triggers the
+- Screenshots: Various bindings using =scrot= and =ksnip= for capturing the full screen, a selected
+  area (saving to file or clipboard), or launching the Ksnip GUI. The =--release= flag triggers the
   action when the key is released.
 - Do Not Disturb: =$mod+m= toggles a Do Not Disturb mode via a custom script.
 - Custom Shortcuts: Bindings using =$aux= to open specific LibreOffice Calc spreadsheets (=loffice=) and
@@ -412,7 +412,7 @@ bindsym $aux+Shift+u exec setxkbmap us
 bindsym Print exec scrot ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Shift+F12 exec scrot -s -f ~/Pictures/%Y-%m-%d-%H%M%S.png
 bindsym --release Ctrl+Shift+F12 exec scrot -s -f -o "/tmp/image.png" && xclip -selection clipboard -t image/png -i /tmp/image.png
-bindsym --release Ctrl+Shift+F11 exec flameshot gui
+bindsym --release Ctrl+Shift+F11 exec ksnip -r
 
 # Do not disturb
 bindsym $mod+m exec "~/.config/i3/scripts/toggle_dnd.sh"
@@ -578,7 +578,7 @@ exec --no-startup-id exec "~/.config/i3/connect-speakers.sh"
 exec --no-startup-id sleep 5; exec /usr/bin/kdeconnect-app
 exec --no-startup-id xfsettingsd --replace
 exec dbus-update-activation-environment --systemd DBUS_SESSION_BUS_ADDRESS DISPLAY XAUTHORITY
-exec_always /usr/bin/handy --start-hidden
+exec /usr/bin/handy --start-hidden
 #+end_src
 
 ** Scripts
