@@ -979,6 +979,9 @@
     },
     "external_directory": {
       "~/.config/opencode/get-shit-done/*": "allow"
+    },
+    "task": {
+      "plan-reviewer": "deny"
     }
   }
 }

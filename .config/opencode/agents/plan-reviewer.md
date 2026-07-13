@@ -1,6 +1,7 @@
 ---
 description: Reviews a draft implementation plan for missing assumptions, regression risks, file omissions, and weak verification. Read-only only.
 mode: subagent
+hidden: true
 model: lazer/gpt-5.6-sol
 reasoningEffort: xhigh
 permission:
