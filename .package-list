@@ -24,10 +24,14 @@ bash-completion
 blueman
 bluez-utils
 bmenu
+brave-bin
+brightnessctl
 btrfs-progs
 catfish
 chaotic-keyring
 chaotic-mirrorlist
+chiaki-ng
+chromium
 clamav
 cmake
 cmatrix
@@ -65,7 +69,6 @@ ffmpeg
 ffmpegthumbnailer
 firefox
 fish
-flameshot
 flyctl-bin
 freetype2
 fwupd
@@ -81,6 +84,7 @@ gnome-firmware
 gnome-keyring
 gnome-themes-extra
 gparted
+grim
 grub
 grub-btrfs
 grub-theme-manjaro
@@ -93,7 +97,6 @@ gufw
 gvfs
 gvfs-afc
 gvfs-goa
-gvfs-google
 gvfs-gphoto2
 gvfs-mtp
 gvfs-nfs
@@ -112,7 +115,9 @@ intel-ucode
 inxi
 jfsutils
 jq
+just
 kdeconnect
+ksnip
 less
 lib32-libva-intel-driver
 lib32-mesa
@@ -131,7 +136,6 @@ libvterm
 lightdm
 lightdm-gtk-greeter
 lightdm-gtk-greeter-settings
-linux-firmware-meta
 linux612
 logiops
 logrotate
@@ -140,6 +144,7 @@ lsof
 lvm2
 lxappearance
 make
+mako
 man-db
 man-pages
 manjaro-alsa
@@ -198,6 +203,7 @@ openresolv
 openssh
 os-prober
 pamac-gtk3
+pandoc-cli
 patch
 pavucontrol
 perl
@@ -221,6 +227,7 @@ pulumi
 ripgrep
 rofi
 rsync
+rust-analyzer
 s-nail
 samba
 sane-airscan
@@ -228,11 +235,16 @@ sbctl
 screenfetch
 scrot
 simple-scan
+slurp
 snapd
 snapd-glib
 sof-firmware
 speedtest-cli
 sudo
+sway
+swaybg
+swayidle
+swaylock-effects
 syncthing
 sysfsutils
 system-config-printer
@@ -246,6 +258,7 @@ thunderbird
 tigervnc
 timeshift
 timeshift-autosnap-manjaro
+tlp
 tmux
 tree
 tree-sitter-cli
@@ -275,15 +288,19 @@ vulkan-nouveau
 vulkan-radeon
 wallpapers-2018
 wallpapers-juhraya
+waybar
 wget
 which
+whois
 wireless-regdb
+wl-clipboard
 woeusb
 wpa_supplicant
 xclip
 xcursor-simpleandsoft
 xcursor-vanilla-dmz-aa
 xdg-desktop-portal-gtk
+xdg-desktop-portal-xapp
 xdg-user-dirs
 xdg-utils
 xdotool
