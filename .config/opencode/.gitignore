@@ -1,0 +1,13 @@
+/node_modules/
+/package.json
+/bun.lock
+/package-lock.json
+
+/server.env
+
+/logs/
+/scheduler/
+/cache/
+
+/__pycache__/
+*.py[cod]
