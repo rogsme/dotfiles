@@ -4,7 +4,8 @@
 
 export interface ModelEntry {
   id: string;
-  name: string;
+  /** Optional in pi-coding-agent's model schema — providers may omit it. */
+  name?: string;
   provider: string;
 }
 
@@ -41,7 +42,10 @@ export function resolveModel(
   // 2. Fuzzy match against available models. Normalize separators so cosmetic
   // punctuation differences still match — e.g. "claude-haiku-4.5" and
   // "claude-haiku-4-5" (dot vs dash in the version) resolve to the same model.
-  const normalize = (s: string) => s.toLowerCase().replace(/\./g, "-");
+  // `name` is optional in pi-coding-agent's model schema (some providers register
+  // models without it), so normalize tolerates undefined — an empty normalized
+  // name simply never matches, which is correct.
+  const normalize = (s: string | undefined) => (s ?? "").toLowerCase().replace(/\./g, "-");
   const query = normalize(input);
 
   // Score each model: prefer exact id match > id contains > name contains > provider+id contains
@@ -66,7 +70,7 @@ export function resolveModel(
       // undated registry id like "claude-haiku-4-5".
       query
         .split(/[\s\-/]+/)
-        .every(part => /^\d{8}$/.test(part) || id.includes(part) || name.includes(part) || m.provider.toLowerCase().includes(part))
+        .every(part => /^\d{8}$/.test(part) || id.includes(part) || name.includes(part) || (m.provider ?? "").toLowerCase().includes(part))
     ) {
       score = 20; // all parts present somewhere
     }

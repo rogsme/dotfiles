@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.80.6",
   "theme": "dark",
   "defaultProvider": "lazer",
-  "defaultModel": "glm-5.2",
+  "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
   "packages": [
     "npm:@juicesharp/rpiv-ask-user-question",

@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Subagents crashed with `Cannot read properties of undefined (reading 'toLowerCase')` whenever an agent pinned a `model:` that wasn't available under any configured provider** (notably the built-in `Explore` agent, which pins `anthropic/claude-haiku-4-5`). `resolveModel`'s fuzzy-match loop called `normalize(m.name)` on every available model, but `name` is an *optional* field in pi-coding-agent's model schema — providers such as the custom `lazer` provider register models with only an `id`, leaving `name` `undefined`. The first unavailable model pin therefore threw a `TypeError` synchronously inside the `Agent` tool's `execute`, before the subagent session was even created, so every `Explore` (and any agent whose pinned model didn't exactly match) failed instantly. `normalize` now tolerates `undefined` (an absent name simply never matches, which is correct), and the date-stamp `provider.includes(part)` branch guards `m.provider` the same way. After the fix, an unresolvable config-pinned model gracefully falls back to the parent model (the documented behavior) instead of crashing.
+
 ## [0.13.0] - 2026-06-30
 
 ### Added
