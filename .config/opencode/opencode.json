@@ -961,7 +961,8 @@
     "theme_list": "<leader>t"
   },
   "plugin": [
-    "opencode-scheduler"
+    "opencode-scheduler",
+    "@dietrichgebert/ponytail"
   ],
   "permission": {
     "read": {
