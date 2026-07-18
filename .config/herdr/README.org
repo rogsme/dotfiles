@@ -1,0 +1,400 @@
+#+TITLE: Herdr Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:conf :tangle config.toml :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* Herdr Configuration
+:PROPERTIES:
+:ID:       a1f3c8d2-7e4b-4a91-b5e0-8c2d1f6a9b3e
+:END:
+This is my personal configuration for [[https://herdr.dev][Herdr]], the terminal workspace manager for AI
+coding agents. It's written using Org Mode's literate programming features, which allows embedding
+documentation directly alongside the code. This file is configured to automatically "tangle" the code
+blocks into the actual Herdr configuration file (=config.toml= in the same directory) whenever this Org
+file is saved in Emacs (see the [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]] section). This approach keeps the configuration
+well-documented and easier to manage.
+
+The config lives at =~/.config/herdr/config.toml= (XDG-compliant). Herdr works without a config file;
+this one exists to mirror my tmux muscle memory as closely as Herdr allows, keep the Catppuccin theme I
+use everywhere else, and stay out of the way the rest of the time.
+
+** Installation
+:PROPERTIES:
+:ID:       a5b7c9d1-e3f5-4a7b-8c9d-2e4f6a8b0c1d
+:END:
+Steps to get this configuration up and running from scratch.
+
+*** Install Herdr
+:PROPERTIES:
+:ID:       b6c8d0e2-f4a6-4b8c-8d0e-3f5a7b9c1d2e
+:END:
+#+begin_example
+curl -fsSL https://herdr.dev/install.sh | sh
+#+end_example
+
+*** Tangle the Config
+:PROPERTIES:
+:ID:       c7d9e1f3-a5b7-4c9d-8e1f-4a6b8c0d2e3f
+:END:
+If you have auto-tangle set up (see [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]]), just save this file in Emacs and the
+=config.toml= will be generated automatically. Otherwise, open this file in Emacs and run:
+
+#+begin_example
+M-x org-babel-tangle
+#+end_example
+
+This produces =config.toml= in the same directory as this =README.org= file. Make sure both live inside
+=~/.config/herdr/=.
+
+*** Apply the Config
+:PROPERTIES:
+:ID:       d8e0f2a4-b6c8-4d0e-8f2a-5b7c9d1e3f4a
+:END:
+If Herdr is already running, reload the config without restarting panes:
+
+#+begin_example
+herdr server reload-config
+#+end_example
+
+Or open the global menu inside Herdr (=prefix+b= then the menu item) and choose =reload config=.
+Startup-only settings still need a restart.
+
+** Getting Started
+:PROPERTIES:
+:ID:       a2b4c6d8-e0f2-4a3b-8c5d-7e9f1a2b4c6d
+:END:
+A quick primer on how Herdr works and the keybindings in this config.
+
+*** Core Concepts
+:PROPERTIES:
+:ID:       b3c5d7e9-f1a3-4b5c-8d7e-0f2a4b6c8d0e
+:END:
+Herdr organizes things in four layers:
+
+- *Sessions*: A persistent background server namespace. The default =herdr= command attaches to the
+  default session. Named sessions (=herdr session attach work=) are fully separate runtime namespaces;
+  most people only need the default. Use one Herdr *workspace* per project instead of one session per
+  project.
+- *Workspaces*: The project-level container. One per repo, task, or investigation. Owns tabs and panes.
+  The sidebar rolls agent states up per workspace.
+- *Tabs*: Layouts inside a workspace, for separating views like =agents=, =logs=, =server=.
+- *Panes*: Real terminals. Splittable right or down. Survive client detach.
+
+The *prefix key* is =C-b= (same as tmux). Every Herdr command starts with the prefix, then a second key.
+For example, =C-b c= means: press =Ctrl+b=, release, then press =c=.
+
+Herdr is also *mouse-native*: click panes, tabs, workspaces, and agents; drag split borders; right-click
+for context menus; drag-select to copy. Keyboard control is an optional layer on top.
+
+*** Workflow Example
+:PROPERTIES:
+:ID:       c4d6e8f0-a2b4-4c6d-8e8f-1a3b5c7d9e1f
+:END:
+A typical session, mirroring the tmux workflow:
+
+1. Start Herdr: =herdr=. It launches or attaches to the default background session.
+2. You're in the first workspace. Rename it: =C-b $=, type "icp", press Enter.
+3. Open a new tab: =C-b c=. Rename it: =C-b ,=, type "front", press Enter.
+4. In the "front" tab, open a split: =C-b |= (side by side) or =C-b -= (stacked).
+5. Navigate between panes: =C-b h/j/k/l=.
+6. Switch between tabs: =C-b 1=, =C-b 2=, or =C-b n= / =C-b p=.
+7. Detach (leave everything running): =C-b d=. Agents and panes keep running.
+8. Come back later: =herdr=. Everything is where you left it — Herdr saves continuously.
+9. Start a coding agent in a pane: =claude=, =codex=, =pi=, or =opencode=. Herdr detects it
+   automatically; the sidebar shows =working=, =blocked=, =done=, or =idle= across every workspace.
+10. See a URL in build output? =Ctrl-click= it to open in your browser.
+
+*** Quick Reference
+:PROPERTIES:
+:ID:       d5e7f9a1-b3c5-4d7e-8f9a-2b4c6d8e0f2a
+:END:
+Cheat sheet for all keybindings defined in this config.
+
+#+begin_example
+PREFIX = C-b
+
+Workspaces (tmux "sessions"):
+  C-b d             Detach from session
+  C-b $             Rename workspace
+  C-b s             Workspace picker
+  C-b g             Session navigator (goto)
+
+Tabs (tmux "windows"):
+  C-b c             New tab
+  C-b ,             Rename tab
+  C-b 1-9           Switch to tab N
+  C-b n / p         Next / previous tab
+  C-b &             Close tab
+
+Panes:
+  C-b |             Split vertically (side by side)
+  C-b -             Split horizontally (stacked)
+  C-b h/j/k/l       Navigate panes
+  C-b H/J/K/L       Resize panes (prefix required for each press)
+  C-b x             Close pane
+  C-b z             Toggle pane zoom/fullscreen
+  C-b q             Session navigator (tmux "show pane numbers" equivalent)
+
+Copy Mode:
+  C-b [             Enter copy mode (navigate with h/j/k/l)
+  v                 Start selection (in copy mode)
+  y                 Yank to clipboard (in copy mode)
+  q / Esc           Exit copy mode
+  /  ?              Search forward / backward (smart-case)
+  n  N              Repeat search / repeat opposite direction
+
+Utilities:
+  C-b r             Reload config
+
+Notes (differences from tmux):
+  - Herdr saves session layout continuously; tmux-resurrect's C-b C-s / C-b C-r have no equivalent.
+  - Pane resize requires the prefix for each press (no repeat-window like tmux's -r).
+  - URL picking (tmux-fzf-url's C-b u) is not bound; Ctrl-click URLs natively instead.
+#+end_example
+
+** Philosophy
+:PROPERTIES:
+:ID:       b2e4a7c1-3d5f-4b82-a6c9-1e7f2d8b0a4c
+:END:
+This config mirrors my [[file:~/code/dotfiles/tmux/README.org][tmux config]] so muscle memory carries over. The goals are:
+
+- Sensible defaults that don't fight you
+- Vim-style navigation (=h/j/k/l=)
+- =C-b= prefix, same as tmux
+- Catppuccin mocha, to match Neovim and tmux
+- Minimal config — Herdr already does the right thing for most settings
+
+** Header
+:PROPERTIES:
+:ID:       c3f5b8d2-4e6a-5c93-b7d0-2f8a3e9c1b5d
+:END:
+Simple header block with personal information, which will appear at the top of the tangled =config.toml=.
+
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+#
+# herdr configuration
+# Tangled from README.org
+#
+
+onboarding = false
+#+end_src
+
+** Theme
+:PROPERTIES:
+:ID:       d4a6c9e3-5f7b-6da4-c8e1-3a9b4f0d2c6e
+:END:
+Catppuccin mocha, matching my tmux and Neovim setups. Herdr ships Catppuccin as a built-in theme.
+
+#+begin_src conf
+[theme]
+name = "catppuccin"
+#+end_src
+
+** Terminal
+:PROPERTIES:
+:ID:       e5b7daf4-6a8c-7eb5-d9f2-4b0c5a1e3d7f
+:END:
+New panes, tabs, and workspaces inherit the current pane's working directory instead of jumping to
+=$HOME=. This mirrors the tmux config's =-c "#{pane_current_path}"= behavior on splits and new windows.
+
+#+begin_src conf
+[terminal]
+new_cwd = "follow"
+#+end_src
+
+** UI
+:PROPERTIES:
+:ID:       f6c8eb05-7b9d-8fc6-ea03-5c1d6b2f4e8a
+:END:
+Herdr is mouse-native by default, matching the tmux config's =set -g mouse on=. Tabs are created
+immediately with generated names (tmux's default behavior) rather than prompting for a name first.
+
+#+begin_src conf
+[ui]
+prompt_new_tab_name = false
+#+end_src
+
+** Key Bindings
+:PROPERTIES:
+:ID:       a3df5c72-4cae-5ad3-fb70-2d8e3c9a1f5b
+:END:
+Custom keybindings mirroring my tmux config. The prefix stays =C-b= (Herdr's default, same as tmux).
+
+Binding strings are explicit: =prefix+n= means press the configured prefix and then =n=;
+=ctrl+alt+n= would be a direct terminal-mode shortcut. Named punctuation is accepted, so =prefix+|=
+and =prefix+minus= work.
+
+*** Sessions / Workspaces
+:PROPERTIES:
+:ID:       b4ea6d83-5dbf-6be4-ac81-3e9f4d0b2a6c
+:END:
+Herdr's closest analog to a tmux session is a workspace. Named Herdr sessions exist for fully separate
+runtime namespaces, but the recommended pattern is one workspace per project inside the default session.
+
+- =C-b d= :: Detach from the session (panes keep running). tmux's =C-b d=.
+- =C-b $= :: Rename the current workspace. tmux's =C-b $= renames a session.
+- =C-b s= :: Open the workspace picker. tmux's =C-b s= lists sessions.
+- =C-b g= :: Open the session navigator (searchable workspace/tab/pane tree). No direct tmux equivalent;
+  the closest is tmux's =C-b q= pane-number jump, which Herdr folds into this navigator.
+
+#+begin_src conf
+[keys]
+detach = "prefix+d"
+rename_workspace = "prefix+$"
+workspace_picker = "prefix+s"
+goto = "prefix+g"
+#+end_src
+
+*** Tabs
+:PROPERTIES:
+:ID:       c5fb7e94-6eca-7cf5-bd92-4f0a5e1c3b7d
+:END:
+Tabs are Herdr's analog to tmux windows.
+
+- =C-b c= :: New tab (in current directory via =new_cwd = "follow"=). tmux's =C-b c=.
+- =C-b ,= :: Rename tab. tmux's =C-b ,=.
+- =C-b &= :: Close tab. tmux's =C-b &=.
+- =C-b n= / =C-b p= :: Next / previous tab. tmux's =C-b n= / =C-b p=.
+- =C-b 1= through =C-b 9= :: Jump to tab N. tmux's =C-b 1-9=.
+
+#+begin_src conf
+new_tab = "prefix+c"
+rename_tab = "prefix+comma"
+close_tab = "prefix+ampersand"
+next_tab = "prefix+n"
+previous_tab = "prefix+p"
+switch_tab = "prefix+1..9"
+#+end_src
+
+*** Splits
+:PROPERTIES:
+:ID:       d6ac8fa5-7fdb-8da6-cea3-5a1b6f2d4c8e
+:END:
+=|= for a vertical split (panes side by side), =-= for a horizontal split (panes stacked). Same
+mnemonics as tmux. New panes inherit the current directory via =new_cwd = "follow"=.
+
+#+begin_src conf
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+#+end_src
+
+*** Pane Navigation
+:PROPERTIES:
+:ID:       e7bd9ab6-8aec-9eb7-dfb4-6b2c7a3e5d9f
+:END:
+Vim-style pane navigation. Muscle memory carries over from Neovim and tmux.
+
+#+begin_src conf
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+#+end_src
+
+*** Pane Resizing
+:PROPERTIES:
+:ID:       f8ceb0c7-9bfd-0fc8-eac5-7c3d8b4f6e0a
+:END:
+Uppercase =H/J/K/L= resize panes in tmux with the =-r= repeatable flag. Herdr's keybinding system
+does not support repeatable prefix bindings, so this config uses Herdr's resize *mode* instead:
+=prefix+shift+r= enters a modal resize mode where =h/j/k/l= resize the focused pane without
+re-pressing the prefix. =Esc= exits resize mode. This is the closest Herdr analog to tmux's
+repeatable resize.
+
+=prefix+r= is reserved for config reload (see [[*Reload Config][Reload Config]]), matching tmux. Herdr's
+default =prefix+shift+r= for reload is freed up and reused for resize mode.
+
+#+begin_src conf
+resize_mode = "prefix+shift+r"
+#+end_src
+
+*** Pane Lifecycle
+:PROPERTIES:
+:ID:       a9dfb1d8-0cae-1ad9-fbd6-8d4e9c5a7f1b
+:END:
+- =C-b x= :: Close the focused pane. tmux's =C-b x=.
+- =C-b z= :: Toggle zoom (fullscreen) on the focused pane. tmux's =C-b z=.
+
+#+begin_src conf
+close_pane = "prefix+x"
+zoom = "prefix+z"
+#+end_src
+
+*** Copy Mode
+:PROPERTIES:
+:ID:       b0eac2e9-1dbf-2be0-acd7-9e5f0d6b8a2c
+:END:
+=C-b [= enters copy mode. Once inside, Herdr uses vi-style navigation by default: =h/j/k/l= move,
+=v= starts a selection, =y= yanks to the clipboard, =q= or =Esc= exits. Herdr 0.7.4 also supports
+tmux-style =w/b/e= word motions, ={= / =}= paragraph motion, =/= and =?= smart-case search with =n=
+and =N= to repeat. This matches the tmux config's vi copy mode closely.
+
+Herdr's copy mode is already vi-style by default, so no =mode-keys vi= equivalent is needed. The
+=v= and =y= bindings are built-in. This section exists only to document the behavior; no config keys
+are required.
+
+#+begin_src conf
+copy_mode = "prefix+["
+#+end_src
+
+*** Reload Config
+:PROPERTIES:
+:ID:       c1fbd3f0-2eca-3cf1-bde8-0f6a1e7c9b3d
+:END:
+Reload the config without restarting panes. tmux's =C-b r= reloads =tmux.conf=; this is the Herdr
+equivalent. Herdr's default =prefix+shift+r= is reassigned to resize mode above.
+
+#+begin_src conf
+reload_config = "prefix+r"
+#+end_src
+
+** Differences from tmux
+:PROPERTIES:
+:ID:       d2acd4a1-3fdb-4da2-cef9-1a7b2f8d0c4e
+:END:
+A few tmux habits don't have exact Herdr equivalents. They're documented here so the gap is explicit.
+
+- *Session save/restore (=C-b C-s= / =C-b C-r= via tmux-resurrect):* Herdr saves session layout
+  continuously to =session.json= and restores it automatically on server restart. There is no manual
+  save/restore action to bind. Native agent session resume (Claude Code, Codex, Pi, OpenCode, etc.)
+  is on by default via =[session] resume_agents_on_restore = true=.
+- *Repeatable pane resize (=prefix+H/J/K/L= with tmux's =-r=):* Herdr's keybinding parser does not
+  support repeatable prefix bindings. The closest equivalent is Herdr's resize mode (=prefix+r= by
+  default), which enters a modal resize mode where =h/j/k/l= resize without re-pressing the prefix.
+  This config keeps the default =prefix+r= for resize mode.
+- *URL picker (=C-b u= via tmux-fzf-url):* Not bound. Herdr has built-in Ctrl-click URL opening for
+  OSC 8 hyperlinks and visible =http://= / =https://= URLs. A community plugin (=x0d7x/herdr-fzf-url=)
+  exists but is intentionally not installed here to keep the config dependency-free.
+- *=C-b q= (show pane numbers):* Herdr's =prefix+q= is bound to =detach= (the tmux =C-b d= equivalent)
+  by default; this config rebinds =prefix+q= to =goto= (the session navigator), which is the closest
+  analog to tmux's pane-number jump. Detach moves to =prefix+d=, matching tmux.
+
+** Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       c7fbb9f6-8eca-9cf7-bde4-6f2a7e3c5b9d
+:END:
+To enable automatic tangling when this file is saved in Emacs, add the following to your Emacs
+configuration. This checks for the =#+auto_tangle: t= property and runs =org-babel-tangle= on save.
+If you already have this in your Emacs config from the tmux or i3 setup, you don't need to add it again.
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
