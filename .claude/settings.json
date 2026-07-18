@@ -1,7 +1,47 @@
 {
+  "agentPushNotifEnabled": true,
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
+  },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "~/.claude/hooks/notify.sh question",
+            "type": "command"
+          }
+        ],
+        "matcher": "AskUserQuestion"
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bash '/home/roger/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "~/.claude/hooks/notify.sh stop",
+            "type": "command"
+          }
+        ]
+      }
+    ]
+  },
+  "model": "claude-fable-5[1m]",
   "permissions": {
     "allow": [],
     "deny": [
@@ -11,41 +51,13 @@
       "Read(**/*.key)"
     ]
   },
-  "model": "claude-fable-5[1m]",
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "AskUserQuestion",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh question"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh stop"
-          }
-        ]
-      }
-    ]
-  },
+  "skipAutoPermissionPrompt": true,
+  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
-    "type": "command",
     "command": "npx -y ccstatusline@latest",
     "padding": 0,
-    "refreshInterval": 10
+    "refreshInterval": 10,
+    "type": "command"
   },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "tui": "fullscreen",
-  "skipDangerousModePermissionPrompt": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "tui": "fullscreen"
 }
