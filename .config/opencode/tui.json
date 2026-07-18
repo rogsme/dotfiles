@@ -10,5 +10,8 @@
     "app_exit": "ctrl+c,<leader>q",
     "editor_open": "<leader>e",
     "theme_list": "<leader>t"
-  }
+  },
+  "plugin": [
+    "@prevalentware/opencode-goal-plugin"
+  ]
 }

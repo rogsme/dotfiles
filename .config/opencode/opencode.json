@@ -5,7 +5,7 @@
   "small_model": "lazer/minimax-m3",
   "agent": {
     "plan": {
-      "model": "lazer/gpt-5.6-sol",
+      "model": "openai/gpt-5.6-sol",
       "reasoningEffort": "high"
     },
     "build": {
@@ -19,6 +19,12 @@
   "instructions": [
     "~/.config/opencode/instructions/shell-strategy/shell_strategy.md"
   ],
+  "mcp": {
+    "chrome-devtools": {
+      "type": "local",
+      "command": ["npx", "-y", "chrome-devtools-mcp@latest", "--browserUrl", "http://127.0.0.1:9222"]
+    }
+  },
   "provider": {
     "lazer": {
       "npm": "@ai-sdk/openai-compatible",
@@ -962,7 +968,8 @@
   },
   "plugin": [
     "opencode-scheduler",
-    "@dietrichgebert/ponytail"
+    "@dietrichgebert/ponytail",
+    "@prevalentware/opencode-goal-plugin"
   ],
   "permission": {
     "read": {
