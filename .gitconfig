@@ -8,7 +8,6 @@
 
 [core]
     pager = delta
-    hooksPath = /home/roger/.config/git/hooks
 
 [interactive]
     diffFilter = delta --color-only
