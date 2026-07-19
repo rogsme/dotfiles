@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "plugins": {
+    "feature-dev@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-21T11:48:33.011Z",
+        "lastUpdated": "2026-07-09T17:33:53.937Z"
+      }
+    ],
+    "frontend-design@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-21T11:48:33.011Z",
+        "lastUpdated": "2026-07-09T17:33:53.937Z"
+      },
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/personal/valsevilla.design",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
+        "version": "unknown",
+        "installedAt": "2026-05-22T21:43:33.353Z",
+        "lastUpdated": "2026-05-22T21:43:33.353Z"
+      }
+    ],
+    "claude-md-management@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/claude-md-management/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-04-21T11:48:33.011Z",
+        "lastUpdated": "2026-04-21T11:48:33.011Z"
+      }
+    ],
+    "gopls-lsp@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-04-21T11:48:33.011Z",
+        "lastUpdated": "2026-04-21T11:48:33.011Z"
+      },
+      {
+        "scope": "user",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/gopls-lsp/1.0.0",
+        "version": "1.0.0",
+        "installedAt": "2026-07-16T18:19:15.446Z",
+        "lastUpdated": "2026-07-16T18:19:15.446Z"
+      }
+    ],
+    "superpowers@claude-plugins-official": [
+      {
+        "scope": "project",
+        "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/superpowers/6.1.1",
+        "version": "6.1.1",
+        "installedAt": "2026-06-15T14:05:18.272Z",
+        "lastUpdated": "2026-07-09T13:47:00.251Z"
+      }
+    ]
+  }
+}

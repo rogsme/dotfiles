@@ -7,6 +7,39 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "async": false,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "AskUserQuestion"
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "ExitPlanMode"
+      }
+    ],
     "PreToolUse": [
       {
         "hooks": [
@@ -16,6 +49,37 @@
           }
         ],
         "matcher": "AskUserQuestion"
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "AskUserQuestion"
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "ExitPlanMode"
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ]
       }
     ],
     "SessionStart": [
@@ -28,6 +92,15 @@
           }
         ],
         "matcher": "*"
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -35,6 +108,26 @@
         "hooks": [
           {
             "command": "~/.claude/hooks/notify.sh stop",
+            "type": "command"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
             "type": "command"
           }
         ]

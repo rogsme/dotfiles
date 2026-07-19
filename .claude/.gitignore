@@ -1,0 +1,52 @@
+# Secrets / credentials
+.credentials.json
+*.key
+*.pem
+
+# Runtime state (regenerated per session)
+sessions/
+session-env/
+projects/
+teams/
+tasks/
+file-history/
+shell-snapshots/
+paste-cache/
+plans/
+jobs/
+daemon/
+daemon.log
+
+# History & logs
+history.jsonl
+*.log
+*.log.*
+
+# Caches & ephemeral state
+cache/
+backups/
+debug/
+downloads/
+mcp-needs-auth-cache.json
+stats-cache.json
+.last-cleanup
+.last-update-result.json
+
+# Plugin runtime (keep config json, ignore caches/data/marketplace clones)
+plugins/cache/
+plugins/data/
+plugins/marketplaces/
+
+# Editor / OS noise
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Backups of config
+settings.json.bak
+settings.json.orig
+*.bak
+*.orig
