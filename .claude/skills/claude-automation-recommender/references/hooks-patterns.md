@@ -1,226 +1,32 @@
-# Hooks Recommendations
+# Lifecycle Automation
 
-Hooks automatically run commands in response to Claude Code events. They're ideal for enforcement and automation that should happen consistently.
+Recommend lifecycle automation only for a repeated, deterministic event with a demonstrated benefit. The presence of tests, a type configuration, a formatter, or a lockfile alone is not evidence that every edit should trigger work.
 
-**Note**: These are common patterns. Use web search to find hooks for tools/frameworks not listed here to recommend the best hooks for the user.
+## Product Mapping
 
-## Auto-Formatting Hooks
+- Claude Code supports lifecycle hooks in scoped settings and plugin components.
+- OpenCode exposes lifecycle events through plugins; native permissions and formatters may solve enforcement or formatting with less code.
+- Use the product's permission system rather than a model instruction when an operation must be denied.
 
-### Prettier (JavaScript/TypeScript)
-| Detection | File Exists |
-|-----------|-------------|
-| `.prettierrc`, `.prettierrc.json`, `prettier.config.js` | ✓ |
+Verify current event names, matcher semantics, input schema, exit behavior, scope, and configuration against official documentation before proposing exact configuration.
 
-**Recommend**: PostToolUse hook on Edit/Write to auto-format
-**Value**: Code stays formatted without thinking about it
+## Recommend When
 
-### ESLint (JavaScript/TypeScript)
-| Detection | File Exists |
-|-----------|-------------|
-| `.eslintrc`, `.eslintrc.json`, `eslint.config.js` | ✓ |
+- The same safe command must run at a well-defined lifecycle point.
+- A policy needs deterministic enforcement and native permissions cannot express it.
+- The repository already has a fast, non-interactive script suitable for automation.
+- The user explicitly wants a notification or audit event unavailable natively.
 
-**Recommend**: PostToolUse hook on Edit/Write to auto-fix
-**Value**: Lint errors fixed automatically
+## Avoid When
 
-### Black/isort (Python)
-| Detection | File Exists |
-|-----------|-------------|
-| `pyproject.toml` with black/isort, `.black`, `setup.cfg` | ✓ |
+- The trigger is inferred only from a directory or config file.
+- The action is slow, flaky, interactive, destructive, or environment-dependent.
+- It would run broad test/typecheck suites after every edit without measured need.
+- A formatter, LSP, CI job, permission rule, or existing script already covers it.
+- The proposed hook parses commands with a fragile substring or regex security check.
 
-**Recommend**: PostToolUse hook to format Python files
-**Value**: Consistent Python formatting
+## Required Report Details
 
-### Ruff (Python - Modern)
-| Detection | File Exists |
-|-----------|-------------|
-| `ruff.toml`, `pyproject.toml` with `[tool.ruff]` | ✓ |
+State trigger frequency, command timeout, concurrency behavior, platform portability, dependencies, failure policy, permissions, and how to disable the automation. Estimate the cost of firing on a normal work session.
 
-**Recommend**: PostToolUse hook for lint + format
-**Value**: Fast, comprehensive Python linting
-
-### gofmt (Go)
-| Detection | File Exists |
-|-----------|-------------|
-| `go.mod` | ✓ |
-
-**Recommend**: PostToolUse hook to run gofmt
-**Value**: Standard Go formatting
-
-### rustfmt (Rust)
-| Detection | File Exists |
-|-----------|-------------|
-| `Cargo.toml` | ✓ |
-
-**Recommend**: PostToolUse hook to run rustfmt
-**Value**: Standard Rust formatting
-
----
-
-## Type Checking Hooks
-
-### TypeScript
-| Detection | File Exists |
-|-----------|-------------|
-| `tsconfig.json` | ✓ |
-
-**Recommend**: PostToolUse hook to run tsc --noEmit
-**Value**: Catch type errors immediately
-
-### mypy/pyright (Python)
-| Detection | File Exists |
-|-----------|-------------|
-| `mypy.ini`, `pyrightconfig.json`, pyproject.toml with mypy | ✓ |
-
-**Recommend**: PostToolUse hook for type checking
-**Value**: Catch type errors in Python
-
----
-
-## Protection Hooks
-
-### Block Sensitive File Edits
-| Detection | Presence Of |
-|-----------|-------------|
-| `.env`, `.env.local`, `.env.production` | Environment files |
-| `credentials.json`, `secrets.yaml` | Secret files |
-| `.git/` directory | Git internals |
-
-**Recommend**: PreToolUse hook that blocks Edit/Write to these paths
-**Value**: Prevent accidental secret exposure or git corruption
-
-### Block Lock File Edits
-| Detection | Presence Of |
-|-----------|-------------|
-| `package-lock.json`, `yarn.lock`, `pnpm-lock.yaml` | JS lock files |
-| `Cargo.lock`, `poetry.lock`, `Pipfile.lock` | Other lock files |
-
-**Recommend**: PreToolUse hook that blocks direct edits
-**Value**: Lock files should only change via package manager
-
----
-
-## Test Runner Hooks
-
-### Jest (JavaScript/TypeScript)
-| Detection | Presence Of |
-|-----------|-------------|
-| `jest.config.js`, `jest` in package.json | Jest configured |
-| `__tests__/`, `*.test.ts`, `*.spec.ts` | Test files exist |
-
-**Recommend**: PostToolUse hook to run related tests after edit
-**Value**: Immediate test feedback on changes
-
-### pytest (Python)
-| Detection | Presence Of |
-|-----------|-------------|
-| `pytest.ini`, `pyproject.toml` with pytest | pytest configured |
-| `tests/`, `test_*.py` | Test files exist |
-
-**Recommend**: PostToolUse hook to run pytest on changed files
-**Value**: Immediate test feedback
-
----
-
-## Quick Reference: Detection → Recommendation
-
-| If You See | Recommend This Hook |
-|------------|-------------------|
-| Prettier config | Auto-format on Edit/Write |
-| ESLint config | Auto-lint on Edit/Write |
-| Ruff/Black config | Auto-format Python |
-| tsconfig.json | Type-check on Edit |
-| Test directory | Run related tests on Edit |
-| .env files | Block .env edits |
-| Lock files | Block lock file edits |
-| Go project | gofmt on Edit |
-| Rust project | rustfmt on Edit |
-
----
-
-## Notification Hooks
-
-Notification hooks run when Claude Code sends notifications. Use matchers to filter by notification type.
-
-### Permission Alerts
-| Matcher | Use Case |
-|---------|----------|
-| `permission_prompt` | Alert when Claude requests permissions |
-
-**Recommend**: Play sound, send desktop notification, or log permission requests
-**Value**: Never miss permission prompts when multitasking
-
-### Idle Notifications
-| Matcher | Use Case |
-|---------|----------|
-| `idle_prompt` | Alert when Claude is waiting for input (60+ seconds idle) |
-
-**Recommend**: Play sound or send notification when Claude needs attention
-**Value**: Know when Claude is ready for your input
-
-### Example Configuration
-
-```json
-{
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "permission_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "afplay /System/Library/Sounds/Ping.aiff"
-          }
-        ]
-      },
-      {
-        "matcher": "idle_prompt",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "osascript -e 'display notification \"Claude is waiting\" with title \"Claude Code\"'"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### Available Matchers
-
-| Matcher | Triggers When |
-|---------|---------------|
-| `permission_prompt` | Claude needs permission for a tool |
-| `idle_prompt` | Claude waiting for input (60+ seconds) |
-| `auth_success` | Authentication succeeds |
-| `elicitation_dialog` | MCP tool needs input |
-
----
-
-## Quick Reference: Detection → Recommendation
-
-| If You See | Recommend This Hook |
-|------------|-------------------|
-| Prettier config | Auto-format on Edit/Write |
-| ESLint config | Auto-lint on Edit/Write |
-| Ruff/Black config | Auto-format Python |
-| tsconfig.json | Type-check on Edit |
-| Test directory | Run related tests on Edit |
-| .env files | Block .env edits |
-| Lock files | Block lock file edits |
-| Go project | gofmt on Edit |
-| Rust project | rustfmt on Edit |
-| Multitasking workflow | Notification hooks for alerts |
-
----
-
-## Hook Placement
-
-Hooks go in `.claude/settings.json`:
-
-```
-.claude/
-└── settings.json  ← Hook configurations here
-```
-
-Recommend creating the `.claude/` directory if it doesn't exist.
+Official sources: [Claude Code hooks](https://code.claude.com/docs/en/hooks), [OpenCode plugins](https://opencode.ai/docs/plugins/), and [OpenCode permissions](https://opencode.ai/docs/permissions/).

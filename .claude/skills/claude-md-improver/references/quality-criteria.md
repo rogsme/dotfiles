@@ -1,109 +1,54 @@
-# CLAUDE.md Quality Criteria
+# Evidence-Based Quality Criteria
 
-## Scoring Rubric
+Assess instructions by observable effect, not numeric scores or letter grades.
 
-### 1. Commands/Workflows (20 points)
+## Finding Types
 
-**20 points**: All essential commands documented with context
-- Build, test, lint, deploy commands present
-- Development workflow clear
-- Common operations documented
+| Type | Evidence to require | Typical correction |
+|---|---|---|
+| Stale | Referenced path, command, tool, version, or architecture contradicts current repository state | Update or remove |
+| Conflicting | Two effective sources direct incompatible behavior | Resolve at the narrowest appropriate scope |
+| Missing | Repeated or consequential repository-specific knowledge is not safely derivable | Add one concise instruction |
+| Over-broad | Guidance loads outside the files or tasks where it applies | Move to nested instructions or a path-scoped rule |
+| Derivable | Content merely repeats manifests, directory names, help text, or obvious code | Remove; point to a canonical source only if needed |
+| Unclear | Vague language has no observable action or completion condition | Rewrite as a concrete instruction |
 
-**15 points**: Most commands present, some missing context
+## Evaluation Dimensions
 
-**10 points**: Basic commands only, no workflow
+### Effective Scope
 
-**5 points**: Few commands, many missing
+- Identify where each source loads and whether it is unconditional, inherited, imported, or lazy.
+- Check `paths` patterns against real repository paths.
+- Distinguish organization, user, project, local, and nested instructions.
+- Flag duplication even when the duplicate text appears in different mechanisms.
 
-**0 points**: No commands documented
+### Currency
 
-### 2. Architecture Clarity (20 points)
+- Verify paths and script names directly.
+- Treat runtime behavior as unverified unless safely tested or confirmed by authoritative project evidence.
+- Flag instructions that depend on removed tools, old workflows, or superseded conventions.
 
-**20 points**: Clear codebase map
-- Key directories explained
-- Module relationships documented
-- Entry points identified
-- Data flow described where relevant
+### Conciseness
 
-**15 points**: Good structure overview, minor gaps
+- Every always-loaded line should prevent a likely mistake or repeated discovery.
+- Imports improve organization, not token cost.
+- Prefer deletion when the repository or tool already communicates the fact clearly.
+- Move task procedures to skills and path-specific guidance to scoped rules when supported.
 
-**10 points**: Basic directory listing only
+### Actionability
 
-**5 points**: Vague or incomplete
+- Use concrete verbs, paths, commands, conditions, and expected outcomes.
+- State important prohibitions precisely; do not add generic engineering advice.
+- Keep rationale only when it prevents a plausible incorrect alternative.
 
-**0 points**: No architecture info
+### Consistency
 
-### 3. Non-Obvious Patterns (15 points)
+- Compare all simultaneously effective sources, not each file in isolation.
+- More specific text appearing later may influence behavior, but concatenation does not guarantee a deterministic override. Remove contradictions rather than relying on order.
 
-**15 points**: Gotchas and quirks captured
-- Known issues documented
-- Workarounds explained
-- Edge cases noted
-- "Why we do it this way" for unusual patterns
+## Safe Evidence Rules
 
-**10 points**: Some patterns documented
-
-**5 points**: Minimal pattern documentation
-
-**0 points**: No patterns or gotchas
-
-### 4. Conciseness (15 points)
-
-**15 points**: Dense, valuable content
-- No filler or obvious info
-- Each line adds value
-- No redundancy with code comments
-
-**10 points**: Mostly concise, some padding
-
-**5 points**: Verbose in places
-
-**0 points**: Mostly filler or restates obvious code
-
-### 5. Currency (15 points)
-
-**15 points**: Reflects current codebase
-- Commands work as documented
-- File references accurate
-- Tech stack current
-
-**10 points**: Mostly current, minor staleness
-
-**5 points**: Several outdated references
-
-**0 points**: Severely outdated
-
-### 6. Actionability (15 points)
-
-**15 points**: Instructions are executable
-- Commands can be copy-pasted
-- Steps are concrete
-- Paths are real
-
-**10 points**: Mostly actionable
-
-**5 points**: Some vague instructions
-
-**0 points**: Vague or theoretical
-
-## Assessment Process
-
-1. Read the CLAUDE.md file completely
-2. Cross-reference with actual codebase:
-   - Run documented commands (mentally or actually)
-   - Check if referenced files exist
-   - Verify architecture descriptions
-3. Score each criterion
-4. Calculate total and assign grade
-5. List specific issues found
-6. Propose concrete improvements
-
-## Red Flags
-
-- Commands that would fail (wrong paths, missing deps)
-- References to deleted files/folders
-- Outdated tech versions
-- Copy-paste from templates without customization
-- Generic advice not specific to the project
-- "TODO" items never completed
-- Duplicate info across multiple CLAUDE.md files
+- Static repository evidence is sufficient for path, script, and configuration claims.
+- Safe checks may include listing commands, parsing configuration, or running non-mutating help/status commands.
+- Do not execute deployment, publishing, migration, destructive, production-data, or infrastructure-apply workflows for documentation validation.
+- Mark unresolved claims as unverified and state the safest way to verify them.

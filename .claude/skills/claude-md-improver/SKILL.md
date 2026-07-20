@@ -1,179 +1,87 @@
 ---
 name: claude-md-improver
-description: Audit and improve CLAUDE.md files in repositories. Use when user asks to check, audit, update, improve, or fix CLAUDE.md files. Scans for all CLAUDE.md files, evaluates quality against templates, outputs quality report, then makes targeted updates. Also use when the user mentions "CLAUDE.md maintenance" or "project memory optimization".
-tools: Read, Glob, Grep, Bash, Edit
+description: Audit and improve effective CLAUDE.md instructions. Use when asked to check, update, fix, or optimize repository CLAUDE.md files, scoped rules, imports, or project memory.
+compatibility: Runs in Claude Code or OpenCode; audits Claude Code instruction semantics and notes OpenCode compatibility when relevant.
 ---
 
 # CLAUDE.md Improver
 
-Audit, evaluate, and improve CLAUDE.md files across a codebase to ensure Claude Code has optimal project context.
+Audit first. Do not modify instruction files until the user approves proposed diffs.
 
-**This skill can write to CLAUDE.md files.** After presenting a quality report and getting user approval, it updates CLAUDE.md files with targeted improvements.
+## 1. Establish Scope
 
-## Workflow
+- Identify the repository root and the directory from which the agent is expected to run.
+- Inspect exact user and managed instruction locations only when they can affect that repository. Do not scan unrelated home directories.
+- Exclude dependency, vendor, cache, generated, build, coverage, VCS, and tool-output directories unless the repository explicitly treats one as source.
 
-### Phase 1: Discovery
+## 2. Resolve Effective Instructions
 
-Find all CLAUDE.md files in the repository:
+Build the instruction set Claude Code would receive, including:
 
-```bash
-find . -name "CLAUDE.md" -o -name ".claude.md" -o -name ".claude.local.md" 2>/dev/null | head -50
-```
+- managed policy `CLAUDE.md` for the current platform, when accessible
+- `~/.claude/CLAUDE.md` and `~/.claude/rules/**/*.md`
+- ancestor `CLAUDE.md` and `CLAUDE.local.md` files from the working directory upward
+- repository `CLAUDE.md`, `.claude/CLAUDE.md`, and root `CLAUDE.local.md`
+- nested `CLAUDE.md` and `CLAUDE.local.md` files, mapped to the subtrees where they load
+- `.claude/rules/**/*.md`, including each rule's `paths` scope
+- active `@path` imports, resolved relative to the importing file and followed recursively within Claude Code's supported depth
+- configured exclusions or alternate setting sources that change what loads
 
-**File Types & Locations:**
+Record load order, effective scope, lazy-loading behavior, and conflicts. Imports reorganize content but do not reduce startup context.
 
-| Type | Location | Purpose |
-|------|----------|---------|
-| Project root | `./CLAUDE.md` | Primary project context (checked into git, shared with team) |
-| Local overrides | `./.claude.local.md` | Personal/local settings (gitignored, not shared) |
-| Global defaults | `~/.claude/CLAUDE.md` | User-wide defaults across all projects |
-| Package-specific | `./packages/*/CLAUDE.md` | Module-level context in monorepos |
-| Subdirectory | Any nested location | Feature/domain-specific context |
+If OpenCode is also used, check whether `AGENTS.md`, OpenCode instruction configuration, or disabled Claude compatibility changes which instructions OpenCode sees. Do not expand a CLAUDE.md audit into an unrelated configuration audit.
 
-**Note:** Claude auto-discovers CLAUDE.md files in parent directories, making monorepo setups work automatically.
+## 3. Gather Repository Evidence
 
-### Phase 2: Quality Assessment
+Read relevant manifests, scripts, CI files, tool configs, source layout, and maintained docs before judging instructions. Prefer static evidence and read-only inspection.
 
-For each CLAUDE.md file, evaluate against quality criteria. See [references/quality-criteria.md](references/quality-criteria.md) for detailed rubrics.
+- Verify paths and command names against repository files.
+- Run only safe, read-only or non-destructive validation when it materially resolves uncertainty.
+- Never run deploy, publish, destructive, infrastructure-apply, production, or migration commands merely to validate documentation.
+- Label claims as verified, contradicted, or unverified; do not infer that a command works from its name alone.
 
-**Quick Assessment Checklist:**
+Use [quality-criteria.md](references/quality-criteria.md) to classify findings.
 
-| Criterion | Weight | Check |
-|-----------|--------|-------|
-| Commands/workflows documented | High | Are build/test/deploy commands present? |
-| Architecture clarity | High | Can Claude understand the codebase structure? |
-| Non-obvious patterns | Medium | Are gotchas and quirks documented? |
-| Conciseness | Medium | No verbose explanations or obvious info? |
-| Currency | High | Does it reflect current codebase state? |
-| Actionability | High | Are instructions executable, not vague? |
+## 4. Report Before Editing
 
-**Quality Scores:**
-- **A (90-100)**: Comprehensive, current, actionable
-- **B (70-89)**: Good coverage, minor gaps
-- **C (50-69)**: Basic info, missing key sections
-- **D (30-49)**: Sparse or outdated
-- **F (0-29)**: Missing or severely outdated
-
-### Phase 3: Quality Report Output
-
-**ALWAYS output the quality report BEFORE making any updates.**
-
-Format:
-
-```
-## CLAUDE.md Quality Report
-
-### Summary
-- Files found: X
-- Average score: X/100
-- Files needing update: X
-
-### File-by-File Assessment
-
-#### 1. ./CLAUDE.md (Project Root)
-**Score: XX/100 (Grade: X)**
-
-| Criterion | Score | Notes |
-|-----------|-------|-------|
-| Commands/workflows | X/20 | ... |
-| Architecture clarity | X/20 | ... |
-| Non-obvious patterns | X/15 | ... |
-| Conciseness | X/15 | ... |
-| Currency | X/15 | ... |
-| Actionability | X/15 | ... |
-
-**Issues:**
-- [List specific problems]
-
-**Recommended additions:**
-- [List what should be added]
-
-#### 2. ./packages/api/CLAUDE.md (Package-specific)
-...
-```
-
-### Phase 4: Targeted Updates
-
-After outputting the quality report, ask user for confirmation before updating.
-
-**Update Guidelines (Critical):**
-
-1. **Propose targeted additions only** - Focus on genuinely useful info:
-   - Commands or workflows discovered during analysis
-   - Gotchas or non-obvious patterns found in code
-   - Package relationships that weren't clear
-   - Testing approaches that work
-   - Configuration quirks
-
-2. **Keep it minimal** - Avoid:
-   - Restating what's obvious from the code
-   - Generic best practices already covered
-   - One-off fixes unlikely to recur
-   - Verbose explanations when a one-liner suffices
-
-3. **Show diffs** - For each change, show:
-   - Which CLAUDE.md file to update
-   - The specific addition (as a diff or quoted block)
-   - Brief explanation of why this helps future sessions
-
-**Diff Format:**
+Return an evidence-based report with no score or grade:
 
 ```markdown
-### Update: ./CLAUDE.md
+## Instruction Audit
 
-**Why:** Build command was missing, causing confusion about how to run the project.
+### Effective Hierarchy
+| Source | Effective scope/load point | Evidence |
+|---|---|---|
 
+### Findings
+#### [Stale | Conflicting | Missing | Over-broad | Derivable | Unclear]
+- **Location:** `path:line`
+- **Evidence:** repository fact or instruction interaction
+- **Impact:** concrete agent behavior or context cost
+- **Recommendation:** keep, remove, move, scope, or rewrite
+
+### Proposed Diffs
+#### `path`
+**Why:** concise evidence-based reason
 ```diff
-+ ## Quick Start
-+
-+ ```bash
-+ npm install
-+ npm run dev  # Start development server on port 3000
-+ ```
-```
+ exact proposed change
 ```
 
-### Phase 5: Apply Updates
+### Unverified
+- Claim and what would verify it safely
+```
 
-After user approval, apply changes using the Edit tool. Preserve existing content structure.
+Show every proposed diff, including deletions and moves, then stop for approval. A general request to audit is not approval to edit.
 
-## Templates
+## 5. Apply Approved Changes
 
-See [references/templates.md](references/templates.md) for CLAUDE.md templates by project type.
+After explicit approval:
 
-## Common Issues to Flag
+- Re-read each target file so concurrent changes are preserved.
+- Apply only the approved hunks; ask again before materially altering them.
+- Keep instructions concise, imperative, repository-specific, and correctly scoped.
+- Preserve useful existing structure and local instructions.
+- Re-resolve imports, paths, scopes, and contradictions after editing.
+- Report changed files and any validation not performed.
 
-1. **Stale commands**: Build commands that no longer work
-2. **Missing dependencies**: Required tools not mentioned
-3. **Outdated architecture**: File structure that's changed
-4. **Missing environment setup**: Required env vars or config
-5. **Broken test commands**: Test scripts that have changed
-6. **Undocumented gotchas**: Non-obvious patterns not captured
-
-## User Tips to Share
-
-When presenting recommendations, remind users:
-
-- **`#` key shortcut**: During a Claude session, press `#` to have Claude auto-incorporate learnings into CLAUDE.md
-- **Keep it concise**: CLAUDE.md should be human-readable; dense is better than verbose
-- **Actionable commands**: All documented commands should be copy-paste ready
-- **Use `.claude.local.md`**: For personal preferences not shared with team (add to `.gitignore`)
-- **Global defaults**: Put user-wide preferences in `~/.claude/CLAUDE.md`
-
-## What Makes a Great CLAUDE.md
-
-**Key principles:**
-- Concise and human-readable
-- Actionable commands that can be copy-pasted
-- Project-specific patterns, not generic advice
-- Non-obvious gotchas and warnings
-
-**Recommended sections** (use only what's relevant):
-- Commands (build, test, dev, lint)
-- Architecture (directory structure)
-- Key Files (entry points, config)
-- Code Style (project conventions)
-- Environment (required vars, setup)
-- Testing (commands, patterns)
-- Gotchas (quirks, common mistakes)
-- Workflow (when to do what)
+Use [templates.md](references/templates.md) only for minimal syntax examples and [update-guidelines.md](references/update-guidelines.md) when drafting changes.

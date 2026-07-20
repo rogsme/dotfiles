@@ -128,3 +128,4 @@ passed = sum(1 for _, ok, _ in checks if ok)
 for name, ok, detail in checks:
     print(f"{'PASS' if ok else 'FAIL'} {name}" + ("" if ok else f"  [{detail}]"))
 print(f"SCORE {passed}/{len(checks)}")
+sys.exit(0 if checks and passed == len(checks) else 1)

@@ -1,189 +1,91 @@
 ---
 name: fill-test-gaps
 description: >-
-  Use when the user wants to increase test coverage, write missing tests, fill
-  coverage gaps, or add tests for untested code. Also use when the user says
-  "add tests", "improve coverage", "fill test gaps", "what's untested", or
-  wants coverage-driven test generation for a branch, directory, or the whole
-  project. Requires .claude/skills.md with coverage commands configured.
-argument-hint: "[--branch <target> | --path <dir> | --all]"
+  Use when the user wants to add meaningful tests, improve coverage of changed
+  or risky behavior, or find untested lines, branches, error paths, or public
+  behavior. Requires .claude/skills.yaml with coverage configuration.
+compatibility: Requires Git, YAML project configuration, and project coverage/test commands; designed for Claude Code and OpenCode.
 ---
 
 # Fill Test Gaps
 
-Scan the project for untested code and fill gaps with meaningful, coverage-driven unit tests.
+Add the smallest useful tests for changed or risky behavior. Optimize for changed lines, meaningful branches, error paths, and public contracts, not a raw coverage percentage or test count.
 
-**Arguments:** `$ARGUMENTS` controls the scope. One of:
+Interpret command arguments when available; otherwise use the user's wording:
 
-- `--branch <target>` — Only test source files changed between `<target>` and HEAD. Also extends existing test files if they don't cover new code paths.
-- `--path <dir>` — Only scan the given directory.
-- `--all` — Full project scan. Tests everything that's untested.
-- *(empty)* — Auto-detect from PR base branch. If no PR found, stop with usage help.
+- `--branch <target>`: changed source files and behavior from `<target>` to `HEAD`.
+- `--path <path>`: one repository-relative area.
+- `--all`: analyze the whole configured coverage output.
+- Empty: use the current pull-request base when available; otherwise show valid scopes and stop.
 
----
+Reject unknown arguments and out-of-repository paths.
 
-## Test Quality Guardrails
+## Required Configuration
 
-All test quality rules (anti-patterns, quality checklist, positive patterns, layer-specific conventions) are defined in `TEST_PATTERNS.md` at the project root. Every agent MUST read that file before writing any test.
+Before analysis, read `.claude/skills.yaml`. There is no Markdown fallback. The required shape is:
 
----
-
-## Setup: Load Project Config
-
-**Before doing anything else**, read `.claude/skills.md` and find the `## Fill Test Gaps` section. This section defines:
-- **Coverage Command** — the command to run tests with coverage (e.g., `pnpm test:ci`, `uv run pytest --cov=src --cov-report=json`)
-- **Coverage Output** — where the coverage JSON lives (e.g., `coverage/coverage-final.json`, `coverage.json`)
-- **Skip List** — files/patterns to exclude from testing even if coverage reports them
-- **Verification Commands** — linter/type checker commands to run after writing tests
-
-If `.claude/skills.md` does not exist or has no `## Fill Test Gaps` section, **stop** and tell the user:
-> This project needs a `.claude/skills.md` file with a `## Fill Test Gaps` section.
-
-Also read `CLAUDE.md` to understand the project's technology stack, test conventions, and commit rules.
-
----
-
-## Phase 0: Scope Resolution
-
-Parse `$ARGUMENTS` to determine the mode:
-
-1. **`--branch <target>`** — Get changed files via `git diff --name-only`. Filter to source files (exclude test files). If no testable files remain, stop.
-2. **`--path <dir>`** — Set scope to the given directory.
-3. **`--all`** — No scope filter.
-4. ***(empty)*** — Auto-detect PR base branch. If found, behave as `--branch <base>`. Otherwise stop with usage help.
-5. ***(unrecognized)*** — Stop with usage help.
-
-## Phase 1: Coverage Collection & Reconnaissance
-
-#### Step 1 — Collect coverage baseline
-
-Run the **coverage command** from config.
-
-**Do NOT read the full test output into context.** Instead, dispatch an **Explore agent** to parse the coverage data:
-- Read the coverage JSON file (path from config)
-- For each source file in scope, extract: covered/uncovered **functions** (by name), uncovered **branches** (by line number), and overall line/branch/function percentages
-- Return a structured summary: `{ file, uncoveredFunctions[], uncoveredBranches[], linePct, branchPct, fnPct }`
-- Ignore files with 100% coverage
-
-**Scope narrowing:**
-- In `--branch` mode: only parse coverage for changed files
-- In `--path` mode: only parse coverage for files in the specified directory
-- In `--all` mode: parse all files, sorted by coverage % ascending
-
-#### Step 2 — Convention reference (parallel with Step 1)
-
-Dispatch an **Explore agent** simultaneously to gather testing conventions:
-- Read `CONVENTIONS.md` and `CLAUDE.md` for project standards
-- Read test configuration files (e.g., `pyproject.toml`, `jest.config.ts`, `jest.setup.ts`)
-- Read shared test setup files (e.g., `conftest.py`, `jest.setup.ts`)
-- Read 2-3 existing test files per layer to catalog actual patterns
-- Return a conventions summary to pass to writing agents
-
-## Phase 2: Gap Analysis & Batching
-
-Using the **coverage data from Phase 1** (not guesswork), determine what needs testing:
-
-For each source file with < 100% function or branch coverage:
-1. List the specific **uncovered functions** by name
-2. List the specific **uncovered branches** by line number — read those lines to understand the untested condition
-3. Determine if a test file already exists -> extend it; otherwise -> create new
-
-**Skip** files matching the skip list from config, even if coverage reports them.
-
-**Prioritize by impact:**
-- **High**: Functions with 0% coverage containing branching logic
-- **Medium**: Partially-covered functions with untested error/edge branches
-- **Low**: High-coverage functions missing only trivial branches
-
-**In `--branch` mode:**
-- Changed files with no test file -> full test file needed
-- Changed files with existing test file -> extend with additional test methods
-
-Group gaps into independent batches by layer or domain. Each batch must be self-contained.
-
-**If no gaps remain after filtering**, stop and report the current coverage state.
-
-## Phase 3: Parallel Test Writing
-
-Determine agents to dispatch (minimum 3, max 6). Each batch must be fully independent — no two agents may write to the same file.
-
-**File conflict rules:**
-- Agents must NOT modify shared files (test config, conftest, shared utilities)
-- If a fixture is needed but doesn't exist, define it locally within the test file
-- Each agent owns its test files exclusively
-
-Dispatch all agents **simultaneously** using `mode: "bypassPermissions"`. Each agent receives:
-1. Specific uncovered functions and branches (from coverage data)
-2. Exact list of files allowed to create/modify
-3. Whether each test file is new or an extension
-4. Conventions summary from Phase 1
-5. Instructions to read `TEST_PATTERNS.md` before writing any tests
-
-Each agent MUST follow this workflow:
-
-#### Step 1 — Learn conventions
-- Read `TEST_PATTERNS.md` for anti-patterns, quality checklist, and layer-specific conventions
-- Read `CONVENTIONS.md` and `CLAUDE.md`
-- Read shared test setup files (read-only)
-- Read 2-3 existing test files from the same layer
-
-#### Step 2 — Understand the code under test
-- Read source file(s) thoroughly
-- Identify specific uncovered functions and branches
-- For each uncovered branch, understand what condition triggers it
-- Plan tests targeting specific gaps — NOT already-covered code
-
-#### Step 3 — Write tests
-- Follow the project's test file location pattern (colocated or mirrored — determined from existing test files and CLAUDE.md)
-- When extending existing files: read first, append new tests, continue existing patterns
-- Before writing each test, verify it passes the Quality Checklist from TEST_PATTERNS.md
-- Follow layer-specific conventions from TEST_PATTERNS.md
-
-#### Step 4 — Self-review against guardrails
-- Re-read TEST_PATTERNS.md
-- Delete any test failing quality checklist or matching an anti-pattern
-- If fewer than 2 tests remain, reconsider if file genuinely needs testing
-
-#### Step 5 — Verify
-- Run new tests in background; wait for completion
-- If tests fail, read failure summary, fix, re-run
-- Review against CONVENTIONS.md, fix violations
-- Do NOT add suppress comments unless no other way
-
-## Phase 4: Fixture Consolidation
-
-After all agents complete, dispatch a **general-purpose agent** using `mode: "bypassPermissions"` and `model: "sonnet"`:
-1. Scan ALL test files for locally defined fixtures/helpers/mocks
-2. Identify duplicates across 2+ files or broadly useful utilities
-3. Promote to shared location
-4. Update imports in test files
-5. Run full test suite to verify
-
-Skip if no duplicates found.
-
-## Phase 5: Coverage Verification
-
-Run the coverage command again, capturing only the summary output.
-
-Compare against baseline:
-- If coverage didn't increase for target files, flag for review (tests may be tautological)
-- Verify overall coverage meets CI threshold if applicable
-
-If tests fail, dispatch an agent to fix them and rerun verification. Do not commit changes.
-
-## Phase 6: Report
-
-```
-| File | Tests Added | New/Extended | Layer | Coverage Before | Coverage After |
-|------|-------------|--------------|-------|-----------------|----------------|
+```yaml
+version: 1
+skills:
+  fill-test-gaps:
+    coverage:
+      command: "project-coverage-command"
+      output: "coverage/coverage-final.json"
+      format: "istanbul"           # istanbul or coverage.py
+    skip:
+      - "generated/**"
+    commands:
+      check:
+        - "project-test-command"
+      fix:                         # optional; this skill is a write workflow
+        - "project-test-format-command"
 ```
 
-Include:
-- Total tests before/after
-- Overall coverage before/after
-- Per-file coverage delta
-- Tests deleted during self-review (with reason)
-- Remaining gaps not addressed (with reason)
-- In `--branch` mode: changed files and their test coverage status
+Validate before running coverage:
 
-Do not commit or push. Leave all changes for the user to review.
+- The root contains only `version` and `skills`; `version` is integer `1`, and `skills` is a mapping containing `fill-test-gaps`.
+- The section contains exactly `coverage`, `skip`, and `commands`.
+- `coverage` contains exactly non-empty string `command`, repository-relative `output`, and `format`, which is exactly `istanbul` or `coverage.py`.
+- `skip` is a list, possibly empty, of valid repository-relative globs.
+- `commands` contains only required non-empty string list `check` and optional non-empty string list `fix`.
+- Every path/glob is syntactically valid and cannot escape the repository. Every command list item is one command, not a command sequence to split.
+
+Reject unknown keys, invalid types, malformed values, or missing fields with the failing key and the YAML shape above. Do not validate or consume sibling skill sections.
+
+Read project instructions, conventions, test-quality guidance, manifests, test configuration, and representative nearby tests when present. Actual tooling and authored rules determine test locations and style; do not assume a language or framework.
+
+## Coverage Analysis
+
+Run `coverage.command` separately and stop if it fails or does not create `coverage.output`. Parse only the declared format:
+
+- `istanbul`: use each file's statement, function, and branch maps with their count maps. Map zero counts through `statementMap`, `fnMap`, and `branchMap`; do not treat percentages alone as evidence.
+- `coverage.py`: use per-file executed/missing lines and executed/missing branches when present. Do not invent function coverage because standard coverage.py JSON does not provide it.
+- If either report omits branch or function detail, degrade to accurate missing-line analysis and state which dimensions were unavailable.
+
+Normalize reported paths to repository-relative paths, reject report entries outside the repository, apply `skip`, and filter to scope. A percentage can rank ties but must not be the objective.
+
+Prioritize evidence in this order:
+
+1. Changed lines and branches with changed behavior.
+2. Public behavior and contracts used by other code.
+3. Error, validation, security, data-loss, and boundary paths.
+4. Complex uncovered branches and functions.
+5. Remaining missing lines that can support a meaningful behavior test.
+
+Skip generated code, unreachable defensive code, trivial declarations, and gaps that would only produce implementation-coupled tests; explain each skip.
+
+## Writing
+
+Read the source, callers, existing tests, and applicable configuration before proposing a test. Extend existing files when natural. Refactor fixtures/helpers only when directly required by tests in files owned by that writer; do not perform repository-wide fixture consolidation.
+
+Create 1-4 independent writing batches based on scope size. Each writer receives exact source and test-file ownership; no file may be owned by two writers, and shared configuration is read-only. Use one writer when parallelism adds no value. There is no minimum test count.
+
+Each test must exercise observable behavior and target identified risk. Avoid tautologies, mock-only assertions, broad snapshots, redundant variants, and suppressions. Follow project-owned conventions and use existing dependencies.
+
+For `--all`, analyze and rank the whole project, then present bounded batches with files, targeted behavior, and expected checks. Wait for user approval of one or more batches before writing. Do not interpret `--all` as permission for an unbounded rewrite.
+
+## Verification
+
+Run targeted tests first. Then run every optional `commands.fix` entry separately in listed order and every `commands.check` entry separately in listed order; stop on the first failure. Rerun `coverage.command` separately and compare the targeted line/branch/function evidence available in the declared format. A test is useful even if the global percentage barely changes; investigate tests that do not execute their target.
+
+Report behavior covered, files changed, targeted coverage evidence before/after, command results, and remaining ranked gaps with reasons. Do not commit or push.

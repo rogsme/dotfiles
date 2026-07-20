@@ -1,161 +1,74 @@
 ---
 name: audit-tests
 description: >-
-  Use when the user wants to check test suite health, find orphaned or misnamed
-  test files, detect anti-patterns in tests, or clean up test structure. Also
-  use when the user says "audit tests", "check test quality", "find bad tests",
-  "clean up test suite", or wants a structural review of the testing layer.
-  Audits are read-only unless the user explicitly asks to fix issues or passes
-  --fix. Requires .claude/skills.md with test structure configured.
-argument-hint: "[--branch <target> | --path <dir> | --all] [--fix]"
+  Use when the user wants to audit test-suite health, find missing, orphaned,
+  misnamed, or weak tests, or clean up test structure. Audits are read-only
+  unless the user passes --fix or explicitly asks for fixes. Requires
+  .claude/skills.yaml.
+compatibility: Requires Git, YAML project configuration, and project test commands; designed for Claude Code and OpenCode.
 ---
 
 # Audit Tests
 
-Audit the test suite for structural issues, naming violations, and quality problems. Report findings by default; apply changes only with explicit fix intent.
+Audit tests against project-owned rules and actual test-tool configuration. Report only by default. Treat `--fix` or explicit fix/clean-up intent as permission to edit; never infer fix intent from "audit", "check", or "review".
 
-**Arguments:** `$ARGUMENTS` controls the scope:
+Interpret command arguments when the host supplies them; otherwise use the user's wording:
 
-- `--branch <target>` — Only audit test files for source files changed between `<target>` and HEAD.
-- `--path <dir>` — Only audit files in the given directory.
-- `--all` — Full project audit.
-- `--fix` — Apply fixable changes after the audit. May be combined with any scope.
-- *(empty)* — Auto-detect from PR base branch. If no PR found, stop with usage help.
+- `--branch <target>`: files changed from `<target>` to `HEAD`, plus related tests.
+- `--path <path>`: files under one repository-relative path.
+- `--all`: all configured source and test files.
+- Empty: use the current pull-request base when available; otherwise show the valid scopes and stop.
+- `--fix`: may accompany any scope.
 
-Treat an explicit request such as "fix the test structure" or "clean up the test suite" as fix mode. Plain audit, check, or review requests are read-only.
+Reject unknown arguments and out-of-repository paths.
 
----
+## Required Configuration
 
-## Setup: Load Project Config
+Before auditing, read `.claude/skills.yaml`. There is no Markdown fallback. The required shape is:
 
-**Before doing anything else**, read `.claude/skills.md` and find the `## Audit Tests` section. This section defines:
-- **Test Structure** — how tests are organized: `colocated` (test file next to source: `foo.test.ts`) or `mirrored` (separate test dir: `src/tests/<dir>/test_<file>.py`)
-- **Known Exceptions** — files/patterns to skip during audits (intentional deviations)
-- **Scope Groups** (optional) — how to group files for parallel audits
-- **Verification Command** — the command to verify tests are still discoverable after fixes
+```yaml
+version: 1
+skills:
+  audit-tests:
+    source_globs:
+      - "src/**"
+    test_globs:
+      - "tests/**"
+    known_exceptions:
+      - pattern: "tests/fixtures/**"
+        reason: "Fixture modules are imported by tests and are not tests."
+    commands:
+      check:
+        - "project-test-collection-command"
+      fix:                         # optional; fix mode only
+        - "project-test-format-command"
+```
 
-If `.claude/skills.md` does not exist or has no `## Audit Tests` section, **stop** and tell the user:
-> This project needs a `.claude/skills.md` file with a `## Audit Tests` section.
+Validate before doing other work:
 
-Also read:
-- `CONVENTIONS.md` to understand the project's test naming and structure conventions
-- `TEST_PATTERNS.md` to understand test quality anti-patterns (needed for Audit 10)
-- `CLAUDE.md` for project-level rules
+- The root contains only `version` and `skills`; `version` is integer `1`, and `skills` is a mapping containing `audit-tests`.
+- The section contains only `source_globs`, `test_globs`, `known_exceptions`, and `commands`; all are required except `commands.fix`.
+- Glob lists and command lists are non-empty lists of non-empty strings. `known_exceptions` is a list, possibly empty, of mappings containing exactly non-empty `pattern` and `reason` strings.
+- Paths and globs are syntactically valid, repository-relative, and cannot escape the repository. Reject source/test files classified by both glob sets.
+- `commands` contains only `check` and optional `fix`. Do not parse chained commands into steps: every list item is one separately executed command.
 
----
+Reject unknown keys, invalid types, malformed values, or missing required fields with the failing key and the YAML shape above. Do not validate or consume sibling skill sections.
 
-## Phase 0: Scope Resolution
+Also read existing project instructions, `CONVENTIONS.md`, test-quality guidance, manifests, and the actual test runner/linter configuration when present. Derive framework, discovery, naming, fixture, assertion, and quality rules from the YAML scope plus those files. Do not assume Python, JavaScript, a naming syntax, or a colocated/mirrored layout. If source-to-test correspondence cannot be established confidently, report that limitation rather than guessing.
 
-Detect and remove `--fix` before resolving scope, then parse the remaining `$ARGUMENTS`:
+## Workflow
 
-1. **`--branch <target>`** — Get changed source files via `git diff --name-only`. For each source file, include its corresponding test file in scope.
-2. **`--path <dir>`** — Set scope to the given directory.
-3. **`--all`** — All source and test files (excluding known exceptions).
-4. ***(empty)*** — Auto-detect PR base branch. If found, behave as `--branch <base>`. Otherwise stop with usage help.
-5. ***(unrecognized)*** — Stop with usage help.
+1. Resolve scope and apply a known exception when a file matches its configured `pattern`. Record every excluded file with the configured `reason`.
+2. Partition selected files into 1-4 non-overlapping groups based on size and domains. Use one read-only reviewer for a small scope and additional independent reviewers only when useful. Give each reviewer exact ownership and the same project-derived rules.
+3. Review source/test correspondence, discovery and naming, orphaned or empty files, duplicate/shadowed tests, cross-test coupling, missing required documentation, assertions and behavior verification, fixture misuse, brittle snapshots, mock-only tests, tautologies, and other project-documented anti-patterns. Report only evidence-backed findings with file locations and rule/config sources.
+4. In read-only mode, run each `commands.check` entry separately in listed order. It must be read-only; if a configured check mutates files, stop and report the configuration error. Stop on the first command failure and include its output in the report.
 
-If scope groups are defined in config, group files accordingly. Otherwise, group by directory.
+### Fix Mode
 
----
+Apply every clear finding, including clear semantic corrections to tests. Prefer the shared/root-cause correction when several findings have one cause. Rename or delete only when evidence makes the intended destination or safe removal unambiguous; do not invent speculative assertions or behavior changes whose intent cannot be proved. Never add suppressions or weaken test, lint, type, or coverage configuration.
 
-## Phase 1: Parallel Directory Audits
+After edits, run each optional `commands.fix` entry separately in order, then rerun each `commands.check` entry separately in order. Stop on the first failure, fix failures caused by the edits when safe, and report unresolved failures. Fix commands are forbidden in read-only mode.
 
-Launch **one Explore sub-agent per scope group** (or per test directory) in parallel. Each agent audits source files and their corresponding test files. Each sub-agent runs ALL audits below and reports findings (no fixes yet).
+## Report
 
-Each sub-agent prompt MUST include:
-- Instructions to read `TEST_PATTERNS.md` as the first step for anti-pattern definitions
-- The known exceptions list from config
-- The test structure pattern (colocated vs mirrored) so it knows where to look for test files
-
-### Audit 1: Missing test files
-Source file exists but no corresponding test file.
-
-### Audit 2: Orphaned test files
-Test file exists but no matching source file. Analyze imports to determine what it actually tests. Recommend merge or rename.
-
-### Audit 3: Test file naming
-Test file name doesn't match the expected pattern for its source file.
-
-### Audit 4: Test class/function naming
-Test functions don't follow `test_*` (Python) or `it('...')` (JS) conventions. Test classes don't follow `Test*` (Python) or `describe('...')` (JS) conventions.
-
-### Audit 5: Missing docstrings/headers
-Test functions or files missing required documentation.
-
-### Audit 6: Cross-test imports
-Test files importing from other test files instead of source code.
-
-### Audit 7: Empty test files
-Test files with no actual test functions.
-
-### Audit 8: No-assertion tests
-Test functions that never assert anything.
-
-### Audit 9: Duplicate test names
-Test functions with identical names within the same scope that would shadow each other.
-
-### Audit 10: Anti-pattern violations
-Check against the anti-patterns defined in `TEST_PATTERNS.md`:
-1. **Tautological tests** — restate implementation without exercising logic
-2. **"Doesn't throw" / trivial property tests** — no meaningful assertions
-3. **Redundant input variations** — same code path with trivially different inputs
-4. **Testing the mock** — only assert mock calls, not actual behavior
-5. **Snapshot abuse** — large snapshot assertions instead of specific field checks
-6. **Trivial function tests** — tests for re-exports, constants, single-line getters
-
----
-
-## Phase 2: Optional Fixes
-
-If fix mode was not requested, do not modify files and continue to the report with recommended actions. In fix mode, review all findings and launch general-purpose agents for fixable issues:
-
-### Fixable (apply changes):
-- **Orphaned test files** (Audit 2): Merge contents into correct test file, delete orphan via `git rm`
-- **Naming mismatches** (Audit 3): Rename via `git mv`
-- **Missing docstrings** (Audit 5): Add appropriate docstrings
-- **Empty test files** (Audit 7): Delete via `git rm`
-- **No-assertion tests** (Audit 8): Add meaningful assertions or delete
-- **Anti-pattern violations** (Audit 10): Fix per anti-pattern type (delete tautological, add assertions to mock-only tests, etc.)
-
-### Report-only (do not fix):
-- Missing test files (Audit 1)
-- Class/function naming issues (Audit 4)
-- Cross-test imports (Audit 6)
-- Duplicate test names (Audit 9)
-
-Each fix agent MUST:
-1. Read all involved files before making changes
-2. Run the project's linter on modified files
-3. Do NOT commit or push; leave changes for the user to review
-
----
-
-## Phase 3: Verification
-
-After fixes in fix mode:
-1. Run the **verification command** from config to ensure all tests are still discoverable
-2. If any collection errors occur, fix immediately
-
-Skip this phase in read-only mode.
-
----
-
-## Phase 4: Report
-
-Present a consolidated report. In read-only mode, list proposed changes instead of changes applied.
-
-### Changes Applied (fix mode) / Proposed Changes (read-only mode)
-| Change | File | Details |
-|--------|------|---------|
-| Renamed | `old.test.ts` -> `New.test.tsx` | Match source |
-| Merged | `orphan.test.ts` -> `correct.test.ts` | N tests moved |
-| Deleted | `empty.test.ts` | No test functions |
-| Fixed | `foo.test.ts` | Removed N anti-pattern violations |
-
-### Issues to Address Manually
-| Audit | Scope | Issue | Count |
-|-------|-------|-------|-------|
-| Missing tests | ... | `Foo.tsx` has no tests | 1 |
-| ... | ... | ... | ... |
-
-Include totals at the bottom.
+List files reviewed and excluded, findings by severity with evidence, checks and results, changes applied or proposed, and ambiguous items left untouched. For missing tests, offer an immediate `fill-test-gaps` handoff with the affected files. Do not commit or push.

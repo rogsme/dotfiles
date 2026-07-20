@@ -1,93 +1,81 @@
-# Update workflow — re-evaluating the panel and refreshing the routing table
+# Panel Update Workflow
 
-Follow this when a lazer model is added, removed, replaced, or repriced, or
-when the user asks to re-run the model evals. This workflow owns ONLY this
-skill's routing table and eval records. 
+Follow this only when the user explicitly requests a Lazer panel update,
+re-score, or re-run. The explicit request is sufficient approval to send the
+benchmark prompts and necessary text inputs to the selected external models;
+do not add a classification gate.
 
-## 1. Detect what changed
+## 1. Detect Changes
 
-Diff the live config against the routing table in `../SKILL.md`:
+Compare available `lazer/*` model IDs with the routing table in `../SKILL.md`.
+Classify each difference as new, replaced, removed, or metadata-only. Evaluate
+new and replaced models. Do not rerun models for metadata-only changes unless
+the user requests it. Never show cost estimates.
 
-```bash
-python3 -c "
-import json
-cfg = json.load(open('$HOME/.config/opencode/opencode.json'))
-for mid, m in cfg['provider']['lazer']['models'].items():
-    c = m.get('cost', {})
-    print(mid, '|', c.get('input'), '/', c.get('output'), '| ctx', m.get('limit',{}).get('context'))"
-```
+## 2. Run Incrementally
 
-Classify each difference: **new model** (full eval), **replaced model** (full
-eval, treat as new), **repriced** (no re-run; update Cost line guidance and
-value judgments only), **removed** (drop the table row; keep its history in
-eval-results.md).
+Read `../eval/README.md` before running anything. Its local-execution warning is
+part of this workflow: generated code runs locally under timeouts, not in a
+sandbox, and can still access host resources.
 
-## 2. Run the eval (incremental by default)
+Use `../eval/run_one.sh` for each realm. Launch independent invocations through
+parallel tool calls; rely on returned statuses rather than detached jobs or
+completion notifications. Keep stdout, stderr, and metadata artifacts. The
+runner's default is a real 1,200-second timeout; any override must remain
+finite.
 
-Evaluate ONLY new/changed models unless the user asks for a full panel re-run
-or the harness itself changed. Mechanics live in `../eval/README.md` — read it
-now; do not improvise commands. Summary: `mkdir -p out work` in `../eval/`,
-launch all 8 realms for the model as parallel background calls via
-`run_one.sh`, 600 s+ timeouts, wait for notifications.
-
-Reliability protocol (from the 2026-07-07 run): empty output → one retry and
-record the flake; two empties on the same realm = DNF for that realm; a run
-past ~2× the timeout gets killed and recorded as DNF. Flakes and tails are
-first-class results — they decide interactive-tier eligibility.
+Retry empty successful output once and record the flake. Two empty outputs or a
+timeout are delivery failures for that realm. Do not hide stderr.
 
 ## 3. Grade
 
-- **Mechanical realms (1, 2, 3, 4, 6, 7)**: use the graders in `../eval/ref/`.
-  If any grader was modified since the last run, re-validate it against its
-  reference solution FIRST — a fresh harness must score 100% on the reference
-  before model results count.
-- **Standing discounts**: realm 7's `4 % 6**7**4` case (punishes float-native
-  evaluators); realm 4's rollback check accepts "rolled back".
-- **Judged realms — apply the original anchors for consistency:**
-  - Realm 5 (writing): accuracy to inputs, ≤150-word cap is a hard
-    instruction-following penalty (~1.5 pts), completeness (what/why/risk/
-    out-of-scope), no invented facts. 9 = accurate+complete+within cap;
-    8-8.5 = minor organizational flaws; ≤7.5 = cap violation or inaccuracy.
-  - Realm 8 (design): battery score is the floor; judge the PLAN on data
-    structures, real invariants, and a genuinely-argued rejected alternative.
-    Deduct for: global `sys.setrecursionlimit` instead of iterative design
-    (-0.5 to -1), delegating parsing to `ast` (-0.5), self-tests that were
-    clearly never executed (-1 to -1.5). Credit visible self-verification.
-- Record median AND max latency across all realms, and estimated cost
-  (visible chars/4 × current pricing — note it is a floor).
+- For realms 1, 2, 3, 4, 6, and 7, use the graders under `../eval/ref/`.
+- If a grader changed, validate it against its reference solution before using
+  it for new claims.
+- Realm 4 accepts either "rollback" or "rolled back" in the summary.
+- Realm 5 anchors: factual accuracy, the 150-word hard cap, complete coverage of
+  what/why/risk/out-of-scope, and no invented facts.
+- Realm 8 anchors: behavioral battery first, then concrete data structures,
+  invariants, cycle handling, and a genuinely argued rejected alternative.
+  Record unexecuted or failing self-tests rather than assuming they passed.
+- Record median and maximum observed latency. Label timeouts and retries.
 
-## 4. Compare and propose (approval gate)
+The known realm-7 large-integer comparison artifact may be disclosed separately
+but must not be silently erased from raw results.
 
-Build a comparison table: new model's per-realm scores, median/max latency,
-and price next to the current tier occupants. Propose a tier placement and any
-routing-table changes (including displacements — e.g. a new value king demotes
-qwen), each with a one-line justification tied to measured results. **Present
-this to the user and wait for approval before editing anything.**
+## 4. Compare
 
-## 5. Write the updates
+Compare only measured behavior: per-realm checks, judged outputs under the
+anchors above, delivery failures, and observed latency. Do not infer image,
+document, long-context, tool-use, or agentic capability from this text-only
+benchmark. With one primary run per cell, phrase differences as observations,
+not stable rankings.
 
-After approval, keep these consistent in one pass:
+Present the proposed routing changes with one evidence sentence each. If the
+user requested only evaluation, wait for approval before changing routing. If
+the user explicitly requested evaluation and routing refresh, that request is
+the edit approval.
 
-1. `../SKILL.md` — routing table row(s): route-here / never-route / notes with
-   the measured basis; update the eval-date stamp in the intro; update the
-   fallback chain if the cheap tier changed; update mode defaults if the
-   workhorse changed.
-2. `../references/eval-results.md` — APPEND a dated section with the new
-   scores, latency, flakes, and judged notes. Never rewrite or delete previous
-   results; they are the audit trail.
-3. `../eval/README.md` — only if the harness or protocol itself changed.
+## 5. Update Consistently
+
+Update only the affected files:
+
+1. `../SKILL.md`: routing rows, observed basis, fallback, and evaluation date.
+2. `../references/eval-results.md`: append a dated section; preserve prior raw
+   observations as the audit trail.
+3. `../eval/README.md`: only when harness mechanics or risk changed.
+
+Do not add references to tools, skills, models, or capabilities that are not
+present and verified in the current OpenCode/Lazer setup.
 
 ## 6. Verify
 
-- Every model in `opencode.json`'s lazer provider appears in the routing table
-  (or is explicitly listed as excluded, like claude-fable-5).
-- No table row cites a model absent from the config.
-- Frontmatter description still <1024 chars if edited.
-- Quick probe of any newly added model:
-  `opencode run -m lazer/<id> --variant high "Reply with exactly: PROBE_OK"`.
+- Every routed model is available as `lazer/<id>` or clearly marked historical.
+- Every referenced local resource exists.
+- Frontmatter still says explicit requests only.
+- Shell syntax and Python compilation pass before any optional execution.
+- If the user requested a live probe, run it through the same finite-timeout,
+  stderr-preserving invocation contract as other delegations.
 
-## Consistency warning
-
-Judged scores (realms 5, 8) are assigned by whichever Claude session runs this
-workflow. Stick to the anchors above rather than personal taste, and when a
-judgment call is close, say so in eval-results.md instead of forcing precision.
+Judged scores can vary by evaluator. Preserve the anchors and disclose close
+calls instead of manufacturing precision.

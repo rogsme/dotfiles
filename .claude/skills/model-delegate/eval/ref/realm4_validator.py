@@ -3,17 +3,26 @@
 Usage: python3 realm4_validator.py <output_file>
 Prints one PASS/FAIL line per check plus a final score line.
 """
+import argparse
 import json
 import re
 import sys
+from pathlib import Path
 
 EXPECTED_KEY_ORDER = [
     "id", "title", "severity", "started_at", "resolved_at",
     "duration_minutes", "impact_pct", "services", "oncall", "summary",
 ]
 
-raw = open(sys.argv[1]).read()
+parser = argparse.ArgumentParser()
+parser.add_argument("output_file")
+args = parser.parse_args()
+try:
+    raw = Path(args.output_file).read_text(encoding="utf-8")
+except OSError as exc:
+    parser.error(str(exc))
 checks = []
+total_checks = len(EXPECTED_KEY_ORDER) + 3
 
 
 def check(name, ok, detail=""):
@@ -39,8 +48,9 @@ check("parses_as_json", data is not None)
 if data is None:
     for name, ok, detail in checks:
         print(f"{'PASS' if ok else 'FAIL'} {name} {detail}")
-    print(f"SCORE 0/{len(EXPECTED_KEY_ORDER) + 2}")
-    sys.exit(0)
+    passed = sum(1 for _, ok, _ in checks if ok)
+    print(f"SCORE {passed}/{total_checks}")
+    sys.exit(1)
 
 keys = [k for k, _ in pairs]
 check("key_order_exact", keys == EXPECTED_KEY_ORDER, f"got {keys}")
@@ -60,10 +70,12 @@ check("services", data.get("services") == ["checkout-web", "payments-api"],
 check("oncall", data.get("oncall") == "Maria", f"got {data.get('oncall')!r}")
 summary = data.get("summary") or ""
 check("summary_le_80_mentions_rollback",
-      isinstance(summary, str) and len(summary) <= 80 and "rollback" in summary.lower(),
+      isinstance(summary, str) and len(summary) <= 80
+      and re.search(r"\b(?:rollback|rolled back)\b", summary, re.I),
       f"len={len(summary)}")
 
 passed = sum(1 for _, ok, _ in checks if ok)
 for name, ok, detail in checks:
     print(f"{'PASS' if ok else 'FAIL'} {name}" + (f"  [{detail}]" if not ok and detail else ""))
 print(f"SCORE {passed}/{len(checks)}")
+sys.exit(0 if passed == len(checks) else 1)

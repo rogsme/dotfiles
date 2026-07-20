@@ -277,9 +277,14 @@ def q3():
     return targeted_ok + fuzz_ok, targeted_n + fuzz_n, fails
 
 
+all_passed = True
 for name, fn in (("Q1_regex", q1), ("Q2_eval", q2), ("Q3_cache", q3)):
     try:
         p, n, ff = fn()
         print(f"{name} {p}/{n}" + (f"  first_fails={ff}" if ff else ""))
+        all_passed = all_passed and p == n
     except Exception as e:
         print(f"{name} HARNESS_ERROR {type(e).__name__}: {e}")
+        all_passed = False
+
+sys.exit(0 if all_passed else 1)

@@ -17,3 +17,4 @@ for expr, after, expected in CASES:
     else:
         print(f"FAIL {expr!r} after {after} -> {got} (want {expected})")
 print(f"SCORE {passed}/{len(CASES)}")
+sys.exit(0 if CASES and passed == len(CASES) else 1)

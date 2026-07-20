@@ -1,181 +1,26 @@
-# Subagent Recommendations
+# Agent Recommendations
 
-Subagents are specialized Claude instances that run in parallel, each with their own context window and tool access. They're ideal for focused reviews, analysis, or generation tasks.
+Use an agent when isolation, reusable specialization, or context containment provides concrete value. Do not create a custom agent merely to rename ordinary code review or exploration.
 
-**Note**: These are common patterns. Design custom subagents based on the codebase's specific review and analysis needs.
+## Check Built-ins First
 
-## Code Review Agents
+- Claude Code provides built-in exploration, planning, and general-purpose agents; verify the installed version's current set.
+- OpenCode provides Build and Plan primary agents plus General, Explore, and Scout subagents.
+- Reuse a built-in unless the repository needs a stable custom prompt, narrower permissions, different model/cost profile, or specialized integration.
 
-### code-reviewer
-**Best for**: Automated code quality checks on large codebases
+## Evidence Threshold
 
-| Recommend When | Detection |
-|----------------|-----------|
-| Large codebase (>500 files) | File count |
-| Frequent code changes | Active development |
-| Team wants consistent review | Quality focus |
+Recommend a custom agent only when all apply:
 
-**Value**: Runs code review in parallel while you continue working
-**Model**: sonnet (balanced quality/speed)
-**Tools**: Read, Grep, Glob, Bash
+- A recurring task has a clear boundary and expected output.
+- Existing built-ins or skills do not provide the needed isolation or policy.
+- Required capabilities and permissions can be constrained.
+- The value exceeds extra model calls, context, configuration, and maintenance.
 
----
+## Minimal Definition To Propose
 
-### security-reviewer
-**Best for**: Security-focused code review
+Specify target product, scope, description/trigger, prompt responsibilities, model selection rationale, permission boundary, maximum work or cost limit when supported, and verification procedure. Use current product-native fields; Claude Code and OpenCode agent frontmatter are not interchangeable.
 
-| Recommend When | Detection |
-|----------------|-----------|
-| Auth code present | `auth/`, `login`, `session` patterns |
-| Payment processing | `stripe`, `payment`, `billing` patterns |
-| User data handling | `user`, `profile`, `pii` patterns |
-| API keys in code | Environment variable patterns |
+For analysis agents, default to read-only capability. Grant shell, network, MCP, or write access only when the task requires it and disclose the consequence.
 
-**Value**: Catches OWASP vulnerabilities, auth issues, data exposure
-**Model**: sonnet
-**Tools**: Read, Grep, Glob (read-only for safety)
-
----
-
-### test-writer
-**Best for**: Generating comprehensive test coverage
-
-| Recommend When | Detection |
-|----------------|-----------|
-| Low test coverage | Few test files vs source files |
-| Test suite exists | `tests/`, `__tests__/` present |
-| Testing framework configured | jest, pytest, vitest in deps |
-
-**Value**: Generates tests matching project conventions
-**Model**: sonnet
-**Tools**: Read, Write, Grep, Glob
-
----
-
-## Specialized Agents
-
-### api-documenter
-**Best for**: API documentation generation
-
-| Recommend When | Detection |
-|----------------|-----------|
-| REST endpoints | Express routes, FastAPI paths |
-| GraphQL schema | `.graphql` files |
-| OpenAPI exists | `openapi.yaml`, `swagger.json` |
-| Undocumented APIs | Routes without docs |
-
-**Value**: Generates OpenAPI specs, endpoint documentation
-**Model**: sonnet
-**Tools**: Read, Write, Grep, Glob
-
----
-
-### performance-analyzer
-**Best for**: Finding performance bottlenecks
-
-| Recommend When | Detection |
-|----------------|-----------|
-| Database queries | ORM usage, raw SQL |
-| High-traffic code | API endpoints, hot paths |
-| Performance complaints | User reports slowness |
-| Complex algorithms | Nested loops, recursion |
-
-**Value**: Finds N+1 queries, O(n²) algorithms, memory leaks
-**Model**: sonnet
-**Tools**: Read, Grep, Glob, Bash
-
----
-
-### ui-reviewer
-**Best for**: Frontend accessibility and UX review
-
-| Recommend When | Detection |
-|----------------|-----------|
-| React/Vue/Angular | Frontend framework detected |
-| Component library | `components/` directory |
-| User-facing UI | Not just API project |
-
-**Value**: Catches accessibility issues, UX problems, responsive design gaps
-**Model**: sonnet
-**Tools**: Read, Grep, Glob
-
----
-
-## Utility Agents
-
-### dependency-updater
-**Best for**: Safe dependency updates
-
-| Recommend When | Detection |
-|----------------|-----------|
-| Outdated deps | `npm outdated` has results |
-| Security advisories | `npm audit` warnings |
-| Major version behind | Significant version gaps |
-
-**Value**: Updates dependencies incrementally with testing
-**Model**: sonnet
-**Tools**: Read, Write, Bash, Grep
-
----
-
-### migration-helper
-**Best for**: Framework/version migrations
-
-| Recommend When | Detection |
-|----------------|-----------|
-| Major upgrade needed | Framework version very old |
-| Breaking changes coming | Deprecation warnings |
-| Refactoring planned | Architectural changes |
-
-**Value**: Plans and executes migrations incrementally
-**Model**: opus (complex reasoning needed)
-**Tools**: Read, Write, Grep, Glob, Bash
-
----
-
-## Quick Reference: Detection → Recommendation
-
-| If You See | Recommend Subagent |
-|------------|-------------------|
-| Large codebase | code-reviewer |
-| Auth/payment code | security-reviewer |
-| Few tests | test-writer |
-| API routes | api-documenter |
-| Database heavy | performance-analyzer |
-| Frontend components | ui-reviewer |
-| Outdated packages | dependency-updater |
-| Old framework version | migration-helper |
-
----
-
-## Subagent Placement
-
-Subagents go in `.claude/agents/`:
-
-```
-.claude/
-└── agents/
-    ├── code-reviewer.md
-    ├── security-reviewer.md
-    └── test-writer.md
-```
-
----
-
-## Model Selection Guide
-
-| Model | Best For | Trade-off |
-|-------|----------|-----------|
-| **haiku** | Simple, repetitive checks | Fast, cheap, less thorough |
-| **sonnet** | Most review/analysis tasks | Balanced (recommended default) |
-| **opus** | Complex migrations, architecture | Thorough, slower, more expensive |
-
----
-
-## Tool Access Guide
-
-| Access Level | Tools | Use Case |
-|--------------|-------|----------|
-| Read-only | Read, Grep, Glob | Reviews, analysis |
-| Writing | + Write | Code generation, docs |
-| Full | + Bash | Migrations, testing |
+Official sources: [Claude Code subagents](https://code.claude.com/docs/en/sub-agents) and [OpenCode agents](https://opencode.ai/docs/agents/).

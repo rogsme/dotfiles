@@ -19,3 +19,4 @@ for t in tests:
         line = traceback.format_exc().strip().splitlines()[-1]
         print(f"FAIL {t.__name__}: {line[:120]}")
 print(f"SCORE {passed}/{len(tests)}")
+sys.exit(0 if tests and passed == len(tests) else 1)

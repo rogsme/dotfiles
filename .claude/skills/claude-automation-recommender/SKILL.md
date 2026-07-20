@@ -1,288 +1,116 @@
 ---
 name: claude-automation-recommender
-description: Analyze a codebase and recommend Claude Code automations (hooks, subagents, skills, plugins, MCP servers). Use when user asks for automation recommendations, wants to optimize their Claude Code setup, mentions improving Claude Code workflows, asks how to first set up Claude Code for a project, or wants to know what Claude Code features they should use.
-tools: Read, Glob, Grep, Bash
+description: Analyze a repository and recommend evidence-backed Claude Code or OpenCode automation. Use for setup reviews, workflow optimization, or recommendations for hooks, agents, skills, plugins, and MCP servers.
+compatibility: Read-only analysis for Claude Code and OpenCode; recommendations must identify the target product and supported capability.
 ---
 
-# Claude Automation Recommender
+# Automation Recommender
 
-Analyze codebase patterns to recommend tailored Claude Code automations across all extensibility options.
+Remain read-only. Do not create, edit, install, enable, authenticate, or execute a recommended automation.
 
-**This skill is read-only.** It analyzes the codebase and outputs recommendations. It does NOT create or modify any files. Users implement the recommendations themselves or ask Claude separately to help build them.
+## 1. Identify The Environment
 
-## Output Guidelines
+Determine which products are actually used. Inspect only relevant repository and user configuration; do not search unrelated home directories or print secrets.
 
-- **Recommend 1-2 of each type**: Don't overwhelm - surface the top 1-2 most valuable automations per category
-- **If user asks for a specific type**: Focus only on that type and provide more options (3-5 recommendations)
-- **Go beyond the reference lists**: The reference files contain common patterns, but use web search to find recommendations specific to the codebase's tools, frameworks, and libraries
-- **Tell users they can ask for more**: End by noting they can request more recommendations for any specific category
+For Claude Code, inspect when present:
 
-## Automation Types Overview
+- effective `CLAUDE.md`, `CLAUDE.local.md`, and `.claude/rules/`
+- `.claude/settings.json`, `.claude/settings.local.json`, and relevant user settings
+- `.claude/agents/`, `.claude/skills/`, legacy commands, hooks, permissions, enabled plugins, and `.mcp.json`
+- installed or configured built-ins exposed by the current version
 
-| Type | Best For |
-|------|----------|
-| **Hooks** | Automatic actions on tool events (format on save, lint, block edits) |
-| **Subagents** | Specialized reviewers/analyzers that run in parallel |
-| **Skills** | Packaged expertise, workflows, and repeatable tasks (invoked by Claude or user via `/skill-name`) |
-| **Plugins** | Collections of skills that can be installed |
-| **MCP Servers** | External tool integrations (databases, APIs, browsers, docs) |
+For OpenCode, inspect when present:
 
-## Workflow
+- effective `AGENTS.md` or Claude-compatible fallback instructions
+- `opencode.json`/`opencode.jsonc` and relevant global configuration
+- `.opencode/agents/`, `.opencode/skills/`, `.opencode/plugins/`, permissions, formatters, LSP, and MCP configuration
+- built-in Build, Plan, General, Explore, Scout, and other capabilities exposed by the installed version
 
-### Phase 1: Codebase Analysis
+Use safe version, list, help, or status operations only when they are available and genuinely read-only. Report inaccessible configuration instead of guessing.
 
-Gather project context:
+## 2. Profile Repeated Work
 
-```bash
-# Detect project type and tools
-ls -la package.json pyproject.toml Cargo.toml go.mod pom.xml 2>/dev/null
-cat package.json 2>/dev/null | head -50
+Ground opportunities in repository evidence such as:
 
-# Check dependencies for MCP server recommendations
-cat package.json 2>/dev/null | grep -E '"(react|vue|angular|next|express|fastapi|django|prisma|supabase|stripe)"'
+- repeated documented procedures or repeated user corrections
+- CI checks that developers routinely reproduce locally
+- project-specific review rules with clear inputs and outputs
+- external systems whose data is repeatedly copied into sessions
+- expensive exploration that a focused agent could isolate
+- existing automation that is duplicated, broken, or underused
 
-# Check for existing Claude Code config
-ls -la .claude/ CLAUDE.md 2>/dev/null
+A test directory, `tsconfig.json`, dependency, or framework name alone is not enough to justify automation. Require a concrete workflow, pain point, policy, or integration need.
 
-# Analyze project structure
-ls -la src/ app/ lib/ tests/ components/ pages/ api/ 2>/dev/null
-```
+## 3. Prefer Existing Capabilities
 
-**Key Indicators to Capture:**
+For each opportunity, check in order:
 
-| Category | What to Look For | Informs Recommendations For |
-|----------|------------------|----------------------------|
-| Language/Framework | package.json, pyproject.toml, import patterns | Hooks, MCP servers |
-| Frontend stack | React, Vue, Angular, Next.js | Playwright MCP, frontend skills |
-| Backend stack | Express, FastAPI, Django | API documentation tools |
-| Database | Prisma, Supabase, raw SQL | Database MCP servers |
-| External APIs | Stripe, OpenAI, AWS SDKs | context7 MCP for docs |
-| Testing | Jest, pytest, Playwright configs | Testing hooks, subagents |
-| CI/CD | GitHub Actions, CircleCI | GitHub MCP server |
-| Issue tracking | Linear, Jira references | Issue tracker MCP |
-| Docs patterns | OpenAPI, JSDoc, docstrings | Documentation skills |
+1. Existing repository or user configuration
+2. Product built-ins and native permissions, formatters, LSP, CLI, or integrations
+3. A small project instruction or skill
+4. A focused agent or lifecycle hook/plugin
+5. A verified external plugin or MCP server
 
-### Phase 2: Generate Recommendations
+Do not recommend a duplicate of an installed skill, configured MCP server, existing script, native CLI, or built-in agent. Prefer the lowest-maintenance capability that solves the observed problem.
 
-Based on analysis, generate recommendations across all categories:
+Read the matching reference only when needed:
 
-#### A. MCP Server Recommendations
+- [hooks-patterns.md](references/hooks-patterns.md): lifecycle automation and evidence thresholds
+- [subagent-templates.md](references/subagent-templates.md): agent selection
+- [skills-reference.md](references/skills-reference.md): repeatable instruction workflows
+- [plugins-reference.md](references/plugins-reference.md): distributable or event-driven extensions
+- [mcp-servers.md](references/mcp-servers.md): external systems and data access
 
-See [references/mcp-servers.md](references/mcp-servers.md) for detailed patterns.
+## 4. Verify Before Recommending
 
-| Codebase Signal | Recommended MCP Server |
-|-----------------|------------------------|
-| Uses popular libraries (React, Express, etc.) | **context7** - Live documentation lookup |
-| Frontend with UI testing needs | **Playwright** - Browser automation/testing |
-| Uses Supabase | **Supabase MCP** - Direct database operations |
-| PostgreSQL/MySQL database | **Database MCP** - Query and schema tools |
-| GitHub repository | **GitHub MCP** - Issues, PRs, actions |
-| Uses Linear for issues | **Linear MCP** - Issue management |
-| AWS infrastructure | **AWS MCP** - Cloud resource management |
-| Slack workspace | **Slack MCP** - Team notifications |
-| Memory/context persistence | **Memory MCP** - Cross-session memory |
-| Sentry error tracking | **Sentry MCP** - Error investigation |
-| Docker containers | **Docker MCP** - Container management |
+Prefer current official product and publisher documentation. Record the source URL and retrieval date for version-sensitive claims.
 
-#### B. Skills Recommendations
+For every recommendation, verify:
 
-See [references/skills-reference.md](references/skills-reference.md) for details.
+- it exists and supports the target product/version
+- its capability is not already built in or configured
+- the exact installation or configuration procedure
+- minimum permissions and credentials
+- data sent outside the workstation or trust boundary
+- startup, context-token, model, network, and execution cost
+- update ownership and maintenance burden
+- failure modes, supply-chain risk, prompt-injection exposure, and rollback/removal path
 
-Create skills in `.claude/skills/<name>/SKILL.md`. Some are also available via plugins:
+For third-party MCP servers, plugins, and skills, also verify the publisher identity, canonical source repository or registry, recent maintenance, license, and release provenance. If any required item cannot be verified, do not recommend installation; list it under `Not recommended / unverified` with the missing evidence.
 
-| Codebase Signal | Skill | Plugin |
-|-----------------|-------|--------|
-| Creating or improving skills | skill-creator | anthropics/skills |
-| Git commits | commit | commit-commands |
-| React/Vue/Angular | frontend-design | frontend-design |
-| Automation rules | writing-rules | hookify |
-| Feature planning | feature-dev | feature-dev |
+Never copy install commands from aggregators, blog posts, or stale local catalogs when an official source is available.
 
-**Custom skills to create** (with templates, scripts, examples):
+## 5. Report All Justified Findings
 
-| Codebase Signal | Skill to Create | Invocation |
-|-----------------|-----------------|------------|
-| API routes | **api-doc** (with OpenAPI template) | Both |
-| Database project | **create-migration** (with validation script) | User-only |
-| Test suite | **gen-test** (with example tests) | User-only |
-| Component library | **new-component** (with templates) | User-only |
-| PR workflow | **pr-check** (with checklist) | User-only |
-| Releases | **release-notes** (with git context) | User-only |
-| Code style | **project-conventions** | Claude-only |
-| Onboarding | **setup-dev** (with prereq script) | User-only |
-
-#### C. Hooks Recommendations
-
-See [references/hooks-patterns.md](references/hooks-patterns.md) for configurations.
-
-| Codebase Signal | Recommended Hook |
-|-----------------|------------------|
-| Prettier configured | PostToolUse: auto-format on edit |
-| ESLint/Ruff configured | PostToolUse: auto-lint on edit |
-| TypeScript project | PostToolUse: type-check on edit |
-| Tests directory exists | PostToolUse: run related tests |
-| `.env` files present | PreToolUse: block `.env` edits |
-| Lock files present | PreToolUse: block lock file edits |
-| Security-sensitive code | PreToolUse: require confirmation |
-
-#### D. Subagent Recommendations
-
-See [references/subagent-templates.md](references/subagent-templates.md) for templates.
-
-| Codebase Signal | Recommended Subagent |
-|-----------------|---------------------|
-| Large codebase (>500 files) | **code-reviewer** - Parallel code review |
-| Auth/payments code | **security-reviewer** - Security audits |
-| API project | **api-documenter** - OpenAPI generation |
-| Performance critical | **performance-analyzer** - Bottleneck detection |
-| Frontend heavy | **ui-reviewer** - Accessibility review |
-| Needs more tests | **test-writer** - Test generation |
-
-#### E. Plugin Recommendations
-
-See [references/plugins-reference.md](references/plugins-reference.md) for available plugins.
-
-| Codebase Signal | Recommended Plugin |
-|-----------------|-------------------|
-| General productivity | **anthropic-agent-skills** - Core skills bundle |
-| Document workflows | Install docx, xlsx, pdf skills |
-| Frontend development | **frontend-design** plugin |
-| Building AI tools | **mcp-builder** for MCP development |
-
-### Phase 3: Output Recommendations Report
-
-Format recommendations clearly. **Only include 1-2 recommendations per category** - the most valuable ones for this specific codebase. Skip categories that aren't relevant.
+Include every recommendation that clears the evidence and verification bar; do not enforce a numeric quota. Rank by value first and maintenance cost second. Skip categories with no justified addition, but always evaluate and report the Plugins category consistently.
 
 ```markdown
-## Claude Code Automation Recommendations
+## Automation Recommendations
 
-I've analyzed your codebase and identified the top automations for each category. Here are my top 1-2 recommendations per type:
+### Environment
+- **Products/versions:** ...
+- **Existing configuration and built-ins:** ...
+- **Evidence inspected:** ...
+- **Blind spots:** ...
 
-### Codebase Profile
-- **Type**: [detected language/runtime]
-- **Framework**: [detected framework]
-- **Key Libraries**: [relevant libraries detected]
+### Ranked Findings
+#### 1. [Recommendation]
+- **Type / product:** Hook, agent, skill, plugin, MCP, or native capability; Claude Code/OpenCode
+- **Value:** High/Medium/Low, with repository evidence
+- **Maintenance cost:** Low/Medium/High, with owner and recurring work
+- **Why existing capabilities are insufficient:** ...
+- **Exact setup:** verified command or configuration, including scope
+- **Minimum permissions:** ...
+- **Data boundary:** local files/services/data transmitted and destination
+- **Runtime cost:** startup, tokens, model calls, processes, or network calls
+- **Risks and rollback:** ...
+- **Sources:** official/canonical URLs and retrieval date
 
----
+### Plugins
+- Recommended findings, or `No plugin is justified; existing/standalone capabilities cover the observed needs.`
 
-### 🔌 MCP Servers
-
-#### context7
-**Why**: [specific reason based on detected libraries]
-**Install**: `claude mcp add context7`
-
----
-
-### 🎯 Skills
-
-#### [skill name]
-**Why**: [specific reason]
-**Create**: `.claude/skills/[name]/SKILL.md`
-**Invocation**: User-only / Both / Claude-only
-**Also available in**: [plugin-name] plugin (if applicable)
-```yaml
----
-name: [skill-name]
-description: [what it does]
-disable-model-invocation: true  # for user-only
----
+### Not Recommended / Unverified
+- Candidate, evidence gap, duplication, or disproportionate cost
 ```
 
----
-
-### ⚡ Hooks
-
-#### [hook name]
-**Why**: [specific reason based on detected config]
-**Where**: `.claude/settings.json`
-
----
-
-### 🤖 Subagents
-
-#### [agent name]
-**Why**: [specific reason based on codebase patterns]
-**Where**: `.claude/agents/[name].md`
-
----
-
-**Want more?** Ask for additional recommendations for any specific category (e.g., "show me more MCP server options" or "what other hooks would help?").
-
-**Want help implementing any of these?** Ask to implement any of the recommendations above.
-```
-
-## Decision Framework
-
-### When to Recommend MCP Servers
-- External service integration needed (databases, APIs)
-- Documentation lookup for libraries/SDKs
-- Browser automation or testing
-- Team tool integration (GitHub, Linear, Slack)
-- Cloud infrastructure management
-
-### When to Recommend Skills
-
-- Document generation (docx, xlsx, pptx, pdf — also in plugins)
-- Frequently repeated prompts or workflows
-- Project-specific tasks with arguments
-- Applying templates or scripts to tasks (skills can bundle supporting files)
-- Quick actions invoked with `/skill-name`
-- Workflows that should run in isolation (`context: fork`)
-
-**Invocation control:**
-- `disable-model-invocation: true` — User-only (for side effects: deploy, commit, send)
-- `user-invocable: false` — Claude-only (for background knowledge)
-- Default (omit both) — Both can invoke
-
-### When to Recommend Hooks
-- Repetitive post-edit actions (formatting, linting)
-- Protection rules (block sensitive file edits)
-- Validation checks (tests, type checks)
-
-### When to Recommend Subagents
-- Specialized expertise needed (security, performance)
-- Parallel review workflows
-- Background quality checks
-
-### When to Recommend Plugins
-- Need multiple related skills
-- Want pre-packaged automation bundles
-- Team-wide standardization
-
----
-
-## Configuration Tips
-
-### MCP Server Setup
-
-**Team sharing**: Check `.mcp.json` into repo so entire team gets same MCP servers
-
-**Debugging**: Use `--mcp-debug` flag to identify configuration issues
-
-**Prerequisites to recommend:**
-- GitHub CLI (`gh`) - enables native GitHub operations
-- Puppeteer/Playwright CLI - for browser MCP servers
-
-### Headless Mode (for CI/Automation)
-
-Recommend headless Claude for automated pipelines:
-
-```bash
-# Pre-commit hook example
-claude -p "fix lint errors in src/" --allowedTools Edit,Write
-
-# CI pipeline with structured output
-claude -p "<prompt>" --output-format stream-json | your_command
-```
-
-### Permissions for Hooks
-
-Configure allowed tools in `.claude/settings.json`:
-
-```json
-{
-  "permissions": {
-    "allow": ["Edit", "Write", "Bash(npm test:*)", "Bash(git commit:*)"]
-  }
-}
-```
+Keep recommendations actionable and repository-specific. Distinguish facts from inferences and call out platform differences instead of presenting Claude Code and OpenCode configuration as interchangeable.

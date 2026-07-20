@@ -5,89 +5,77 @@ description: >-
   "open a PR to main", "submit a PR", "make a pull request to X", "PR to X branch",
   or any variation of creating a pull request targeting a specific branch. Also triggers
   on "/create-pr".
-argument-hint: "<target-branch>"
+compatibility: Requires Git, an authenticated GitHub CLI, and network access; designed for Claude Code and OpenCode.
 ---
 
 # Create Pull Request
 
-Orchestrate a full pre-PR quality gate pipeline and create a GitHub pull request.
-The target branch is the branch argument (e.g., "create a PR to dev" means target = `dev`).
+Create a GitHub pull request from the current branch. A target/base branch is mandatory; ask
+for it if absent. Create a ready PR unless the user explicitly requests a draft.
 
-## Workflow
+Use available file-reading, skill/subagent, and shell capabilities. Require `git`, `gh`, a Git
+worktree with a GitHub remote, authenticated GitHub access, and network access. Keep commands
+non-interactive. Report a missing or failed capability with the command and relevant error;
+never suggest that authentication succeeded when `gh auth status` failed.
 
-Execute the following phases in order. If any phase fails and cannot be auto-fixed,
-stop and report the failure to the user — do not create the PR.
+## 1. Preflight and Existing PR
 
-### Phase 0: Preflight
+1. Validate the target as a branch name and identify the current branch. Stop for detached
+   `HEAD` or when source and target are the same.
+2. Resolve the GitHub host and source remote without printing embedded credentials. Prefer the
+   current branch's GitHub upstream, then an appropriate GitHub `origin`.
+3. Check `gh` authentication non-interactively for that host.
+4. Before doing quality work or pushing, query open PRs for the current source branch and
+   requested target. If one exists, return its URL, state, and draft status;
+   do not create a duplicate.
+5. Inspect `git status --short`. If the worktree is dirty, ask whether to invoke the `commit`
+   skill/capability first or continue with only existing commits. If continuing, clearly state
+   that uncommitted changes are excluded. Do not stash, discard, or silently commit them.
 
-1. Confirm the current branch is not the target branch. Abort if they are the same.
-2. Run `git status` to check for uncommitted changes. If uncommitted changes exist,
-   ask the user whether to commit first (invoke the `commit` skill) or abort.
-3. Run `git log <target>..HEAD --oneline` to confirm there are commits to include.
-   Abort if there are no commits.
+## 2. Resolve the Current Remote Base
 
-### Phase 1: Convention Review
+Fetch only the requested target safely into its remote-tracking ref, without tags or force, and
+use that freshly fetched ref as the base for every log, diff, review, and check. Stop if the
+remote or target cannot be resolved.
 
-Invoke the **review-conventions** skill with `--branch <target>` to review all files
-changed between the target branch and HEAD. Run it in read-only mode. If it reports
-violations that should block the PR, stop and report them; do not fix or commit them.
+Compare the fetched base with `HEAD`:
 
-### Phase 2: Quality Gates
+- Stop if there are no source commits to include.
+- Use a non-mutating merge analysis such as `git merge-tree` to detect conflicts. Block the PR
+  when conflicts are detected and report the affected paths.
+- If the source is behind the fetched base but the merge analysis is conflict-free, warn and
+  continue. Never merge, rebase, reset, or force-push to update the branch.
 
-Read project instructions, manifests, task runners, and CI configuration to discover
-the repository's quality commands. Run each applicable configured gate directly:
+## 3. Read-Only Review
 
-1. **Lint** — Run the project linter without auto-fix flags.
-2. **Typecheck** — Run the type checker when the project uses one.
-3. **Test** — Run the full test suite.
+Run the `review-conventions` skill/capability against the fetched remote base in read-only mode.
+If that capability is unavailable, perform the equivalent read-only review from applicable
+project guidance. Block only clear, objective violations of repository rules. Report subjective
+or advisory suggestions without blocking or editing files.
 
-Do not modify files, auto-fix failures, or commit during quality gates. Stop and report
-the failing command and its relevant output. Do not invent gates that do not apply to
-the project's ecosystem.
+## 4. Repository-Defined Checks
 
-### Phase 3: Push & Create PR
+Discover pre-PR commands from repository instructions, manifests, task runners, and CI
+configuration. Run only checks the repository actually defines for this change; do not invent a
+generic lint/typecheck/test suite. Use non-fixing/read-only options and do not edit files,
+auto-fix, commit, or weaken configuration. If a command fails or modifies tracked content, stop
+and report the command and relevant output without reverting user work.
 
-1. **Push the branch:**
-   ```bash
-   git push -u origin HEAD
-   ```
+## 5. Build and Create
 
-2. **Detect PR template:** Check for `.github/pull_request_template.md` in the repo root.
+1. Find a PR template using common case variants and locations: root, `.github/`, or `docs/`
+   `pull_request_template.md`/`PULL_REQUEST_TEMPLATE.md`, plus Markdown files in root or
+   `.github/` `PULL_REQUEST_TEMPLATE/`/`pull_request_template/` directories. If several templates
+   exist, choose the clearly applicable one or ask; do not combine them arbitrarily.
+2. Derive a concise title and fill the selected template from the commits and diff against the
+   fetched base. Without a template, use a short body containing `Summary` and `Test plan`.
+3. Push normally with upstream tracking to the resolved source remote. Never force-push.
+4. Query again for an existing PR to the requested target to avoid a race or recovering from a
+   partially successful prior run. Return it if found.
+5. Create the PR with explicit source and base, the prepared title/body, and `--assignee '@me'`.
+   Add `--draft` only when requested; omission creates a ready PR.
+6. Output the PR URL returned by `gh`. If push or creation fails, report the relevant error and
+   do not claim success.
 
-3. **Build PR metadata:**
-   - **Title:** Derive from the branch name or commit summary. Keep under 70 characters.
-   - **Body:** If a PR template exists, read it and fill in each section based on the
-     commits being merged (`git log <target>..HEAD` and `git diff <target>...HEAD`).
-     If no template exists, generate a body with:
-     - `## Summary` — bullet points of what changed and why
-     - `## Type of change` — categorize (bug fix, feature, refactor, etc.)
-     - `## Test plan` — how the changes were verified
-
-4. **Create the PR:**
-   ```bash
-   gh pr create \
-     --base <target> \
-     --title "<title>" \
-     --body "$(cat <<'EOF'
-   <body content>
-   EOF
-   )" \
-     --assignee rogsme
-   ```
-
-5. **Output the PR URL** so the user can see it.
-
-## Error Handling
-
-- If `gh` is not installed or not authenticated, inform the user and suggest
-  running `! gh auth login`.
-- If the push fails (e.g., remote branch protection), report the error verbatim.
-- If any quality gate fails, stop the pipeline and report which command failed and why.
-
-## Key Rules
-
-- Never force-push. Use regular `git push`.
-- Run every applicable repository-defined quality gate before creating the PR.
-- Never create a PR with failing checks.
-- Always assign the PR to `rogsme`.
-- Respect project-specific `CLAUDE.md` instructions (e.g., commit message format, branch strategy).
+Never merge, rebase, force-push, auto-fix, edit project files, or create commits as part of this
+workflow. Use the commit skill only after the user chooses that option.

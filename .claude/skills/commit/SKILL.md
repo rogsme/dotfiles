@@ -6,96 +6,103 @@ description: >-
   or any variation of committing unstaged/staged changes. Also triggers on
   "/commit". Analyzes changes and creates one or more logical atomic commits
   following the repository's own commit conventions.
-argument-hint: "[optional message or guidance]"
+compatibility: Requires Git and a non-interactive shell; designed for Claude Code and OpenCode.
 ---
 
-# Commit — Atomic Commits Following Repository Conventions
+# Commit
 
-Create one or more logical atomic commits from all uncommitted changes (staged, unstaged,
-and untracked) by analyzing the repository's own commit history to match its conventions.
+Create the smallest useful set of atomic commits while preserving all worktree content.
+A bare request to "commit" includes the entire worktree: staged, unstaged, and untracked
+changes. Treat supplied text as message guidance, not a literal message or a path scope,
+and adapt it to repository conventions.
 
-## Step 1: Learn the repository's commit conventions
+Use available file-reading and shell capabilities. Require a working `git` executable and
+a Git worktree; otherwise report the missing capability and stop. Use only non-interactive
+commands. Never use interactive staging, editors, or pagers.
 
-Run `git log --no-merges --format='%s' -20` to read the last 20 non-merge commit subjects.
+## 1. Inspect Safely
 
-Analyze the patterns to determine:
-- **Format**: Conventional commits (`type(scope): message`), plain messages, or other
-- **Types used**: e.g., `feat`, `fix`, `test`, `style`, `docs`, `chore`, `refactor`
-- **Scope usage**: Always present, optional, or never used
-- **Case style**: Lowercase start, sentence case, etc.
-- **Body style**: Run `git log --no-merges --format='%s%n%b---' -10` if needed to check
-  whether commits typically include bodies (bullet points, paragraphs, or none)
+1. Read status and change metadata before file contents: `git status --short`, staged and
+   unstaged name/status and numstat output, and metadata for untracked files.
+2. Classify likely secrets or credentials (`.env` except documented examples, private keys,
+   tokens, credential files), database/data dumps, and suspicious generated, binary, or large
+   artifacts by name, type, size, and ignore rules before reading or staging them. Skip and
+   warn about each suspicious path; do not expose its contents.
+3. Stop on unresolved merges or an operation already in progress unless completing that
+   operation was explicitly requested.
+4. Read applicable repository guidance, including `CLAUDE.md`, `AGENTS.md`, and
+   `CONTRIBUTING.md` wherever present. Follow explicit project rules over inferred style.
+5. Inspect all remaining in-scope diffs and untracked files. Bare `commit` means all safe
+   changes; honor an explicit narrower scope if the user supplied one.
+6. Inspect recent non-merge subjects and, when useful, bodies. If `HEAD` does not exist,
+   use project guidance and a concise imperative subject as the unborn-repository fallback.
+   Do not impose Conventional Commits unless the repository does.
 
-Do NOT impose conventional commits if the repo doesn't use them. Match what exists.
+If no safe in-scope changes remain, report that and stop.
 
-## Step 2: Survey all uncommitted changes
+## 2. Plan Atomic Commits
 
-Run these commands to get the full picture:
+Group changes by coherent purpose and order dependent commits first. Keep implementation and
+its tests together unless repository history clearly separates them. Separate independent
+behavior, formatting, generated output, and unrelated documentation. Do not split one logical
+change merely to create more commits.
 
-```bash
-git status
-git diff              # unstaged changes
-git diff --cached     # staged changes
-```
+Existing staged state is input, not an immutable boundary: temporarily reorganize it when
+needed to make correct commits. Never discard or overwrite worktree content.
 
-Read every modified/added/deleted file to understand what changed and why. Do not skip files.
-For new untracked files, read them to understand their purpose.
+## 3. Stage Exactly
 
-## Step 3: Group changes into logical atomic commits
+For each group:
 
-Analyze all changes and group them into logical units. Each commit should represent one
-coherent change. Common grouping strategies:
+1. Record status and the current staged diff. Normalize only the index back to `HEAD` with
+   `git reset HEAD -- <paths>` as needed; this must leave the worktree untouched. In an
+   unborn repository, use index-only operations such as
+   `git rm --cached -r --ignore-unmatch -- <paths>` instead.
+2. Stage whole paths with `git add -- <paths>`. Always use `--` before path arguments; never
+   use `git add .`, `git add -A`, or an interactive Git command.
+3. When one file contains changes for different commits, build a temporary patch outside the
+   repository from `git diff HEAD -- <path>` (or against Git's empty tree when unborn), retain
+   only the group's complete hunks, then run
+   `git apply --cached --check <patch>` followed by `git apply --cached <patch>`. If changes
+   share a hunk, split the patch carefully with valid hunk ranges and verify it with `--check`.
+   This stages partial hunks non-interactively while leaving every worktree byte intact.
+4. Compare `git diff --cached -- <paths>` with the intended group, then inspect the exact full
+   cached diff using `git diff --cached --check` and `git diff --cached`. Remove accidental
+   staged content with index-only operations and repeat until the cache contains exactly one
+   atomic change. Do not proceed on ambiguity.
 
-- **Single logical change** -> one commit (most common case)
-- **Multiple independent changes** -> separate commits, one per logical unit
-- **Test + implementation** -> may be one commit or separate, match repo convention
+Temporary patches must not be added to the repository and should be removed after use. Any
+previously staged change not included in the current commit remains in the worktree and can be
+staged for its intended later group.
 
-Grouping rules:
-- A commit should be self-contained: it should not break the build or tests on its own
-- Related changes across multiple files belong in the same commit (e.g., a route + its schema + its test)
-- Unrelated changes should be separate commits even if they touch the same file area
-- Formatting/style changes separate from functional changes
-- Documentation changes separate from code changes (unless tightly coupled)
+## 4. Commit and Handle Hooks
 
-If ALL changes are part of one logical unit, create a single commit. Do not split artificially.
+Write a concise message matching project history: format, type/scope usage, case, punctuation,
+and body style. Incorporate supplied message guidance where accurate, but rewrite it when needed
+to fit the repository and actual diff.
 
-## Step 4: Create each commit
+Run `git commit` non-interactively with `-m` arguments or `-F <message-file>`. This runs the
+repository's configured Git hooks; never bypass them with `--no-verify`. Do not proactively run
+linters, tests, type checks, or other quality suites merely to commit.
 
-For each logical group, in dependency order (base changes first):
+If a configured hook fails:
 
-1. **Stage only the relevant files** — use `git add <file1> <file2> ...`, never `git add -A` or `git add .`
-2. **Write the commit message** matching the conventions discovered in Step 1
-3. **Create the commit** using a HEREDOC for proper formatting:
+- Fix a clear root cause automatically when the fix is safe and in scope.
+- Never weaken hook or tool configuration, add suppressions, or delete/disable tests merely to
+  pass.
+- If a hook deterministically modifies files, inspect those changes, stage only the intended
+  paths or hunks with `git add -- <paths>` or a cached patch, and re-verify the exact cached diff.
+- Retry only while making clear progress. Stop and report ambiguity, unrelated required changes,
+  nondeterminism, or a repeated failure with no progress.
 
-```bash
-git commit -m "$(cat <<'EOF'
-type(scope): subject line here
+A failed hook creates no commit, so retry the same commit after correction. Never amend unless
+the user explicitly requested it.
 
-- Detail bullet if the repo convention uses bodies
-- Another detail
-EOF
-)"
-```
+## 5. Verify
 
-Message guidelines:
-- Subject line: concise, focuses on the "why" or "what" (not "how")
-- Body: only include if the repo convention uses bodies AND the change warrants explanation
-- Match the tense, case, and punctuation style of existing commits
-- If the user passed an optional message/guidance as an argument, incorporate it
+After every commit, confirm its recorded diff and reassess the remaining staged, unstaged, and
+untracked changes before building the next group. At the end, run `git status --short` and show
+the newly created commits with a bounded `git log --oneline` query. Report intentionally skipped
+or remaining paths explicitly.
 
-## Step 5: Verify
-
-Run `git status` after all commits to confirm the working tree is clean (or only has
-intentionally uncommitted files). Run `git log --oneline -N` (where N = number of commits
-created) to show the user what was committed.
-
-## Important Rules
-
-- **Check CLAUDE.md first** for any project-specific commit rules (e.g., forbidden trailers,
-  required formats, branch naming). These override the conventions inferred from history.
-- **Never use `git add -A` or `git add .`** — always stage specific files by path.
-- **Never commit files that likely contain secrets** (`.env`, credentials, keys). Warn the user.
-- **Never amend existing commits** unless the user explicitly asks.
-- **Never push** unless the user explicitly asks.
-- **If pre-commit hooks fail**: fix the issues, re-stage, and create a NEW commit (do not amend).
-- **If there are no changes to commit**, inform the user and stop.
+Never push or amend unless explicitly requested.

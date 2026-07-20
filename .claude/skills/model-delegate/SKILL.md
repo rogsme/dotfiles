@@ -1,114 +1,115 @@
 ---
 name: model-delegate
-description: "Route self-contained subtasks to cheaper/faster OpenCode lazer models as text-only subagents. Use when the user says \"distribute the work among models\", \"spread this across models\", \"do this cheaply\", \"run this quick\", \"ask another model\", \"get a second opinion from X\", or names a lazer model for a task. Also consult before large context-heavy reads (huge files, bulk repo exploration, research sweeps) where offloading to a cheap model would save cost and context — propose the delegation and wait for approval. Also use when the panel changes: \"a new model was added\", \"re-run the model evals\", \"re-score the panel\", \"update model-delegate\" — see the update workflow. Covers model selection by strength, cost/latency budgets, fallback chains, verification rules, and panel re-evaluation."
+description: >-
+  Route self-contained subtasks to OpenCode Lazer models only when the user
+  explicitly asks to distribute work, run work quickly or cheaply, ask another
+  model, get a second opinion, use a named Lazer model, or update/re-run the
+  model panel evaluation. Covers model selection, robust invocation, fallback,
+  attribution, verification, and panel maintenance. Never triggers proactively.
+compatibility: Requires the OpenCode CLI with the Lazer provider, text-file attachments, and GNU timeout.
 ---
 
 # Model Delegation
 
-Route self-contained subtasks to `lazer/*` models through the OpenCode CLI,
-treating each call as a **text-only subagent**: it returns analysis, drafts,
-reviews, or suggested diffs. Claude remains the only writer — never let a
-delegated model edit files, and never apply its output without the
-verification step for its tier.
+Route explicitly requested subtasks through `opencode run -m lazer/<model>`.
+Treat results as text suggestions: delegated models do not become trusted
+writers, and their conclusions retain attribution until independently checked.
 
-Rankings below were measured on 2026-07-07 across 8 realms (58 runs; coding
-implementation/debugging/hard-exam, reasoning, structured output, writing,
-open-ended design). Full data: `references/eval-results.md`.
+The user's explicit delegation request is sufficient approval to send the
+task's necessary context to the selected Lazer model. Do not add a data-
+classification or second approval gate. Include only context needed to complete
+the task.
 
-## When NOT to delegate (check first)
+Do not trigger this skill proactively. Without an explicit delegation request,
+do the work directly.
 
-Skip delegation and do the work directly when ANY of these hold:
-
-- The task depends on conversation or repo context already absorbed — writing
-  a self-contained handoff prompt would take longer than the task itself.
-- The result needs Claude-level judgment anyway (architecture calls, security
-  decisions, anything the user will act on without review).
-- The task is a quick targeted lookup (one file, one symbol) — direct tools
-  are faster than a 7s+ round trip.
-- The user asked for Claude's own opinion.
+The routing observations come from one run per model/realm on 2026-07-07, with
+retries only for delivery failures. Read `references/eval-results.md` for the
+measured scope and limitations. Do not present cost estimates.
 
 ## Modes
 
-| Trigger | Mode | Behavior |
+| Explicit request | Mode | Behavior |
 |---|---|---|
-| "run this quick" | speed | qwen-3.7-plus, 120 s cap |
-| "do this cheaply" | budget | minimax-m3 for trivial/mechanical; qwen-3.7-plus for anything with logic |
-| "distribute the work" / "spread across models" | fan-out | Split into self-contained subtasks; launch all in parallel; match model to subtask by the routing table |
-| "use <model> for this" / "ask <model>" | manual | User override — route to the named model regardless of the table |
-| No trigger, Claude's judgment | proactive | **Propose first, wait for approval.** One line: what, to which model, why, estimated cost (see Cost line) |
+| "run this quick" | speed | Use `qwen-3.7-plus`; 120-second timeout |
+| "do this cheaply" | budget | Use `minimax-m3` only for mechanical work; otherwise `qwen-3.7-plus` |
+| "distribute/spread the work" | fan-out | Split into independent prompts and invoke them through parallel tool calls |
+| "use/ask <model>" | manual | Use the named available `lazer/<model>` |
+| "get a second opinion" | review | Use a model with a different measured failure profile |
 
-## Routing table
+## Routing
 
-| Model | Route here | Never route here | Notes |
+| Model | Route here | Avoid here | Measured basis |
 |---|---|---|---|
-| `qwen-3.7-plus` | DEFAULT workhorse: exploration, file/repo summarization, standard code analysis, debugging, drafts, structured extraction | — | Elite accuracy, fastest (7 s median), ~$0.4/$1.6 per M. Best value in panel; produced the best design in the open-ended eval |
-| `minimax-m3` | Trivial mechanical: reformat, rename lists, boilerplate, simple summaries | Precise semantics, hard logic, multi-part structured prompts | Cheapest by 4×. Measured failures: operator-precedence and boundary-semantics bugs; returned empty output twice on a complex 3-section prompt |
-| `glm-5.2` | Hard algorithmic work, tricky implementations, adversarial code review | Anything accepted without verification | Only perfect score on the 2,084-check exam — but shipped a broken self-test it never ran. ALWAYS verify its output yourself |
-| `kimi-2.7-code` | Prose the user reads: PR bodies, docs, summaries, review write-ups | Time-boxed/interactive work | Best judged writing. Latency tail up to 12 min — async only |
-| `gpt-5.5` | Correctness-critical + fast turnaround; second opinions on hard problems | Budget-sensitive bulk work | Only model that self-verified before answering. Flat latency (~15 s typical). Premium: $5/$30 per M |
-| `gemini-3.1-pro` | Very large inputs: huge files, PDFs, images, long transcripts (1M ctx, multimodal) | Ordinary code tasks (no measured edge for 2nd-highest price) | Big-input strength inferred from specs, not eval-tested — flag this when using |
-| `deepseek-v4-pro` | Async batch analysis where wall-clock is irrelevant | Anything interactive or deadline-bound | Correct but operationally unreliable: empty-output flake, 17-min run, one 25-min hang killed |
-| `claude-fable-5` | Never delegate to it | — | That is the host model's family and the price ceiling; do the work directly instead |
+| `qwen-3.7-plus` | Default: exploration summaries, code analysis, debugging, drafts, extraction | Claims requiring acceptance without verification | Strong scores across the eight prompts; lowest observed median latency in this run |
+| `minimax-m3` | Mechanical formatting, list transforms, simple summaries | Precise semantics, hard logic, multi-part outputs | Passed simpler realms; missed hard semantic cases and returned empty output twice on realm 8 |
+| `glm-5.2` | Hard algorithms, tricky implementation, adversarial review | Unverified code | Only model with all realm-7 checks; emitted a faulty realm-8 self-test |
+| `kimi-2.7-code` | User-facing prose when a long wait is acceptable | Interactive or tightly timed work | Strongest judged writing in this run; observed hard-task tail reached about 12 minutes |
+| `gpt-5.5` | Correctness-critical second opinions with verification | Bulk work without a specific reason | Near-complete mechanical scores and visible self-checking in its realm-8 response |
+| `gemini-3.1-pro` | Alternative second opinion | Preferential routing without task-specific evidence | Strong benchmark scores, but no measured advantage on these prompts |
+| `deepseek-v4-pro` | Explicitly requested asynchronous analysis | Interactive or deadline-bound work | One empty response, one long run, and one killed run in this harness |
 
-For adversarial multi-model review, pair models with different failure
-profiles: `glm-5.2` + `gpt-5.5` + `qwen-3.7-plus`.
+Do not infer image, PDF, video, long-context, tool-use, or agentic capability
+from this evaluation; none was tested. This workflow attaches UTF-8 text files
+and consumes text output only.
 
-## Invocation contract
+For multi-model review, use models with different observed failure profiles,
+such as `glm-5.2`, `gpt-5.5`, and `qwen-3.7-plus`.
 
-Run each delegation as a background Bash call so work continues while waiting:
+## Invocation
+
+Create a UTF-8 prompt file and a unique output directory. Make the prompt
+self-contained: task, necessary text inputs, requested output format, and a
+conciseness instruction. Attach additional inputs only when they are text.
+
+Use OpenCode's file attachment instead of expanding prompt contents into a
+shell argument:
 
 ```bash
-opencode run -m lazer/<model> --variant high "$(cat <prompt-file>)" 2>/dev/null > <out-file>
+timeout --signal=TERM --kill-after=5s "${timeout_seconds}s" \
+  opencode run --model "lazer/${model}" --variant high --format default \
+  --file "$prompt_file" \
+  "Follow the attached UTF-8 prompt exactly and return only the requested text." \
+  >"$output_file" 2>"$error_file"
 ```
 
-1. **Prompt file**: write the handoff prompt to the session scratchpad. It must
-   be self-contained — the model has no conversation or repo context. Include:
-   task, all needed input inline, exact output format, and "be concise".
-2. **Parallel**: launch independent delegations in ONE message, all background.
-   Wait for completion notifications — never poll.
-3. **Timeouts**: 120 s for speed-mode/lookups, 600 s for hard tasks. On expiry,
-   kill and fall back.
-4. **Validation**: output is valid only if it contains ≥3 lines of meaningful
-   content in the requested format. Empty or garbled output → retry ONCE on
-   the next model up the fallback chain, never the same model:
-   `minimax-m3 → qwen-3.7-plus → glm-5.2 → gpt-5.5`.
-5. **Attribution**: when presenting delegated results, say which model produced
-   what. Never present a delegated conclusion as verified unless it passed the
-   verification tier below.
+Use 120 seconds for speed requests and 600 seconds for hard tasks unless the
+user specifies another bound. Treat exit 124 as timeout and any other nonzero
+status as failure. Preserve and report relevant stderr; never redirect it to
+`/dev/null`.
 
-## Verification tiers
+Launch independent invocations as parallel tool calls. Completion is the tool
+result and process exit status; do not assume background completion
+notifications and do not poll detached processes.
 
-- **Code from any delegated model**: run it / run its tests before presenting.
-  Mandatory for `glm-5.2` and `minimax-m3` output.
-- **Factual claims about the repo**: spot-check at least one claim against the
-  actual source before relying on it.
-- **Prose/drafts**: read fully; check no invented facts vs the inputs given.
+## Validate And Fall Back
 
-## Cost line (for proposals and fan-out plans)
+Validate meaning and requested structure, not output length. Examples:
 
-Estimate: `(prompt_chars + expected_output_chars) / 4 / 1e6 × ($in + $out)`.
-Read current pricing from `~/.config/opencode/opencode.json`
-(`.provider.lazer.models.<id>.cost`) — do not trust the table above to stay
-current. Typical delegation ≈ $0.001–0.05 on qwen; ~16× that on gpt-5.5.
+- Parse JSON when JSON was requested and check required keys/types.
+- Confirm every requested section or item is present.
+- Reject empty output, refusal text that does not answer the task, truncated
+  syntax, or prose where a strict machine-readable format was requested.
+- For code, extract it and apply the verification tier below.
+
+On delivery or semantic-format failure, retry once on the next suitable model:
+`minimax-m3 -> qwen-3.7-plus -> glm-5.2 -> gpt-5.5`. Do not retry the same model.
+If a manual model request fails, report the failure before using a fallback.
+
+## Attribution And Verification
+
+- Attribute each delegated result to its model.
+- Run relevant tests or checks before presenting delegated code as verified.
+- Spot-check repository claims against source files.
+- Read prose fully and compare factual statements with the supplied inputs.
+- Label unverified conclusions explicitly; never turn attribution into an
+  implied endorsement.
 
 ## Maintenance
 
-- Model list and pricing live in `~/.config/opencode/opencode.json`; the
-  routing table reflects the 2026-07-07 eval.
-- When a model is added, replaced, or repriced — or the user asks to re-run
-  the evals — read **`references/update-workflow.md`** and follow it: detect
-  changes, run the harness incrementally, grade with the original anchors,
-  propose tier placement for approval, then update the table and append to
-  the results file.
-- If a routed model consistently underperforms its tier, note it to the user
-  and suggest a re-eval rather than silently rerouting.
+Read `references/update-workflow.md` only when the user explicitly requests a
+panel update, re-score, or re-run. The reusable local harness is under `eval/`;
+`eval/README.md` documents its mechanics and execution risk.
 
-## Resources
-
-- **`references/eval-results.md`** — full evaluation report backing the
-  routing table. Read when the user questions a routing choice or asks about
-  model strengths.
-- **`references/update-workflow.md`** — panel re-evaluation procedure. Read
-  when models are added/changed or a re-score is requested.
-- **`eval/`** — the complete reusable benchmark harness (prompts, graders,
-  runner). `eval/README.md` has the mechanics; the update workflow drives it.
+Do not silently change routing after one bad result. Report repeated
+underperformance and recommend an explicitly requested re-evaluation.

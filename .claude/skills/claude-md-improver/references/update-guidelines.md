@@ -1,150 +1,36 @@
-# CLAUDE.md Update Guidelines
+# Update Guidelines
 
-## Core Principle
+## Keep
 
-Only add information that will genuinely help future Claude sessions. The context window is precious - every line must earn its place.
+- commands whose exact form, order, or scope is not obvious from repository configuration
+- recurring gotchas and constraints that prevent concrete failures
+- conventions that intentionally differ from language or tool defaults
+- non-obvious package boundaries, generated-source rules, and focused verification steps
 
-## What TO Add
+## Remove Or Move
 
-### 1. Commands/Workflows Discovered
+- dependency lists, directory tours, and facts trivially derived from code
+- generic advice, historical notes, and one-off fixes
+- duplicated or contradictory instructions
+- long procedures better loaded on demand as a skill
+- package-specific rules from unconditional root context
 
-```markdown
-## Build
+## Drafting Test
 
-`npm run build:prod` - Full production build with optimization
-`npm run build:dev` - Fast dev build (no minification)
-```
+For every changed line, answer:
 
-Why: Saves future sessions from discovering these again.
+1. What repository evidence supports it?
+2. What likely mistake or repeated discovery does it prevent?
+3. Is this the narrowest correct scope?
+4. Can it be stated more directly or deleted?
 
-### 2. Gotchas and Non-Obvious Patterns
+## Approval Boundary
 
-```markdown
-## Gotchas
+Before editing, show exact diffs with file paths and evidence-based reasons. Apply only explicitly approved hunks. If the file changed after approval, preserve unrelated changes and request renewed approval when the approved hunk no longer applies cleanly or its meaning changes.
 
-- Tests must run sequentially (`--runInBand`) due to shared DB state
-- `yarn.lock` is authoritative; delete `node_modules` if deps mismatch
-```
+## Validation
 
-Why: Prevents repeating debugging sessions.
-
-### 3. Package Relationships
-
-```markdown
-## Dependencies
-
-The `auth` module depends on `crypto` being initialized first.
-Import order matters in `src/bootstrap.ts`.
-```
-
-Why: Architecture knowledge that isn't obvious from code.
-
-### 4. Testing Approaches That Worked
-
-```markdown
-## Testing
-
-For API endpoints: Use `supertest` with the test helper in `tests/setup.ts`
-Mocking: Factory functions in `tests/factories/` (not inline mocks)
-```
-
-Why: Establishes patterns that work.
-
-### 5. Configuration Quirks
-
-```markdown
-## Config
-
-- `NEXT_PUBLIC_*` vars must be set at build time, not runtime
-- Redis connection requires `?family=0` suffix for IPv6
-```
-
-Why: Environment-specific knowledge.
-
-## What NOT to Add
-
-### 1. Obvious Code Info
-
-Bad:
-```markdown
-The `UserService` class handles user operations.
-```
-
-The class name already tells us this.
-
-### 2. Generic Best Practices
-
-Bad:
-```markdown
-Always write tests for new features.
-Use meaningful variable names.
-```
-
-This is universal advice, not project-specific.
-
-### 3. One-Off Fixes
-
-Bad:
-```markdown
-We fixed a bug in commit abc123 where the login button didn't work.
-```
-
-Won't recur; clutters the file.
-
-### 4. Verbose Explanations
-
-Bad:
-```markdown
-The authentication system uses JWT tokens. JWT (JSON Web Tokens) are
-an open standard (RFC 7519) that defines a compact and self-contained
-way for securely transmitting information between parties as a JSON
-object. In our implementation, we use the HS256 algorithm which...
-```
-
-Good:
-```markdown
-Auth: JWT with HS256, tokens in `Authorization: Bearer <token>` header.
-```
-
-## Diff Format for Updates
-
-For each suggested change:
-
-### 1. Identify the File
-
-```
-File: ./CLAUDE.md
-Section: Commands (new section after ## Architecture)
-```
-
-### 2. Show the Change
-
-```diff
- ## Architecture
- ...
-
-+## Commands
-+
-+| Command | Purpose |
-+|---------|---------|
-+| `npm run dev` | Dev server with HMR |
-+| `npm run build` | Production build |
-+| `npm test` | Run test suite |
-```
-
-### 3. Explain Why
-
-> **Why this helps:** The build commands weren't documented, causing
-> confusion about how to run the project. This saves future sessions
-> from needing to inspect `package.json`.
-
-## Validation Checklist
-
-Before finalizing an update, verify:
-
-- [ ] Each addition is project-specific
-- [ ] No generic advice or obvious info
-- [ ] Commands are tested and work
-- [ ] File paths are accurate
-- [ ] Would a new Claude session find this helpful?
-- [ ] Is this the most concise way to express the info?
+- Re-read edited files and resolve imports from their actual locations.
+- Confirm referenced paths and configuration keys exist.
+- Recheck effective hierarchy for conflicts and unintended broad scope.
+- Use safe checks only. Never deploy, publish, migrate, destroy resources, or touch production data just to validate instructions.

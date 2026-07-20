@@ -1,101 +1,83 @@
 ---
 name: git-archaeology
 description: >-
-  Use this skill when the user asks to "analyze a repo", "check repo health",
-  "git archaeology", "codebase diagnostic", "who built this", "what changes the most",
-  "bus factor", "churn analysis", "bug hotspots", or wants to understand a codebase's
-  history, health, and risk areas before reading source code. Also triggers on
-  "/git-archaeology". Generates a structured GIT-ARCHAEOLOGY.md report.
-argument-hint: "[path] [timeframe]"
+  Use this skill for history-based repository analysis: "git archaeology", contributor
+  concentration, ownership history, bus factor, churn trends, fix-keyword hotspots, project
+  momentum, or historical risk indicators. Do not use for ordinary source-code analysis or
+  generic repository health questions without a Git-history focus. Also triggers on
+  "/git-archaeology" and writes GIT-ARCHAEOLOGY.md.
+compatibility: Requires Bash 4.3+, Git 2.x, and GNU coreutils (sort with NUL support).
 ---
 
 # Git Archaeology
 
-Analyze a git repository's history to produce a structured health diagnostic report.
-Run a data collection script, interpret the results, and write `GIT-ARCHAEOLOGY.md`
-to the repository root with findings, analysis, and recommendations.
+Analyze a Git repository's history and write a bounded diagnostic report. Treat
+history patterns as indicators to investigate, never as proof of quality,
+intent, ownership, or causation.
 
-## Origin
+## Inputs
 
-Based on: https://piechowski.io/post/git-commands-before-reading-code/
-"The Git Commands I Run Before Reading Any Code" by Ally Piechowski (Apr 2026).
-Extended with churn velocity, deleted files tracking, and cross-reference analysis.
+Accept these independent optional inputs from the user's request:
 
-## Arguments
+| Input | Example | Default |
+|---|---|---|
+| Repository | `/work/services/api` | Current repository |
+| Scope | `src/payments` | Entire repository |
+| Timeframe | `6 months ago` | Auto-detect, capped at one year |
 
-The skill accepts optional arguments in this order:
+Never infer whether one path means a repository or a scope. Resolve it against
+the current context; if both interpretations remain possible, ask one short
+question. Pass inputs to the collector only through the named options:
 
+```bash
+bash scripts/collect.sh --repo <repository> --scope <repository-relative-subdirectory> --since <timeframe>
 ```
-/git-archaeology [path] [timeframe]
-```
 
-| Argument | Example | Default |
-|----------|---------|---------|
-| `path` | `src/api`, `packages/core` | Entire repository |
-| `timeframe` | `6months`, `2years`, `3 months ago` | Auto-detect (capped at 1 year) |
-
-Examples:
-- `/git-archaeology` — full repo, auto timeframe
-- `/git-archaeology src/api` — scoped to src/api
-- `/git-archaeology 6months` — full repo, last 6 months
-- `/git-archaeology src/api 6months` — scoped + custom timeframe
+Omit unset options. The collector accepts paths containing spaces or beginning
+with dashes. Keep `--scope` repository-relative; use `--repo` for the working
+tree itself. The automatic timeframe must remain capped at one year.
 
 ## Workflow
 
-### Step 1: Parse Arguments
+1. Resolve `scripts/collect.sh` relative to this skill directory and run it with
+   the explicit named options above.
+2. Stop and report the collector's error if the repository has no commits, the
+   scope is invalid, or Git rejects the timeframe.
+3. Read `assets/report-template.md` relative to this skill directory.
+4. Interpret the bounded data and replace `GIT-ARCHAEOLOGY.md` at the analyzed
+   repository root. Always write or replace that file; do not append and do not
+   preserve an older report.
+5. Return only a 3-5 line summary covering overall indicators, the first area to
+   inspect, contributor concentration, and momentum.
 
-Parse the user's input to extract optional `path` and `timeframe` arguments.
-Heuristic: if an argument looks like a file path (contains `/` or matches a directory in the repo), treat it as `path`. Otherwise treat it as `timeframe`.
+Do not paste the full report into the conversation.
 
-Normalize timeframe strings: `6months` → `6 months ago`, `2years` → `2 years ago`, `1year` → `1 year ago`.
+## Interpretation
 
-### Step 2: Collect Data
+- **Churn:** Distinguish routine churn in tests/configuration from repeated
+  changes in core logic. Compare values within the emitted ranking; do not claim
+  that churn caused defects.
+- **Contributors:** Use the collector's non-merge commit denominator for shares.
+  Compare all-time identities with identities active in the selected period.
+  Git mailmap normalization is applied, but bots are included and aliases not in
+  `.mailmap` may remain split. State this limitation in the report.
+- **Fix-keyword clusters:** Describe these as files changed by commits whose
+  messages matched the listed keywords. Commit wording is an imperfect proxy,
+  not a defect count.
+- **Momentum:** Include emitted zero-commit months. Describe acceleration,
+  stability, deceleration, irregularity, or seasonality only when the bounded
+  series supports it.
+- **Firefighting:** Report the matching-commit share using the same non-merge
+  denominator. Use it as an operational indicator, not evidence of missing tests
+  or deployment quality.
+- **Deleted files:** Identify patterns without assigning motive. Deletions can
+  indicate cleanup, migration, or abandoned work; history alone cannot choose.
+- **Velocity:** Compare the emitted six calendar months, including zeros. Avoid
+  conclusions when a file has too few observations.
+- **Cross-reference:** Prioritize files present in both bounded churn and
+  fix-keyword rankings for inspection. Correlation raises review priority but
+  does not establish that a file is defective.
 
-Run the collection script:
-
-```bash
-bash ~/.claude/skills/git-archaeology/scripts/collect.sh [--path <path>] [--since <timeframe>]
-```
-
-The script outputs structured text with `======== SECTION_NAME ========` delimiters.
-It auto-detects project age and caps the lookback at 1 year if no timeframe is provided.
-
-If the script fails (not a git repo, no commits), report the error and stop.
-
-### Step 3: Analyze and Write Report
-
-Read the report template from `~/.claude/skills/git-archaeology/assets/report-template.md`.
-
-For each section, parse the raw data from the script output and write both:
-1. **Data tables** with the actual numbers from the script
-2. **Narrative analysis** interpreting what the data means
-
-Key analysis guidelines:
-
-**Churn Hotspots:** Distinguish between healthy churn (tests, config, CI) and concerning churn (core business logic, shared utilities). Flag files with >2x the median change count.
-
-**Bus Factor:** Calculate the percentage of commits from the top contributor. Flag if >50%. Compare all-time vs recent contributors — note if original architects are no longer active.
-
-**Bug Clusters:** Cross-reference against churn hotspots immediately. Files on both lists are highest priority. Note if commit message quality limits this analysis (e.g., many generic messages).
-
-**Momentum:** Classify the trend: accelerating, stable, decelerating, erratic, or seasonal. Note any months with zero commits or sudden spikes (>2x average).
-
-**Firefighting:** Rate as none/low/moderate/high based on count relative to total commits. >5% of commits being hotfixes/reverts = high.
-
-**Deleted Files:** Look for patterns: entire directories (feature killed), test deletions (concerning), migrations from one technology to another.
-
-**Churn Velocity:** Flag files where recent months show higher churn than earlier months — these are getting worse. Files with decreasing velocity are stabilizing.
-
-**Cross-Reference:** This is the most important section. Files appearing in both churn and bug lists represent the highest-risk code. Be specific about what to do with each one.
-
-### Step 4: Write the File
-
-Write the completed report to `GIT-ARCHAEOLOGY.md` in the repository root.
-
-After writing, give a brief (3-5 line) summary to the user highlighting:
-- The overall health assessment (one sentence)
-- The #1 risk area
-- The bus factor situation
-- Whether momentum is healthy
-
-Do NOT dump the full report into the conversation — the user can read the file.
+Keep all tables within the collector's limits. Name specific files in
+recommendations, and phrase recommendations as checks to perform rather than
+diagnoses already proven.
