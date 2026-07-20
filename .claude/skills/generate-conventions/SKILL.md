@@ -245,13 +245,10 @@ Write the synthesized CONVENTIONS.md to the determined output path. The file sho
 - Use bullet points for rules
 - Be comprehensive but not redundant with itself
 
-### Commit (both modes)
-
-After writing/updating the file, invoke the `commit` skill to stage and commit the changes. If no changes were made, do not commit.
-
 ### Final Report (both modes)
 
 After writing/updating, report:
 - The mode used (create vs update)
 - The output path
 - A summary of what was generated or changed (in update mode, list sections added/modified)
+- Do not commit or push. Leave changes for the user to review.

@@ -92,7 +92,7 @@ Create skills in `.claude/skills/<name>/SKILL.md`. Some are also available via p
 
 | Codebase Signal | Skill | Plugin |
 |-----------------|-------|--------|
-| Building plugins | skill-development | plugin-dev |
+| Creating or improving skills | skill-creator | anthropics/skills |
 | Git commits | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
 | Automation rules | writing-rules | hookify |

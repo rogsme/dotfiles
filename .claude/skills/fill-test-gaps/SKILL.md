@@ -150,12 +150,6 @@ Each agent MUST follow this workflow:
 - Review against CONVENTIONS.md, fix violations
 - Do NOT add suppress comments unless no other way
 
-#### Step 6 — Atomic commit
-- Stage only new/modified test files for this batch
-- Descriptive commit message: `Add tests for <what was tested>`
-- Check CLAUDE.md for commit rules
-- Do NOT push
-
 ## Phase 4: Fixture Consolidation
 
 After all agents complete, dispatch a **general-purpose agent** using `mode: "bypassPermissions"` and `model: "sonnet"`:
@@ -164,7 +158,6 @@ After all agents complete, dispatch a **general-purpose agent** using `mode: "by
 3. Promote to shared location
 4. Update imports in test files
 5. Run full test suite to verify
-6. Invoke the `commit` skill to commit the consolidation changes
 
 Skip if no duplicates found.
 
@@ -176,7 +169,7 @@ Compare against baseline:
 - If coverage didn't increase for target files, flag for review (tests may be tautological)
 - Verify overall coverage meets CI threshold if applicable
 
-If tests fail, dispatch agent to fix, then invoke the `commit` skill to commit the fixes.
+If tests fail, dispatch an agent to fix them and rerun verification. Do not commit changes.
 
 ## Phase 6: Report
 
@@ -192,3 +185,5 @@ Include:
 - Tests deleted during self-review (with reason)
 - Remaining gaps not addressed (with reason)
 - In `--branch` mode: changed files and their test coverage status
+
+Do not commit or push. Leave all changes for the user to review.

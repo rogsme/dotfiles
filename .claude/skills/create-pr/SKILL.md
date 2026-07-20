@@ -29,17 +29,21 @@ stop and report the failure to the user — do not create the PR.
 ### Phase 1: Convention Review
 
 Invoke the **review-conventions** skill with `--branch <target>` to review all files
-changed between the target branch and HEAD. Let it fix violations and commit as needed.
+changed between the target branch and HEAD. Run it in read-only mode. If it reports
+violations that should block the PR, stop and report them; do not fix or commit them.
 
-### Phase 2: Quality Gates (parallel where possible)
+### Phase 2: Quality Gates
 
-Run these three skills. They can run sequentially since each may produce commits:
+Read project instructions, manifests, task runners, and CI configuration to discover
+the repository's quality commands. Run each applicable configured gate directly:
 
-1. **lint** — Run the project linter and fix any errors.
-2. **typecheck** — Run the type checker and fix any errors.
-3. **test** — Run the full test suite and fix any failures.
+1. **Lint** — Run the project linter without auto-fix flags.
+2. **Typecheck** — Run the type checker when the project uses one.
+3. **Test** — Run the full test suite.
 
-Each skill reads `CLAUDE.md ## Commands` to discover the correct project commands.
+Do not modify files, auto-fix failures, or commit during quality gates. Stop and report
+the failing command and its relevant output. Do not invent gates that do not apply to
+the project's ecosystem.
 
 ### Phase 3: Push & Create PR
 
@@ -78,13 +82,12 @@ Each skill reads `CLAUDE.md ## Commands` to discover the correct project command
 - If `gh` is not installed or not authenticated, inform the user and suggest
   running `! gh auth login`.
 - If the push fails (e.g., remote branch protection), report the error verbatim.
-- If any quality gate skill fails after its internal fix attempts, stop the pipeline
-  and report which gate failed and why.
+- If any quality gate fails, stop the pipeline and report which command failed and why.
 
 ## Key Rules
 
 - Never force-push. Use regular `git push`.
-- Never skip quality gates — all three (lint, typecheck, test) must pass.
+- Run every applicable repository-defined quality gate before creating the PR.
 - Never create a PR with failing checks.
 - Always assign the PR to `rogsme`.
 - Respect project-specific `CLAUDE.md` instructions (e.g., commit message format, branch strategy).

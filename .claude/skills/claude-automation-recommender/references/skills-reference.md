@@ -10,16 +10,17 @@ Some pre-built skills are available through official plugins (install via `/plug
 
 ## Available from Official Plugins
 
-### Plugin Development (plugin-dev)
+### Skill Development
 
 | Skill | Best For |
 |-------|----------|
-| **skill-development** | Creating new skills with proper structure |
-| **hook-development** | Building hooks for automation |
+| **skill-creator** | Creating and improving skills with evaluation support |
 | **command-development** | Creating slash commands |
 | **agent-development** | Building specialized subagents |
 | **mcp-integration** | Integrating MCP servers into plugins |
 | **plugin-structure** | Understanding plugin architecture |
+
+For hook development, use the current official Claude Code hook documentation rather than a copied skill.
 
 ### Git Workflows (commit-commands)
 
@@ -54,7 +55,7 @@ Some pre-built skills are available through official plugins (install via `/plug
 
 | Codebase Signal | Skill | Plugin |
 |-----------------|-------|--------|
-| Building plugins | skill-development | plugin-dev |
+| Creating or improving skills | skill-creator | anthropics/skills |
 | Git commits | commit | commit-commands |
 | React/Vue/Angular | frontend-design | frontend-design |
 | Automation rules | writing-rules | hookify |

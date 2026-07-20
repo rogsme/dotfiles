@@ -29,7 +29,7 @@ The `$ARGUMENTS` value selects the scope. If empty, defaults to "all".
 If `.claude/skills.md` does not exist or has no `## Update Docs` section, **stop** and tell the user:
 > This project needs a `.claude/skills.md` file with a `## Update Docs` section. See the skill documentation for the expected format.
 
-Also read `CLAUDE.md` to understand the project's commit rules.
+Also read `CLAUDE.md` to understand the project's documentation and project rules.
 
 ---
 
@@ -76,9 +76,9 @@ Each agent prompt MUST include:
 
 ## After All Agents Complete
 
-1. Invoke the `commit` skill to stage and commit the documentation changes. If no files were changed, do not commit.
-2. Summarize what was updated across all doc files:
+1. Summarize what was updated across all doc files:
    - Files modified vs files already up-to-date
    - Key additions (new endpoints, models, services documented)
    - Key removals (stale references removed)
-3. List any doc files that may need manual review (e.g., architecture diagrams, workflow guides).
+2. List any doc files that may need manual review (e.g., architecture diagrams, workflow guides).
+3. Do not commit or push. Leave changes for the user to review.

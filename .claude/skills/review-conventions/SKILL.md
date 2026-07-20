@@ -5,19 +5,21 @@ description: >-
   coding standards, or fix convention violations before a PR or merge. Also use
   when the user says "review conventions", "check code style", "enforce
   standards", "are we following conventions", or wants a pre-merge quality
-  sweep. Requires .claude/skills.md with scope groups configured.
-argument-hint: "[--branch <target> | --path <dir> | --all]"
+  sweep. Reviews are read-only unless the user explicitly asks to fix issues or
+  passes --fix. Requires .claude/skills.md with scope groups configured.
+argument-hint: "[--branch <target> | --path <dir> | --all] [--fix]"
 ---
 
 # Review Conventions
 
-Review code and verify it follows this project's coding conventions. Fix any violations found.
+Review code and verify it follows this project's coding conventions. Report violations by default; apply changes only with explicit fix intent.
 
 **Arguments:** `$ARGUMENTS` controls the scope. One of:
 
 - `--branch <target>` — Only review source files changed between `<target>` and HEAD (e.g., `--branch main`).
 - `--path <dir>` — Only review files in the given directory (e.g., `--path src/services/`).
 - `--all` — Full project review. Checks everything.
+- `--fix` — Fix convention violations after reviewing. May be combined with any scope.
 - *(empty)* — Auto-detect: try `gh pr view --json baseRefName -q .baseRefName 2>/dev/null` to find the PR base branch. If a PR is found, behave as `--branch <base>`. If no PR is found, **stop** and tell the user:
   > No open PR detected for this branch. Please specify a scope:
   > - `/review-conventions --branch main` to review files changed vs main
@@ -25,6 +27,8 @@ Review code and verify it follows this project's coding conventions. Fix any vio
   > - `/review-conventions --all` to review the entire project
 
 If the argument doesn't match any of the above patterns, **stop** and show the same usage help.
+
+Treat an explicit request to fix or enforce conventions as fix mode. Plain review, check, or pre-merge sweep requests are read-only.
 
 ---
 
@@ -39,17 +43,17 @@ If the argument doesn't match any of the above patterns, **stop** and show the s
 If `.claude/skills.md` does not exist or has no `## Review Conventions` section, **stop** and tell the user:
 > This project needs a `.claude/skills.md` file with a `## Review Conventions` section. See the skill documentation for the expected format.
 
-Also read `CLAUDE.md` to understand the project's technology stack, architecture, and commit rules.
+Also read `CLAUDE.md` to understand the project's technology stack, architecture, and project rules.
 
 ---
 
 ## Instructions
 
-You are orchestrating a convention review. Conventions live in `CONVENTIONS.md` — the full rule set is there, not in this skill. Each scope group gets its own sub-agent that reviews, fixes, verifies, and commits atomically.
+You are orchestrating a convention review. Conventions live in `CONVENTIONS.md` — the full rule set is there, not in this skill. Each scope group gets its own sub-agent. Read-only mode reports violations; fix mode may edit and verify owned files.
 
 ### Phase 0: Scope Resolution
 
-Parse `$ARGUMENTS` to determine the mode:
+Detect and remove `--fix` before resolving scope, then parse the remaining `$ARGUMENTS`:
 
 1. **`--branch <target>`** — Run `git diff --name-only <target>...HEAD` to get changed files. If empty, try `git diff --name-only <target>`. Filter to the file extensions from config. If no matching files remain, report that and stop.
 2. **`--path <dir>`** — Glob all matching files in the given directory. If no files found, report that and stop.
@@ -61,11 +65,11 @@ Group the in-scope files by the scope groups defined in `.claude/skills.md`. Dis
 
 ### Phase 1: Parallel Convention Review
 
-Launch one **general-purpose agent per non-empty scope group simultaneously** using `mode: "bypassPermissions"` and `model: "sonnet"`. Each agent receives:
+Launch one agent per non-empty scope group simultaneously. Use read-only exploration agents in review mode and general-purpose agents in fix mode. Each agent receives:
 1. The exact list of files it must check (only the in-scope files in its scope group)
 2. Instructions to **read `CONVENTIONS.md` first** as the source of truth for all conventions
 3. If the config specifies convention sections per scope, tell the agent which sections to focus on
-4. The **agent workflow** (Steps 1-5 below, summarized in the agent prompt)
+4. The **agent workflow** (Steps 1-4 below, summarized in the agent prompt)
 
 **File conflict rules** (critical for parallel safety):
 - Each agent owns its files exclusively — verify no overlap before dispatching
@@ -75,7 +79,7 @@ Launch one **general-purpose agent per non-empty scope group simultaneously** us
 
 ### Phase 2: Final Verification
 
-After all agents complete, run the **verification command** from `.claude/skills.md` to catch any cross-scope issues. If failures remain, fix them and invoke the `commit` skill to commit the fixes. Do NOT push.
+In fix mode, run the **verification command** from `.claude/skills.md` to catch cross-scope issues and fix failures without committing. In review mode, run it only if it is non-mutating; otherwise skip it and note that in the report. Never add auto-fix flags in review mode.
 
 ### Phase 3: Report
 
@@ -102,28 +106,19 @@ Each agent MUST follow this workflow:
 - Read `CLAUDE.md` for project-level rules
 - Internalize the applicable convention sections provided in the agent prompt
 
-#### Step 2 — Review and fix
+#### Step 2 — Review or fix
 - Read each file in scope fully
 - Check every applicable rule against the file
-- Fix violations in-place with minimal changes — only change what's needed to satisfy conventions
+- In review mode, report violations without modifying files
+- In fix mode, fix violations in-place with minimal changes — only change what's needed to satisfy conventions
 - Do NOT add comments like `# Updated`, `// Changed`, `# Added`, `// Removed`, etc.
-- Re-read each modified file to confirm the fix is correct and didn't introduce new issues
+- In fix mode, re-read each modified file to confirm the fix is correct and didn't introduce new issues
 
 #### Step 3 — Verify
-- Run the project's linter on the agent's owned files and fix any errors
-- Run the project's type checker on the agent's owned files and fix any errors
-- Run the project's formatter on the agent's owned files and fix any formatting issues
-- If tests exist for modified files, run them to verify they still pass
-- Do NOT skip linter/type checker fixes — fix them proactively
+- In review mode, run only non-mutating checks and report errors
+- In fix mode, run the project's linter, type checker, formatter, and relevant tests on owned files; fix resulting errors
 - Do NOT add suppress comments unless there is genuinely no other way
 
-#### Step 4 — Atomic commit
-- Stage only the files modified by convention fixes (only files in this agent's scope)
-- Never use `git add -A` or `git add .`
-- If no files were modified, skip the commit and report "no violations found"
-- Commit message format: `style(<scope>): <description>` where `<scope>` is the scope group name
-- Do NOT push
-- Check CLAUDE.md for commit rules (e.g., some projects forbid `Co-Authored-By` lines)
-
-#### Step 5 — Report
+#### Step 4 — Report
 - Return a summary listing: files checked, violations found (with rule name), violations fixed, any issues that could not be auto-fixed
+- Do NOT commit or push; leave fix-mode changes for the user to review

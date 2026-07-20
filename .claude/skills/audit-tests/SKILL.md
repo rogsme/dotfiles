@@ -5,20 +5,24 @@ description: >-
   test files, detect anti-patterns in tests, or clean up test structure. Also
   use when the user says "audit tests", "check test quality", "find bad tests",
   "clean up test suite", or wants a structural review of the testing layer.
-  Requires .claude/skills.md with test structure configured.
-argument-hint: "[--branch <target> | --path <dir> | --all]"
+  Audits are read-only unless the user explicitly asks to fix issues or passes
+  --fix. Requires .claude/skills.md with test structure configured.
+argument-hint: "[--branch <target> | --path <dir> | --all] [--fix]"
 ---
 
 # Audit Tests
 
-Audit the test suite for structural issues, naming violations, and quality problems. Fixes orphaned and misnamed test files in place; reports-only for missing tests.
+Audit the test suite for structural issues, naming violations, and quality problems. Report findings by default; apply changes only with explicit fix intent.
 
 **Arguments:** `$ARGUMENTS` controls the scope:
 
 - `--branch <target>` — Only audit test files for source files changed between `<target>` and HEAD.
 - `--path <dir>` — Only audit files in the given directory.
 - `--all` — Full project audit.
+- `--fix` — Apply fixable changes after the audit. May be combined with any scope.
 - *(empty)* — Auto-detect from PR base branch. If no PR found, stop with usage help.
+
+Treat an explicit request such as "fix the test structure" or "clean up the test suite" as fix mode. Plain audit, check, or review requests are read-only.
 
 ---
 
@@ -36,13 +40,13 @@ If `.claude/skills.md` does not exist or has no `## Audit Tests` section, **stop
 Also read:
 - `CONVENTIONS.md` to understand the project's test naming and structure conventions
 - `TEST_PATTERNS.md` to understand test quality anti-patterns (needed for Audit 10)
-- `CLAUDE.md` for project-level rules and commit conventions
+- `CLAUDE.md` for project-level rules
 
 ---
 
 ## Phase 0: Scope Resolution
 
-Parse `$ARGUMENTS` to determine the mode:
+Detect and remove `--fix` before resolving scope, then parse the remaining `$ARGUMENTS`:
 
 1. **`--branch <target>`** — Get changed source files via `git diff --name-only`. For each source file, include its corresponding test file in scope.
 2. **`--path <dir>`** — Set scope to the given directory.
@@ -101,9 +105,9 @@ Check against the anti-patterns defined in `TEST_PATTERNS.md`:
 
 ---
 
-## Phase 2: Fix Orphaned and Misnamed Files
+## Phase 2: Optional Fixes
 
-After all sub-agents complete, review reports. For fixable issues, launch **general-purpose agents** using `mode: "bypassPermissions"`:
+If fix mode was not requested, do not modify files and continue to the report with recommended actions. In fix mode, review all findings and launch general-purpose agents for fixable issues:
 
 ### Fixable (apply changes):
 - **Orphaned test files** (Audit 2): Merge contents into correct test file, delete orphan via `git rm`
@@ -122,24 +126,25 @@ After all sub-agents complete, review reports. For fixable issues, launch **gene
 Each fix agent MUST:
 1. Read all involved files before making changes
 2. Run the project's linter on modified files
-3. Invoke the `commit` skill to commit the changes
-4. Do NOT push
+3. Do NOT commit or push; leave changes for the user to review
 
 ---
 
 ## Phase 3: Verification
 
-After all fixes:
+After fixes in fix mode:
 1. Run the **verification command** from config to ensure all tests are still discoverable
 2. If any collection errors occur, fix immediately
+
+Skip this phase in read-only mode.
 
 ---
 
 ## Phase 4: Report
 
-Present a consolidated report:
+Present a consolidated report. In read-only mode, list proposed changes instead of changes applied.
 
-### Changes Applied
+### Changes Applied (fix mode) / Proposed Changes (read-only mode)
 | Change | File | Details |
 |--------|------|---------|
 | Renamed | `old.test.ts` -> `New.test.tsx` | Match source |
