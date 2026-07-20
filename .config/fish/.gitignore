@@ -1,2 +1,6 @@
 fish_history
 personal_abbr.fish
+functions/tide/*
+functions/fish_prompt.fish
+/functions/_tide*
+fish_variable*
