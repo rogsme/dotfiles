@@ -1,0 +1,28 @@
+# Worktrunk user config — personal preferences.
+# Docs: https://worktrunk.dev/config/
+# Backup of original (with generated reference comments): config.toml.bak
+
+# Centralized worktrees: ~/code/worktrees/<repo>/<branch>
+# sanitize_hash appends a short hash only when sanitization changes the name,
+# so `feature/auth` and `feature-auth` never collide.
+worktree-path = "~/code/worktrees/{{ repo }}/{{ branch | sanitize_hash }}"
+
+# LLM-generated commit messages via OpenCode (lazer/glm-5.2, low reasoning).
+[commit.generation]
+command = "opencode run -m lazer/glm-5.2 --variant low"
+
+# Interactive picker: use delta for diff previews, sized to terminal width.
+[switch.picker]
+pager = "delta --paging=never --width=$COLUMNS"
+
+# Copy gitignored files (deps, .env, caches) from the primary worktree
+# so a new worktree can run the full server immediately.
+[post-start]
+copy = "wt step copy-ignored"
+
+# Aliases — run as `wt <name>`.
+[aliases]
+# Create a worktree and launch OpenCode there.
+#   wt agent feature-auth              -> interactive TUI
+#   wt agent feature-auth -- "Fix..."  -> TUI seeded with --prompt
+agent = "wt switch --create {{ args[0] }} --execute=opencode{% if args | length > 1 %} -- --prompt {{ args[1:] | join(' ') }}{% endif %}"
