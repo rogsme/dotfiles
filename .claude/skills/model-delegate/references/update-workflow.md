@@ -2,9 +2,7 @@
 
 Follow this when a lazer model is added, removed, replaced, or repriced, or
 when the user asks to re-run the model evals. This workflow owns ONLY this
-skill's routing table and eval records. Gateway registration is the
-`add-model` skill's job; the GSD reviewer panel is `gsd-update-reviewers`' job
-— point the user there for those.
+skill's routing table and eval records. 
 
 ## 1. Detect what changed
 
