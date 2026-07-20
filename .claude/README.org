@@ -22,6 +22,9 @@ The =settings.json= file configures Claude Code's behavior, including experiment
 definitions, and permission rules.
 
 ** Experimental Features
+:PROPERTIES:
+:ID:       08e60135-97b9-4900-b5ff-2c03605873ae
+:END:
 
 #+begin_src json
 "env": {
@@ -33,6 +36,9 @@ Enables the experimental agent teams feature, which allows spawning multiple Cla
 coordinate on tasks together.
 
 ** Hooks
+:PROPERTIES:
+:ID:       c55d6bb4-2397-40b7-955c-5e23381cdf6d
+:END:
 
 Hooks let you run shell commands in response to Claude Code lifecycle events. Two hooks are configured:
 
@@ -67,6 +73,9 @@ Hooks let you run shell commands in response to Claude Code lifecycle events. Tw
 #+end_src
 
 ** Permissions
+:PROPERTIES:
+:ID:       57447d18-bbe4-4fe3-8539-f6851581afd6
+:END:
 
 Sensitive files are denied from being read by Claude to prevent accidental exposure of secrets:
 
@@ -91,6 +100,9 @@ The =hooks/notify.sh= script sends push notifications via a self-hosted [[https:
 key piece that makes the async phone workflow possible.
 
 ** How It Works
+:PROPERTIES:
+:ID:       78a0fcca-c9af-402e-a25e-b6fca51fbe41
+:END:
 
 1. *SSH detection*: The script first checks if the current tmux session originated from an SSH connection.
    If not (i.e., working locally), it exits silently — no need for notifications when you're sitting at
@@ -104,6 +116,9 @@ key piece that makes the async phone workflow possible.
    which project Claude is working on.
 
 ** Event Types
+:PROPERTIES:
+:ID:       da1734d0-2f06-44c7-9c4c-11d288b2c81b
+:END:
 
 | Event      | Title                   | Priority  | Description                          |
 |------------+-------------------------+-----------+--------------------------------------|
@@ -112,6 +127,9 @@ key piece that makes the async phone workflow possible.
 | =error=    | Claude hit an error     | high      | Extracts error details from JSON     |
 
 ** Setup
+:PROPERTIES:
+:ID:       57b56719-1d5e-4713-a244-a278b55d7e0c
+:END:
 
 To use this hook, replace the placeholder values in =notify.sh=:
 
@@ -128,6 +146,9 @@ Global skills live in =~/.claude/skills/<name>/SKILL.md= and are available acros
 replace per-project command files by reading project-specific configuration at runtime.
 
 ** Simple Skills (read commands from CLAUDE.md)
+:PROPERTIES:
+:ID:       81775101-4819-4cff-a345-afc255eb3ebf
+:END:
 
 These follow a generic "run tool → fix errors → repeat → commit" loop. They discover the correct
 command by parsing the =## Commands= section of each project's =CLAUDE.md=.
@@ -139,6 +160,9 @@ command by parsing the =## Commands= section of each project's =CLAUDE.md=.
 | =/typecheck= | Fix type errors, pass type checking before commit/PR, CI type failures        |
 
 ** Complex Skills (read config from =.claude/skills.md=)
+:PROPERTIES:
+:ID:       c6b7803a-c520-4ffd-96c3-2cceacbb0136
+:END:
 
 These orchestrate multi-phase workflows with parallel sub-agents. They read project-specific
 configuration (scope groups, doc maps, exceptions, commands) from a per-project =.claude/skills.md=
@@ -153,6 +177,9 @@ file on-demand when invoked — keeping =CLAUDE.md= lean.
 | =/fill-test-gaps=       | Increase coverage, write missing tests, coverage-driven test generation |
 
 ** Pre-installed Skills
+:PROPERTIES:
+:ID:       d46b1357-a1ea-440d-8efb-1feb84a362ca
+:END:
 
 | Skill              | Purpose                                              |
 |--------------------+------------------------------------------------------|
@@ -160,6 +187,9 @@ file on-demand when invoked — keeping =CLAUDE.md= lean.
 | =/playwright-cli=  | Browser automation for web testing and data extraction|
 
 ** Per-Project Config (=.claude/skills.md=)
+:PROPERTIES:
+:ID:       f2a95bbc-11fe-47e5-9848-f660b25ea45b
+:END:
 
 Complex skills require a =.claude/skills.md= file in each project. Each section is named after the
 skill it configures (e.g., =## Review Conventions=, =## Audit Tests=). The file is only read when a
@@ -185,38 +215,6 @@ mirrored (src/tests/<dir>/test_<file>.py)
 ### Verification Command
 uv run pytest src/tests/ -v --co -q
 #+end_src
-
-* Get Shit Done (GSD)
-:PROPERTIES:
-:ID:       e6f70819-0234-5678-f012-456789012345
-:END:
-[[https://github.com/gsd-build/get-shit-done][GSD]] is a workflow orchestration layer for Claude Code that adds structured project management —
-roadmaps, phased execution, parallel agents, verification, and more.
-
-** Installation
-
-#+begin_src bash
-npx get-shit-done-cc@latest
-#+end_src
-
-Select *Claude Code* as the runtime and *global* for the installation scope. Verify with =/gsd:help=.
-
-** How It Fits Here
-
-GSD installs itself into =~/.claude/get-shit-done/=, which gets *wiped on every update*. Never treat
-files inside it as permanent. Custom patches are backed up to =~/.claude/gsd-patch-backups/= and
-documented in =~/.claude/gsd-customizations.md=. See =~/.claude/CLAUDE.md= for the full patching
-workflow.
-
-** Current Patches
-
-| Patched file     | What changed                                                      |
-|------------------+-------------------------------------------------------------------|
-| =review.md=      | 6-model adversarial review (5 OpenCode models + Claude Opus)      |
-| =ui-review.md=   | Cross-AI UI perspectives, score comparison, severity-based routing |
-| =verify-work.md= | =--auto= flag for playwright/curl automated testing before UAT    |
-
-After a =/gsd:update=, run =/gsd:reapply-patches= or restore manually from =gsd-patch-backups/=.
 
 * Remote Workflow Overview
 :PROPERTIES:
