@@ -1,140 +1,11 @@
 {
-  "agentPushNotifEnabled": true,
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
-  },
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
-  "hooks": {
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "async": false,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ],
-        "matcher": "AskUserQuestion"
-      },
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ],
-        "matcher": "ExitPlanMode"
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "~/.claude/hooks/notify.sh question",
-            "type": "command"
-          }
-        ],
-        "matcher": "AskUserQuestion"
-      },
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ],
-        "matcher": "AskUserQuestion"
-      },
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ],
-        "matcher": "ExitPlanMode"
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "bash '/home/roger/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": "*"
-      },
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "~/.claude/hooks/notify.sh stop",
-            "type": "command"
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "async": true,
-            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
-          }
-        ]
-      }
-    ]
+  "attribution": {
+    "commit": "",
+    "pr": ""
   },
-  "model": "claude-fable-5[1m]",
   "permissions": {
     "allow": [],
     "deny": [
@@ -144,17 +15,155 @@
       "Read(**/*.key)"
     ]
   },
-  "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": true,
+  "model": "claude-fable-5[1m]",
+  "hooks": {
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh question"
+          }
+        ]
+      },
+      {
+        "matcher": "AskUserQuestion",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "ExitPlanMode",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/home/roger/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh stop"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "async": true
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
+    "type": "command",
     "command": "npx -y ccstatusline@latest",
     "padding": 0,
-    "refreshInterval": 10,
-    "type": "command"
+    "refreshInterval": 10
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "ponytail@ponytail": true
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
   },
   "tui": "fullscreen",
-  "attribution": {
-    "commit": "",
-    "pr": ""
-  }
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
