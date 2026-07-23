@@ -4,7 +4,7 @@
   },
   "show_path": true,
   "include_gitignored_files": true,
-  "attribution": "false",
+  "attribution": false,
   "hooks": {
     "PermissionRequest": [
       {
