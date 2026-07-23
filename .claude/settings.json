@@ -152,5 +152,9 @@
     "refreshInterval": 10,
     "type": "command"
   },
-  "tui": "fullscreen"
+  "tui": "fullscreen",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
 }
