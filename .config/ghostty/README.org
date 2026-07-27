@@ -164,6 +164,13 @@ shell-integration-features = no-cursor
 # set: cursor-color = cell-foreground  and  cursor-text = cell-background
 #+end_src
 
+** Scroll
+:PROPERTIES:
+:ID:       77cceae5-a27d-4179-95b5-2444abd996c4
+:END:
+#+begin_src conf
+mouse-scroll-multiplier = precision:1,discrete:1.5
+#+end_src
 * Setting Up Auto-Tangle
 :PROPERTIES:
 :ID:       fae42d41-2163-436c-b0ed-7601e6682929

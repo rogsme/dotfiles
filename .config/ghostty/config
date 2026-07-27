@@ -95,3 +95,5 @@ shell-integration-features = no-cursor
 # Note: 'cursor-invert-fg-bg' is not a valid Ghostty option and has been removed.
 # To invert instead of using fixed colors, drop cursor-color/cursor-text above and
 # set: cursor-color = cell-foreground  and  cursor-text = cell-background
+
+mouse-scroll-multiplier = precision:1,discrete:1.5

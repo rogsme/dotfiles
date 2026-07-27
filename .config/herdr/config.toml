@@ -21,6 +21,7 @@ new_cwd = "follow"
 [ui]
 prompt_new_tab_name = false
 
+agent_panel_sort = "spaces"
 [keys]
 detach = "prefix+d"
 rename_workspace = "prefix+$"
