@@ -103,7 +103,7 @@ alias ..='cd ..'
 # Use 'eza' for directory listings: long format, all files, colors, icons, dirs first
 alias ls='eza -la --color=always --group-directories-first --icons'
 # Ping personal website
-alias pr='ping rogs.me'
+alias pr='ping -i 0.2 rogs.me'
 # Get current public IP address using ifconfig.me
 alias my-ip="curl ifconfig.me"
 # Use emacsclient to connect to a running Emacs daemon for faster startup
