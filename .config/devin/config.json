@@ -82,5 +82,8 @@
     "setup_complete": true
   },
   "theme_mode": "dark",
-  "version": 1
+  "version": 1,
+  "devin": {
+    "org_id": "org-6349925d39e44bba81883421b22b75ea"
+  }
 }
