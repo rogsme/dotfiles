@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "gpt-5-6-sol-high"
+    "model": "claude-5-fable-high"
   },
   "show_path": true,
   "include_gitignored_files": true,
