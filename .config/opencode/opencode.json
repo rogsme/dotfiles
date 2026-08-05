@@ -15,6 +15,11 @@
       "reasoningEffort": "high"
     }
   },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "reserved": 10000
+  },
   "tools": {
     "webfetch": true,
     "websearch": true
@@ -1106,20 +1111,16 @@
   ],
   "permission": {
     "read": {
-      "~/.config/opencode/get-shit-done/*": "allow",
-      "/tmp": "allow"
+      "/tmp/*": "allow"
     },
     "edit": {
-      "/tmp": "allow"
+      "/tmp/*": "allow"
     },
     "glob": {
-      "/tmp": "allow"
+      "/tmp/*": "allow"
     },
     "grep": {
-      "/tmp": "allow"
-    },
-    "external_directory": {
-      "~/.config/opencode/get-shit-done/*": "allow"
+      "/tmp/*": "allow"
     },
     "task": {
       "plan-reviewer": "deny"

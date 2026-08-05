@@ -8,7 +8,7 @@
         "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/unknown",
         "version": "unknown",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-07-09T17:33:53.937Z"
+        "lastUpdated": "2026-08-05T12:56:03.413Z"
       }
     ],
     "frontend-design@claude-plugins-official": [
@@ -18,7 +18,7 @@
         "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
         "version": "unknown",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-07-09T17:33:53.937Z"
+        "lastUpdated": "2026-08-05T12:56:03.413Z"
       },
       {
         "scope": "project",
@@ -60,10 +60,10 @@
       {
         "scope": "project",
         "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
-        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/superpowers/6.1.1",
-        "version": "6.1.1",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/superpowers/6.2.0",
+        "version": "6.2.0",
         "installedAt": "2026-06-15T14:05:18.272Z",
-        "lastUpdated": "2026-07-09T13:47:00.251Z"
+        "lastUpdated": "2026-08-05T12:56:05.206Z"
       }
     ],
     "ponytail@ponytail": [
