@@ -4,3 +4,4 @@ functions/tide/*
 functions/fish_prompt.fish
 /functions/_tide*
 fish_variable*
+conf.d/secrets.fish

@@ -132,6 +132,17 @@ Load configurations stored in separate files.
 source "$HOME/.config/fish/abbreviations.fish"
 #+end_src
 
+** Secrets
+:PROPERTIES:
+:ID:       5b3f2b1a-4c99-4a11-9f2e-4e1c9a5a0f01
+:END:
+Environment variables that contain API keys or other secrets live in =~/.config/fish/conf.d/secrets.fish=.
+Fish auto-sources every =*.fish= file in =conf.d/= at startup, so variables defined there are exported to
+every shell session (and any process the shell spawns, such as opencode). The file is listed in
+=.gitignore= so secrets are never committed to the dotfiles repository. Copy
+=conf.d/secrets.fish.example= to =conf.d/secrets.fish= and fill in your values; do not commit the real
+file.
+
 ** System Utilities
 :PROPERTIES:
 :ID:       53f4073c-9351-46af-a09c-0c2af2c16ae3
