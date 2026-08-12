@@ -101,7 +101,7 @@ alias mv='mv -i'
 # Shortcut to navigate to the parent directory
 alias ..='cd ..'
 # Use 'eza' for directory listings: long format, all files, colors, icons, dirs first
-alias ls='eza -la --color=always --group-directories-first --icons'
+alias ls='eza -la --color=always --group-directories-first --icons auto'
 # Ping personal website
 alias pr='ping -i 0.2 rogs.me'
 # Get current public IP address using ifconfig.me
