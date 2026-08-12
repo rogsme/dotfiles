@@ -26,6 +26,16 @@
             "async": false
           }
         ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -46,6 +56,16 @@
             "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
             "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
           }
         ]
       }
@@ -77,6 +97,16 @@
             "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
             "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
           }
         ]
       }
@@ -111,6 +141,15 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "Stop": [
@@ -130,6 +169,15 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -139,6 +187,71 @@
             "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
             "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
+            "timeout": 10
           }
         ]
       }
