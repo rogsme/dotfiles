@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "subagent_depth": 10,
+  "subagent_depth": 2,
   "default_agent": "plan",
   "theme": "system",
   "model": "openai/gpt-5.6-sol",
