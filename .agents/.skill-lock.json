@@ -1,0 +1,97 @@
+{
+  "version": 3,
+  "skills": {
+    "neon": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/neondatabase/agent-skills.git",
+      "skillPath": "skills/neon/SKILL.md",
+      "skillFolderHash": "60bf7ab6e2492f644250822aece1dbfb3ff9af24",
+      "installedAt": "2026-07-19T15:55:23.429Z",
+      "updatedAt": "2026-07-19T15:55:23.429Z"
+    },
+    "neon-postgres": {
+      "source": "neondatabase/agent-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/neondatabase/agent-skills.git",
+      "skillPath": "skills/neon-postgres/SKILL.md",
+      "skillFolderHash": "2406cadf9ccbf743f8b487146217041af2105c7a",
+      "installedAt": "2026-07-19T15:55:23.429Z",
+      "updatedAt": "2026-07-19T15:55:23.429Z"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/skills.git",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "skillFolderHash": "76a98a285cb0434f3d39e1a873823556330e398b",
+      "installedAt": "2026-07-19T15:55:25.501Z",
+      "updatedAt": "2026-07-19T15:55:25.501Z"
+    },
+    "skill-creator": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/anthropics/skills.git",
+      "skillPath": "skills/skill-creator/SKILL.md",
+      "skillFolderHash": "3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6",
+      "pluginName": "example-skills",
+      "installedAt": "2026-07-20T20:57:31.400Z",
+      "updatedAt": "2026-07-20T20:57:31.400Z"
+    },
+    "computer-use": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/computer-use/SKILL.md",
+      "skillFolderHash": "2072384f53670cb61d93f4f6264ad2d8f6b5239c",
+      "installedAt": "2026-08-12T14:41:14.283Z",
+      "updatedAt": "2026-08-12T14:41:14.283Z"
+    },
+    "orca-cli": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orca-cli/SKILL.md",
+      "skillFolderHash": "a5a90c9731fbee834eca6d655b39eaa795dd2323",
+      "installedAt": "2026-08-12T14:41:14.283Z",
+      "updatedAt": "2026-08-12T19:12:31.190Z"
+    },
+    "orchestration": {
+      "source": "stablyai/orca",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/stablyai/orca.git",
+      "skillPath": "skills/orchestration/SKILL.md",
+      "skillFolderHash": "9aa26fde93c0592e5983cdca1ccd33b402802255",
+      "installedAt": "2026-08-12T14:41:14.284Z",
+      "updatedAt": "2026-08-12T14:41:14.284Z"
+    },
+    "herdr": {
+      "source": "herdrdev/herdr",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/herdrdev/herdr.git",
+      "skillPath": "skills/herdr/SKILL.md",
+      "skillFolderHash": "4821f1d39ccae24b9b274b03184edaaf198a3994",
+      "installedAt": "2026-08-13T16:26:13.055Z",
+      "updatedAt": "2026-08-13T16:26:13.055Z"
+    }
+  },
+  "dismissed": {
+    "findSkillsPrompt": true
+  },
+  "lastSelectedAgents": [
+    "amp",
+    "antigravity",
+    "antigravity-cli",
+    "cline",
+    "codex",
+    "cursor",
+    "deepagents",
+    "gemini-cli",
+    "github-copilot",
+    "kimi-code-cli",
+    "opencode",
+    "warp",
+    "zed",
+    "claude-code"
+  ]
+}

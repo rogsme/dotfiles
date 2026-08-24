@@ -8,7 +8,7 @@
         "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/unknown",
         "version": "unknown",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-08-15T22:15:47.154Z"
+        "lastUpdated": "2026-08-18T13:47:58.857Z"
       }
     ],
     "frontend-design@claude-plugins-official": [
@@ -18,7 +18,7 @@
         "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/unknown",
         "version": "unknown",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-08-15T22:15:47.154Z"
+        "lastUpdated": "2026-08-18T13:47:58.856Z"
       },
       {
         "scope": "project",
