@@ -1110,7 +1110,6 @@
   },
   "plugin": [
     "opencode-scheduler",
-    "@dietrichgebert/ponytail",
     "@prevalentware/opencode-goal-plugin"
   ],
   "permission": {
