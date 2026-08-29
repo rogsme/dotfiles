@@ -12,6 +12,7 @@
     },
     "build": {
       "model": "lazer/glm-5.3",
+      "variant": "high",
       "reasoningEffort": "high"
     }
   },
