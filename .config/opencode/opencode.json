@@ -11,7 +11,7 @@
       "reasoningEffort": "high"
     },
     "build": {
-      "model": "openai/gpt-5.6-sol",
+      "model": "lazer/glm-5.3",
       "reasoningEffort": "high"
     }
   },
@@ -314,6 +314,91 @@
             }
           }
         },
+        "glm-5.3": {
+          "name": "GLM 5.3",
+          "attachment": false,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          },
+          "family": "glm",
+          "release_date": "2026-08-14",
+          "cost": {
+            "input": 1.4,
+            "output": 4.4,
+            "cache_read": 0.26
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
+        "glm-5.3-flash": {
+          "name": "GLM 5.3 Flash",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          },
+          "family": "glm",
+          "release_date": "2026-08-26",
+          "cost": {
+            "input": 0.15,
+            "output": 0.5,
+            "cache_read": 0.029
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "video",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            }
+          }
+        },
         "kimi-2.7-code": {
           "name": "Kimi K2.7 Code",
           "attachment": true,
@@ -473,6 +558,53 @@
               "text",
               "image",
               "video"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "interleaved": {
+            "field": "reasoning_content"
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "none": {
+              "reasoningEffort": "none"
+            }
+          }
+        },
+        "qwen-3.8-max": {
+          "name": "Qwen 3.8 Max",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": true,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 131072
+          },
+          "family": "qwen",
+          "release_date": "2026-08-03",
+          "cost": {
+            "input": 2,
+            "output": 6,
+            "cache_read": 0.25
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "video",
+              "pdf"
             ],
             "output": [
               "text"
