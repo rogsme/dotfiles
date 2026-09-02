@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "claude-5-fable-high"
+    "model": "fusion-claude-opus-5-medium-sidekick-gpt-5-6-luna-high"
   },
   "show_path": true,
   "include_gitignored_files": true,
