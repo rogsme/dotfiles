@@ -246,31 +246,6 @@
             }
           }
         },
-        "qwen-3-coder": {
-          "name": "Qwen 3 Coder",
-          "attachment": false,
-          "reasoning": true,
-          "temperature": true,
-          "tool_call": true,
-          "limit": {
-            "context": 262144,
-            "output": 65536
-          },
-          "family": "qwen",
-          "release_date": "2025-07-23",
-          "cost": {
-            "input": 0.22,
-            "output": 1
-          },
-          "modalities": {
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          }
-        },
         "glm-5.2": {
           "name": "GLM 5.2",
           "attachment": false,
@@ -400,52 +375,6 @@
             }
           }
         },
-        "kimi-2.7-code": {
-          "name": "Kimi K2.7 Code",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": false,
-          "tool_call": true,
-          "structured_output": true,
-          "limit": {
-            "context": 262144,
-            "output": 262144
-          },
-          "family": "kimi",
-          "release_date": "2026-06-12",
-          "cost": {
-            "input": 0.95,
-            "output": 4,
-            "cache_read": 0.19
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "video"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "interleaved": {
-            "field": "reasoning_content"
-          },
-          "variants": {
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "none": {
-              "reasoningEffort": "none"
-            }
-          }
-        },
         "kimi-k3": {
           "name": "Kimi K3",
           "attachment": true,
@@ -483,11 +412,8 @@
             "low": {
               "reasoningEffort": "low"
             },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "none": {
-              "reasoningEffort": "none"
+            "max": {
+              "reasoningEffort": "max"
             }
           }
         },
@@ -504,9 +430,9 @@
           "family": "minimax",
           "release_date": "2026-05-31",
           "cost": {
-            "input": 0.1,
-            "output": 0.4,
-            "cache_read": 0.02
+            "input": 0.3,
+            "output": 1.2,
+            "cache_read": 0.06
           },
           "modalities": {
             "input": [
@@ -551,8 +477,7 @@
           "cost": {
             "input": 0.4,
             "output": 1.6,
-            "cache_read": 0.04,
-            "cache_write": 0.5
+            "cache_read": 0.08
           },
           "modalities": {
             "input": [
@@ -626,52 +551,6 @@
             },
             "none": {
               "reasoningEffort": "none"
-            }
-          }
-        },
-        "claude-opus-4.8": {
-          "name": "Claude Opus 4.8",
-          "attachment": true,
-          "reasoning": true,
-          "temperature": false,
-          "tool_call": true,
-          "limit": {
-            "context": 1000000,
-            "output": 128000
-          },
-          "family": "claude-opus",
-          "release_date": "2026-05-28",
-          "cost": {
-            "input": 5,
-            "output": 25,
-            "cache_read": 0.5,
-            "cache_write": 6.25
-          },
-          "modalities": {
-            "input": [
-              "text",
-              "image",
-              "pdf"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "variants": {
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh"
-            },
-            "max": {
-              "reasoningEffort": "max"
             }
           }
         },
@@ -785,6 +664,53 @@
             "input": 10,
             "output": 50,
             "cache_read": 1,
+            "cache_write": 12.5
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
+          }
+        },
+        "claude-fable-5.1": {
+          "name": "Claude Fable 5.1",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1000000,
+            "output": 128000
+          },
+          "family": "claude-fable",
+          "release_date": "2026-09-01",
+          "cost": {
+            "input": 10,
+            "output": 50,
+            "cache_read": 0.25,
             "cache_write": 12.5
           },
           "modalities": {
@@ -945,20 +871,6 @@
           },
           "interleaved": {
             "field": "reasoning_content"
-          },
-          "variants": {
-            "high": {
-              "reasoningEffort": "high"
-            },
-            "low": {
-              "reasoningEffort": "low"
-            },
-            "medium": {
-              "reasoningEffort": "medium"
-            },
-            "xhigh": {
-              "reasoningEffort": "xhigh"
-            }
           }
         },
         "grok-4.6": {
@@ -1180,6 +1092,54 @@
             }
           }
         },
+        "gpt-6-astra": {
+          "name": "GPT-6 Astra",
+          "attachment": true,
+          "reasoning": true,
+          "temperature": false,
+          "tool_call": true,
+          "structured_output": true,
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          },
+          "family": "gpt",
+          "release_date": "2026-09-03",
+          "cost": {
+            "input": 10,
+            "output": 50,
+            "cache_read": 1,
+            "cache_write": 12.5
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "variants": {
+            "high": {
+              "reasoningEffort": "high"
+            },
+            "low": {
+              "reasoningEffort": "low"
+            },
+            "max": {
+              "reasoningEffort": "max"
+            },
+            "medium": {
+              "reasoningEffort": "medium"
+            },
+            "xhigh": {
+              "reasoningEffort": "xhigh"
+            }
+          }
+        },
         "mimo-2.5": {
           "name": "MiMo 2.5",
           "attachment": false,
@@ -1222,6 +1182,56 @@
             "input": 1,
             "output": 3,
             "cache_read": 0.2
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "glean": {
+          "name": "Glean",
+          "attachment": false,
+          "reasoning": false,
+          "temperature": true,
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          },
+          "family": "glean",
+          "release_date": "2026-07-07",
+          "cost": {
+            "input": 0,
+            "output": 0
+          },
+          "modalities": {
+            "input": [
+              "text"
+            ],
+            "output": [
+              "text"
+            ]
+          }
+        },
+        "glean-advanced": {
+          "name": "Glean Advanced",
+          "attachment": false,
+          "reasoning": false,
+          "temperature": true,
+          "tool_call": true,
+          "limit": {
+            "context": 131072,
+            "output": 32768
+          },
+          "family": "glean",
+          "release_date": "2026-07-07",
+          "cost": {
+            "input": 0,
+            "output": 0
           },
           "modalities": {
             "input": [

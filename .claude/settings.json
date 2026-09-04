@@ -13,7 +13,8 @@
       "Read(**/*credential*)",
       "Read(**/*.pem)",
       "Read(**/*.key)"
-    ]
+    ],
+    "defaultMode": "bypassPermissions"
   },
   "model": "claude-fable-5-1[1m]",
   "hooks": {
@@ -285,6 +286,8 @@
   },
   "tui": "fullscreen",
   "skipDangerousModePermissionPrompt": true,
+  "editorMode": "normal",
+  "autoCompactEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }

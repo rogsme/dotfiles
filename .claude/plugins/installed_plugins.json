@@ -5,20 +5,20 @@
       {
         "scope": "project",
         "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
-        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/ed404106fcd8",
-        "version": "ed404106fcd8",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/0120fb83da5d",
+        "version": "0120fb83da5d",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-08-28T19:30:28.271Z"
+        "lastUpdated": "2026-09-02T23:59:38.711Z"
       }
     ],
     "frontend-design@claude-plugins-official": [
       {
         "scope": "project",
         "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
-        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/ed404106fcd8",
-        "version": "ed404106fcd8",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/0120fb83da5d",
+        "version": "0120fb83da5d",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-08-28T19:30:28.271Z"
+        "lastUpdated": "2026-09-02T23:59:38.711Z"
       },
       {
         "scope": "project",
