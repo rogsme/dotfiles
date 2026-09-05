@@ -1,7 +1,7 @@
 ---
 description: Claude-Code-style plan mode with an approval loop and final plan handoff. Read-only planning agent that inspects code, asks focused questions, and writes an approved plan to .opencode/plans/*.md for a fresh Build session.
 mode: primary
-model: openai/gpt-5.6-sol
+model: openai/gpt-6-astra
 reasoningEffort: xhigh
 permission:
   edit:
