@@ -1,0 +1,27 @@
+{
+  "$schema": "https://opencode.ai/v2/cli.json",
+  "theme": {
+    "name": "system"
+  },
+  "keybinds": {
+    "leader": "ctrl+x",
+    "app.exit": "ctrl+c,<leader>q",
+    "prompt.editor": "<leader>e",
+    "theme.switch": "<leader>t"
+  },
+  "plugins": [
+    "@prevalentware/opencode-goal-plugin"
+  ],
+  "scroll": {
+    "acceleration": false
+  },
+  "diffs": {
+    "wrap": "word"
+  },
+  "session": {
+    "sidebar": "auto",
+    "scrollbar": false,
+    "thinking": "hide"
+  },
+  "animations": true
+}

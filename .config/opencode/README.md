@@ -30,11 +30,12 @@ The main configuration lives in `opencode.json`.
 
 ### Default Models
 
-- Default chat model: `openai/gpt-5.6-sol`
-- Planning agent model: `openai/gpt-5.6-sol`
-- Build agent model: `lazer/glm-5.2`
+- Default chat model: `openai/gpt-6-astra`
+- Planning agent model: `openai/gpt-6-astra`
+- Build agent model: `openai/gpt-6-sol`
+- Small model: `lazer/glm-5.3-flash`
 
-Both configured agents currently use `reasoningEffort: "medium"`.
+Both configured agents currently use `reasoningEffort: "high"`; build also uses `variant: "high"`.
 
 ### Enabled Tools
 
@@ -53,28 +54,35 @@ That instruction set is specifically aimed at non-interactive shell use. It teac
 The config defines a provider named `lazer` using `@ai-sdk/openai-compatible` with:
 
 - provider name: `Lazer`
-- base URL: `https://llm.lazertechnologies.com/v1`
+- base URL: `https://proxy.lazertechnologies.com/`
 
 ### Registered Models
 
 The `lazer` provider currently exposes these model IDs:
 
-- `deepinfra/MiniMaxAI/MiniMax-M2.5`
-- `deepinfra/Qwen/Qwen3-235B-A22B-Instruct-2507`
-- `deepinfra/Qwen/Qwen3-235B-A22B-Thinking-2507`
-- `deepinfra/Qwen/Qwen3-Coder-480B-A35B-Instruct`
-- `deepinfra/Qwen/Qwen3-Coder-480B-A35B-Instruct-Turbo`
-- `deepinfra/deepseek-ai/DeepSeek-V3.2`
-- `deepinfra/moonshotai/Kimi-K2.5`
-- `deepinfra/openai/gpt-oss-120b`
-- `deepinfra/openai/gpt-oss-120b-Turbo`
-- `deepinfra/zai-org/GLM-5`
-- `gemini/gemini-2.0-flash`
-- `gemini/gemini-2.5-flash`
-- `gemini/gemini-2.5-pro`
-- `gemini/gemini-3.5-flash`
-- `gemini/gemini-3.1-pro-preview`
-- `xai/grok-code-fast-1`
+- `claude-haiku-4.5`
+- `claude-opus-5.5`
+- `claude-sonnet-5`
+- `deepseek-v4-flash`
+- `deepseek-v4-pro`
+- `deepseek-v4.1-flash`
+- `gemini-3.1-pro`
+- `gemini-3.8-flash`
+- `gemma-4-31b`
+- `glean`
+- `glean-advanced`
+- `glm-5.3`
+- `glm-5.3-flash`
+- `gpt-5.6-terra`
+- `gpt-6-astra`
+- `gpt-6-luna`
+- `gpt-6-sol`
+- `gpt-oss-120b`
+- `grok-4.6`
+- `kimi-k3`
+- `minimax-m3`
+- `qwen-3.7-plus`
+- `qwen-3.8-max`
 
 These are presented in OpenCode with friendlier display names via the provider config.
 
@@ -113,24 +121,25 @@ The current OpenCode plugin list is:
 
 The `agents/` directory contains custom OpenCode agents.
 
-### `agents/opencode-expert.md`
+### `agents/claude-plan.md`
 
-This agent is a specialized OpenCode helper for:
-
-- setup and configuration
-- agents and permissions
-- providers and models
-- keybinds and workflows
-- OpenCode troubleshooting
-- migrations from other coding assistants into OpenCode
+A Claude-Code-style plan mode agent: read-only planning with an approval loop that writes approved plans to `.opencode/plans/*.md` for a fresh Build session.
 
 Current agent characteristics:
 
-- model: `lazer/gemini-3.5-flash`
+- model: `openai/gpt-6-astra`
 - mode: `primary`
-- edit permission: `ask`
+- edit permission: denied except for plan files
 
-The prompt is designed to be OpenCode-first, practical, and docs-driven.
+### `agents/plan-reviewer.md`
+
+A hidden read-only subagent that reviews draft implementation plans for missing assumptions, regression risks, file omissions, and weak verification.
+
+Current agent characteristics:
+
+- model: `openai/gpt-6-sol`
+- mode: `subagent`
+- edit permission: `deny`
 
 ## Configuration Guidelines
 
