@@ -26,3 +26,6 @@
     user = rogsme
 [init]
     defaultBranch = master
+[credential "https://git.rogs.me"]
+	helper = 
+	helper = !tea login helper
