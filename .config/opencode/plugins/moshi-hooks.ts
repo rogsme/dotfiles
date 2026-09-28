@@ -14,11 +14,15 @@ const helperBinary = "/home/roger/.local/bin/moshi-hook"
 // Mirrors internal/config.SocketPath. The MOSHI_SOCKET_PATH override wins
 // over the per-platform default so tests and dev daemons can point us at a
 // throwaway socket.
+//
 function resolveSocketPath(): string {
   const override = process.env.MOSHI_SOCKET_PATH
   if (override) return override
   if (process.platform === "darwin") {
     return pathJoin(homedir(), "Library", "Application Support", "Moshi", "moshi-hook.sock")
+  }
+  if (process.platform === "win32") {
+    return "\\\\.\\pipe\\moshi-hook"
   }
   if (process.env.XDG_RUNTIME_DIR) {
     return pathJoin(process.env.XDG_RUNTIME_DIR, "moshi-hook.sock")
@@ -116,68 +120,6 @@ function tmuxSocketFromEnv(value: string | undefined): string {
   return idx > 0 ? value.slice(0, idx) : ""
 }
 
-function herdrFocusedPane(session: string): string {
-  if (process.env.HERDR_ENV !== "1") return ""
-  const args: string[] = []
-  if (session) args.push("--session", session)
-  args.push("pane", "list")
-  try {
-    const result = spawnSync("herdr", args, { encoding: "utf8", timeout: 300 })
-    const text = typeof result.stdout === "string" ? result.stdout : ""
-    if (!text) return ""
-    const payload = JSON.parse(text) as { result?: { panes?: Array<{ pane_id?: string, focused?: boolean }> } }
-    const pane = payload.result?.panes?.find((p) => p.focused && p.pane_id)
-    return pane?.pane_id ?? ""
-  } catch {
-    return ""
-  }
-}
-
-function herdrPaneWorkspace(session: string, paneId: string): { paneId: string, workspaceId: string, workspace: string, tabId: string, tab: string } {
-  if (process.env.HERDR_ENV !== "1" || !paneId) return { paneId, workspaceId: "", workspace: "", tabId: "", tab: "" }
-  const paneArgs: string[] = []
-  if (session) paneArgs.push("--session", session)
-  paneArgs.push("pane", "get", paneId)
-  try {
-    const paneResult = spawnSync("herdr", paneArgs, { encoding: "utf8", timeout: 300 })
-    const paneText = typeof paneResult.stdout === "string" ? paneResult.stdout : ""
-    const panePayload = paneText ? JSON.parse(paneText) as { result?: { pane?: { pane_id?: string, workspace_id?: string, tab_id?: string } } } : {}
-    const canonicalPaneId = panePayload.result?.pane?.pane_id ?? paneId
-    let workspaceId = panePayload.result?.pane?.workspace_id ?? ""
-    let tabId = panePayload.result?.pane?.tab_id ?? ""
-    if (!workspaceId || !tabId) {
-      const paneListArgs: string[] = []
-      if (session) paneListArgs.push("--session", session)
-      paneListArgs.push("pane", "list")
-      const paneListResult = spawnSync("herdr", paneListArgs, { encoding: "utf8", timeout: 300 })
-      const paneListText = typeof paneListResult.stdout === "string" ? paneListResult.stdout : ""
-      const paneListPayload = paneListText ? JSON.parse(paneListText) as { result?: { panes?: Array<{ pane_id?: string, workspace_id?: string, tab_id?: string, focused?: boolean }> } } : {}
-      const panes = paneListPayload.result?.panes ?? []
-      const pane = panes.find((p) => p.pane_id === canonicalPaneId) ?? panes.find((p) => p.focused)
-      workspaceId = workspaceId || pane?.workspace_id || ""
-      tabId = tabId || pane?.tab_id || ""
-    }
-    if (!workspaceId) return { paneId: canonicalPaneId, workspaceId: "", workspace: "", tabId, tab: "" }
-    const workspaceArgs: string[] = []
-    if (session) workspaceArgs.push("--session", session)
-    workspaceArgs.push("workspace", "list")
-    const workspaceResult = spawnSync("herdr", workspaceArgs, { encoding: "utf8", timeout: 300 })
-    const workspaceText = typeof workspaceResult.stdout === "string" ? workspaceResult.stdout : ""
-    const workspacePayload = workspaceText ? JSON.parse(workspaceText) as { result?: { workspaces?: Array<{ workspace_id?: string, label?: string }> } } : {}
-    const workspace = workspacePayload.result?.workspaces?.find((w) => w.workspace_id === workspaceId)?.label ?? ""
-    const tabArgs: string[] = []
-    if (session) tabArgs.push("--session", session)
-    tabArgs.push("tab", "list", "--workspace", workspaceId)
-    const tabResult = spawnSync("herdr", tabArgs, { encoding: "utf8", timeout: 300 })
-    const tabText = typeof tabResult.stdout === "string" ? tabResult.stdout : ""
-    const tabPayload = tabText ? JSON.parse(tabText) as { result?: { tabs?: Array<{ tab_id?: string, label?: string }> } } : {}
-    const tab = tabPayload.result?.tabs?.find((t) => t.tab_id === tabId)?.label ?? ""
-    return { paneId: canonicalPaneId, workspaceId, workspace, tabId, tab }
-  } catch {
-    return { paneId, workspaceId: "", workspace: "", tabId: "", tab: "" }
-  }
-}
-
 function resolveTerminalContext(): TerminalContext {
   const tmuxPane = process.env.TMUX_PANE ?? ""
   const tmuxSocket = tmuxSocketFromEnv(process.env.TMUX)
@@ -199,16 +141,15 @@ function resolveTerminalContext(): TerminalContext {
   }
   const zellijSession = process.env.ZELLIJ_SESSION_NAME ?? ""
   const zellijPane = process.env.ZELLIJ_PANE_ID ?? ""
-  const herdrSession = process.env.HERDR_ENV === "1" ? process.env.HERDR_SESSION ?? "" : ""
-  const herdrInfo = herdrPaneWorkspace(
-    herdrSession,
-    process.env.HERDR_ENV === "1" ? process.env.HERDR_PANE_ID ?? herdrFocusedPane(herdrSession) : "",
-  )
-  const herdrPane = herdrInfo.paneId
-  const herdrWorkspaceId = herdrInfo.workspaceId
-  const herdrWorkspace = herdrInfo.workspace
-  const herdrTabId = herdrInfo.tabId
-  const herdrTab = herdrInfo.tab
+  // Herdr stamps pane identity into every pane's environment; labels are
+  // resolved daemon-side from these ids, so no herdr CLI runs in-process.
+  const inHerdr = process.env.HERDR_ENV === "1"
+  const herdrSession = inHerdr ? process.env.HERDR_SESSION ?? "" : ""
+  const herdrPane = inHerdr ? process.env.HERDR_PANE_ID ?? "" : ""
+  const herdrWorkspaceId = inHerdr ? process.env.HERDR_WORKSPACE_ID ?? "" : ""
+  const herdrWorkspace = ""
+  const herdrTabId = inHerdr ? process.env.HERDR_TAB_ID ?? "" : ""
+  const herdrTab = ""
   let terminalKind = ""
   if (tmuxSession) terminalKind = "tmux"
   else if (process.env.HERDR_ENV === "1") terminalKind = "herdr"
@@ -216,7 +157,7 @@ function resolveTerminalContext(): TerminalContext {
   return { terminalKind, tmuxSession, tmuxWindow, tmuxPane, tmuxSocket, zellijSession, zellijPane, herdrSession, herdrPane, herdrWorkspaceId, herdrWorkspace, herdrTabId, herdrTab }
 }
 
-const terminalContext = resolveTerminalContext()
+let terminalContext = resolveTerminalContext()
 
 function projectNameForCwd(cwd: string | undefined): string {
   return terminalContext.tmuxSession || terminalContext.herdrSession || terminalContext.zellijSession || projectNameFromCwd(cwd)
@@ -588,6 +529,20 @@ const lastUserPrompts = new Map<string, string>()
 const lastAssistantTitles = new Map<string, string>()
 const messageRoles = new Map<string, string>()
 const assistantTextByMessage = new Map<string, string>()
+const parentSessionBySession = new Map<string, string>()
+
+function rememberSessionOrigin(value: unknown): void {
+  if (!value || typeof value !== "object") return
+  const rec = value as Record<string, unknown>
+  const info = rec.info && typeof rec.info === "object" ? rec.info as Record<string, unknown> : rec
+  const sessionID = stringProp(info, "id", "sessionID", "sessionId") || stringProp(rec, "sessionID", "sessionId", "id")
+  const parentID = stringProp(info, "parentID", "parentId", "parent_id") || stringProp(rec, "parentID", "parentId", "parent_id")
+  if (sessionID && parentID) parentSessionBySession.set(sessionID, parentID)
+}
+
+function isChildSession(sessionID: string | undefined): boolean {
+  return !!sessionID && parentSessionBySession.has(sessionID)
+}
 
 function sessionKey(sessionID: string | undefined, cwd: string): string {
   return sessionID && sessionID.length > 0 ? sessionID : "cwd:" + cwd
@@ -865,6 +820,7 @@ const server: Plugin = async ({ directory, client, serverUrl }) => {
   modelLimitsReady = refreshOpenCodeModelLimits(client as unknown as Record<string, unknown>, directory)
   return ({
   "chat.message": async (input, output) => {
+    if (isChildSession(input.sessionID)) return
     const prompt = textFromParts(output.parts)
     const formatted = rememberUserPrompt(input.sessionID, directory, prompt)
     if (!formatted) return
@@ -872,11 +828,13 @@ const server: Plugin = async ({ directory, client, serverUrl }) => {
     const title = titleForPromptStart(input.sessionID, directory) || "OpenCode started"
     sendSessionUpdate("chat.message", input.sessionID, directory, undefined, "session_started", title, formatted)
   },
-  event: async ({ event }) => {
+  event: async ({ event }: { event: { type: string; properties?: unknown } }) => {
     const props = eventRecord(event)
+    rememberSessionOrigin(props)
     switch (event.type) {
       case "session.created": {
         const cwd = directoryFromProperties(props, directory)
+        if (isChildSession(sessionIDFromProperties(props))) break
         sendSessionUpdate("session.created", sessionIDFromProperties(props), cwd, undefined, "", "OpenCode started")
         break
       }
@@ -907,6 +865,7 @@ const server: Plugin = async ({ directory, client, serverUrl }) => {
         const statusType = statusTypeFromProperties(props)
         const cwd = directoryFromProperties(props, directory)
         const sessionID = sessionIDFromProperties(props)
+        if (isChildSession(sessionID)) break
         if (statusType === "busy") {
           break
         } else if (statusType === "idle") {
@@ -918,12 +877,15 @@ const server: Plugin = async ({ directory, client, serverUrl }) => {
       }
       case "session.idle": {
         const cwd = directoryFromProperties(props, directory)
+        if (isChildSession(sessionIDFromProperties(props))) break
         sendIdleIfActive("session.idle", sessionIDFromProperties(props), cwd)
         break
       }
       case "session.deleted": {
         const cwd = directoryFromProperties(props, directory)
-        sendSessionClosed("session.deleted", sessionIDFromProperties(props), cwd)
+        const sessionID = sessionIDFromProperties(props)
+        if (!isChildSession(sessionID)) sendSessionClosed("session.deleted", sessionID, cwd)
+        if (sessionID) parentSessionBySession.delete(sessionID)
         break
       }
       case "permission.asked":
@@ -976,7 +938,184 @@ const server: Plugin = async ({ directory, client, serverUrl }) => {
   })
 }
 
-export default {
-  id: "moshi-hooks",
-  server,
+
+// OpenCode 2.0.5 uses a separate plugin and event API. Keep the V1 server
+// entrypoint above: both loaders accept this definition and select their API.
+import type { Plugin as PluginV2 } from "@opencode/plugin"
+
+async function setup(ctx: PluginV2.Context) {
+  // V1 also loads definitions in its registration-only V2 host.
+  if (!ctx.session || !ctx.event) return
+  // A serve process (the shared background service, or a server TUIs attach
+  // to) inherits the environment of whichever terminal started it, not of the
+  // TUIs showing its sessions. The TUI half (moshi-hooks-tui) binds panes.
+  if (process.argv.includes("serve")) {
+    terminalContext = { ...terminalContext, terminalKind: "", tmuxSession: "", tmuxWindow: "", tmuxPane: "", tmuxSocket: "", zellijSession: "", zellijPane: "", herdrSession: "", herdrPane: "", herdrWorkspaceId: "", herdrTabId: "" }
+  }
+  const directory = ctx.location.directory
+  const controller = new AbortController()
+  const streams = new Set<ReadableStreamDefaultController<Uint8Array>>()
+  const encoder = new TextEncoder()
+  const owned = new Set<string>()
+  const running = new Set<string>()
+  const pendingPermissions = new Map<string, string>()
+  const sequence = new Map<string, number>()
+
+  // Expose the existing Moshi transcript protocol using the public V2 API.
+  // The plugin API exposes session.context, not the client's message/export
+  // APIs. Every request re-reads native state; after compaction this is the
+  // context retained by OpenCode rather than the full archived history.
+  const relay = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    idleTimeout: 0,
+    async fetch(req: Request) {
+      const url = new URL(req.url)
+      if (req.method !== "GET") return new Response("forbidden", { status: 403 })
+      if (url.pathname === "/global/health") return Response.json({ healthy: true })
+      if (url.pathname === "/event") {
+        let subscriber: ReadableStreamDefaultController<Uint8Array>
+        return new Response(new ReadableStream<Uint8Array>({
+          start(stream) { subscriber = stream; streams.add(stream); stream.enqueue(encoder.encode(": connected\n\n")) },
+          cancel() { streams.delete(subscriber) },
+        }), { headers: { "Content-Type": "text/event-stream" } })
+      }
+      const match = /^\/session\/([^/]+)\/message(?:\/([^/]+))?$/.exec(url.pathname)
+      if (!match || !owned.has(match[1])) return new Response("not found", { status: 404 })
+      try {
+        const messages = await ctx.session.context({ sessionID: match[1] })
+        const rows = messages.map((message) => openCodeV2Message(message, match[1])).filter(Boolean)
+        if (!match[2]) return Response.json(rows)
+        const row = rows.find((row) => row?.info.id === match[2])
+        return row ? Response.json(row) : new Response("not found", { status: 404 })
+      } catch {
+        return new Response("OpenCode transcript unavailable", { status: 502 })
+      }
+    },
+  })
+  moshiServerUrl = "http://127.0.0.1:" + relay.port
+
+  function publishChange(sessionID: string, messageID: string) {
+    if (!messageID) return
+    const data = encoder.encode("data: " + JSON.stringify({ type: "message.updated", properties: { sessionID, messageID } }) + "\n\n")
+    for (const stream of streams) {
+      try { stream.enqueue(data) } catch { streams.delete(stream) }
+    }
+  }
+
+  function finish(sessionID: string, eventName: string, title: string) {
+    for (const [id, owner] of pendingPermissions) {
+      if (owner === sessionID) pendingPermissions.delete(id)
+    }
+    if (!running.delete(sessionID)) return
+    sendSessionUpdate(eventName, sessionID, directory, undefined, "task_complete", title, lastUserPrompts.get(sessionID) || "")
+  }
+
+  async function consume() {
+    for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+      if (controller.signal.aborted) break
+      const data = event.data as Record<string, any>
+      const sessionID = data.sessionID
+      if (typeof sessionID !== "string") continue
+      // Subscribe is server-wide; a location plugin must not claim another
+      // project's sessions or let child sessions replace the pane owner.
+      if (!owned.has(sessionID)) {
+        const info = await ctx.session.get({ sessionID }).catch(() => null)
+        if (!info || info.parentID || info.location.directory !== directory) continue
+        owned.add(sessionID)
+      }
+      if ("durable" in event && event.durable) {
+        const previous = sequence.get(sessionID) ?? -1
+        if (event.durable.seq <= previous) continue
+        sequence.set(sessionID, event.durable.seq)
+      }
+      switch (event.type) {
+        case "session.created":
+          sendSessionUpdate(event.type, sessionID, directory, undefined, "", "OpenCode started")
+          break
+        // Prompt hooks run BEFORE admission and can fail or run twice. Only
+        // durable inbox admission is evidence that a real prompt was sent.
+        case "session.inbox.enqueued":
+          if (data.item.type === "user") {
+            const prompt = rememberUserPrompt(sessionID, directory, data.item.payload.text || "")
+            running.add(sessionID)
+            sendSessionUpdate("chat.message", sessionID, directory, undefined, "session_started", "OpenCode started", prompt)
+          }
+          break
+        case "session.execution.interrupted":
+          finish(sessionID, event.type, "OpenCode interrupted")
+          break
+        case "session.execution.succeeded":
+          finish(sessionID, event.type, "OpenCode complete")
+          break
+        case "session.execution.failed":
+          finish(sessionID, event.type, "OpenCode failed")
+          break
+        case "permission.asked": {
+          const requestID = data.id as string
+          pendingPermissions.set(requestID, sessionID)
+          // Do not await a human decision in the event reader: cancellation
+          // and terminal-side replies must continue to be processed.
+          void requestMoshiApproval({ ...data, permission: data.action, patterns: data.resources }, directory, event.type)?.then(async (result) => {
+            const reply = openCodeReplyForDecision(result?.decision)
+            if (reply && pendingPermissions.delete(requestID) && !controller.signal.aborted) {
+              await ctx.permission.reply({ sessionID, requestID, decision: reply })
+            }
+          }).catch(() => {})
+          break
+        }
+        case "permission.replied":
+          pendingPermissions.delete(data.requestID)
+          sendSessionUpdate(event.type, sessionID, directory)
+          break
+        case "session.deleted":
+          owned.delete(sessionID)
+          running.delete(sessionID)
+          sendSessionClosed(event.type, sessionID, directory)
+          break
+      }
+      publishChange(sessionID, data.assistantMessageID || data.messageID || data.inboxID || "")
+    }
+  }
+  void consume().catch((error) => {
+    if (!controller.signal.aborted) console.error("moshi-hooks: OpenCode event subscription failed", error)
+  })
+  return () => {
+    controller.abort()
+    for (const stream of streams) { try { stream.close() } catch {} }
+    streams.clear()
+    relay.stop(true)
+  }
 }
+
+// Normalize V2 native messages at the plugin boundary so existing Moshi
+// clients retain their OpenCode text, reasoning, tool and attachment renderer.
+function openCodeV2Message(message: any, sessionID: string) {
+  const role = message.type
+  if (role !== "user" && role !== "assistant") return null
+  const parts: any[] = []
+  if (role === "user") {
+    if (message.text) parts.push({ type: "text", text: message.text })
+    for (const file of message.files || []) parts.push({ type: "file", mime: file.mime, filename: file.name, url: "data:" + file.mime + ";base64," + file.data })
+  } else {
+    for (const part of message.content || []) {
+      if (part.type !== "tool") { parts.push(part); continue }
+      const state = part.state
+      parts.push({
+        type: "tool", callID: part.id, tool: part.name,
+        state: { ...state, status: state.status === "streaming" ? "pending" : state.status,
+          output: (state.content || []).filter((item: any) => item.type === "text").map((item: any) => item.text).join("\n"),
+          attachments: (state.content || []).filter((item: any) => item.type === "file").map((item: any) => ({ type: "file", mime: item.mime, filename: item.name, url: item.uri })),
+          error: typeof state.error === "string" ? state.error : state.error ? JSON.stringify(state.error) : undefined,
+          time: part.time,
+        },
+      })
+    }
+  }
+  // Content lives in parts only: duplicating it in info bypasses the client's
+  // normal part redaction and doubles large tool results on the wire.
+  const { content, text, files, ...info } = message
+  return { info: { ...info, role, sessionID, modelID: message.model?.id, providerID: message.model?.providerID }, parts }
+}
+
+export default { id: "moshi-hooks", server, setup }

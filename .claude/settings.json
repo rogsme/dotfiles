@@ -1,163 +1,139 @@
 {
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  },
+  "agentPushNotifEnabled": true,
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "permissions": {
-    "allow": [],
-    "deny": [
-      "Read(**/secrets/*)",
-      "Read(**/*credential*)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)"
-    ],
-    "defaultMode": "auto"
+  "autoCompactEnabled": true,
+  "editorMode": "normal",
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
   },
-  "model": "opus[1m]",
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "repo": "DietrichGebert/ponytail",
+        "source": "github"
+      }
+    }
+  },
   "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "async": true,
+            "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
+            "type": "command"
+          }
+        ],
+        "matcher": "permission_prompt"
+      }
+    ],
     "PermissionRequest": [
       {
         "hooks": [
           {
-            "type": "command",
+            "async": false,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": false
-          }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
+            "type": "command"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "AskUserQuestion"
       },
       {
-        "matcher": "ExitPlanMode",
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
+            "type": "command"
           }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
+        ],
+        "matcher": "ExitPlanMode"
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh question"
+            "command": "~/.claude/hooks/notify.sh question",
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "AskUserQuestion"
       },
       {
-        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "type": "command",
+            "command": "rtk hook claude",
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      },
+      {
+        "hooks": [
+          {
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "AskUserQuestion"
       },
       {
-        "matcher": "ExitPlanMode",
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
+            "type": "command"
           }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "rtk hook claude"
-          }
-        ]
+        ],
+        "matcher": "ExitPlanMode"
       }
     ],
     "SessionEnd": [
       {
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
+            "type": "command"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "*",
         "hooks": [
           {
-            "type": "command",
             "command": "bash '/home/roger/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": "*"
       },
       {
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
+            "type": "command"
           }
         ]
       }
@@ -166,26 +142,17 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "~/.claude/hooks/notify.sh stop"
+            "command": "~/.claude/hooks/notify.sh stop",
+            "type": "command"
           }
         ]
       },
       {
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
+            "type": "command"
           }
         ]
       }
@@ -194,100 +161,37 @@
       {
         "hooks": [
           {
-            "type": "command",
+            "async": true,
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "if [ -f '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -r '/home/roger/.orca/agent-hooks/claude-hook.sh' ] && [ -x '/home/roger/.orca/agent-hooks/claude-hook.sh' ]; then /bin/sh '/home/roger/.orca/agent-hooks/claude-hook.sh'; else { command -p cat 2>/dev/null || cat; } >/dev/null 2>&1 || :; fi",
-            "timeout": 10
+            "type": "command"
           }
         ]
       }
     ]
   },
-  "statusLine": {
-    "type": "command",
-    "command": "npx -y ccstatusline@latest",
-    "padding": 0,
-    "refreshInterval": 10
-  },
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "ponytail": {
-      "source": {
-        "source": "github",
-        "repo": "DietrichGebert/ponytail"
-      }
+  "model": "opus[1m]",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
     }
   },
-  "tui": "fullscreen",
+  "permissions": {
+    "allow": [],
+    "defaultMode": "auto",
+    "deny": [
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ]
+  },
+  "skipAutoPermissionPrompt": true,
   "skipDangerousModePermissionPrompt": true,
-  "editorMode": "normal",
-  "autoCompactEnabled": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "statusLine": {
+    "command": "npx -y ccstatusline@latest",
+    "padding": 0,
+    "refreshInterval": 10,
+    "type": "command"
+  },
+  "tui": "fullscreen"
 }
