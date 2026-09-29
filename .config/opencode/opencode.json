@@ -3,17 +3,16 @@
   "subagent_depth": 2,
   "default_agent": "plan",
   "theme": "system",
-  "model": "openai/gpt-6-astra",
+  "model": "openai/gpt-6.1-sol",
   "small_model": "lazer/glm-5.3-flash",
   "agent": {
     "plan": {
-      "model": "openai/gpt-6-astra",
-      "reasoningEffort": "high"
+      "model": "openai/gpt-6.1-sol",
+      "variant": "max"
     },
     "build": {
-      "model": "openai/gpt-6-sol",
-      "variant": "high",
-      "reasoningEffort": "high"
+      "model": "openai/gpt-6.1-sol",
+      "variant": "high"
     }
   },
   "compaction": {

@@ -1,139 +1,136 @@
 {
-  "agentPushNotifEnabled": true,
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "autoCompactEnabled": true,
-  "editorMode": "normal",
-  "enabledPlugins": {
-    "gopls-lsp@claude-plugins-official": true
+  "permissions": {
+    "allow": [],
+    "deny": [
+      "Read(**/secrets/*)",
+      "Read(**/*credential*)",
+      "Read(**/*.pem)",
+      "Read(**/*.key)"
+    ],
+    "defaultMode": "auto"
   },
-  "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-  },
-  "extraKnownMarketplaces": {
-    "ponytail": {
-      "source": {
-        "repo": "DietrichGebert/ponytail",
-        "source": "github"
-      }
-    }
-  },
+  "model": "opus[1m]",
   "hooks": {
     "Notification": [
       {
+        "matcher": "permission_prompt",
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
-        ],
-        "matcher": "permission_prompt"
+        ]
       }
     ],
     "PermissionRequest": [
       {
         "hooks": [
           {
-            "async": false,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": false
           }
         ]
       }
     ],
     "PostToolUse": [
       {
+        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
-        ],
-        "matcher": "AskUserQuestion"
+        ]
       },
       {
+        "matcher": "ExitPlanMode",
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
-        ],
-        "matcher": "ExitPlanMode"
+        ]
       }
     ],
     "PreToolUse": [
       {
+        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "command": "~/.claude/hooks/notify.sh question",
-            "type": "command"
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh question"
           }
-        ],
-        "matcher": "AskUserQuestion"
+        ]
       },
       {
+        "matcher": "Bash",
         "hooks": [
           {
-            "command": "rtk hook claude",
-            "type": "command"
+            "type": "command",
+            "command": "rtk hook claude"
           }
-        ],
-        "matcher": "Bash"
+        ]
       },
       {
+        "matcher": "AskUserQuestion",
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
-        ],
-        "matcher": "AskUserQuestion"
+        ]
       },
       {
+        "matcher": "ExitPlanMode",
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
-        ],
-        "matcher": "ExitPlanMode"
+        ]
       }
     ],
     "SessionEnd": [
       {
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
         ]
       }
     ],
     "SessionStart": [
       {
+        "matcher": "*",
         "hooks": [
           {
+            "type": "command",
             "command": "bash '/home/roger/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10,
-            "type": "command"
+            "timeout": 10
           }
-        ],
-        "matcher": "*"
+        ]
       },
       {
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
         ]
       }
@@ -142,17 +139,17 @@
       {
         "hooks": [
           {
-            "command": "~/.claude/hooks/notify.sh stop",
-            "type": "command"
+            "type": "command",
+            "command": "~/.claude/hooks/notify.sh stop"
           }
         ]
       },
       {
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
         ]
       }
@@ -161,37 +158,40 @@
       {
         "hooks": [
           {
-            "async": true,
+            "type": "command",
             "command": "'/home/roger/.local/bin/moshi-hook' claude-hook",
-            "type": "command"
+            "async": true
           }
         ]
       }
     ]
   },
-  "model": "opus[1m]",
-  "modelSettings": {
-    "claude-opus-5-5": {
-      "effortLevel": "xhigh"
-    }
-  },
-  "permissions": {
-    "allow": [],
-    "defaultMode": "auto",
-    "deny": [
-      "Read(**/secrets/*)",
-      "Read(**/*credential*)",
-      "Read(**/*.pem)",
-      "Read(**/*.key)"
-    ]
-  },
-  "skipAutoPermissionPrompt": true,
-  "skipDangerousModePermissionPrompt": true,
   "statusLine": {
+    "type": "command",
     "command": "npx -y ccstatusline@latest",
     "padding": 0,
-    "refreshInterval": 10,
-    "type": "command"
+    "refreshInterval": 10
   },
-  "tui": "fullscreen"
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
+    }
+  },
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "editorMode": "normal",
+  "autoCompactEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
 }
