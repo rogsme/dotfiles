@@ -195,3 +195,116 @@ export const HerdrAgentStatePlugin = async () => {
     },
   };
 };
+
+// OpenCode 2 plugin API. Same observable behavior as HerdrAgentStatePlugin
+// above; the V1 entrypoint stays for V1 host compatibility. NOTE: herdr
+// manages this file (HERDR_INTEGRATION_VERSION=8) — reinstalling or updating
+// the herdr integration overwrites it and removes this V2 block. Re-apply it
+// after a herdr integration update, or relocate it to a custom plugin file
+// beside this one.
+import { Plugin } from "@opencode/plugin";
+
+// V2 implementation: same observable behavior as HerdrAgentStatePlugin.
+async function setup(ctx) {
+  if (
+    process.env.HERDR_ENV !== "1" ||
+    !process.env.HERDR_SOCKET_PATH ||
+    !process.env.HERDR_PANE_ID
+  ) {
+    return;
+  }
+
+  const controller = new AbortController();
+  void (async () => {
+    // V2 events are { type, data }-shaped (data.sessionID, data.id,
+    // data.action, data.resources). This replicates the V1 event switch
+    // (lines 125–194 of the original above):
+    // - child-session tracking via session.created/updated (info.id + info.parentID),
+    // - state reporting via reportState/reportSession, same event-type mapping,
+    // - same "blocked without agent_session_id" behavior for child permissions/questions.
+    for await (const { type, data: rawData } of ctx.event.subscribe({ signal: controller.signal })) {
+      const data = rawData ?? {};
+      const sessionID =
+        typeof data.sessionID === "string" && data.sessionID ? data.sessionID : undefined;
+
+      const info = data.info;
+      if (info?.id && info.parentID) {
+        childSessions.add(info.id);
+      }
+      if (sessionID && childSessions.has(sessionID)) {
+        // Child session events are dropped so they cannot clobber the pane's
+        // root-agent state, but a subagent waiting on the user must still
+        // surface as blocked (and clear once answered). Report state only,
+        // without an agent_session_id, so the pane keeps the root session.
+        switch (type) {
+          case "permission.asked":
+          case "question.asked":
+            await reportState("blocked");
+            break;
+          case "permission.replied":
+          case "question.replied":
+          case "question.rejected":
+            await reportState("working");
+            break;
+          default:
+            break;
+        }
+        continue;
+      }
+
+      switch (type) {
+        case "session.created":
+          // A root session.created is a genuine new-session start (subagent
+          // creates are dropped above). Signal it so herdr replaces the pane's
+          // prior session id instead of treating the change as cross-talk.
+          await reportSession(sessionID, "new");
+          break;
+        case "session.updated":
+          await reportSession(sessionID);
+          break;
+        case "session.status": {
+          const state = stateFromSessionStatus(data.status);
+          if (state) {
+            await reportState(state, sessionID);
+          } else {
+            await reportSession(sessionID);
+          }
+          break;
+        }
+        case "tool.execute.before":
+        case "tool.execute.after":
+        case "permission.replied":
+        case "question.replied":
+        case "question.rejected":
+        case "session.compacted":
+          await reportState("working", sessionID);
+          break;
+        case "permission.asked":
+        case "question.asked":
+        case "session.error":
+          await reportState("blocked", sessionID);
+          break;
+        case "session.idle":
+          await reportState("idle", sessionID);
+          break;
+        case "session.deleted":
+          break;
+        default:
+          break;
+      }
+    }
+  })().catch(() => {});
+  await ctx.session.hook("prompt", async (event) => {
+    // V1 "chat.message" case: reportState("working", sessionID) unless child session.
+    const record = (event && (event.data ?? event)) ?? {};
+    const sessionID =
+      typeof record.sessionID === "string" && record.sessionID ? record.sessionID : undefined;
+    if (sessionID && childSessions.has(sessionID)) {
+      return;
+    }
+    await reportState("working", sessionID);
+  });
+  return () => controller.abort();
+}
+
+export default { id: "herdr-agent-state", server: HerdrAgentStatePlugin, setup };

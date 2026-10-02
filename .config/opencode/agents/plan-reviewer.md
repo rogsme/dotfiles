@@ -2,24 +2,21 @@
 description: Reviews a draft implementation plan for missing assumptions, regression risks, file omissions, and weak verification. Read-only only.
 mode: subagent
 hidden: true
-model: openai/gpt-6-sol
-reasoningEffort: xhigh
-permission:
-  edit: deny
-  bash:
-    "*": deny
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "ls*": allow
-    "pwd*": allow
-    "rg *": allow
-    "grep *": allow
-    "find *": allow
-  task:
-    "*": deny
-  webfetch: allow
-color: warning
+model: openai/gpt-6-sol#xhigh
+permissions:
+  - { action: edit, resource: "*", effect: deny }
+  - { action: shell, resource: "*", effect: deny }
+  - { action: shell, resource: "git diff*", effect: allow }
+  - { action: shell, resource: "git log*", effect: allow }
+  - { action: shell, resource: "git show*", effect: allow }
+  - { action: shell, resource: "ls*", effect: allow }
+  - { action: shell, resource: "pwd*", effect: allow }
+  - { action: shell, resource: "rg *", effect: allow }
+  - { action: shell, resource: "grep *", effect: allow }
+  - { action: shell, resource: "find *", effect: allow }
+  - { action: subagent, resource: "*", effect: deny }
+  - { action: webfetch, resource: "*", effect: allow }
+color: "#f59e0b"
 ---
 You are a read-only plan reviewer.
 

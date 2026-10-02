@@ -1,40 +1,35 @@
 ---
 description: Claude-Code-style plan mode with an approval loop and final plan handoff. Read-only planning agent that inspects code, asks focused questions, and writes an approved plan to .opencode/plans/*.md for a fresh Build session.
 mode: primary
-model: openai/gpt-6-astra
-reasoningEffort: xhigh
-permission:
-  edit:
-    "*": deny
-    ".opencode/plans/*.md": allow
-  bash:
-    "*": deny
-    "mkdir -p .opencode/plans": allow
-    "git status*": allow
-    "git diff*": allow
-    "git log*": allow
-    "git show*": allow
-    "git rev-parse*": allow
-    "git branch*": allow
-    "git ls-files*": allow
-    "~/.config/opencode/scripts/random-plan-name.sh*": allow
-    "/Users/roger/.config/opencode/scripts/random-plan-name.sh*": allow
-    "ls*": allow
-    "pwd*": allow
-    "rg *": allow
-    "grep *": allow
-    "find *": allow
-    "which *": allow
-  task:
-    "*": deny
-    "explore": allow
-    "plan-reviewer": allow
-  webfetch: allow
-  question: allow
-  external_directory:
-    "~/.config/opencode/templates/*": allow
-    "~/.config/opencode/scripts/*": allow
-color: accent
+model: openai/gpt-6-astra#xhigh
+permissions:
+  - { action: edit, resource: "*", effect: deny }
+  - { action: edit, resource: ".opencode/plans/*.md", effect: allow }
+  - { action: shell, resource: "*", effect: deny }
+  - { action: shell, resource: "mkdir -p .opencode/plans", effect: allow }
+  - { action: shell, resource: "git status*", effect: allow }
+  - { action: shell, resource: "git diff*", effect: allow }
+  - { action: shell, resource: "git log*", effect: allow }
+  - { action: shell, resource: "git show*", effect: allow }
+  - { action: shell, resource: "git rev-parse*", effect: allow }
+  - { action: shell, resource: "git branch*", effect: allow }
+  - { action: shell, resource: "git ls-files*", effect: allow }
+  - { action: shell, resource: "~/.config/opencode/scripts/random-plan-name.sh*", effect: allow }
+  - { action: shell, resource: "/Users/roger/.config/opencode/scripts/random-plan-name.sh*", effect: allow }
+  - { action: shell, resource: "ls*", effect: allow }
+  - { action: shell, resource: "pwd*", effect: allow }
+  - { action: shell, resource: "rg *", effect: allow }
+  - { action: shell, resource: "grep *", effect: allow }
+  - { action: shell, resource: "find *", effect: allow }
+  - { action: shell, resource: "which *", effect: allow }
+  - { action: subagent, resource: "*", effect: deny }
+  - { action: subagent, resource: "explore", effect: allow }
+  - { action: subagent, resource: "plan-reviewer", effect: allow }
+  - { action: webfetch, resource: "*", effect: allow }
+  - { action: question, resource: "*", effect: allow }
+  - { action: external_directory, resource: "~/.config/opencode/templates/*", effect: allow }
+  - { action: external_directory, resource: "~/.config/opencode/scripts/*", effect: allow }
+color: "#22d3ee"
 ---
 <system-reminder>
 # Plan Mode - System Reminder

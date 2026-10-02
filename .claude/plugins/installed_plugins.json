@@ -68,6 +68,16 @@
         "lastUpdated": "2026-09-24T18:46:34.021Z",
         "gitCommitSha": "5bf4e78011075bcfc0dc295f0724994cd123ee71"
       }
+    ],
+    "vercel@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/vercel/0.50.0",
+        "version": "0.50.0",
+        "installedAt": "2026-10-01T14:27:02.336Z",
+        "lastUpdated": "2026-10-01T14:27:02.336Z",
+        "gitCommitSha": "882e66c2698689324c341b7bb8fd8beb92c27bf6"
+      }
     ]
   }
 }
