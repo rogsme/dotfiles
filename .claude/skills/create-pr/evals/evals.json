@@ -1,0 +1,82 @@
+{
+  "skill_name": "create-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a PR to dev. The destination's default branch is main. main has docs/PULL_REQUEST_TEMPLATE/bug.md and feature.md; the parser fix clearly matches bug.md. The feature worktree has an uncommitted .github/pull_request_template.md with different headings. Continue with committed changes only. gh is authenticated as release-bot, not rogsme. CONTRIBUTING requires no local checks; npm test exists but was not run. The bug template has Description, Related issue, Validation, and unchecked tests-run and reviewer-approved boxes. Issue 42 is confirmed related, but this change does not resolve it.",
+      "expected_output": "Use main's docs bug template, preserve its sections, keep certifications unchecked and record tests not run; use a neutral issue reference. Preserve pending work, avoid an optional suite, explicitly assign rogsme, and verify the completed PR rather than using @me or the uncommitted template.",
+      "files": [],
+      "expectations": [
+        "Selects the bug template from destination main, not the dirty local override",
+        "Explicitly assigns rogsme, not @me",
+        "Uses a completed body-file without --template",
+        "Keeps tests-run and reviewer-approved unchecked and does not run optional tests",
+        "Verifies the created PR's assignment and identity"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Open a ready PR to main. There are no destination-owned templates, but the owner's public .github repository has .github/PULL_REQUEST_TEMPLATE.md. The GitHub template GraphQL field is unsupported on this host. The REST contents lookup works. rogsme is assignable. Follow the inherited template.",
+      "expected_output": "Fall back to read-only template discovery in the public owner repository, preserve the inherited sections, submit completed body-file content with explicit head/base/repo and rogsme, and verify readiness and assignment. Do not use a generic body because the clone has no template.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create a PR to main assigned to rogsme and alex. Creation printed https://github.com/acme/parser/pull/73 but exited 1 with pull request update failed. The exact PR read-back confirms the expected title/body, head commit, main base, and ready state. Only alex is assigned. Adding an assignee is permitted, and a subsequent read-back can confirm both users.",
+      "expected_output": "Treat this as an existing PR created by this attempt, not a failed creation to retry. Add rogsme without removing alex, re-read and verify the complete result, and report the original metadata failure/recovery with the same URL. Never create a duplicate.",
+      "files": [],
+      "expectations": [
+        "Recognizes creation succeeded despite nonzero exit and avoids duplicate creation",
+        "Adds rogsme without removing alex",
+        "Verifies assignment after recovery",
+        "Reports the same URL with original error and recovery outcome"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a draft PR to acme/parser main from rogsme/parser main. origin is the fork; upstream is acme/parser. A PR from another fork named contributor/parser main already targets the same base. Follow acme/parser's templates and push only my source branch.",
+      "expected_output": "Resolve distinct source/destination repositories, allow same-named branches across forks, fetch upstream's base, reject the other fork as an exact duplicate, use explicit destination repo and rogsme:main head, draft and rogsme assignment, and verify the source identity/OID.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Create a PR to dev. The destination default branch contains a single template in both .github and docs, plus two equally plausible specialized templates. No guidance identifies which specialized template applies, and I did not select one. The CLI template lookup failed with a rate-limit error.",
+      "expected_output": "Distinguish rate-limit failure from absence, apply .github precedence for equivalent defaults, and clarify genuinely ambiguous template selection. Do not combine templates, select alphabetically, or quietly publish a generic body after failed discovery.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Create a PR to main with existing commits only and leave my dirty index/worktree alone. CONTRIBUTING explicitly requires a regression check. The pending worktree fixes a bug that is still present in the commit being pushed, so tests pass in the worktree. There is a staged-only file version and an unrelated untracked file.",
+      "expected_output": "Preserve all pending/index-only content. Run the required check against a safely isolated committed snapshot or report a blocker. Do not claim passing worktree tests certify the PR, stash/reset/commit pending work, or repair the failing committed code as part of PR creation.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Create a PR to main. The existing exact head/base PR is open, ready, and assigned to alex. rogsme is not assigned. It existed before this attempt; do not change that PR.",
+      "expected_output": "Return the existing URL, state, draft status, and assignment without pushing, duplicating, or editing it. Do not mistake the new-PR assignment requirement for authorization to modify an existing PR.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Create a PR to main. The assignee eligibility endpoint returns 404 for rogsme. gh is authenticated as a different user. No branch has been pushed yet.",
+      "expected_output": "Stop before publication and report the assignment blocker. Do not substitute @me, omit assignment, switch accounts interactively, or create an unassignable PR.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Investigate PR best practices and improve our create-pr skill. Show a preview of an example PR following the repository template. Do not publish or push anything.",
+      "expected_output": "Research or prepare a preview without git push or gh pr create, including --dry-run. Treat this as skill maintenance/description drafting, not permission to publish.",
+      "files": [],
+      "expectations": [
+        "Does not execute publication commands",
+        "Does not recommend gh pr create --dry-run as a harmless preview"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Create a PR to dev. dev has advanced since my branch diverged, but a merge analysis is conflict-free. One new committed file is named .env and may contain a credential. A pre-push hook can edit files. A later create request could time out without returning a URL.",
+      "expected_output": "Use fixed fetched-base/head OIDs and a three-dot PR diff, warn about being behind without rebasing, screen secrets without exposing contents and block suspected-secret publication. If publication becomes safe, inspect hook effects and pushed OID; resolve any uncertain creation by exact query and stop if verification is unavailable rather than retry blindly.",
+      "files": []
+    }
+  ]
+}
