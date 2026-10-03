@@ -714,8 +714,8 @@
             }
           ]
         },
-        "claude-sonnet-5": {
-          "name": "Claude Sonnet 5",
+        "claude-sonnet-5.5": {
+          "name": "Claude Sonnet 5.5",
           "capabilities": {
             "tools": true,
             "input": [
@@ -733,11 +733,11 @@
           },
           "family": "claude-sonnet",
           "cost": {
-            "input": 3,
-            "output": 15,
+            "input": 2,
+            "output": 10,
             "cache": {
-              "read": 0.3,
-              "write": 3.75
+              "read": 0.2,
+              "write": 2.5
             }
           },
           "variants": [
@@ -952,12 +952,6 @@
               "id": "xhigh",
               "settings": {
                 "reasoningEffort": "xhigh"
-              }
-            },
-            {
-              "id": "max",
-              "settings": {
-                "reasoningEffort": "max"
               }
             }
           ]
@@ -1214,8 +1208,8 @@
             }
           ]
         },
-        "grok-4.6": {
-          "name": "Grok 4.6",
+        "grok-4.7": {
+          "name": "Grok 4.7",
           "capabilities": {
             "tools": true,
             "input": [
@@ -1267,48 +1261,6 @@
               }
             }
           ]
-        },
-        "glean": {
-          "name": "Glean",
-          "capabilities": {
-            "tools": true,
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "limit": {
-            "context": 131072,
-            "output": 32768
-          },
-          "family": "glean",
-          "cost": {
-            "input": 0,
-            "output": 0
-          }
-        },
-        "glean-advanced": {
-          "name": "Glean Advanced",
-          "capabilities": {
-            "tools": true,
-            "input": [
-              "text"
-            ],
-            "output": [
-              "text"
-            ]
-          },
-          "limit": {
-            "context": 131072,
-            "output": 32768
-          },
-          "family": "glean",
-          "cost": {
-            "input": 0,
-            "output": 0
-          }
         }
       }
     }
