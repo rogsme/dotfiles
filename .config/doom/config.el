@@ -85,7 +85,7 @@
                   ("NEXT" . (:foreground "red" :background "orange" :weight bold))
                   ("DELEGATED" . (:foreground "white" :background "blue" :weight bold))
                   ("TODO" . (:foreground "white" :background "violet" :weight bold))
-                  ("WAITING" (:foreground "white" :background "#A9BE00" :weight bold))
+                  ("WAITING" . (:foreground "white" :background "#A9BE00" :weight bold))
                   ("SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
                   ("PROJ" . (:foreground "white" :background "deeppink3" :weight bold))
                   ("DONE" . (:foreground "white" :background "forest green" :weight bold))
@@ -381,18 +381,14 @@ related notes or tasks."
   (add-hook! python-mode #'lsp-deferred))
 
 (after! python
-  :init
   (require 'auto-virtualenv)
- (setq auto-virtualenv-global-dirs
-      '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
+  (setq auto-virtualenv-global-dirs
+        '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
   (add-hook 'python-mode-hook 'auto-virtualenv-setup)
   (setq enable-local-variables :all)
   (setq poetry-tracking-strategy 'projectile)
   (setq cov-coverage-mode t)
   (add-hook 'python-mode-hook 'cov-mode))
-
-(after! groovy-mode
-  (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
 
 (setq lsp-go-analyses '((shadow . t)
                         (simplifycompositelit . :json-false)))
@@ -528,7 +524,7 @@ related notes or tasks."
        :desc "OpenCode"                 "o" #'opencode-menu))
 
 (setq chatgpt-shell-model-version my/gpt-model)
-(setq chatgpt-shell-streaming "t")
+(setq chatgpt-shell-streaming t)
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-api-url-base openai-api-base)
 (setq chatgpt-shell-openai-key openai-api-key)
@@ -601,7 +597,10 @@ Now, write the commit message in this exact format:
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
-  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+  (setq aidermacs-extra-args
+        '("--no-gitignore" "--chat-mode" "ask" "--no-auto-commits"
+          "--cache-prompts" "--dark-mode" "--pretty" "--stream"
+          "--vim" "--cache-keepalive-pings" "2" "--no-show-model-warnings")))
 
 ;; Use vterm for the terminal backend (eat is default upstream)
 (setq claude-code-terminal-backend 'vterm)
@@ -655,7 +654,7 @@ Now, write the commit message in this exact format:
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
 (setq org-plantuml-exec-mode 'plantuml)
-(setq plantuml-server-url 'nil)
+(setq plantuml-server-url nil)
 
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))

@@ -39,7 +39,7 @@ First off, set my user and email
 :ID:       72bedc3d-e7fe-4cf6-9d1b-543a848ca672
 :END:
 
-I use a non-POSIX shell (fish), so I need to tell Emacs to sue the correct shells
+I use a non-POSIX shell (fish), so I need to tell Emacs to use the correct shells: =bash= for internal shell commands, and fish for interactive terminals (vterm).
 
 #+begin_src emacs-lisp
 (setq shell-file-name (executable-find "bash"))
@@ -68,7 +68,7 @@ This section configures the visual aspects of my Emacs experience. I prefer a cl
 :ID:       b4df4ef4-d0ca-4047-90b3-f4128425aa9f
 :END:
 
-This works only in Linux. On MacOS we keep the default fonts.
+This works on non-macOS systems. On MacOS we keep the default fonts.
 
 #+begin_src emacs-lisp
 (if (not (eq system-type 'darwin))
@@ -141,7 +141,7 @@ This section is organized into logical subsections, each focusing on a specific 
 :ID:       37915445-e875-4da0-bab0-3f8f8b8e89f5
 :END:
 
-This section contains the foundational settings for Org mode, including directory paths and basic behavior.
+This section contains the foundational settings for Org mode and basic buffer behavior.
 
 #+begin_src emacs-lisp
 (after! org
@@ -230,7 +230,7 @@ Visual appearance settings for Org mode, including fonts, colors, and formatting
                   ("NEXT" . (:foreground "red" :background "orange" :weight bold))
                   ("DELEGATED" . (:foreground "white" :background "blue" :weight bold))
                   ("TODO" . (:foreground "white" :background "violet" :weight bold))
-                  ("WAITING" (:foreground "white" :background "#A9BE00" :weight bold))
+                  ("WAITING" . (:foreground "white" :background "#A9BE00" :weight bold))
                   ("SOMEDAY" . (:foreground "white" :background "#00807E" :weight bold))
                   ("PROJ" . (:foreground "white" :background "deeppink3" :weight bold))
                   ("DONE" . (:foreground "white" :background "forest green" :weight bold))
@@ -514,7 +514,7 @@ Key components of this setup:
 - Mail Storage: Mail is stored locally in the Maildir format specified by =mu4e-maildir= (=~/.mail=),
   enabling offline access and fast searching via the =mu= indexer.
 - Configuration Structure: The settings are broken down into logical blocks below: Basic Setup,
-  Composing, Viewing, Sending, Account Specific, and Custom Marks.
+  Composing, Viewing, Sending, and Account Specific.
 
 *Note:* This setup requires the =mu= command-line tool and its Emacs interface, =mu4e=. If =mu4e= is
 installed system-wide (e.g., via a package manager) instead of through Doom's =:email mu4e= module, you
@@ -669,24 +669,14 @@ LSP (Language Server Protocol) provides most of these features in a standardized
 
 #+begin_src emacs-lisp
 (after! python
-  :init
   (require 'auto-virtualenv)
- (setq auto-virtualenv-global-dirs
-      '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
+  (setq auto-virtualenv-global-dirs
+        '("~/.virtualenvs/" "~/.pyenv/versions/" "~/.envs/" "~/.conda/" "~/.conda/envs/" "./.venv"))
   (add-hook 'python-mode-hook 'auto-virtualenv-setup)
   (setq enable-local-variables :all)
   (setq poetry-tracking-strategy 'projectile)
   (setq cov-coverage-mode t)
   (add-hook 'python-mode-hook 'cov-mode))
-#+end_src
-** Groovy
-:PROPERTIES:
-:ID:       8f8956c2-a7a3-4508-8f30-dc7a2f5e105b
-:END:
-
-#+begin_src emacs-lisp
-(after! groovy-mode
-  (define-key groovy-mode-map (kbd "<f4>") 'my/jenkins-verify))
 #+end_src
 
 ** Go
@@ -743,7 +733,7 @@ These are additional packages that aren't part of the standard Doom modules but 
 :END:
 
 This function brings up a comparison between the current ~init.el~ file and the example file
-(~templates/init.example.el~). Very useful for upgrading manually.
+(~static/init.example.el~). Very useful for upgrading manually.
 
 More info here: https://github.com/doomemacs/doomemacs/issues/581#issuecomment-645448095
 
@@ -873,7 +863,6 @@ like writing commit messages.
 
 I use the following cloud services:
 
-- GitHub Copilot: For real-time code suggestions while typing
 - ChatGPT Shell: For general programming assistance and problem-solving
 - Magit GPT: For automatically generating meaningful commit messages
 - Forge LLM: For generating PR descriptions
@@ -929,8 +918,9 @@ It helps me avoid hardcoding the same model names in different places.
 :ID:       783b30cc-a698-45c5-8609-164111535dab
 :END:
 
-This helper function loads the necessary environment variables for LLM tools from my `private.el`.
-I call it in places like Aider or Forge where shell commands or HTTP requests depend on the correct env.
+This helper function exports the =openai-api-base= and =openai-api-key= values defined in my
+~private.el~ into the environment (=OPENAI_API_BASE= and =OPENAI_API_KEY=) when the config loads,
+so external tools like Aider that run shell commands or make HTTP requests inherit the correct setup.
 
 #+begin_src emacs-lisp
 (defun my/setup-llm-env ()
@@ -1002,7 +992,7 @@ Each submenu entry corresponds to a different assistant or LLM feature:
 - =SPC l c=: Opens the ChatGPT Shell transient. Great for quick conversations, answering questions, or
   doing ad-hoc debugging.
 - =SPC l f=: Calls =my/set-forge-llm-provider= to switch the active provider for Forge LLM. Useful when I
-  want to use a different model (e.g. GLM-5 vs MiniMax M2.5) for generating pull request descriptions.
+  want to use a different model (e.g. GLM-5.3 Flash vs MiniMax M3) for generating pull request descriptions.
 - =SPC l m=: Calls =my/set-magit-gptcommit-provider= to switch the LLM used for generating commit messages.
 - =SPC l C=: Opens the Claude Code transient menu. This provides a project-aware Claude-powered assistant
   for code navigation, refactoring, and error fixing directly via the official Claude Code CLI.
@@ -1047,7 +1037,7 @@ UX inside Emacs.
 
 #+begin_src emacs-lisp
 (setq chatgpt-shell-model-version my/gpt-model)
-(setq chatgpt-shell-streaming "t")
+(setq chatgpt-shell-streaming t)
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-api-url-base openai-api-base)
 (setq chatgpt-shell-openai-key openai-api-key)
@@ -1131,7 +1121,7 @@ Now, write the commit message in this exact format:
 This section sets up Forge LLM to work with my Lazer model catalog, allowing me to dynamically choose
 which model to use with ~M-x my/set-forge-llm-provider~ or ~SPC l f~.
 
-The default provider is set to GLM-5, but I can call ~my/set-forge-llm-provider~ at any time to switch
+The default provider is set to GLM-5.3, but I can call ~my/set-forge-llm-provider~ at any time to switch
 providers on the fly. The selected LLM is then used by Forge LLM when I run pull request generation.
 
 The ~forge-llm-max-diff-size~ is set to ~nil~ to avoid truncating large diffs, ensuring I get full
@@ -1169,8 +1159,8 @@ Here’s a breakdown of the config:
 - API keys are loaded into the environment from variables defined in =private.el=, keeping them secure
   and out of version control.
 - =aidermacs-use-architect-mode=: Enables enhanced mode with structured input/output formatting.
-- =aidermacs-default-model=: Sets Qwen3 Coder 480B Turbo as the default model, but this can be switched
-  easily.
+- =aidermacs-default-model=: Sets Qwen 3.8 Max (=my/qwen-model=) as the default model, but this can be
+  switched easily.
 - =aidermacs-auto-commits=: Disabled to avoid unintended Git changes during a session.
 - =aidermacs-backend=: Uses =vterm= as the terminal backend for smoother interaction.
 - =aidermacs-vterm-multiline-newline-key=: Custom binding to insert newlines in vterm when chatting with the model.
@@ -1186,7 +1176,10 @@ all from within Emacs.
   (setq aidermacs-auto-commits nil)
   (setq aidermacs-backend 'vterm)
   (setq aidermacs-vterm-multiline-newline-key "S-<return>")
-  (add-to-list 'aidermacs-extra-args "--no-gitignore --chat-mode ask --no-auto-commits --cache-prompts --dark-mode --pretty --stream --vim --cache-keepalive-pings 2 --no-show-model-warnings"))
+  (setq aidermacs-extra-args
+        '("--no-gitignore" "--chat-mode" "ask" "--no-auto-commits"
+          "--cache-prompts" "--dark-mode" "--pretty" "--stream"
+          "--vim" "--cache-keepalive-pings" "2" "--no-show-model-warnings")))
 #+end_src
 
 ** Claude Code
@@ -1237,8 +1230,9 @@ Clipmon serves as my clipboard manager within Emacs. I chose it over alternative
 because it offers better integration with my workflow and provides automatic monitoring of clipboard
 changes. This allows me to maintain a history of copied text without manual intervention.
 
-The configuration below sets up Clipmon to check the clipboard every second and makes the kill ring
-accessible through M-y with helm integration.
+The configuration below would set up Clipmon to check the clipboard every second and make the kill
+ring accessible through M-y with helm integration. It is currently disabled and kept commented for
+future reference.
 
 #+begin_src emacs-lisp
 ;; (require 'clipmon)
@@ -1311,7 +1305,7 @@ accessible through M-y with helm integration.
 (setq plantuml-executable-path "/usr/bin/plantuml")
 (setq plantuml-default-exec-mode 'executable)
 (setq org-plantuml-exec-mode 'plantuml)
-(setq plantuml-server-url 'nil)
+(setq plantuml-server-url nil)
 
 (org-babel-do-load-languages 'org-babel-load-languages '((plantuml . t)))
 (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
