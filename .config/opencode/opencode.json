@@ -58,6 +58,36 @@
       "action": "websearch",
       "resource": "*",
       "effect": "allow"
+    },
+    {
+      "action": "shell",
+      "resource": "rtk *",
+      "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "~/.claude/*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "~/.claude/*",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "~/.claude/*",
+      "effect": "ask"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/home/roger/.local/share/rtk/tee/*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "/home/roger/.local/share/rtk/tee/*",
+      "effect": "allow"
     }
   ],
   "plugins": [
@@ -1090,6 +1120,67 @@
               "id": "none",
               "settings": {
                 "reasoningEffort": "none"
+              }
+            },
+            {
+              "id": "xhigh",
+              "settings": {
+                "reasoningEffort": "xhigh"
+              }
+            }
+          ]
+        },
+        "gpt-6.1-sol": {
+          "name": "GPT-6.1 Sol",
+          "capabilities": {
+            "tools": true,
+            "input": [
+              "text",
+              "image",
+              "pdf"
+            ],
+            "output": [
+              "text"
+            ]
+          },
+          "limit": {
+            "context": 1050000,
+            "input": 922000,
+            "output": 128000
+          },
+          "family": "gpt",
+          "structured_output": true,
+          "cost": {
+            "input": 2,
+            "output": 10,
+            "cache": {
+              "read": 0.1,
+              "write": 2.5
+            }
+          },
+          "variants": [
+            {
+              "id": "high",
+              "settings": {
+                "reasoningEffort": "high"
+              }
+            },
+            {
+              "id": "low",
+              "settings": {
+                "reasoningEffort": "low"
+              }
+            },
+            {
+              "id": "max",
+              "settings": {
+                "reasoningEffort": "max"
+              }
+            },
+            {
+              "id": "medium",
+              "settings": {
+                "reasoningEffort": "medium"
               }
             },
             {
