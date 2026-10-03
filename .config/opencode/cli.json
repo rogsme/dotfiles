@@ -10,7 +10,10 @@
     "acceleration": false
   },
   "diffs": {
-    "wrap": "word"
+    "wrap": "word",
+    "source": "turn",
+    "tree": true,
+    "view": "auto"
   },
   "session": {
     "sidebar": "auto",

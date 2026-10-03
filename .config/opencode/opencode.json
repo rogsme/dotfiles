@@ -11,10 +11,19 @@
     },
     "title": {
       "model": "lazer/glm-5.3-flash"
+    },
+    "explore": {
+      "model": "lazer/glm-5.3-flash#low"
+    },
+    "general": {
+      "model": "openai/gpt-6.1-sol#high"
     }
   },
+  "formatter": true,
   "compaction": {
-    "buffer": 10000
+    "keep": {
+      "tokens": 24000
+    }
   },
   "experimental": {
     "subagent_depth": 2
@@ -34,6 +43,21 @@
       "action": "external_directory",
       "resource": "/home/roger/.local/share/rtk/tee/*",
       "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "ask"
     }
   ],
   "plugins": [
