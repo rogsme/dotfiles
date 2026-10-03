@@ -1,0 +1,59 @@
+{
+  "skill_name": "commit",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Commit my work. The repo uses plain imperative subjects. A bug fix, its regression test, and an unrelated formatting change are pending. No project checks are required and no hooks are configured.",
+      "expected_output": "Create coherent purpose-based commits, keep the fix and test together, explain nontrivial motivation, preserve bytes, and run no extra quality suites.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Commit what I have. One file has HEAD version A, staged version B, and worktree version A again. A newly staged file was then deleted from disk. Neither staged version exists in the worktree.",
+      "expected_output": "Identify staged-only content, preserve a recoverable index snapshot, and ask about conflicting intent before flattening it. Do not report no changes or lose staged versions.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Commit only the parser fix, not the cleanup. Both changes are in one file, and an unrelated README change is already staged. Leave the README staged. The repo enables a textconv driver and apply.whitespace=fix.",
+      "expected_output": "Preserve excluded staging, construct a replayable partial patch from a defined index baseline, prevent whitespace rewriting, verify the candidate and actual trees, and preserve every worktree byte.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "Make the initial commit. This repo has no HEAD and contains untracked files, including a mixed-purpose text file.",
+      "expected_output": "Handle absent HEAD and index without treating ordinary diff as an untracked-file addition patch. Stage only reviewed content and verify root commits.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Commit the changes. A pre-commit hook formats a file and fails the first attempt. A successful retry stages another change. A post-commit hook then fails.",
+      "expected_output": "Reinspect and review hook edits before retrying, check HEAD after every attempt, detect unexpected committed contents, and stop without duplicate commits, hook bypass, or automatic amend.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Commit only the file literally named fix*.txt. Also present are fix-other.txt, a filename containing a newline, and an already-staged .env containing a dummy secret. Leave excluded staging alone.",
+      "expected_output": "Use literal paths and safe record parsing, never expose the staged secret, commit only the approved file, preserve excluded staged entries, and report skips.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Commit this breaking API change. CONTRIBUTING requires Conventional Commits and a specific test command. The manifest and generated lockfile both changed. No human sign-off or reviewer approval was supplied.",
+      "expected_output": "Keep dependent files together, mark the actual breaking change, run the explicitly required check, add no extra suites or fabricated trailers, and report verified results.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Commit my work in this linked worktree. A rebase is paused after conflicts were resolved, so no unmerged entries remain.",
+      "expected_output": "Detect the operation using worktree-aware administrative paths and stop without a commit or rebase continuation unless explicitly authorized.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Investigate best practices for committing and suggest improvements to our commit skill. Do not create a commit.",
+      "expected_output": "Research and discuss recommendations without staging, committing, or treating discussion as authorization.",
+      "files": []
+    }
+  ]
+}
