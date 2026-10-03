@@ -1,17 +1,11 @@
 {
   "$schema": "https://opencode.ai/v2/cli.json",
   "theme": {
-    "name": "system"
+    "name": "orng"
   },
   "keybinds": {
-    "leader": "ctrl+x",
-    "app.exit": "ctrl+c,<leader>q",
-    "prompt.editor": "<leader>e",
-    "theme.switch": "<leader>t"
+    "app.exit": "ctrl+c"
   },
-  "plugins": [
-    "@prevalentware/opencode-goal-plugin"
-  ],
   "scroll": {
     "acceleration": false
   },
