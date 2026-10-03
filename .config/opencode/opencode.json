@@ -20,6 +20,9 @@
     }
   },
   "formatter": true,
+  "websearch": {
+    "provider": "random"
+  },
   "compaction": {
     "keep": {
       "tokens": 24000
