@@ -115,6 +115,11 @@ Only the exit binding is overridden here. The other shortcuts are V2 defaults.
   package.json                    Pinned local plugin SDK dependency
   bun.lock                        Dependency lockfile
   .gitignore                      Dependencies, secrets, and generated files
+  commands/
+    save-plan.md                  Save a project-scoped plan for approval
+    execute-plan.md               Implement an approved plan
+  themes/
+    rogs.json                     Custom terminal theme
   plugins/
     rtk.ts                        Shell command rewriting
     worktrunk.ts                  Git branch activity markers
@@ -149,9 +154,11 @@ The main model and agent overrides in [opencode.json](opencode.json) are:
   "agents": {
     "plan": { "model": "openai/gpt-6.1-sol#max" },
     "build": { "model": "openai/gpt-6.1-sol#high" },
-    "title": { "model": "lazer/glm-5.3-flash" }
+    "title": { "model": "lazer/glm-5.3-flash" },
+    "explore": { "model": "lazer/glm-5.3-flash#low" },
+    "general": { "model": "openai/gpt-6.1-sol#high" }
   },
-  "compaction": { "buffer": 10000 },
+  "compaction": { "keep": { "tokens": 24000 } },
   "experimental": { "subagent_depth": 2 }
 }
 ```
@@ -163,13 +170,15 @@ This is an excerpt, not a replacement for the complete file.
 | Default model | GPT-6.1 Sol through the `openai` provider |
 | Plan agent | GPT-6.1 Sol with the `max` variant |
 | Build agent | GPT-6.1 Sol with the `high` variant |
+| General agent | GPT-6.1 Sol with the `high` variant |
 | Title agent | GLM 5.3 Flash through Lazer |
-| Compaction buffer | A 10,000-token reserve for automatic compaction |
+| Explore agent | GLM 5.3 Flash with the `low` variant through Lazer |
+| Compaction tokens | 24,000 tokens of recent context retained by compaction |
 | Subagent depth | Experimental nesting limit set to `2` |
 
 The `#variant` suffix selects a model variant for an agent. The root `model`
-setting uses the plain `provider/model` reference. Other built-in agents are
-not overridden in this file.
+setting uses the plain `provider/model` reference. The remaining built-in
+agents (`compaction`, `summary`) are not overridden.
 
 ### Lazer Provider
 
@@ -188,10 +197,9 @@ under `providers.lazer.models`.
 | Kimi | `kimi-k3` |
 | MiniMax | `minimax-m3` |
 | Qwen | `qwen-3.7-plus`, `qwen-3.8-max` |
-| Claude | `claude-sonnet-5`, `claude-opus-5.5`, `claude-haiku-4.5` |
+| Claude | `claude-sonnet-5.5`, `claude-opus-5.5`, `claude-haiku-4.5` |
 | GPT | `gpt-5.6-terra`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6.1-sol`, `gpt-6-luna` |
-| Grok | `grok-4.6` |
-| Glean | `glean`, `glean-advanced` |
+| Grok | `grok-4.7` |
 
 Each definition records capabilities, token limits, and pricing metadata. Most
 also define reasoning variants. The variants and accepted media differ by
@@ -211,7 +219,7 @@ GPT defaults and new GPT references should use `openai`, as required by
 
 ### Directory Permissions
 
-The global configuration adds three rules:
+The global configuration adds these rules:
 
 ```json
 {
@@ -230,13 +238,35 @@ The global configuration adds three rules:
       "action": "external_directory",
       "resource": "/home/roger/.local/share/rtk/tee/*",
       "effect": "allow"
+    },
+    {
+      "action": "external_directory",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "allow"
+    },
+    {
+      "action": "read",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "/home/roger/.agents/skills/*",
+      "effect": "ask"
+    },
+    {
+      "action": "websearch",
+      "resource": "*",
+      "effect": "allow"
     }
   ]
 }
 ```
 
-These remove the external-directory prompt for shared Claude files and RTK's
-saved command output. Edits under `~/.claude/` still request approval. Directory
+These remove the external-directory prompt for shared Claude files, RTK's
+saved command output, and the shared agent skills directory. Edits under
+`~/.claude/` and `/home/roger/.agents/skills/` still request approval.
+Websearch runs without a permission prompt. Directory
 access and permission to perform an action are separate checks; these rules do
 not grant unrestricted edits or shell access.
 
@@ -264,8 +294,20 @@ OpenCode also discovers skills from compatibility locations such as
 `~/.claude/skills` and `~/.agents/skills`, so shared skills can be available
 without being copied here. Project-local skills can live in `.opencode/skills/`.
 
-No custom slash commands or MCP servers are declared in this global file.
-Projects and plugins may add their own.
+### Commands
+
+The global [commands/](commands/) directory defines two slash commands for a
+plan-first workflow:
+
+- `/save-plan` runs in the Plan agent. It turns the current discussion into a
+  self-contained, project-scoped plan saved under `~/.opencode/plan/`, then
+  asks for approval.
+- `/execute-plan` runs in the Build agent. It resolves the plan by name,
+  re-checks its approval status and project identity, and implements it with
+  verification evidence in the final report.
+
+No MCP servers are declared in the global file. Projects and plugins may add
+their own.
 
 ## Terminal Settings
 
@@ -275,23 +317,36 @@ configuration:
 ```json
 {
   "$schema": "https://opencode.ai/v2/cli.json",
-  "theme": { "name": "orng" },
+  "theme": { "name": "rogs" },
   "keybinds": { "app.exit": "ctrl+c" },
   "scroll": { "acceleration": false },
-  "diffs": { "wrap": "word" },
+  "diffs": {
+    "wrap": "word",
+    "source": "turn",
+    "tree": true,
+    "view": "auto"
+  },
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "hide",
+    "new_location": "launch"
   },
+  "tabs": { "mode": "auto" },
+  "prompt": { "image_preview": true },
   "animations": true
 }
 ```
 
-The theme is `orng`. Scroll acceleration is disabled, and long diff lines wrap
-at words. The sidebar appears when there is enough space; the transcript
-scrollbar and reasoning blocks are hidden by default. Hiding reasoning changes
-its presentation, not the model's reasoning effort. Animations stay enabled.
+The theme is the custom `rogs` theme from [themes/rogs.json](themes/rogs.json).
+Scroll acceleration is disabled, and long diff lines wrap
+at words. Diffs open on the last turn's changes with the file tree shown, and
+the layout adapts to the available width. The sidebar appears when there is
+enough space; the transcript scrollbar and reasoning blocks are hidden by
+default. New sessions start in the TUI launch directory. Session tabs use the
+automatic mode, and image attachments preview above the prompt. Hiding
+reasoning changes its presentation, not the model's reasoning effort.
+Animations stay enabled.
 
 Use `Ctrl+P` and select **Open settings** to change common preferences. Valid
 edits to `cli.json` reload while the TUI is running.
