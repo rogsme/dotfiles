@@ -42,12 +42,22 @@ Keep every project folder inside ~/.opencode/plan/ and preserve existing files.
      Record an unborn branch or unavailable commit explicitly.
    - Objective, requirements, and exclusions
    - Agreed decisions and relevant code locations
-   - Ordered implementation steps
-   - Tests and acceptance criteria
+   - Ordered implementation steps with target files or modules
+   - Acceptance criteria, each with a verification command, its working
+     directory, and expected result; where automation is unavailable,
+     specify a concrete manual check and expected observation
    - Dependencies, risks, and unresolved questions
-   Include enough context for a fresh session to execute the plan.
    Keep credentials and secrets out of the file.
-4. Read back the saved file, summarize it, and use the question tool
+4. Read back the saved file and confirm that:
+   - No unresolved decision blocks implementation.
+   - Every implementation step identifies its target files or modules.
+     Check existing targets against the project; label planned new targets.
+   - Every acceptance criterion has a concrete verification method and
+     expected result. Check existing verification commands against the
+     project's scripts or tooling; label planned new verification tooling.
+   If any check fails, keep the plan draft, explain what is missing, and
+   resolve it before requesting approval.
+   Once all checks pass, summarize the saved plan and use the question tool
    to offer: Approve, Revise, or Cancel.
 5. On Revise, gather feedback, update the draft, and request approval again.
    Any substantive change to the reviewed plan requires renewed approval.

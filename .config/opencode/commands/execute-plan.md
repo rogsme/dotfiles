@@ -52,5 +52,11 @@ Before implementation:
    change, explain the conflict and request clarification before proceeding.
 
 Implement the approved plan while preserving unrelated user changes.
-Run its verification steps. Report completed work, test results,
-and any unmet acceptance criteria.
+Run every verification step from its specified working directory.
+In the final report, account for every implementation step as completed,
+failed, or blocked, and every acceptance criterion as passed, failed,
+or blocked. Include the verification commands or manual checks performed
+and their observed results. Mark unperformed verification as blocked and
+explain why; an unverified criterion is not passed.
+Claim the plan is complete only when every implementation step is completed
+and every acceptance criterion has passed with verification evidence.
