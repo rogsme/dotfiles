@@ -18,7 +18,14 @@
   "session": {
     "sidebar": "auto",
     "scrollbar": false,
-    "thinking": "hide"
+    "thinking": "hide",
+    "new_location": "launch"
   },
-  "animations": true
+  "animations": true,
+  "tabs": {
+    "mode": "auto"
+  },
+  "prompt": {
+    "image_preview": true
+  }
 }
