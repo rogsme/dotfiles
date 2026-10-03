@@ -487,12 +487,13 @@ related notes or tasks."
 
 (my/require-llm-backends)
 
-(defconst my/glm5-model "glm-5.2")
-(defconst my/gpt5-model "gpt-5.5")
-(defconst my/gpt5-mini-model "gpt-5.4-mini ")
+(defconst my/glm-model "glm-5.3")
+(defconst my/glm-flash-model "glm-5.3-flash")
+(defconst my/gpt-model "gpt-6.1-sol")
+(defconst my/gpt-mini-model "gpt-6-luna")
 (defconst my/minimax-model "minimax-m3")
-(defconst my/kimi-model "kimi-2.7-code")
-(defconst my/qwen-model "qwen-3.7-plus")
+(defconst my/kimi-model "kimi-k3")
+(defconst my/qwen-model "qwen-3.8-max")
 
 (defun my/setup-llm-env ()
   (setenv "OPENAI_API_BASE" openai-api-base)
@@ -509,12 +510,13 @@ related notes or tasks."
 (defun my/llm-provider (name)
   "Return a configured LLM provider instance by NAME."
   (pcase name
-    ("GLM-5.2"              (make-llm-lazer-compatible my/glm5-model))
-    ("GPT-5.5"              (make-llm-lazer-compatible my/gpt5-model))
-    ("GPT-5.4 Mini"         (make-llm-lazer-compatible my/gpt5-mini-model))
+    ("GLM-5.3"              (make-llm-lazer-compatible my/glm-model))
+    ("GLM-5.3 Flash"        (make-llm-lazer-compatible my/glm-flash-model))
+    ("GPT-6.1 Sol"          (make-llm-lazer-compatible my/gpt-model))
+    ("GPT-6 Luna"           (make-llm-lazer-compatible my/gpt-mini-model))
     ("MiniMax M3"           (make-llm-lazer-compatible my/minimax-model))
-    ("Kimi K2.7 Code"       (make-llm-lazer-compatible my/kimi-model))
-    ("Qwen 3.7 Plus"        (make-llm-lazer-compatible my/qwen-model))))
+    ("Kimi K3"              (make-llm-lazer-compatible my/kimi-model))
+    ("Qwen 3.8 Max"         (make-llm-lazer-compatible my/qwen-model))))
 
 (map! :leader
       (:prefix-map ("l" . "LLMs")
@@ -525,7 +527,7 @@ related notes or tasks."
        :desc "Claude Code (menu)"       "C" #'claude-code-transient
        :desc "OpenCode"                 "o" #'opencode-menu))
 
-(setq chatgpt-shell-model-version my/gpt5-model)
+(setq chatgpt-shell-model-version my/gpt-model)
 (setq chatgpt-shell-streaming "t")
 (setq chatgpt-shell-system-prompt "You are a senior developer knowledgeable in every programming language")
 (setq chatgpt-shell-api-url-base openai-api-base)
@@ -535,12 +537,12 @@ related notes or tasks."
   "Set the Magit GPT commit LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM for Magit GPT Commit: "
-                          '("GLM-5.2" "GPT-5.5" "GPT-5.5 Mini" "MiniMax M3" "Kimi K2.7 Code" "Qwen 3.7 Plus"))))
+                          '("GLM-5.3" "GLM-5.3 Flash" "GPT-6.1 Sol" "GPT-6 Luna" "MiniMax M3" "Kimi K3" "Qwen 3.8 Max"))))
   (setq magit-gptcommit-llm-provider (my/llm-provider provider))
   (message "Magit GPT provider set to %s" provider))
 
-;; Default to Qwen3 Coder 480B Turbo for commit generation.
-(setq magit-gptcommit-llm-provider (my/llm-provider "Kimi K2.7 Code"))
+;; Default to GLM-5.3 Flash for commit generation.
+(setq magit-gptcommit-llm-provider (my/llm-provider "GLM-5.3 Flash"))
 
 (setq llm-warn-on-nonfree nil)
 
@@ -584,12 +586,12 @@ Now, write the commit message in this exact format:
   "Set the Forge LLM provider dynamically."
   (interactive
    (list (completing-read "Choose LLM: "
-                          '("GLM-5.2" "GPT-5.5" "GPT-5.4 Mini" "MiniMax M3" "Kimi K2.7 Code" "Qwen 3.7 Plus"))))
+                          '("GLM-5.3" "GLM-5.3 Flash" "GPT-6.1 Sol" "GPT-6 Luna" "MiniMax M3" "Kimi K3" "Qwen 3.8 Max"))))
   (setq forge-llm-llm-provider (my/llm-provider provider))
   (message "Forge LLM provider set to %s" provider))
 
-;; Default to GLM-5 for PR descriptions.
-(setq forge-llm-llm-provider (my/llm-provider "GLM-5.2"))
+;; Default to GLM-5.3 for PR descriptions.
+(setq forge-llm-llm-provider (my/llm-provider "GLM-5.3"))
 
 (forge-llm-setup)
 (setq forge-llm-max-diff-size nil)
