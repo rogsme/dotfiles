@@ -61,6 +61,11 @@
       "action": "edit",
       "resource": "/home/roger/.agents/skills/*",
       "effect": "ask"
+    },
+    {
+      "action": "websearch",
+      "resource": "*",
+      "effect": "allow"
     }
   ],
   "plugins": [
