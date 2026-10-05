@@ -24,10 +24,12 @@ permission:
     "~/.eod/*/*": allow
     "~/.config/opencode/skills/eod/*": allow
     "~/.config/opencode/skills/eod/*/*": allow
+    "~/.claude/skills/chat-paste/*": allow
     "/tmp/eod-eval/*": allow
   skill:
     "*": deny
     "eod": allow
+    "chat-paste": allow
     "de-ai-writing": allow
     "avoid-ai-tropes": allow
   task:
@@ -58,7 +60,7 @@ For every request:
 2. Roger's message is the skill's arguments. The first word picks the mode: `internal`, `weekly`, `setup`, or anything else for a daily client EOD. A message that is just a voice dump is a daily client EOD.
 3. Load `de-ai-writing` and `avoid-ai-tropes` for every draft if they exist. Run the checker until it reports zero hard findings.
 4. For the "Before you send" section, call the `eod-review` subagent with the mode and file paths, as the skill's step 7 describes. You draft, it reviews. Don't do its job and don't skip it, unless the request says `EVAL MODE` and tells you to.
-5. Generate the local clipboard preview for every checker-clean daily, internal, and weekly draft, as step 7 describes. Include its link outside the message body and regenerate it after revisions.
+5. Load `chat-paste` and generate the local clipboard preview through the EOD adapter for every checker-clean daily, internal, and weekly draft, as step 7 describes. Follow the shared skill's browser-opening and delivery preferences. Include its link outside the message body and regenerate it after revisions.
 
 Shell: one command per call. Never chain with pipes, `;` or `&&`; each piece is checked against your allowlist and one unlisted piece denies the whole call.
 

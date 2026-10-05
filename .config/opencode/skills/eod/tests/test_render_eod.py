@@ -5,6 +5,7 @@ import re
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 SKILL = Path(__file__).resolve().parents[1]
 SCRIPT = SKILL / "scripts" / "render_eod.py"
@@ -30,7 +31,9 @@ class RenderTests(unittest.TestCase):
         title = "</script><img src=x onerror=alert(1)>__SCRIPTS__"
         page, _ = renderer.render("Public message", title, "client")
         data = re.search(
-            r'<script type="application/json" id="eod-data">(.*?)</script>', page, re.S
+            r'<script type="application/json" id="chat-paste-data">(.*?)</script>',
+            page,
+            re.S,
         )[1]
         self.assertEqual(json.loads(data)["title"], title)
         self.assertNotIn("<img src=x", page)
@@ -40,7 +43,7 @@ class RenderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
             draft = Path(root) / "2026-10-05.md"
             draft.write_text("Hey team!\n\nTODAY 🙂\n* First", encoding="utf-8")
-            command = ["python3", str(SCRIPT), str(draft)]
+            command = ["python3", str(SCRIPT), str(draft), "--no-open"]
             first = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(first.returncode, 0, first.stderr)
             output = draft.with_suffix(".html")
@@ -57,7 +60,9 @@ class RenderTests(unittest.TestCase):
             draft = Path(root) / "2026-10-05.md"
             draft.write_text("![image](https://example.com/a.png)")
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft)], capture_output=True, text=True
+                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                capture_output=True,
+                text=True,
             )
             self.assertEqual(result.returncode, 1)
             self.assertFalse(draft.with_suffix(".html").exists())
@@ -69,7 +74,9 @@ class RenderTests(unittest.TestCase):
             output = draft.with_suffix(".html")
             output.write_text("User-owned page")
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft)], capture_output=True, text=True
+                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                capture_output=True,
+                text=True,
             )
             self.assertEqual(result.returncode, 1)
             self.assertEqual(output.read_text(), "User-owned page")
@@ -82,7 +89,9 @@ class RenderTests(unittest.TestCase):
             target.write_text("User-owned page")
             draft.with_suffix(".html").symlink_to(target)
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft)], capture_output=True, text=True
+                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                capture_output=True,
+                text=True,
             )
             self.assertEqual(result.returncode, 1)
             self.assertEqual(target.read_text(), "User-owned page")
@@ -93,7 +102,9 @@ class RenderTests(unittest.TestCase):
                 path = Path(root) / name
                 path.write_text("Sensitive configuration")
                 result = subprocess.run(
-                    ["python3", str(SCRIPT), str(path)], capture_output=True, text=True
+                    ["python3", str(SCRIPT), str(path), "--no-open"],
+                    capture_output=True,
+                    text=True,
                 )
                 self.assertEqual(result.returncode, 1)
                 self.assertFalse(path.with_suffix(".html").exists())
@@ -103,6 +114,77 @@ class RenderTests(unittest.TestCase):
             config = Path(root) / "client.md"
             config.write_text("---\nchannel: Microsoft Teams chat\n---\n")
             self.assertEqual(renderer.channel(config), "teams")
+
+    def test_heading_policy_stays_in_the_eod_adapter(self):
+        self.assertEqual(
+            renderer.prepare_message("Hey team!\n\nQA ✅\n* Works", "client"),
+            "Hey team!\n\n## QA ✅\n* Works",
+        )
+        source = "Weekly Recap (Oct 1 to Oct 5) 🎯\n\nHey team! Short week.\n\nYour spreadsheets\nImports are done.\n\nVibes & Reflection 😄\nHappy with the result."
+        prepared = renderer.prepare_message(source, "weekly")
+        self.assertIn("## Your spreadsheets", prepared)
+        self.assertIn("## Vibes & Reflection 😄", prepared)
+        self.assertNotIn("## Hey team!", prepared)
+
+    def test_review_flags_are_rejected_only_by_the_eod_adapter(self):
+        for label in [
+            "Before you send:",
+            "Reviewer: Pat",
+            "📝 Friday reminder: say weekly",
+        ]:
+            with self.assertRaisesRegex(ValueError, "review flags"):
+                renderer.render(
+                    f"Public message\n\n{label}\nPrivate annotation", "Demo", "client"
+                )
+
+    def test_old_owned_eod_preview_migrates_to_shared_renderer(self):
+        with tempfile.TemporaryDirectory(prefix="eod-migrate-") as root:
+            draft = Path(root) / "2026-10-05.md"
+            draft.write_text("Hey team!\n\nTODAY 🙂\n* Works")
+            output = draft.with_suffix(".html")
+            output.write_text(
+                "<!doctype html>\n<!-- Generated by EOD formatter v1. -->\nOld generated preview"
+            )
+            result = subprocess.run(
+                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("<!-- Generated by chat-paste v1. -->", output.read_text())
+
+    def test_eod_uses_shared_implementation_without_local_assets(self):
+        self.assertFalse((SKILL / "assets" / "formatter.js").exists())
+        self.assertTrue(renderer.SHARED_SCRIPT.is_file())
+        page, _ = renderer.render(
+            "Hey team!\n\nSHIPPED\n• Works", "Demo", "internal", "slack"
+        )
+        data = json.loads(
+            re.search(
+                r'<script type="application/json" id="chat-paste-data">(.*?)</script>',
+                page,
+                re.S,
+            )[1]
+        )
+        self.assertEqual(data["destination"], "slack")
+        self.assertEqual(data["text"], "Hey team!\n\n## SHIPPED\n• Works")
+        self.assertIn("writing checker", data["revisionNote"])
+
+    def test_adapter_inherits_shared_delivery_policy(self):
+        shared = renderer.shared_formatter()
+        with tempfile.TemporaryDirectory(prefix="eod-open-") as root:
+            source = Path(root) / "2026-10-05.md"
+            source.write_text("Ready")
+            for flags, expected in [([], True), (["--no-open"], False)]:
+                with (
+                    patch.object(renderer, "shared_formatter", return_value=shared),
+                    patch.object(
+                        renderer.sys, "argv", [str(SCRIPT), str(source), *flags]
+                    ),
+                    patch.object(shared, "describe_preview") as deliver,
+                ):
+                    self.assertEqual(renderer.main(), 0)
+                    self.assertEqual(deliver.call_args.kwargs["open_browser"], expected)
 
 
 if __name__ == "__main__":

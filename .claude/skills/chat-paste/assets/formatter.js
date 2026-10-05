@@ -1,8 +1,8 @@
-/* EOD's offline formatter. Slack clipboard protocol reference: slackfmt (see references/formatting.md). */
+/* Offline chat formatter. Slack clipboard protocol reference: slackfmt (see references/clipboard.md). */
 (function (root, factory) {
   const api = factory(typeof module === "object" ? require("./vendor/marked.umd.js").marked : root.marked);
   if (typeof module === "object") module.exports = api;
-  else root.EODFormatter = api;
+  else root.ChatPasteFormatter = api;
 })(typeof globalThis !== "undefined" ? globalThis : this, function (marked) {
   "use strict";
   const emoji = {
@@ -16,33 +16,17 @@
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
   })[ch]);
 
-  function publicText(text) {
-    return String(text).replace(/\r\n?/g, "\n")
-      .split(/^\s{0,3}#{1,6}\s+Internal notes\b.*$/im)[0].trim();
-  }
-
-  function normalize(text, mode) {
-    const source = publicText(text);
+  function normalize(text) {
+    const source = String(text).replace(/\r\n?/g, "\n").trim();
     if (!source) throw new Error("The message is empty.");
     if (source.length > 100000) throw new Error("The message exceeds 100,000 characters.");
-    if (/^\s*(?:Before you send:|Reviewer:|.*Friday reminder:)/im.test(source)) {
-      throw new Error("Remove review flags and reminders. Paste only the message body.");
-    }
-    // Recognize the skill's plain-text headers without changing its saved writing format.
-    const lines = source.split("\n");
+    // Unicode bullets are a common plain-text input. Heading inference and
+    // content filtering belong to callers; only explicit Markdown is styled.
     let fenced = false;
-    const markdown = lines.map((line, index) => {
+    const markdown = source.split("\n").map(line => {
       if (/^\s*(?:```|~~~)/.test(line)) { fenced = !fenced; return line; }
       if (fenced) return line;
       if (/^\s*•\s+/.test(line)) return line.replace(/^(\s*)•\s+/, "$1* ");
-      const trimmed = line.trim();
-      const letters = trimmed.replace(/@\S+/g, "").match(/\p{L}/gu) || [];
-      const caps = letters.length >= 3 && letters.every(c => c === c.toUpperCase());
-      const weekly = mode === "weekly" && trimmed.length <= 100 &&
-        !/[.!?:]$/.test(trimmed) && !/^Hey\b/i.test(trimmed) &&
-        (index === 0 || !lines[index - 1].trim()) && Boolean(lines[index + 1]?.trim());
-      if (mode !== "markdown" && trimmed && !/^\s*(?:[#>*\-]|\d+[.)]\s)/.test(line) &&
-          (caps || /^Weekly Recap\b/.test(trimmed) || weekly)) return `## ${trimmed}`;
       return line;
     }).join("\n");
     return { source, markdown };
@@ -220,8 +204,8 @@
     return { ops };
   }
 
-  function format(text, { mode = "client" } = {}) {
-    const { source, markdown } = normalize(text, mode);
+  function format(text) {
+    const { source, markdown } = normalize(text);
     const lines = model(markdown);
     // Markdown parsers can treat under-indented children as root siblings. Check
     // the source hierarchy independently rather than silently flattening it.
@@ -250,13 +234,13 @@
     return { source, lines, html: toHTML(lines), plain, delta: toDelta(lines), warnings };
   }
 
-  return { format, publicText, escape };
+  return { format, escape };
 });
 
 if (typeof module === "object" && require.main === module) {
   try {
-    const { text, mode } = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
-    process.stdout.write(JSON.stringify(module.exports.format(text, { mode })));
+    const { text } = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+    process.stdout.write(JSON.stringify(module.exports.format(text)));
   } catch (error) {
     process.stderr.write(`${error.message}\n`);
     process.exitCode = 1;

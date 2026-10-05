@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Refresh the offline Markdown parser from a pinned, integrity-checked package."""
+"""Refresh chat-paste's offline parser from a pinned, integrity-checked package."""
 
 import base64
 import hashlib

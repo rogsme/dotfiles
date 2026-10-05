@@ -158,7 +158,7 @@ SECTION NAME <emoji>
 
 ## 7. Deliver
 
-For every daily, internal, and weekly update, read `<skill-dir>/references/formatting.md` and generate the clipboard preview from the saved, checker-clean draft. Regenerate it after every revision. A successful render and the printed preview path are required for delivery; report a rendering failure instead of calling the plain-text output formatted. Keep the saved writing format unchanged: the renderer handles rich headings and real lists.
+For every daily, internal, and weekly update, load the shared `chat-paste` skill, read `<skill-dir>/references/formatting.md`, and generate the clipboard preview through the EOD adapter from the saved, checker-clean draft. Follow `chat-paste` for browser opening and delivery preferences. Regenerate it after every revision. A successful render and the printed preview path are required for delivery; report a rendering failure instead of calling the plain-text output formatted. Keep the saved writing format unchanged: the adapter prepares rich headings and excludes private annotations before shared rendering.
 
 Reply with, in this order:
 
