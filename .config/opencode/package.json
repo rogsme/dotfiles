@@ -1,0 +1,6 @@
+{
+  "name": "opencode-config",
+  "dependencies": {
+    "@opencode/plugin": "2.0.22"
+  }
+}
