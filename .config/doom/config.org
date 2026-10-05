@@ -143,6 +143,13 @@ This section is organized into logical subsections, each focusing on a specific 
 
 This section contains the foundational settings for Org mode and basic buffer behavior.
 
+Key behaviors configured here:
+- Automatic line wrapping with =auto-fill-mode= at 105 columns
+- Disabling =flycheck-mode= so Org buffers always start without syntax checking, avoiding distractions and false positive warnings in notes and prose
+- Automatic saving of all Org buffers whenever a save occurs
+- Image drag-and-drop support via =org-download=
+- Automatic literate configuration tangling on save via =org-auto-tangle-mode=
+
 #+begin_src emacs-lisp
 (after! org
   ;; Include diary
@@ -157,12 +164,29 @@ This section contains the foundational settings for Org mode and basic buffer be
   (add-hook 'org-mode-hook #'auto-fill-mode)
   (setq-default fill-column 105)
 
+  ;; Disable Flycheck in Org mode
+  (add-hook 'org-mode-hook (lambda () (flycheck-mode -1)))
+
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
   (add-hook 'after-save-hook 'org-save-all-org-buffers)
   (require 'org-download)
   (add-hook 'dired-mode-hook 'org-download-enable)
   (add-hook 'org-mode-hook 'org-auto-tangle-mode))
+
+(after! flycheck
+  (setq flycheck-global-modes
+        (cond
+         ((eq flycheck-global-modes t)
+          '(not org-mode))
+         ((and (listp flycheck-global-modes)
+               (eq (car flycheck-global-modes) 'not))
+          (if (memq 'org-mode flycheck-global-modes)
+              flycheck-global-modes
+            (append flycheck-global-modes '(org-mode))))
+         ((listp flycheck-global-modes)
+          (delq 'org-mode flycheck-global-modes))
+         (t flycheck-global-modes))))
 #+end_src
 
 ** Task Management
