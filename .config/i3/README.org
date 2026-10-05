@@ -510,6 +510,7 @@ assign [class="Pcmanfm"] $ws7
 # 8: Misc
 assign [class="KeePassXC"] $ws8
 assign [class="Bitwarden"] $ws8
+assign [class="Obsidian"] $ws8
 assign [class="Joplin"] $ws9
 assign [class="kdeconnect.app"] $ws9
 assign [class="Liferea"] $ws9
