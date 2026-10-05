@@ -34,6 +34,7 @@ Client config and history are data, so they live outside the skill and survive r
 ~/.eod/<client>/YYYY-MM-DD.md         final client EOD (+ "## Internal notes", never pasted)
 ~/.eod/<client>/YYYY-MM-DD-internal.md
 ~/.eod/<client>/YYYY-MM-DD-weekly.md
+~/.eod/<client>/YYYY-MM-DD.html        generated clipboard preview (same suffix as its draft)
 ```
 
 ## 0. Mode and client
@@ -157,16 +158,19 @@ SECTION NAME <emoji>
 
 ## 7. Deliver
 
+For every daily, internal, and weekly update, read `<skill-dir>/references/formatting.md` and generate the clipboard preview from the saved, checker-clean draft. Regenerate it after every revision. A successful render and the printed preview path are required for delivery; report a rendering failure instead of calling the plain-text output formatted. Keep the saved writing format unchanged: the renderer handles rich headings and real lists.
+
 Reply with, in this order:
 
 1. The update as plain text, **not** in a code block, ready to paste.
 2. A `---` line, then "Before you send:" with the review flags. Produce them like this:
    - Call the `eod-review` subagent with the mode and the paths: client config, today's notes, the draft, yesterday's log. Present what it returns. You may merge duplicates or drop a flag that is clearly wrong, but say which one and why in a short line. Never rewrite the draft because of a flag; let Roger decide.
    - Only if `eod-review` is unavailable, or an `EVAL MODE` request says not to use it, read `<skill-dir>/references/review.md` and do the review yourself, after the checker is clean.
-   Always show the reviewer's result, even when it's `No flags.` (write "Reviewer: no flags."), so Roger can tell it ran. Your own extra notes, if any, go after it.
+    Always show the reviewer's result, even when it's `No flags.` (write "Reviewer: no flags."), so Roger can tell it ran. Your own extra notes, if any, go after it.
+    Add the formatted preview's clickable `file://` link and absolute path outside the message body, with the recommended copy button from the renderer. Include any formatting notes it prints. The browser page copies only the update, not review flags, reminders, or `## Internal notes`.
 3. One line offering the internal version: `Want the internal one too? Say `internal`.`. Skip it if he already ran it today.
 4. **Friday only** (and only if the client has `weekly: true`): end with `📝 Friday reminder: say `weekly` to do the Weekly Review.` This line is for Roger and sits outside the paste-ready text.
 
-When he asks for changes, edit the log file, re-run the checker, and return the full updated update (he pastes the whole thing). Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
+When he asks for changes, edit the log file, re-run the checker, regenerate the clipboard preview, and return the full updated update with its preview link. Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
 
 Once Roger is happy with the update, keep `## Waiting on the client` in `~/.eod/<client>/client.md` current: add anything the update asks the client for (with the date), and remove items the notes say were delivered. Create the section if it's missing.

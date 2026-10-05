@@ -54,4 +54,4 @@ NEEDS A DECISION @<internal_lead>
 2. Save to `~/.eod/<client>/<today>-internal.md` and run:
    `python3 <skill-dir>/scripts/check_eod.py ~/.eod/<client>/<today>-internal.md --mode internal --client ~/.eod/<client>/client.md`
    Internal mode allows ticket IDs, links, identifiers, and jargon, but still blocks dashes and AI tropes.
-3. Deliver as plain text, not in a code block. Then "Before you send:" from the same review step as the daily EOD (SKILL.md step 7, with mode `internal`). Typical internal flags: an unverified "fixed" claim, or a decision that should be a DM rather than a channel post.
+3. Generate the clipboard preview using `references/formatting.md` with mode `internal`. Deliver as plain text, not in a code block. Then "Before you send:" and the preview link from the same delivery step as the daily EOD (SKILL.md step 7, with mode `internal`). Typical internal flags: an unverified "fixed" claim, or a decision that should be a DM rather than a channel post.
