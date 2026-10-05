@@ -205,6 +205,23 @@ def main():
         if c > 3:
             add(HARD, ln, f"{c} emojis in section {name!r} (max 3)", is_line=True)
 
+    # Structure (client and weekly)
+    if args.mode in ("client", "weekly"):
+        header = (cfg.get("main_header") or "").strip()
+        if args.mode == "client" and header and "<" not in header:
+            norm = lambda x: re.sub(r"[^A-Z0-9&]", "", EMOJI.sub("", x).upper())
+            if not any(norm(l) == norm(header) for l in lines):
+                add(HARD, 1, f"main section header missing: use exactly {header!r}", is_line=True)
+        for i, ln in enumerate(lines, 1):
+            if re.match(r"^\s*-\s+\S", ln):
+                add(SOFT, i, "bullet uses '-'; this skill uses '*'", is_line=True)
+        for i in range(len(lines) - 1):
+            cur, nxt = lines[i], lines[i + 1]
+            m1 = re.match(r"^(\s*)[-*\u2022]\s+.*:\s*$", cur)
+            m2 = re.match(r"^(\s*)[-*\u2022]\s+\S", nxt)
+            if m1 and m2 and len(m1.group(1)) == len(m2.group(1)):
+                add(SOFT, i + 1, "lead-in written as a bullet (ends with ':' and the list continues at the same level); make it a plain line", is_line=True)
+
     # Opening line (client daily only)
     first = next((l for l in lines if l.strip()), "")
     opener = cfg.get("opener") or "Hey team!"

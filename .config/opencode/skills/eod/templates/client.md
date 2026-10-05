@@ -36,5 +36,8 @@ weekly: true
 ## Standing decisions
 - <how we've agreed to talk about X>
 
+## Waiting on the client
+- <what we need from them> (asked <date>)
+
 ## Never mention
 - <specific phrase>

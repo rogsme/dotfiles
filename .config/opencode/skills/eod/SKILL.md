@@ -10,12 +10,13 @@ You turn Roger's messy end-of-day notes into updates he can paste straight into 
 
 ## Live context
 
-Start every run by getting:
+Start every run with one command:
 
-- `date +"%A %Y-%m-%d"`
-- `git remote get-url origin`
-- `grep -H -E "^(status|repos):" ~/.eod/*/client.md`
-- `ls -1t ~/.eod/*/2*.md | head -8`
+`python3 <skill-dir>/scripts/eod_context.py`
+
+It prints today's date, the current repo, the configured clients and the latest log files.
+
+**Shell rule for the whole skill:** one command per shell call. No pipes, `;`, `&&` or subshells. The agent's allowlist checks every command in a chain separately, so one unlisted piece (a `head`, a `sort`) gets the whole call denied. If you need something the allowlisted commands and scripts can't do, read the files with the read tool instead.
 
 Roger's message is the arguments: the first word picks the mode, the rest is his notes.
 
@@ -102,6 +103,10 @@ Put each item in one bucket before writing anything:
 
 **When internal context and his client notes disagree** (internally "QA is done", for the client "still testing"), the client version is deliberate. Write the client version and don't flag it as an inconsistency. Record the difference in the log's internal notes (internal mode reports it). Only speak up if the client-facing claim will be visibly false within a day or two.
 
+**Merged is not available.** Before writing that the app "now" does something, check whether it's on the environment the client actually uses (`gh run list --limit 5` shows the latest deploy runs). If it isn't there yet (deploy failed, paused, or still running), say when it will show up, up front, so nobody goes looking for it and finds nothing.
+
+**Done is not done if it depends on the client.** If a feature needs something the client hasn't delivered (files, data, access, a decision), check `## Waiting on the client` in the client file and the notes. Describe it as ready for their piece ("ready for your logo as soon as we get the files"), not as finished.
+
 ## 4. Write it
 
 Read `<skill-dir>/references/plain-language.md` before the first draft of the session. It has real before/after translations from past EODs. For a `technical` client, keep the structure and voice rules but skip the jargon translation.
@@ -124,7 +129,9 @@ SECTION NAME <emoji>
 ```
 
 - Section headers: ALL CAPS, one emoji each. The client's `main_header` is the main section; add topic sections only when something deserves its own block (a demo, a blocker, an ask, the plan).
+- The main section header is exactly the client's `main_header`. Don't invent your own ("SHIPPED TODAY").
 - Bullets use `*`. Sub-bullets are fine for a list of small touches.
+- Lead-in lines ("Seven updates went in today. The ones you'll notice:") are plain lines, never bullets. Things that don't fit the lead-in ("behind the scenes" work) go after the list as their own line, not inside it.
 - Emojis: 2 to 3 per section at most, usually 1. Skip them when they feel forced.
 - No bold-label bullets (`* **Thing:** ...`). No markdown headers (`#`). No code blocks, backticks, file paths, or identifiers.
 - Lead each bullet with what changed for the people using the product, then one sentence of how or why if it helps. Use a concrete example or number when the PR has one ("9 of 24 test questions failed before, now all 24 get through").
@@ -156,8 +163,10 @@ Reply with, in this order:
 2. A `---` line, then "Before you send:" with the review flags. Produce them like this:
    - Call the `eod-review` subagent with the mode and the paths: client config, today's notes, the draft, yesterday's log. Present what it returns. You may merge duplicates or drop a flag that is clearly wrong, but say which one and why in a short line. Never rewrite the draft because of a flag; let Roger decide.
    - Only if `eod-review` is unavailable, or an `EVAL MODE` request says not to use it, read `<skill-dir>/references/review.md` and do the review yourself, after the checker is clean.
-   Skip this section entirely if there's nothing worth saying. Never pad it.
+   Always show the reviewer's result, even when it's `No flags.` (write "Reviewer: no flags."), so Roger can tell it ran. Your own extra notes, if any, go after it.
 3. One line offering the internal version: `Want the internal one too? Say `internal`.`. Skip it if he already ran it today.
 4. **Friday only** (and only if the client has `weekly: true`): end with `📝 Friday reminder: say `weekly` to do the Weekly Review.` This line is for Roger and sits outside the paste-ready text.
 
 When he asks for changes, edit the log file, re-run the checker, and return the full updated update (he pastes the whole thing). Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
+
+Once Roger is happy with the update, keep `## Waiting on the client` in `~/.eod/<client>/client.md` current: add anything the update asks the client for (with the date), and remove items the notes say were delivered. Create the section if it's missing.

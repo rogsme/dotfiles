@@ -10,6 +10,8 @@ The client reads these updates to answer three questions: what can we do now tha
 - Keep safety and trust properties; clients care a lot about them: "it can only read the data, never change it", "each client only sees what they have access to", "it never guesses a number to fill the gap", "if something doesn't add up, it stops and tells us".
 - One idea per bullet. If a PR did four unrelated things, keep the one or two the client would notice and call the rest "some housekeeping behind the scenes".
 - Pure internal work (CI, review bots, refactors, codec cleanups) gets at most half a sentence, or gets cut. Mention the cut in the notes to Roger.
+- Never imply the client slows you down. "A rare day with zero interruptions" reads as "you usually interrupt me", and their calls and bug reports are most of those interruptions. Say the day was focused and leave it there.
+- Infrastructure hiccups: say what the client will notice and when it's back, not what broke on our side. "Publishing to the test site is paused, you'll see today's work tomorrow" is enough; "the automated checks stopped" only makes them wonder.
 
 ## Vocabulary
 
