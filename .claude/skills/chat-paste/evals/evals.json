@@ -16,12 +16,12 @@
     {
       "id": 2,
       "prompt": "Format notes.md for Teams. The Internal notes section and Before you send checklist are part of my actual message, so keep them. Preserve the words. Give me a local copy-ready page without sending or opening anything.",
-      "expected_output": "A local Teams-ready preview that preserves the legitimate notes and review labels, with no EOD-specific filtering.",
+      "expected_output": "A local Teams-ready preview that preserves the supplied notes and review labels without caller-specific filtering.",
       "files": ["evals/files/notes.md"],
       "expectations": [
         "Internal notes, Before you send, Reviewer: Pat, and the checklist URL are retained.",
         "The output is a local HTML page with a rich-HTML Teams copy button.",
-        "No EOD-specific filtering or inferred styles change the supplied message."
+        "No caller-specific filtering or inferred styles change the supplied message."
       ]
     }
   ]

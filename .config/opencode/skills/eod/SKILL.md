@@ -158,7 +158,7 @@ SECTION NAME <emoji>
 
 ## 7. Deliver
 
-For every daily, internal, and weekly update, load the shared `chat-paste` skill, read `<skill-dir>/references/formatting.md`, and generate the clipboard preview through the EOD adapter from the saved, checker-clean draft. Follow `chat-paste` for browser opening and delivery preferences. Regenerate it after every revision. A successful render and the printed preview path are required for delivery; report a rendering failure instead of calling the plain-text output formatted. Keep the saved writing format unchanged: the adapter prepares rich headings and excludes private annotations before shared rendering.
+EOD drafting, checking, review, and plain-text delivery work without a clipboard skill. If `chat-paste` is available, load it, read `<skill-dir>/references/formatting.md`, and export the saved, checker-clean draft through the optional adapter. The adapter owns public-content selection and heading preparation; it sends finished Markdown to the formatter's public CLI. Follow `chat-paste` for browser opening and delivery preferences, and regenerate the preview after revisions. If the formatter is absent, deliver the checked update normally and omit the preview link. If an installed formatter fails, report the export error without calling plain text or a stale page a successful formatted export. Keep the saved writing format unchanged.
 
 Reply with, in this order:
 
@@ -167,10 +167,10 @@ Reply with, in this order:
    - Call the `eod-review` subagent with the mode and the paths: client config, today's notes, the draft, yesterday's log. Present what it returns. You may merge duplicates or drop a flag that is clearly wrong, but say which one and why in a short line. Never rewrite the draft because of a flag; let Roger decide.
    - Only if `eod-review` is unavailable, or an `EVAL MODE` request says not to use it, read `<skill-dir>/references/review.md` and do the review yourself, after the checker is clean.
     Always show the reviewer's result, even when it's `No flags.` (write "Reviewer: no flags."), so Roger can tell it ran. Your own extra notes, if any, go after it.
-    Add the formatted preview's clickable `file://` link and absolute path outside the message body, with the recommended copy button from the renderer. Include any formatting notes it prints. The browser page copies only the update, not review flags, reminders, or `## Internal notes`.
+    When a preview was generated successfully, add its `file://` URL and absolute path outside the message body, with the recommended copy button and any relevant formatting notes. The adapter hands over only the public update, excluding review flags, reminders, and `## Internal notes`. Without the optional formatter, omit this part and continue normal delivery.
 3. One line offering the internal version: `Want the internal one too? Say `internal`.`. Skip it if he already ran it today.
 4. **Friday only** (and only if the client has `weekly: true`): end with `📝 Friday reminder: say `weekly` to do the Weekly Review.` This line is for Roger and sits outside the paste-ready text.
 
-When he asks for changes, edit the log file, re-run the checker, regenerate the clipboard preview, and return the full updated update with its preview link. Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
+When he asks for changes, edit the log file, re-run the checker, regenerate the clipboard preview if the optional formatter is available, and return the full updated update with its preview link when generated. Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
 
 Once Roger is happy with the update, keep `## Waiting on the client` in `~/.eod/<client>/client.md` current: add anything the update asks the client for (with the date), and remove items the notes say were delivered. Create the section if it's missing.

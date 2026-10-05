@@ -21,7 +21,7 @@ For copy failures, check a direct click on the button, browser clipboard permiss
 
 ## Test and maintenance paths
 
-Run `tests/*.test.cjs` with `node --test` and `tests/test_render_message.py` with Python unittest. `tests/preview.test.cjs` locks down browser routing and fail-closed behavior. `tests/browser.js` exercises real Chromium clipboard round-trips and the HTML path with a Firefox-like user agent. `tests/firefox.cjs` tests the installed Firefox with its own headless profile and real clipboard events. See `tests/README.md` for commands and destination acceptance. EOD keeps separate tests for its privacy and heading adapter.
+Run `tests/*.test.cjs` with `node --test` and `tests/test_render_message.py` with Python unittest. `tests/preview.test.cjs` locks down browser routing and fail-closed behavior. `tests/browser.js` exercises real Chromium clipboard round-trips and the HTML path with a Firefox-like user agent. `tests/firefox.cjs` tests the installed Firefox with its own headless profile and real clipboard events. See `tests/README.md` for commands and destination acceptance.
 
 The native Slack clipboard protocol is undocumented; retest after Slack updates. The vendored Marked parser is pinned at 18.1.0 with its MIT license in `assets/vendor/marked-LICENSE.md`. `scripts/vendor_marked.py` refreshes the pinned package only after SHA-512 verification. This is a maintainer action, not part of ordinary skill runs.
 

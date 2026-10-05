@@ -39,4 +39,4 @@ Vibes & Reflection 😄
 
 ## After the recap
 
-Same as daily: run the checker, fix hard findings, generate the clipboard preview using `references/formatting.md` with mode `weekly`, and return plain text (no code block). Then "Before you send:" with risks still open from the week (unverified "fixed" claims, unresolved scope questions to raise with the internal lead, stacked promises for next week), followed by the preview link from SKILL.md step 7.
+Same as daily: run the checker, fix hard findings, optionally generate the clipboard preview using `references/formatting.md` with mode `weekly` when the formatter is available, and return plain text (no code block). Then "Before you send:" with risks still open from the week (unverified "fixed" claims, unresolved scope questions to raise with the internal lead, stacked promises for next week), followed by the preview URL if generated. Without the formatter, normal delivery still completes.

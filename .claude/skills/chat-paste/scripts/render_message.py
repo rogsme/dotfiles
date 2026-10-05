@@ -176,6 +176,17 @@ def main():
         "--destination", choices=["slack", "teams", "both"], default="both"
     )
     parser.add_argument("--title", default="Slack and Teams message")
+    parser.add_argument(
+        "--revision-note",
+        default="",
+        help="Optional caller-provided note about editing the source",
+    )
+    parser.add_argument(
+        "--owned-marker",
+        action="append",
+        default=[],
+        help="Allow replacing an older generated HTML file with this exact ownership marker",
+    )
     add_browser_arguments(parser)
     args = parser.parse_args()
     if bool(args.file) == args.stdin:
@@ -194,8 +205,10 @@ def main():
         )
         if source and output.resolve() == source:
             raise ValueError("The output must not overwrite the source message.")
-        page, warnings = render(text, args.title, args.destination)
-        write_preview(page, output)
+        page, warnings = render(
+            text, args.title, args.destination, revision_note=args.revision_note
+        )
+        write_preview(page, output, legacy_signatures=args.owned_marker)
         describe_preview(
             output, args.destination, warnings, open_browser=args.open_browser
         )

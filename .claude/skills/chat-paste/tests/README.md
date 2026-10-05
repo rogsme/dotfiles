@@ -24,7 +24,7 @@ playwright-cli -s=chat-paste-test run-code --filename="$HOME/.claude/skills/chat
 playwright-cli -s=chat-paste-test close
 ```
 
-Use a fresh headless profile. These tests replace only that browser's clipboard with synthetic messages. They check real copy/paste, native Slack MIME in another tab, semantic HTML, typing, failure handling, and absence of external requests. They also verify that generic "Internal notes" sections and review labels remain part of the supplied content. EOD has separate adapter tests for excluding its private annotations.
+Use a fresh headless profile. These tests replace only that browser's clipboard with synthetic messages. They check real copy/paste, native Slack MIME in another tab, semantic HTML, typing, failure handling, and absence of external requests. They also verify that supplied "Internal notes" sections and review labels remain part of the message. Tests run with this skill alone, without another workflow installed.
 
 The Chromium test also exercises the HTML route with a Firefox-like user agent. That is a routing test, not a real Firefox test. To test actual Firefox, use Node 22+ and the installed `firefox` binary:
 
