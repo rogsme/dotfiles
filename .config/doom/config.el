@@ -47,12 +47,29 @@
   (add-hook 'org-mode-hook #'auto-fill-mode)
   (setq-default fill-column 105)
 
+  ;; Disable Flycheck in Org mode
+  (add-hook 'org-mode-hook (lambda () (flycheck-mode -1)))
+
   ;; Save all org buffers on each save
   (add-hook 'auto-save-hook 'org-save-all-org-buffers)
   (add-hook 'after-save-hook 'org-save-all-org-buffers)
   (require 'org-download)
   (add-hook 'dired-mode-hook 'org-download-enable)
   (add-hook 'org-mode-hook 'org-auto-tangle-mode))
+
+(after! flycheck
+  (setq flycheck-global-modes
+        (cond
+         ((eq flycheck-global-modes t)
+          '(not org-mode))
+         ((and (listp flycheck-global-modes)
+               (eq (car flycheck-global-modes) 'not))
+          (if (memq 'org-mode flycheck-global-modes)
+              flycheck-global-modes
+            (append flycheck-global-modes '(org-mode))))
+         ((listp flycheck-global-modes)
+          (delq 'org-mode flycheck-global-modes))
+         (t flycheck-global-modes))))
 
 (after! org
   ;; Logs
