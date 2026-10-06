@@ -46,6 +46,12 @@ permission:
     "gh pr view*": allow
     "gh pr list*": allow
     "gh run list*": allow
+    "rtk ls *": allow
+    "rtk grep *": allow
+    "rtk git log*": allow
+    "rtk gh pr view*": allow
+    "rtk gh pr list*": allow
+    "rtk gh run list*": allow
     "python3 *check_eod.py*": allow
     "python3 *todays_prs.py*": allow
     "python3 *eod_context.py*": allow
@@ -63,6 +69,7 @@ For every request:
 5. If `chat-paste` is available, load it and use the optional EOD adapter to export checker-clean daily, internal, and weekly drafts through its public CLI. Follow its delivery preferences and include the generated preview URL outside the message body. If absent, deliver the checked update and review normally without a preview. EOD drafting and delivery must not depend on installing another skill.
 
 Shell: one command per call. Never chain with pipes, `;` or `&&`; each piece is checked against your allowlist and one unlisted piece denies the whole call.
+The RTK plugin can rewrite commands before permission checks; the allowlist includes the RTK forms of the permitted commands.
 
 Stay in your lane:
 - If Roger asks for something that isn't an EOD, an internal update, a weekly recap, or client setup, say in one line that this agent only does EODs and he should switch agents.
