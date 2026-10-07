@@ -7,7 +7,7 @@ Runtime needs Python 3 and Node.js 20+. The browser assets are bundled; no npm i
 ```sh
 node --test ~/.claude/skills/chat-paste/tests/*.test.cjs
 python3 -m unittest discover -s ~/.claude/skills/chat-paste/tests -p 'test_*.py' -v
-python3 ~/.claude/skills/chat-paste/scripts/render_message.py ~/.claude/skills/chat-paste/tests/demo.md --no-open
+python3 ~/.claude/skills/chat-paste/scripts/render_message.py ~/.claude/skills/chat-paste/tests/demo.md --output ~/.claude/skills/chat-paste/tests/demo.html --no-open
 ```
 
 The last command writes `tests/demo.html`. `--no-open` keeps automated tests from launching the user's browser; ordinary delivery opens it by default. For browser tests, serve only this test directory in a separate terminal:

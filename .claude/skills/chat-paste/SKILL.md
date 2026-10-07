@@ -20,7 +20,7 @@ Turn a message into a self-contained browser page with **Copy for Slack** and **
    python3 <skill-dir>/scripts/render_message.py <message-file> --destination both
    ```
 
-   Substitute the destination. Output defaults to a matching `.html` beside the input. Use `--output <page.html>` to choose another path. The input is never edited. Existing unrelated HTML files and symlinks are preserved. Runtime is offline; no npm install is needed.
+   Substitute the destination. Output defaults to `/tmp/<input-name>.html` (for example, `notes.md` becomes `/tmp/notes.html`). Use `--output <page.html>` when the user names another location. The input is never edited. Existing unrelated HTML files and symlinks are preserved. Runtime is offline; no npm install is needed.
 4. Require exit code 0 and the printed preview path. If formatting is unsupported, explain the specific blocker and preserve the source; do not silently flatten lists, remove unsupported content, or present plain text as a successful rich export. Read `references/clipboard.md` when diagnosing a copy or formatting issue.
 5. The exporter opens the finished preview in the default browser automatically. Pass `--no-open` only when the user asks not to open a browser or an evaluation forbids application launches. Return the printed `file://` URL and absolute path, the recommended copy button, and any relevant formatting notes. If opening fails, report that failure and return the URL. Tell the user to copy and paste normally into the destination's rich-text editor. Keep browser-protocol details out of normal delivery. The skill does not post messages or automatically replace the user's clipboard.
 

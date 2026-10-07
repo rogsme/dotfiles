@@ -73,7 +73,9 @@ class SharedRenderTests(unittest.TestCase):
 
     def test_file_input_is_preserved_and_page_regenerates(self):
         with tempfile.TemporaryDirectory(prefix="chat-paste-") as root:
-            source = Path(root) / "message.txt"
+            source = Path(root) / f"{Path(root).name}.txt"
+            output = Path("/tmp") / f"{Path(root).name}.html"
+            self.addCleanup(output.unlink, missing_ok=True)
             source.write_text("First message")
             command = ["python3", str(SCRIPT), str(source), "--no-open"]
             first = subprocess.run(command, capture_output=True, text=True)
@@ -82,7 +84,8 @@ class SharedRenderTests(unittest.TestCase):
             source.write_text("Revised message")
             second = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(second.returncode, 0, second.stderr)
-            self.assertIn("Revised message", source.with_suffix(".html").read_text())
+            self.assertIn("Revised message", output.read_text())
+            self.assertFalse(source.with_suffix(".html").exists())
 
     def test_unrelated_output_is_preserved(self):
         with tempfile.TemporaryDirectory(prefix="chat-paste-") as root:
@@ -164,6 +167,7 @@ class SharedRenderTests(unittest.TestCase):
                         renderer.sys, "argv", [str(SCRIPT), str(source), *flags]
                     ),
                     patch.object(renderer, "describe_preview") as deliver,
+                    patch.object(renderer, "DEFAULT_OUTPUT_DIR", Path(root)),
                 ):
                     self.assertEqual(renderer.main(), 0)
                     self.assertEqual(deliver.call_args.kwargs["open_browser"], expected)
