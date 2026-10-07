@@ -42,10 +42,11 @@ font-2 = Termsynu:size=10;0
 font-3 = Siji:pixelsize=10;1
 font-4 = FontAwesome:size=10;0
 font-5 = Noto Color Emoji:scale=12;0
+font-6 = Noto Sans Symbols 2:size=10;2
 
 modules-left = i3 music
 modules-center = xwindow
-modules-right = crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
+modules-right = claude-usage crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
 
 [module/i3]
 type = internal/i3
@@ -187,3 +188,10 @@ warn-temperature = 80
 type = custom/script
 exec = ~/.config/polybar/btc.sh
 interval = 60
+
+[module/claude-usage]
+type = custom/script
+exec = ~/.local/bin/polybar-claude-usage
+tail = true
+click-left = ~/.local/bin/polybar-claude-usage --notify
+click-right = kill -USR1 %pid%
