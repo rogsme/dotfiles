@@ -5,22 +5,22 @@
       {
         "scope": "project",
         "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
-        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/e225b998a17e",
-        "version": "e225b998a17e",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/feature-dev/6eb6a30bf024",
+        "version": "6eb6a30bf024",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-09-24T18:46:31.993Z",
-        "gitCommitSha": "e225b998a17e06ac87787165f2a1b5c1cac7edc2"
+        "lastUpdated": "2026-10-07T14:27:49.313Z",
+        "gitCommitSha": "6eb6a30bf024b182d418d3bbd11f156e360365af"
       }
     ],
     "frontend-design@claude-plugins-official": [
       {
         "scope": "project",
         "projectPath": "/home/roger/code/lazer/lazer-internal/lazer-proxy",
-        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/e225b998a17e",
-        "version": "e225b998a17e",
+        "installPath": "/home/roger/.claude/plugins/cache/claude-plugins-official/frontend-design/6eb6a30bf024",
+        "version": "6eb6a30bf024",
         "installedAt": "2026-04-21T11:48:33.011Z",
-        "lastUpdated": "2026-09-24T18:46:31.993Z",
-        "gitCommitSha": "e225b998a17e06ac87787165f2a1b5c1cac7edc2"
+        "lastUpdated": "2026-10-07T14:27:49.313Z",
+        "gitCommitSha": "6eb6a30bf024b182d418d3bbd11f156e360365af"
       },
       {
         "scope": "project",
