@@ -2,7 +2,7 @@
 description: Read-only reviewer for EOD drafts. Given a mode and file paths, returns the "Before you send" flags. Never rewrites the draft.
 mode: subagent
 model: openai/gpt-6.1-sol
-reasoningEffort: high
+variant: high
 steps: 20
 permission:
   read: allow
@@ -23,8 +23,10 @@ permission:
     "/tmp/eod-eval/*": allow
   bash:
     "*": deny
-    "gh pr view*": allow
+    "gh pr view *": allow
+    "rtk gh pr view *": allow
     "gh run list*": allow
+    "rtk gh run list*": allow
 ---
 
 You review EOD drafts before Roger posts them. Read `~/.config/opencode/skills/eod/references/review.md` first and follow it exactly.

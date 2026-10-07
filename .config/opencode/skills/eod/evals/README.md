@@ -1,6 +1,6 @@
 # EOD evals
 
-Replays past days through the EOD agent so you can compare setups (drafter alone vs drafter plus reviewer, or different models) against known answers.
+Replays past days through the EOD agent so you can compare setups (drafter alone vs drafter plus both reviewers, or different models) against known answers.
 
 Cases contain real client notes, so they never live in this folder. Keep them in `~/.eod/evals/cases/` (or point `EOD_EVAL_CASES` somewhere else).
 
@@ -14,6 +14,7 @@ Cases contain real client notes, so they never live in this folder. Keep them in
     notes.md                    the raw notes for that day, verbatim
     yesterday.md                optional; the EOD sent the day before (continuity checks)
     client.md                   optional; frozen client config for this case, else ~/.eod/<client>/client.md
+    prs.json                    optional; todays_prs.py --json output for that day (enables the coverage check)
     expected.md                 what a good run must catch, must not do, and should include
 ```
 

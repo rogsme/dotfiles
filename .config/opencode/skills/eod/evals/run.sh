@@ -3,13 +3,14 @@
 #
 #   run.sh <client repo checkout> [review|solo] [case ...]
 #
-#   review  EOD drafts, eod-review writes "Before you send"  (default)
-#   solo    EOD does everything, no reviewer subagent
+#   review  EOD drafts, eod-review and eod-reader write "Before you send"  (default)
+#   solo    EOD does everything, no reviewer subagents
 #
 # Cases are private (real client notes), so they live outside this skill:
 #   $EOD_EVAL_CASES   default ~/.eod/evals/cases
 # Each run uses a scratch log root in /tmp/eod-eval/<case>/, never ~/.eod.
 # Results land in ~/.eod/evals/results/<timestamp>-<variant>/.
+# Each case is killed after $EOD_EVAL_TIMEOUT seconds (default 1200).
 set -euo pipefail
 
 REPO=${1:?usage: run.sh <client repo checkout> [review|solo] [case ...]}
@@ -43,18 +44,28 @@ for c in "${cases[@]}"; do
   if [ -n "$YESTERDAY" ] && [ -f "$d/yesterday.md" ]; then
     cp "$d/yesterday.md" "$root/$CLIENT/$YESTERDAY.md"
   fi
+  day="${TODAY##* }"
+  if [ -f "$d/prs.json" ]; then
+    cp "$d/prs.json" "$root/$CLIENT/$day.prs.json"
+    prs="- The PR inventory is $root/$CLIENT/$day.prs.json, with states as of that day. Use it as the gather output (it may include PRs the notes don't mention) and pass it to the checker with --prs."
+  else
+    prs="- There is no PR inventory for this case. Run the checker without --prs and check by hand that every merged, opened or worked-on PR in the notes appears with its number."
+  fi
 
   if [ "$VARIANT" = solo ]; then
-    reviewer="- Do not call the eod-review subagent. Write the \"Before you send\" flags yourself using references/review.md."
+    reviewer="- Skip the eod-review and eod-reader subagents. Write the \"Before you send\" flags yourself using references/review.md and label them as a solo review."
   else
-    reviewer="- Use the eod-review subagent for the \"Before you send\" flags, as the skill says."
+    reviewer="- Run the eod-review and eod-reader subagents as the skill says."
   fi
 
   prompt="EVAL MODE (a replay of a past day, not a real one):
 - Today is $TODAY. Ignore the system clock and the date check against it; still check the stated date in the notes against $TODAY.
-- The log root is $root/ instead of ~/.eod/. Read and write only there. The client is $CLIENT.
-- PRs have moved on since this day. Use gh pr view for descriptions and risks, but take the PR states stated in the notes as true. Do not run todays_prs.py: today is in the past, so use only the PRs listed in the notes.
+- The log root is $root/ instead of ~/.eod/. Read and write only there; previews in /tmp/opencode are the one exception. Start with eod_context.py --root $root. The client is $CLIENT.
+- PRs have moved on since this day. Do not run todays_prs.py: today is in the past. Use gh pr view for descriptions and risks, but take PR states from the case (inventory or notes) as true.
+$prs
 $reviewer
+- Render the preview with --no-open.
+- Nobody can answer questions during this run. Where the skill says to ask Roger, make your best call, keep going, and list the question in \"Before you send\".
 - Mode: daily client EOD.
 
 The notes:
@@ -62,7 +73,9 @@ The notes:
 $(cat "$d/notes.md")"
 
   echo "== $c ($VARIANT)"
-  if ! opencode run --agent EOD --dir "$REPO" --title "eod-eval $c $VARIANT" "$prompt" > "$OUT/$c.md" 2>&1; then
+  # opencode v2 has no --dir: run from the checkout, with a private server so
+  # the session uses this directory instead of the background service's.
+  if ! (cd "$REPO" && timeout "${EOD_EVAL_TIMEOUT:-1200}" opencode run --standalone --agent EOD --title "eod-eval $c $VARIANT" "$prompt") > "$OUT/$c.md" 2>&1; then
     echo "   opencode exited non-zero, see $OUT/$c.md" >&2
   fi
   cp -r "$root" "$OUT/$c-logs"

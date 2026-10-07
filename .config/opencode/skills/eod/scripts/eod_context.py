@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Print the live context an EOD run starts from, in one allowlisted command.
 
-    python3 eod_context.py [--logs N]
+    python3 eod_context.py [--logs N] [--root DIR]
 
 Replaces a chain like `date; git remote get-url origin; grep ...; ls | head`,
 which OpenCode's shell allowlist rejects because it checks every command in a
@@ -26,9 +26,9 @@ def git_remote():
         return "not in a git repo"
 
 
-def clients():
+def clients(root):
     rows = []
-    for path in sorted(glob.glob(os.path.join(EOD, "*", "client.md"))):
+    for path in sorted(glob.glob(os.path.join(root, "*", "client.md"))):
         name = os.path.basename(os.path.dirname(path))
         fields = {}
         with open(path, encoding="utf-8") as f:
@@ -42,8 +42,8 @@ def clients():
     return rows
 
 
-def latest_logs(n):
-    files = [p for p in glob.glob(os.path.join(EOD, "*", "2*.md")) if os.path.isfile(p)]
+def latest_logs(root, n):
+    files = [p for p in glob.glob(os.path.join(root, "*", "2*.md")) if os.path.isfile(p)]
     files.sort(key=os.path.getmtime, reverse=True)
     return files[:n]
 
@@ -51,15 +51,16 @@ def latest_logs(n):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--logs", type=int, default=8)
+    ap.add_argument("--root", default=EOD, help="log root (default ~/.eod)")
     a = ap.parse_args()
 
     print(f"Today: {datetime.now().astimezone().strftime('%A %Y-%m-%d')}")
     print(f"Current repo: {git_remote()}")
     print("Configured clients:")
-    for row in clients() or ["none yet"]:
+    for row in clients(a.root) or ["none yet"]:
         print(f"  {row}")
     print("Latest log files:")
-    for p in latest_logs(a.logs) or ["no log yet"]:
+    for p in latest_logs(a.root, a.logs) or ["no log yet"]:
         print(f"  {p}")
 
 

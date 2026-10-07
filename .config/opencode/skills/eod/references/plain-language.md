@@ -1,15 +1,15 @@
 # Plain language for a non-technical client
 
-The client reads these updates to answer three questions: what can we do now that we couldn't yesterday, is anything stuck, and do they need something from us. Every sentence should serve one of those.
+Roger's story comes first (SKILL.md step 2). Translate technical terms so the client can follow the work, and keep his voice, promises, trade-offs, pride, annoyance, and mood. The client also needs to know what they can use now, what is stuck, and what Roger needs from them; PR details support that story.
 
 ## Translation rules
 
-- Describe the effect on the person using the app, not the change in the code.
+- For supporting technical details, describe the effect on the person using the app. Preserve Roger's own framing of his day and why things happened.
 - Swap jargon for the everyday thing it stands for (table below). If there's no everyday word, explain it in half a sentence the first time.
-- Keep real numbers when they show progress or scale ("30,000 figures, 36 exchange rates, all 50 markets", "946 articles searchable"). Drop numbers that only matter to engineers (test counts, SHA hashes, row limits).
+- Keep numbers Roger cited and their meaning, even when they describe engineering work. Translate their significance without silently dropping them; ask if a number is sensitive or unclear. Choose useful supporting numbers from PR descriptions ("30,000 figures, 36 exchange rates, all 50 markets", "946 articles searchable") rather than adding irrelevant hashes or limits.
 - Keep safety and trust properties; clients care a lot about them: "it can only read the data, never change it", "each client only sees what they have access to", "it never guesses a number to fill the gap", "if something doesn't add up, it stops and tells us".
-- One idea per bullet. If a PR did four unrelated things, keep the one or two the client would notice and call the rest "some housekeeping behind the scenes".
-- Pure internal work (CI, review bots, refactors, codec cleanups) gets at most half a sentence, or gets cut. Mention the cut in the notes to Roger.
+- One connected thought per bullet. An apology followed by "but" or "though" and its trade or defense is one thought; keep it together or explicitly link adjacent bullets. If a PR did four unrelated things, keep the one or two the client would notice and call the rest "some housekeeping behind the scenes".
+- Pure internal work (CI, review bots, refactors, codec cleanups) gets one brief behind-the-scenes line that carries its PR numbers: "Housekeeping to keep things steady (#153, #154)".
 - Never imply the client slows you down. "A rare day with zero interruptions" reads as "you usually interrupt me", and their calls and bug reports are most of those interruptions. Say the day was focused and leave it there.
 - Infrastructure hiccups: say what the client will notice and when it's back, not what broke on our side. "Publishing to the test site is paused, you'll see today's work tomorrow" is enough; "the automated checks stopped" only makes them wonder.
 
@@ -22,11 +22,11 @@ Generic terms that come up on most projects. Product-specific terms (what a feat
 | staging, staging env | the test site |
 | production, prod | the live app |
 | deploy / deployed | put up on the test site, is live on the test site |
-| merged / PR merged | is in, is now in the app |
-| PR open, in review | ready and waiting on my final review |
+| merged / PR merged | is now in the app (only if released); otherwise merged and waiting to go live |
+| PR open, in review | still in progress, waiting on review (name whose review only if verified) |
 | seed data, fixtures | the test site's sample data |
 | ingestion, ETL, import job | importing the data, turning the file into usable data |
-| migration, schema change | a behind-the-scenes change to how data is stored (usually cut) |
+| migration, schema change | a behind-the-scenes change to how data is stored |
 | rate limiting, quotas | usage limits |
 | audit log, tracing | a record of who did what and when |
 | auth, SSO, roles | logins, accounts, who can see what |
@@ -36,16 +36,20 @@ Generic terms that come up on most projects. Product-specific terms (what a feat
 | single point of failure | if that one piece goes down, the whole app goes down with it |
 | local dev env, test harness | practice copies of the app on my computer, never touching the real app |
 | CI, tests green | the automated checks passed |
-| AI code review, review bot | automated reviews (usually cut) |
+| AI code review, review bot | automated reviews |
 | ticket, backlog, issue tracker | tasks, the to-do list (or just describe the work) |
-| refactor, cleanup, tech debt | housekeeping behind the scenes (or cut) |
+| refactor, cleanup, tech debt | housekeeping behind the scenes |
 
 ## Before/after examples
 
 These are the patterns that come up most. The client and details are made up; the moves are the point.
 
+**Voice note:** "I got into a very productive ticket PR loop and I ran out of time, so I owe you the video. But I did finish the MCP server. Super busy day, but firing on all engines!"
+**Story restatement (private):** "Roger owes the client the video: he got into a very productive ticket PR loop and ran out of time. But he did finish the MCP server, which is where the recording time went and the win he wants alongside the apology. Super busy day, but firing on all engines! Absent: annoyance, next delivery time."
+**EOD (non-technical, PR merged):** "I got into a very productive loop of picking up tasks and getting changes ready, and I ran out of time, so I owe you the video. But I did finish the connection that lets your assistant use the app (#123); that's where the recording time went." The closing stays "Super busy day, but firing on all engines!" Debt and work share one bullet. If the PR is still open, keep the link, say it's still in progress, and flag the mismatch with his notes.
+
 **PR description:** "Re-enables the review bot on every pull request... Adds a `REVIEW_EFFORT` setting..."
-**EOD:** Cut, or at most "Turned our automated code reviewer back on." Internal tooling and its cost raise questions the client doesn't need.
+**EOD (if merged):** "Turned our automated code reviewer back on (#123)." If open: "Turning our automated code reviewer back on, still in progress (#123)." Costs stay private.
 
 **PR description:** "Accept rounded percentages in answer validation"
 **EOD:** "Growth answers now finish properly. Before, if the app wrote "4.2%" for a figure that's really 4.187%, it stopped the answer to be safe. It now accepts sensible rounding, but still stops if a number is actually wrong."

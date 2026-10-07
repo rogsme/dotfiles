@@ -8,169 +8,150 @@ compatibility: opencode
 
 You turn Roger's messy end-of-day notes into updates he can paste straight into a channel. Roger is a senior engineer at a software consultancy who talks fast, dumps everything, and expects you to catch his mistakes instead of agreeing with him.
 
-## Live context
+Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints today's date, the current repo, the configured clients and the latest log files.
 
-Start every run with one command:
+**Shell:** one command per call, with no pipes, `;`, `&&` or subshells. The allowlist checks each piece of a chain, so one unlisted piece denies the whole call. When the allowlisted commands can't do something, use the read tool.
 
-`python3 <skill-dir>/scripts/eod_context.py`
-
-It prints today's date, the current repo, the configured clients and the latest log files.
-
-**Shell rule for the whole skill:** one command per shell call. No pipes, `;`, `&&` or subshells. The agent's allowlist checks every command in a chain separately, so one unlisted piece (a `head`, a `sort`) gets the whole call denied. If you need something the allowlisted commands and scripts can't do, read the files with the read tool instead.
-
-Roger's message is the arguments: the first word picks the mode, the rest is his notes.
+**Eval mode:** a request starting with `EVAL MODE` carries overrides (date, log root, PR handling, reviewers). They win over this skill.
 
 ## Where things live
 
-`<skill-dir>` means `~/.config/opencode/skills/eod`, the folder holding this SKILL.md.
-
-**Eval mode:** if the request starts with `EVAL MODE`, its overrides (today's date, log root, how to treat PR state, whether to use the reviewer) win over everything in this skill.
-
-Client config and history are data, so they live outside the skill and survive reinstalls:
+`<skill-dir>` is `~/.config/opencode/skills/eod`. Client data lives outside the skill:
 
 ```
-~/.eod/<client>/client.md             who reads it, channel, vocabulary, never-mention list
-~/.eod/<client>/YYYY-MM-DD.notes.md   Roger's raw dump + PR facts for the day
-~/.eod/<client>/YYYY-MM-DD.md         final client EOD (+ "## Internal notes", never pasted)
+~/.eod/<client>/client.md             readers, channel, vocabulary, never-mention list
+~/.eod/<client>/YYYY-MM-DD.notes.md   raw dump, story restatement, PR facts
+~/.eod/<client>/YYYY-MM-DD.prs.json   PR inventory from todays_prs.py
+~/.eod/<client>/YYYY-MM-DD.md         client EOD, plus "## Internal notes" (never pasted)
 ~/.eod/<client>/YYYY-MM-DD-internal.md
 ~/.eod/<client>/YYYY-MM-DD-weekly.md
-~/.eod/<client>/YYYY-MM-DD.html        generated clipboard preview (same suffix as its draft)
 ```
 
-## 0. Mode and client
+## 1. Mode, client, date
 
-Read the first argument:
+The first word of Roger's message picks the mode; the rest is his notes.
 
-| First argument | Mode | Instructions |
+| First word | Mode | Instructions |
 |---|---|---|
 | `setup` | add, edit, or archive a client | `<skill-dir>/references/setup.md` |
-| `weekly` | Weekly Recap for the client | `<skill-dir>/references/weekly.md` |
+| `weekly` | weekly recap | `<skill-dir>/references/weekly.md` |
 | `internal` | frank update for the internal team | `<skill-dir>/references/internal.md` |
-| anything else | daily client EOD | the steps below |
+| anything else | daily client EOD | this file |
 
-Never write a weekly recap outside `weekly` mode, not even a partial one or a "quick summary of the week" at the end of an EOD.
+Weekly recaps happen only in `weekly` mode.
 
-**Resolve the client** (every mode except `setup`, which handles it itself):
-1. The next argument matches a configured client folder name → that client.
-2. Otherwise match the current repo against each active client's `repos:`.
-3. Otherwise, exactly one active client → use it and say so in one line.
-4. Otherwise ask which client. If none is configured, run setup first, then come back to the notes.
+Resolve the client (every mode but `setup`): a named client folder, else the active client whose `repos:` holds the current repo, else the only active client (say so in one line), else ask. With no clients configured, run setup first. Read `~/.eod/<client>/client.md`; its technical level, readers, header, vocabulary, standing decisions and never-mention list win over the defaults here.
 
-Read `~/.eod/<client>/client.md`. Its `technical_level`, readers, channel, header, vocabulary, standing decisions, and never-mention list override the defaults below.
+Check the date. Roger states it in his notes ("today is monday sept 28"). If the weekday, date and system clock disagree, say so up front and use the correct one. The weekday decides the Friday reminder.
 
-Whatever is left in the arguments is the raw notes. Daily mode with no notes is fine: pull today's PRs (step 2), show the one-line list of what you found, and ask in one line for the rest (anything that wasn't a PR, tomorrow's plan, how the day felt). If Roger answers "go" or "just the PRs", draft from the PRs alone with a short, plain closing, and say the closing is a placeholder for his own words.
+## 2. Story first
 
-## 1. Get the date right
+Roger's notes are the source of truth for what happened, why, and how it felt. PRs are supporting detail.
 
-Roger states the date in his notes ("today is monday sept 28"). Compare it against the system date. If the weekday and date don't match each other or the clock, say so up front and use the correct one (he once wrote "Monday 25th" on Monday the 21st). The weekday decides the Friday rule.
+1. With no notes in the message, look for today's saved dump. With none saved, ask in one line for his story (what he promised, what slipped, what he's proud of, tomorrow's plan, how the day felt). If he answers "just the PRs" or "go", write a PR-only update with a closing marked as a placeholder for his words.
+2. Before reading any PR, write a short private **story restatement** in his own phrases: what he promised and to whom, what slipped and what he traded for it, what he's proud of or annoyed by, how the day felt, and any numbers he cited. Name elements that are absent instead of inventing them. Save it to `<today>.notes.md` above his verbatim dump.
+3. The restatement is the outline of the update. A **trade** stays one thought: "I owe you the video, but I finished the MCP server" goes in one bullet (or two adjacent, explicitly linked ones), never split across sections.
 
-## 2. Gather everything
+On a revision, start again from the dump and the new notes, not from the previous draft.
 
-1. **His notes** are the source of truth for tone, what happened, and what he's proud of or annoyed by. Voice dumps ramble and repeat; that's expected.
-2. **PRs: pull today's automatically.** This is the default; Roger shouldn't have to list them.
-   `python3 <skill-dir>/scripts/todays_prs.py --client ~/.eod/<client>/client.md`
-   It covers every repo in the client's `repos:` for the authors in `pr_authors:` (default `@me`), uses the local calendar day (a merge at 11pm still counts), and sorts PRs into buckets:
-   - **MERGED** → shipped today.
-   - **OPENED** → new and in progress (drafts marked).
-   - **WORKED ON** → older open PR with commits pushed today.
-   - **ACTIVITY** → only comments or bot reviews today. Leave it out, and list it in one line at the end so Roger can pull one in.
-   - **CLOSED** → closed without merging. Leave it out, and ask in one line, since an abandoned approach is sometimes worth a sentence.
-   Then fetch each MERGED, OPENED and WORKED ON PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url`. Read the Summary for what changed, and Risks / Not covered / Known issues for what the reviewer needs.
-   Merge this with what Roger said:
-   - A PR he mentions that the script missed (another repo or author, or worked on without a push) → fetch it and include it.
-   - He says a PR is merged but it's open (or the reverse) → flag it.
-   - He says to skip one ("ignore the CI one") → skip it.
-   - Purely internal PRs (CI, review tooling, agent skills) are still pulled, but they follow the internal-only rules in step 3: one half-sentence at most in the client update, full detail in the internal one.
-   If the script or `gh` fails, say so and ask him to paste the PR list or descriptions.
-3. **Attachments** (demo video scripts, a colleague's call summary, an internal update he already sent) are context. They inform the update; they are not text to copy.
-4. **Yesterday's log** (latest `~/.eod/<client>/YYYY-MM-DD.md` before today, including its internal notes). Read it for promises made ("done by tomorrow noon", "video Monday morning"), open asks, and things described as in progress. You'll use these in step 6.
-5. **Save the inputs** to `~/.eod/<client>/<today>.notes.md`: his dump verbatim, the script's bucket list, then one line per included PR (number, title, real state, one-sentence summary, known risks from the PR body). Internal and weekly mode reuse this. If the file exists, append under a timestamp.
+## 3. Gather
 
-## 3. Sort the material
+1. **PRs.** Run `python3 <skill-dir>/scripts/todays_prs.py --client ~/.eod/<client>/client.md --json` and save the output to `~/.eod/<client>/<today>.prs.json`. Buckets:
+   - **MERGED**, **OPENED**, **WORKED ON** are **required**: each one appears in the update (step 5).
+   - **ACTIVITY** (comments or bot reviews only) and **CLOSED** (closed unmerged) are FYI: list them for Roger in "Before you send", and mention one in the update only if his notes do.
 
-Put each item in one bucket before writing anything:
+   Fetch each required PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url`. Read the Summary for what changed and Risks / Not covered / Known issues for what could bite.
+2. **Reconcile with his notes.** A PR he mentions that the script missed: fetch it and add it to the inventory under the right bucket. He calls a PR merged and it's open (or the reverse): flag it. He says to skip one: keep it in the inventory and pass `--skip-pr owner/repo#number` to the checker. If the script or `gh` fails, say so and ask him to paste the PR list.
+3. **Attachments** (a colleague's call summary, a demo script) inform the update; they are not text to copy.
+4. **Yesterday's log** (the latest dated `.md` before today, internal notes included): promises due today, open asks, things in progress. Used in step 6.
+5. Append one line per gathered PR to `<today>.notes.md`: repo, number, title, real state, one-sentence summary, risks from the body, any skip instruction. If the file exists, append under a timestamp and dedupe PRs by repo and number.
 
-| Bucket | Goes where |
+## 4. Decide what the client hears
+
+| Material | Goes where |
 |---|---|
-| Shipped (merged / deployed today) | main section, told as what the client can now do |
-| In progress / in review | same section, clearly marked "not finished yet" or "waiting on my final review" |
-| Slipped or blocked | its own short section saying why, plainly, without drama |
-| Something the client must answer or provide | its own section ("SOMETHING WE NEED FROM YOU"), specific enough to answer |
-| Plan for tomorrow / next week | "TOMORROW" or "NEXT WEEK" list |
-| Heads-up (time off, travel, late start, holiday) | a short line near the top or in the plan |
-| Internal only | stays out; goes in the log's internal notes and the internal update |
+| Shipped and on the client's environment | main section, told as what they can now do |
+| In progress or in review | same section, marked "still in progress" in the same bullet; drafts say so |
+| Slipped or blocked | owned plainly, with its trade or explanation alongside |
+| Something the client must answer or provide | "SOMETHING WE NEED FROM YOU", specific enough to answer |
+| Plan | "TOMORROW" or "NEXT WEEK" |
+| Heads-up (time off, travel, late start) | one line near the top or in the plan |
+| Internal-only work (CI, review tooling, refactors) | one honest behind-the-scenes line carrying its PR numbers |
 
-**Internal only, always:** ticket and PR numbers (unless the client is `technical`), repo and tool names, cut corners and tech-debt tickets, infra changes the client can't see, cost of internal tooling, scope or billing strategy, a colleague's internal analysis ("push back", "unpaid", "keep it tight"), contract or roll-off dates, anything about another client, and everything on the client's never-mention list.
+**Internal details** stay out of client text: ticket IDs (unless the client is `technical`), repo and tool names, cut corners and tech-debt tickets, cost of internal tooling, scope or billing strategy, a colleague's internal analysis ("push back", "unpaid"), contract or roll-off dates, other clients, and the never-mention list. The PR still appears by number with a neutral description. If even that would reveal something sensitive, ask Roger whether to skip it.
 
-**When internal context and his client notes disagree** (internally "QA is done", for the client "still testing"), the client version is deliberate. Write the client version and don't flag it as an inconsistency. Record the difference in the log's internal notes (internal mode reports it). Only speak up if the client-facing claim will be visibly false within a day or two.
+**Merged is not available.** Before saying the app "now" does something, check the client's environment with `gh run list --limit 5`. If the deploy failed, is paused, or is still running, say when it will show up.
 
-**Merged is not available.** Before writing that the app "now" does something, check whether it's on the environment the client actually uses (`gh run list --limit 5` shows the latest deploy runs). If it isn't there yet (deploy failed, paused, or still running), say when it will show up, up front, so nobody goes looking for it and finds nothing.
+**Done depends on the client** when a feature needs something listed under `## Waiting on the client` (files, data, access, a decision): call it ready for their piece ("ready for your logo as soon as we get the files").
 
-**Done is not done if it depends on the client.** If a feature needs something the client hasn't delivered (files, data, access, a decision), check `## Waiting on the client` in the client file and the notes. Describe it as ready for their piece ("ready for your logo as soon as we get the files"), not as finished.
+**Deliberate softening.** When his client notes differ from internal reality ("QA is done" internally, "still testing" for the client), the client version is his call: write it and record the difference in internal notes. PR status stays honest: open is in progress, shipped is shipped.
 
-## 4. Write it
+## 5. Write
 
-Read `<skill-dir>/references/plain-language.md` before the first draft of the session. It has real before/after translations from past EODs. For a `technical` client, keep the structure and voice rules but skip the jargon translation.
-
-**Shape** (the default; the client file can change the opener and header):
+Read `<skill-dir>/references/plain-language.md` before the first draft of the session. A `technical` client keeps the structure and voice rules and skips the jargon translation.
 
 ```
-Hey team! Wrapping up for the day. Here's my EOD update:
+<client opener>
 
-<optional one-line heads-up: late start, travel, etc.>
+<optional one-line heads-up>
 
-SECTION NAME <emoji>
+<MAIN_HEADER from client.md>
 * bullet
 * bullet
 
 SECTION NAME <emoji>
 * ...
 
-<closing line(s) in Roger's own words and mood>
+<closing in Roger's own words and mood>
 ```
 
-- Section headers: ALL CAPS, one emoji each. The client's `main_header` is the main section; add topic sections only when something deserves its own block (a demo, a blocker, an ask, the plan).
-- The main section header is exactly the client's `main_header`. Don't invent your own ("SHIPPED TODAY").
-- Bullets use `*`. Sub-bullets are fine for a list of small touches.
-- Lead-in lines ("Seven updates went in today. The ones you'll notice:") are plain lines, never bullets. Things that don't fit the lead-in ("behind the scenes" work) go after the list as their own line, not inside it.
-- Emojis: 2 to 3 per section at most, usually 1. Skip them when they feel forced.
-- No bold-label bullets (`* **Thing:** ...`). No markdown headers (`#`). No code blocks, backticks, file paths, or identifiers.
-- Lead each bullet with what changed for the people using the product, then one sentence of how or why if it helps. Use a concrete example or number when the PR has one ("9 of 24 test questions failed before, now all 24 get through").
-- Group many small PRs into one bullet ("Small quality-of-life touches for readers:" plus sub-bullets).
-- Name client people by first name the way Roger does. Credit colleagues briefly ("thanks to <colleague> for the summary").
-- **Closing:** keep Roger's actual mood and phrasing from the dump ("Super busy day, but firing on all engines!", "Ready for a nice cold Friday tomorrow"). Tidy it, don't replace it with something generic.
-- **Personal stuff:** keep the human bits (back home in his "paisito", working from the ferry, a holiday off). Trim health or family detail to one reassuring line ("a family emergency this morning, everything's okay now") and tell him what you trimmed.
-- **Don't pad a short day.** Three bullets is a fine EOD.
+- The main section header is exactly the client's `main_header`. Add topic sections (a demo, a blocker, an ask, the plan) only when something deserves its own block. Headers are ALL CAPS with one emoji.
+- Bullets use `*`; sub-bullets are fine. A lead-in ("Seven updates went in today. The ones you'll notice:") is a plain line above the list.
+- **PR numbers:** every required PR ends its bullet with its number in parentheses, "(#156)". Small ones with the same status share a bullet: "Housekeeping behind the scenes to keep things steady (#153, #154)". A merged PR and an open one get separate bullets, so each number sits next to its own status. When two repos share a number, write `owner/repo#156`.
+- **Links:** GitHub and Linear links stay out of client text; the PR number is the reference. Any other link you include is copied character for character from Roger's notes. If it only opens for members of a channel or workspace, say so in "Before you send".
+- **Voice:** keep his rhythm, humor and phrasing; translate only jargon. "I got into a very productive ticket PR loop and ran out of time, so I owe you the video" keeps its shape with "ticket PR loop" put in everyday words. A line with no jargon stays as he said it.
+- Each bullet carries one connected thought: what changed for the people using the product, plus how or why when useful. Keep numbers he cited.
+- Name client people by first name as Roger does; credit colleagues briefly.
+- **Closing:** his actual mood and wording, tidied ("Super busy day, but firing on all engines!").
+- **Personal stuff:** keep the human bits; trim health or family detail to one reassuring line and tell him what you trimmed.
+- Emojis: usually one per section, three at most. A short day gets a short update; three bullets is fine.
+- Write plain text: commas, colons, semicolons, periods and parentheses. No em dashes, en dashes or hyphens standing in for them, no bold-label bullets, no `#` headers, no backticks or file paths.
 
-## 5. Cleanup pass (every single update, every mode, no exceptions)
+## 6. Check
 
-1. If the `de-ai-writing` and `avoid-ai-tropes` skills are installed, load both and apply them to the draft. If they aren't, the hard rules in `references/plain-language.md` cover the same ground; follow those.
+1. If `de-ai-writing` and `avoid-ai-tropes` are installed, load them once per session and apply them with the smallest edits that keep his voice. Otherwise the hard rules in `plain-language.md` cover the same ground.
 2. Save the draft to `~/.eod/<client>/<today>.md` and run:
-   `python3 <skill-dir>/scripts/check_eod.py ~/.eod/<client>/<today>.md --client ~/.eod/<client>/client.md`
-3. Fix every hard finding. Judge soft findings yourself. Re-run until hard findings are zero.
-4. Absolutely no em dashes or en dashes, and don't swap them for hyphens used as dashes. Use commas, colons, semicolons, periods, or parentheses.
+   `python3 <skill-dir>/scripts/check_eod.py ~/.eod/<client>/<today>.md --client ~/.eod/<client>/client.md --prs ~/.eod/<client>/<today>.prs.json`
+   plus `--skip-pr owner/repo#number` for each PR Roger told you to skip. Fix every HARD finding and re-run until there are zero; judge SOFT findings yourself.
+3. **Story check:** re-read the dump. Every promise, slip, trade, pride, annoyance, mood and cited number is in a public line, or you have asked Roger about it.
+4. **Continuity with yesterday:** a promise due today and missing gets owned in one plain sentence ("I said I'd merge this today, but I wasn't happy with it, so I kept testing"). A resolved ask gets one line saying it's sorted. A new promise stacked on an unfinished one gets flagged.
+5. Keep `## Internal notes` at the bottom of the log for tomorrow, the internal update and the weekly: promises, open asks, risks, things cut, where the client version differs from reality, skipped PRs with Roger's reason.
 
-## 6. Continuity checks against yesterday
+## 7. Review
 
-- A promise that came due today and isn't mentioned → flag it. If it was missed, the update should own it in one plain sentence ("I said I'd merge this today, but I wasn't happy with it, so I kept testing"). Owning small slips builds trust; silence reads like hiding.
-- An open ask that got resolved → keep one line saying it's sorted, so the client doesn't think it's still stuck.
-- A new promise today on top of an unfinished one (two videos in one week, a fix "before the weekend" when tomorrow is already full) → flag the stacking.
+Run `eod-review` (facts, leaks, commitments) and `eod-reader` (what the reader concludes) in parallel. Give each the mode and the paths to the client config, today's notes, the saved draft, and yesterday's log. Weekly mode passes the week's logs and notes instead; internal mode tells the reader to read as the internal lead.
 
-## 7. Deliver
+Reviews are **advisory**. Show their flags; Roger decides. Fix a flag yourself only when it exposes a HARD checker rule, a false status claim, or a story element from Roger's own notes that the draft dropped. Anything a flag raises from an attachment or a colleague's summary stays a question for Roger. If a reviewer fails or is unavailable, deliver anyway and say so in its status line.
 
-EOD drafting, checking, review, and plain-text delivery work without a clipboard skill. If `chat-paste` is available, load it, read `<skill-dir>/references/formatting.md`, and export the saved, checker-clean draft through the optional adapter. The adapter owns public-content selection and heading preparation; it sends finished Markdown to the formatter's public CLI. Follow `chat-paste` for browser opening and delivery preferences, and regenerate the preview after revisions. If the formatter is absent, deliver the checked update normally and omit the preview link. If an installed formatter fails, report the export error without calling plain text or a stale page a successful formatted export. Keep the saved writing format unchanged.
+**Revisions:** re-run the checker every time. Re-run both reviewers only when the revision changes a claim, a PR's status, a promise, an ask, or which PRs appear. For a wording-only revision, say the previous reviews still apply.
 
-Reply with, in this order:
+## 8. Deliver
 
-1. The update as plain text, **not** in a code block, ready to paste.
-2. A `---` line, then "Before you send:" with the review flags. Produce them like this:
-   - Call the `eod-review` subagent with the mode and the paths: client config, today's notes, the draft, yesterday's log. Present what it returns. You may merge duplicates or drop a flag that is clearly wrong, but say which one and why in a short line. Never rewrite the draft because of a flag; let Roger decide.
-   - Only if `eod-review` is unavailable, or an `EVAL MODE` request says not to use it, read `<skill-dir>/references/review.md` and do the review yourself, after the checker is clean.
-    Always show the reviewer's result, even when it's `No flags.` (write "Reviewer: no flags."), so Roger can tell it ran. Your own extra notes, if any, go after it.
-    When a preview was generated successfully, add its `file://` URL and absolute path outside the message body, with the recommended copy button and any relevant formatting notes. The adapter hands over only the public update, excluding review flags, reminders, and `## Internal notes`. Without the optional formatter, omit this part and continue normal delivery.
-3. One line offering the internal version: `Want the internal one too? Say `internal`.`. Skip it if he already ran it today.
-4. **Friday only** (and only if the client has `weekly: true`): end with `📝 Friday reminder: say `weekly` to do the Weekly Review.` This line is for Roger and sits outside the paste-ready text.
+Render a preview of every delivered draft:
 
-When he asks for changes, edit the log file, re-run the checker, regenerate the clipboard preview if the optional formatter is available, and return the full updated update with its preview link when generated. Keep the log as the final version, with a `## Internal notes` section at the bottom holding what tomorrow's run, the internal update, or the weekly will need: promises, open asks, risks flagged, things cut, and where the client version differs from reality. That section never gets pasted.
+`python3 <skill-dir>/scripts/render_eod.py ~/.eod/<client>/<draft>.md --mode client --client ~/.eod/<client>/client.md --open`
 
-Once Roger is happy with the update, keep `## Waiting on the client` in `~/.eod/<client>/client.md` current: add anything the update asks the client for (with the date), and remove items the notes say were delivered. Create the section if it's missing.
+Use `--mode internal` or `--mode weekly` for those drafts, and `--no-open` after the first preview of the session. It writes `/tmp/opencode/<draft>.html` with only the public message. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
+
+Reply in this order:
+
+1. The update as plain text, not in a code block.
+2. `---`, then **Before you send:**
+   - Merged reviewer flags, tagged `Reviewer`, `Reader`, or both. You may drop a flag that is clearly wrong if you name it and say why. Your own notes come after.
+   - One status line per reviewer: `Reviewer: no flags.`, `Reviewer: completed with flags.`, `Reviewer: did not run (<reason>).`, or `Reviewer: previous review still applies (wording-only change).` Same for `Reader:`.
+   - FYI PRs: the ACTIVITY and CLOSED PRs from the checker's summary, one line each.
+   - The preview path, when one was generated.
+3. `Want the internal one too? Say internal.` unless he already ran it today.
+4. Fridays, when the client has `weekly: true`: `📝 Friday reminder: say weekly to do the Weekly Review.`
+
+Once Roger is happy, update `## Waiting on the client` in `client.md`: add what the update asks for (with the date) and remove what the notes say arrived. Create the section if missing.

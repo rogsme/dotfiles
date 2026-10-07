@@ -88,7 +88,7 @@ def channel(path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "file", help="Saved final .md draft; output is the matching .html file"
+        "file", help="Saved final .md draft; output is /tmp/opencode/<draft-name>.html"
     )
     parser.add_argument(
         "--mode", choices=["client", "internal", "weekly"], default="client"
@@ -109,7 +109,7 @@ def main():
         action="store_false",
         help="Generate without opening a browser",
     )
-    parser.set_defaults(open_browser=None)
+    parser.set_defaults(open_browser=False)
     args = parser.parse_args()
     try:
         draft = Path(args.file).expanduser().resolve(strict=True)
@@ -121,7 +121,8 @@ def main():
             raise ValueError(
                 "Render a final .md message, not raw notes or client configuration."
             )
-        output = draft.with_suffix(".html")
+        output = Path("/tmp/opencode") / f"{draft.stem}.html"
+        output.parent.mkdir(parents=True, exist_ok=True)
         public_message = prepare_message(draft.read_text(encoding="utf-8"), args.mode)
         if not public_message:
             raise ValueError("The public message is empty.")

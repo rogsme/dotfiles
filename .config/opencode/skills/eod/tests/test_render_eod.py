@@ -15,11 +15,17 @@ spec.loader.exec_module(renderer)
 
 
 class RenderTests(unittest.TestCase):
+    def output_path(self, draft):
+        output = Path("/tmp/opencode") / f"{draft.stem}.html"
+        self.addCleanup(output.unlink, missing_ok=True)
+        return output
+
     def export_page(self, text, mode="client"):
         if not renderer.CHAT_PASTE_CLI.is_file():
             self.skipTest("Optional formatter is not installed")
         with tempfile.TemporaryDirectory(prefix="eod-export-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
+            output = self.output_path(draft)
             draft.write_text(text, encoding="utf-8")
             result = subprocess.run(
                 [sys.executable, str(SCRIPT), str(draft), "--mode", mode, "--no-open"],
@@ -28,7 +34,8 @@ class RenderTests(unittest.TestCase):
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(draft.read_text(encoding="utf-8"), text)
-            return draft.with_suffix(".html").read_text(encoding="utf-8")
+            self.assertFalse(draft.with_suffix(".html").exists())
+            return output.read_text(encoding="utf-8")
 
     def test_private_notes_never_enter_the_export(self):
         page = self.export_page(
@@ -44,12 +51,12 @@ class RenderTests(unittest.TestCase):
     )
     def test_cli_generates_private_page_and_regenerates_after_revisions(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
+            output = self.output_path(draft)
             draft.write_text("Hey team!\n\nTODAY 🙂\n* First", encoding="utf-8")
             command = ["python3", str(SCRIPT), str(draft), "--no-open"]
             first = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(first.returncode, 0, first.stderr)
-            output = draft.with_suffix(".html")
             self.assertEqual(output.stat().st_mode & 0o777, 0o600)
             self.assertIn(output.as_uri(), first.stdout)
             draft.write_text("Hey team!\n\nTODAY 🙂\n* Revised", encoding="utf-8")
@@ -63,7 +70,8 @@ class RenderTests(unittest.TestCase):
     )
     def test_unsupported_input_does_not_create_a_page(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
+            output = self.output_path(draft)
             draft.write_text("![image](https://example.com/a.png)")
             result = subprocess.run(
                 ["python3", str(SCRIPT), str(draft), "--no-open"],
@@ -71,16 +79,17 @@ class RenderTests(unittest.TestCase):
                 text=True,
             )
             self.assertEqual(result.returncode, 1)
-            self.assertFalse(draft.with_suffix(".html").exists())
+            self.assertFalse(output.exists())
 
     @unittest.skipUnless(
         renderer.CHAT_PASTE_CLI.is_file(), "Optional formatter is not installed"
     )
     def test_unrelated_html_is_preserved(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
             draft.write_text("Message")
-            output = draft.with_suffix(".html")
+            output = self.output_path(draft)
+            output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text("User-owned page")
             result = subprocess.run(
                 ["python3", str(SCRIPT), str(draft), "--no-open"],
@@ -95,11 +104,13 @@ class RenderTests(unittest.TestCase):
     )
     def test_symlink_output_is_preserved(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
             draft.write_text("Message")
             target = Path(root) / "private.html"
             target.write_text("User-owned page")
-            draft.with_suffix(".html").symlink_to(target)
+            output = self.output_path(draft)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            output.symlink_to(target)
             result = subprocess.run(
                 ["python3", str(SCRIPT), str(draft), "--no-open"],
                 capture_output=True,
@@ -154,9 +165,10 @@ class RenderTests(unittest.TestCase):
     )
     def test_old_owned_eod_preview_migrates_to_shared_renderer(self):
         with tempfile.TemporaryDirectory(prefix="eod-migrate-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
             draft.write_text("Hey team!\n\nTODAY 🙂\n* Works")
-            output = draft.with_suffix(".html")
+            output = self.output_path(draft)
+            output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text(
                 "<!doctype html>\n<!-- Generated by EOD formatter v1. -->\nOld generated preview"
             )
@@ -189,13 +201,17 @@ class RenderTests(unittest.TestCase):
                 command = call.call_args.args[0]
                 self.assertEqual(command[1], str(SCRIPT))
                 self.assertIn("--stdin", command)
+                self.assertEqual(
+                    command[command.index("--output") + 1],
+                    str(Path("/tmp/opencode") / f"{source.stem}.html"),
+                )
                 self.assertEqual(command[command.index("--destination") + 1], "slack")
                 self.assertEqual(
                     call.call_args.kwargs["input"], "Hey team!\n\n## SHIPPED\n• Works"
                 )
                 self.assertNotIn("PRIVATE_SENTINEL", str(call.call_args))
 
-    def test_adapter_leaves_opening_default_to_formatter(self):
+    def test_adapter_opens_only_with_explicit_flag(self):
         with tempfile.TemporaryDirectory(prefix="eod-open-") as root:
             source = Path(root) / "2026-10-05.md"
             source.write_text("Ready")
@@ -217,15 +233,16 @@ class RenderTests(unittest.TestCase):
                     command = call.call_args.args[0]
                     self.assertEqual(
                         [arg for arg in command if arg in ("--open", "--no-open")],
-                        flags,
+                        flags or ["--no-open"],
                     )
 
     def test_eod_delivery_and_checker_work_without_formatter_or_node(self):
         with tempfile.TemporaryDirectory(prefix="eod-standalone-") as root:
-            draft = Path(root) / "2026-10-05.md"
+            draft = Path(root) / f"{Path(root).name}.md"
             draft.write_bytes((SKILL / "tests/demo.md").read_bytes())
             original = draft.read_bytes()
-            output = draft.with_suffix(".html")
+            output = self.output_path(draft)
+            output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text("OLD_PREVIEW_SENTINEL")
             env = {**os.environ, "HOME": root, "PATH": ""}
             result = subprocess.run(
