@@ -10,10 +10,12 @@ Usage:
   blocks dashes, AI tropes and bold-label bullets.
 --client: reads technical_level, opener, and the "## Never mention" list
   from the client config. technical_level: technical relaxes ticket IDs,
-  identifiers and jargon to SOFT. PR numbers like (#156) are always allowed.
+  identifiers and jargon to SOFT. PR numbers like (#156) are always allowed,
+  and so is a GitHub link written as a PR number's own link:
+  [#156](https://github.com/owner/repo/pull/156).
 --prs: saved JSON output from todays_prs.py --json. Every MERGED, OPENED and
-  WORKED ON PR must appear in the public text as #N, owner/repo#N, or its URL.
-  ACTIVITY and CLOSED PRs are not required.
+  WORKED ON PR must appear in the public text as #N, owner/repo#N, or its URL,
+  and carry its PR URL. ACTIVITY and CLOSED PRs are not required.
 --skip-pr: repo#number explicitly skipped by Roger (repeatable, requires --prs).
 
 Only the text above a "## Internal notes" heading is checked (that section
@@ -133,6 +135,10 @@ ING_TAIL = (
 # --- client-safety -----------------------------------------------------------
 TICKET = r"\b[A-Z]{2,6}-\d{1,5}\b"
 GITHUB = r"https?://(?:github\.com|linear\.app)/\S+"
+PR_LINK = (
+    r"\[(?:([\w.-]+/[\w.-]+))?#(\d+)\]"
+    r"\((https?://github\.com/([\w.-]+/[\w.-]+)/pull/(\d+))\)"
+)
 IDENT_SNAKE = r"\b[a-z0-9]+_[a-z0-9_]+\b"
 IDENT_CAMEL = r"\b[a-z]+[A-Z][A-Za-z0-9]+\b"
 FILEPATH = r"(?:\b[\w.-]+/)+[\w.-]+\.(?:py|ts|tsx|js|md|yml|yaml|json|sql|toml)\b|\b[\w-]+\.(?:py|ts|tsx|js|yml|yaml|toml|sql)\b"
@@ -218,7 +224,11 @@ OPTIONAL_BUCKETS = ("ACTIVITY", "CLOSED")
 
 
 def check_pr_coverage(text, manifest, skipped):
-    """Match required PRs to visible #N, owner/repo#N, or PR URL mentions."""
+    """Match required PRs to visible #N, owner/repo#N, or PR URL mentions.
+
+    Returns (missing, unlinked, summary): unlinked PRs are visible but carry
+    no link to their pull request.
+    """
     data = manifest.get("buckets") if isinstance(manifest, dict) else None
     if not isinstance(data, dict) or not set(REQUIRED_BUCKETS) <= set(data):
         raise ValueError(
@@ -255,7 +265,7 @@ def check_pr_coverage(text, manifest, skipped):
         r"^\s{0,3}#{1,6}\s+Internal notes\b.*$", text, maxsplit=1, flags=re.M | re.I
     )[0].casefold()
     numbers = Counter(pr["number"] for _, pr in gathered.values())
-    missing = []
+    missing, unlinked = [], []
     for key, pr in required.items():
         n, repo = pr["number"], re.escape(pr["repo"].casefold())
         identity = re.search(rf"(?<![\w/#-]){repo}#{n}(?!\w)", public)
@@ -265,6 +275,8 @@ def check_pr_coverage(text, manifest, skipped):
         )
         if not (identity or url or number):
             missing.append(key)
+        elif not url:
+            unlinked.append(key)
     summary = (
         f"PR coverage: {len(required) - len(missing)}/{len(required)} required PRs "
         f"visible ({len(skipped)} explicitly skipped by Roger)."
@@ -273,7 +285,7 @@ def check_pr_coverage(text, manifest, skipped):
         summary += (
             f" Not required, list for Roger as FYI: {', '.join(sorted(optional))}."
         )
-    return missing, summary
+    return missing, unlinked, summary
 
 
 def main():
@@ -315,7 +327,7 @@ def main():
     if args.prs:
         try:
             with open(args.prs, encoding="utf-8") as gathered:
-                missing, summary = check_pr_coverage(
+                missing, unlinked, summary = check_pr_coverage(
                     text, json.load(gathered), args.skip_pr
                 )
             print(summary)
@@ -324,6 +336,14 @@ def main():
                     HARD,
                     1,
                     f"gathered PR missing from public update: {key}",
+                    is_line=True,
+                )
+            for key in unlinked:
+                repo, n = key.split("#")
+                add(
+                    HARD,
+                    1,
+                    f"PR {key} has no link: write [#{n}](https://github.com/{repo}/pull/{n})",
                     is_line=True,
                 )
         except (OSError, ValueError) as error:
@@ -380,9 +400,19 @@ def main():
     def in_url(pos):
         return any(a <= pos < b for a, b in url_spans)
 
+    # A PR number linked to its own pull request is the one allowed GitHub link.
+    pr_links = set()
+    for m in re.finditer(PR_LINK, text):
+        text_repo, text_n, url, url_repo, url_n = m.groups()
+        if text_n != url_n or (text_repo and text_repo.casefold() != url_repo.casefold()):
+            add(HARD, m.start(), f"PR link text does not match its URL: {m.group(0)!r}")
+        else:
+            pr_links.add(m.start(3))
+
     if not internal:
         for m in re.finditer(GITHUB, text):
-            add(safety, m.start(), f"GitHub/Linear link: {m.group(0)!r}")
+            if m.start() not in pr_links:
+                add(safety, m.start(), f"GitHub/Linear link: {m.group(0)!r}")
         for pat, label in [
             (TICKET, "ticket ID"),
             (FILEPATH, "file path"),

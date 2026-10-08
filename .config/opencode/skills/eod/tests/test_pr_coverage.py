@@ -37,9 +37,13 @@ def inventory():
     }
 
 
+def link(n, repo="owner/app"):
+    return f"[#{n}](https://github.com/{repo}/pull/{n})"
+
+
 class CoverageTests(unittest.TestCase):
     def test_only_merged_opened_and_worked_on_are_required(self):
-        missing, summary = checker.check_pr_coverage("* Updates (#1, #2, #3).", inventory(), [])
+        missing, _, summary = checker.check_pr_coverage("* Updates (#1, #2, #3).", inventory(), [])
         self.assertEqual(missing, [])
         self.assertIn("3/3 required PRs visible", summary)
         self.assertIn("FYI: owner/app#4, owner/app#5", summary)
@@ -54,7 +58,7 @@ class CoverageTests(unittest.TestCase):
     def test_private_notes_do_not_count(self):
         for heading in ("## Internal notes", "  ### Internal notes"):
             with self.subTest(heading=heading):
-                missing, summary = checker.check_pr_coverage(
+                missing, _, summary = checker.check_pr_coverage(
                     f"* #1, #2.\n\n{heading}\nIncluded #3.", inventory(), []
                 )
                 self.assertEqual(missing, ["owner/app#3"])
@@ -86,7 +90,7 @@ class CoverageTests(unittest.TestCase):
                 )
 
     def test_explicit_skip_changes_required_count(self):
-        missing, summary = checker.check_pr_coverage(
+        missing, _, summary = checker.check_pr_coverage(
             "* #1, #2.", inventory(), ["owner/app#3"]
         )
         self.assertEqual(missing, [])
@@ -97,7 +101,7 @@ class CoverageTests(unittest.TestCase):
             checker.check_pr_coverage("* #1.", inventory(), ["owner/app#99"])
 
     def test_number_boundaries_are_respected(self):
-        missing, _ = checker.check_pr_coverage("* #10, #2, #3.", inventory(), [])
+        missing, _, _ = checker.check_pr_coverage("* #10, #2, #3.", inventory(), [])
         self.assertEqual(missing, ["owner/app#1"])
 
     def test_colliding_numbers_need_repo_identity(self):
@@ -118,7 +122,7 @@ class CoverageTests(unittest.TestCase):
     def test_duplicate_gather_identity_counts_once(self):
         data = inventory()
         data["buckets"]["ACTIVITY"].append(data["buckets"]["MERGED"][0])
-        missing, summary = checker.check_pr_coverage("* #1, #2, #3.", data, [])
+        missing, _, summary = checker.check_pr_coverage("* #1, #2, #3.", data, [])
         self.assertEqual(missing, [])
         self.assertIn("3/3 required", summary)
 
@@ -133,7 +137,7 @@ class CoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Invalid PR identity"):
             checker.check_pr_coverage("", data, [])
 
-    def test_links_are_not_scanned_as_code_but_github_links_still_flag(self):
+    def test_links_are_not_scanned_as_code_and_only_pr_links_reach_github(self):
         def hard(public):
             result = subprocess.run(
                 [sys.executable, str(CHECKER), "-"],
@@ -153,6 +157,10 @@ class CoverageTests(unittest.TestCase):
         github = hard("* Details: https://github.com/owner/app/pull/1")
         self.assertEqual(len(github), 1)
         self.assertIn("GitHub/Linear link", github[0])
+        self.assertEqual(hard(f"* Shipped ({link(1)}, [owner/app#2]"
+                              "(https://github.com/owner/app/pull/2))."), [])
+        github = hard("* See [the issue](https://github.com/owner/app/issues/1).")
+        self.assertEqual(len(github), 1)
 
     def run_checker(self, root, public, extra=()):
         draft = Path(root) / "draft.md"
@@ -170,20 +178,41 @@ class CoverageTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(
             dir="/tmp/opencode", prefix="eod-coverage-"
         ) as root:
-            result = self.run_checker(root, "* Shipped (#1, #2, #3).")
+            result = self.run_checker(
+                root, f"* Shipped ({link(1)}, {link(2)}, {link(3)})."
+            )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             self.assertIn("0 hard", result.stdout)
             result = self.run_checker(
-                root, "* #1, #2.\n\n## Internal notes\n#3"
+                root, f"* {link(1)}, {link(2)}.\n\n## Internal notes\n#3"
             )
             self.assertEqual(result.returncode, 1)
             self.assertIn(
                 "gathered PR missing from public update: owner/app#3", result.stdout
             )
             result = self.run_checker(
-                root, "* #1, #2.", ["--skip-pr", "owner/app#3"]
+                root, f"* {link(1)}, {link(2)}.", ["--skip-pr", "owner/app#3"]
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_cli_requires_each_pr_number_to_link_to_its_pr(self):
+        with tempfile.TemporaryDirectory(
+            dir="/tmp/opencode", prefix="eod-coverage-"
+        ) as root:
+            result = self.run_checker(root, f"* Shipped (#1, {link(2)}, {link(3)}).")
+            self.assertEqual(result.returncode, 1)
+            self.assertIn(
+                "PR owner/app#1 has no link: write "
+                "[#1](https://github.com/owner/app/pull/1)",
+                result.stdout,
+            )
+            result = self.run_checker(
+                root,
+                "* Shipped ([#1](https://github.com/owner/app/pull/2), "
+                f"{link(2)}, {link(3)}).",
+            )
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("PR link text does not match its URL", result.stdout)
 
     def test_cli_missing_inventory_blocks_delivery(self):
         with tempfile.TemporaryDirectory(

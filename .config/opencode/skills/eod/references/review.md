@@ -28,7 +28,7 @@ The checker already confirms that every required PR number appears, and handles 
 ## Leave alone
 
 - Deliberate differences between internal reality and the client version ("QA is done" internally, "still testing" for the client). Those are Roger's call unless the client claim will be visibly false within a day or two.
-- Style the checker covers.
+- Style the checker covers, including the PR number links.
 - Anything you can't tie to a specific line in the inputs: no hunches, no generic advice.
 
 ## Output

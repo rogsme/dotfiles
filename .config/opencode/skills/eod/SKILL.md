@@ -107,15 +107,15 @@ SECTION NAME <emoji>
 
 - The main section header is exactly the client's `main_header`. Add topic sections (a demo, a blocker, an ask, the plan) only when something deserves its own block. Headers are ALL CAPS with one emoji.
 - Bullets use `*`; sub-bullets are fine. A lead-in ("Seven updates went in today. The ones you'll notice:") is a plain line above the list.
-- **PR numbers:** every required PR ends its bullet with its number in parentheses, "(#156)". Small ones with the same status share a bullet: "Housekeeping behind the scenes to keep things steady (#153, #154)". A merged PR and an open one get separate bullets, so each number sits next to its own status. When two repos share a number, write `owner/repo#156`.
-- **Links:** GitHub and Linear links stay out of client text; the PR number is the reference. Any other link you include is copied character for character from Roger's notes. If it only opens for members of a channel or workspace, say so in "Before you send".
+- **PR numbers:** every required PR ends its bullet with its number in parentheses, linked to the PR's `url` from the inventory: "([#156](https://github.com/owner/repo/pull/156))". Small ones with the same status share a bullet: "Housekeeping behind the scenes to keep things steady ([#153](…/pull/153), [#154](…/pull/154))". A merged PR and an open one get separate bullets, so each number sits next to its own status. When two repos share a number, the link text is `owner/repo#156`.
+- **Links:** a PR number's own link is the one GitHub link in client text; Linear links stay out. Any other link you include is copied character for character from Roger's notes. If it only opens for members of a channel or workspace, say so in "Before you send".
 - **Voice:** keep his rhythm, humor and phrasing; translate only jargon. "I got into a very productive ticket PR loop and ran out of time, so I owe you the video" keeps its shape with "ticket PR loop" put in everyday words. A line with no jargon stays as he said it.
 - Each bullet carries one connected thought: what changed for the people using the product, plus how or why when useful. Keep numbers he cited.
 - Name client people by first name as Roger does; credit colleagues briefly.
 - **Closing:** his actual mood and wording, tidied ("Super busy day, but firing on all engines!").
 - **Personal stuff:** keep the human bits; trim health or family detail to one reassuring line and tell him what you trimmed.
 - Emojis: usually one per section, three at most. A short day gets a short update; three bullets is fine.
-- Write plain text: commas, colons, semicolons, periods and parentheses. No em dashes, en dashes or hyphens standing in for them, no bold-label bullets, no `#` headers, no backticks or file paths.
+- Write plain text: commas, colons, semicolons, periods and parentheses. No em dashes, en dashes or hyphens standing in for them, no bold-label bullets, no `#` headers, no backticks or file paths. The PR links are the only Markdown.
 
 ## 6. Check
 
@@ -141,7 +141,7 @@ Render a preview of every delivered draft:
 
 `python3 <skill-dir>/scripts/render_eod.py ~/.eod/<client>/<draft>.md --mode client --client ~/.eod/<client>/client.md --open`
 
-Use `--mode internal` or `--mode weekly` for those drafts, and `--no-open` after the first preview of the session. It writes `/tmp/opencode/<draft>.html` with only the public message. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
+Use `--mode internal` or `--mode weekly` for those drafts, and `--no-open` after the first preview of the session. It writes `/tmp/opencode/<draft>.html` with only the public message; Roger copies from it so the PR links paste as real links. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
 
 Reply in this order:
 

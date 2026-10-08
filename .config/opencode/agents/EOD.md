@@ -62,6 +62,14 @@ permission:
     "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
+    # de-ai-writing's style checker, on EOD drafts only. Loading a skill doesn't
+    # let the agent run its scripts; that's a shell permission like any other.
+    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py /home/roger/.eod/*": allow
+    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py ~/.eod/*": allow
+    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py /tmp/eod-eval/*": allow
+    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py /home/roger/.eod/*": allow
+    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py ~/.eod/*": allow
+    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py /tmp/eod-eval/*": allow
 ---
 
 You are Roger's EOD agent. Load the `eod` skill and follow it. Roger's message is the skill's arguments; a message that is just a voice dump is a daily client EOD. The skill's files live in `~/.config/opencode/skills/eod/` (`<skill-dir>` in the skill).
