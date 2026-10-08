@@ -6,7 +6,7 @@ const { format } = require("../assets/formatter.js");
 
 // Run the real button handlers with a deterministic clipboard-event double.
 // Real browser clipboard round-trips remain in browser.js and firefox.cjs.
-function preview(userAgent, { rejectHTML = false, copyResult = true, savedTheme, storageFails = false } = {}) {
+function preview(userAgent, { rejectHTML = false, copyResult = true, savedTheme, storageFails = false, systemDark = false, destination = "both" } = {}) {
   const input = "## Update 🚀\n* Parent\n  * Child\n    * Grandchild\n\n[Notes](https://example.com/notes)";
   const elements = new Map();
   const listeners = new Map();
@@ -22,7 +22,7 @@ function preview(userAgent, { rejectHTML = false, copyResult = true, savedTheme,
     });
     return elements.get(id);
   }
-  element("chat-paste-data").textContent = JSON.stringify({ text: input, title: "Test", destination: "both" });
+  element("chat-paste-data").textContent = JSON.stringify({ text: input, title: "Test", destination });
   const document = {
     documentElement: { dataset: {} },
     getElementById: element,
@@ -45,7 +45,8 @@ function preview(userAgent, { rejectHTML = false, copyResult = true, savedTheme,
     },
   };
   vm.runInNewContext(fs.readFileSync(require.resolve("../assets/preview.js"), "utf8"), {
-    document, navigator: { userAgent }, window: { getSelection: () => null, matchMedia: () => ({ matches: false }) },
+    document, navigator: { userAgent }, window: { getSelection: () => null, matchMedia: () => ({ matches: systemDark }) },
+    setTimeout: () => 0, clearTimeout() {},
     localStorage: {
       getItem(key) { if (storageFails) throw new Error("Storage disabled"); return storage.get(key); },
       setItem(key, value) { if (storageFails) throw new Error("Storage disabled"); storage.set(key, value); },
@@ -59,6 +60,8 @@ test("Firefox/Zen Slack copy writes rich HTML instead of refusing the browser", 
   const { element, clipboard, expected } = preview("Mozilla/5.0 Firefox/157.0");
   element("copy-slack").click();
   assert.match(element("status").textContent, /^Copied for Slack/);
+  assert.equal(element("toast").textContent, "Copied for Slack");
+  assert.equal(element("toast").className, "show");
   assert.equal(element("warning").textContent, "");
   assert.equal(clipboard.get("text/html"), expected.html);
   assert.equal(clipboard.get("text/plain"), expected.plain);
@@ -78,6 +81,7 @@ test("Firefox rich-copy failures never succeed with only plain text", () => {
     element("copy-slack").click();
     assert.match(element("status").textContent, /^Copy failed\./);
     assert.match(element("status").textContent, /No plain-text fallback/);
+    assert.equal(element("toast").className, "show error");
   }
 });
 
@@ -102,4 +106,16 @@ test("blocked storage does not break copying or theme changes", () => {
   assert.equal(document.documentElement.dataset.theme, "dark");
   element("copy-slack").click();
   assert(clipboard.has("text/html"));
+});
+
+test("first visit defaults to light even when the system prefers dark", () => {
+  const { document } = preview("Firefox/157.0", { systemDark: true });
+  assert.equal(document.documentElement.dataset.theme, "light");
+});
+
+test("Teams copy shows a toast and the destination button has no recommendation suffix", () => {
+  const { element } = preview("Firefox/157.0", { destination: "teams" });
+  element("copy-teams").click();
+  assert.equal(element("toast").textContent, "Copied for Teams");
+  assert(!element("copy-teams").textContent.includes("recommended"));
 });

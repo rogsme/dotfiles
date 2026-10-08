@@ -13,7 +13,7 @@ Heading styles come from explicit Markdown. Unicode `•` bullets are recognized
 
 ## Privacy and failure behavior
 
-The generated page embeds all scripts and has a restrictive Content Security Policy. It does not upload, fetch external scripts, store browser edits, or send messages. Only the light/dark preference is stored in browser local storage; disabled storage does not prevent copying or switching themes. Source HTML and unsafe link protocols are rejected. Clipboard verification is implemented in automated tests rather than a preview pane.
+The generated page embeds all scripts and has a restrictive Content Security Policy. It does not upload, fetch external scripts, store browser edits, or send messages. The page starts in light mode. Only the light/dark preference is stored in browser local storage, and some browsers, such as Zen, do not keep it for `file://` pages; disabled storage does not prevent copying or switching themes. Source HTML and unsafe link protocols are rejected. Clipboard verification is implemented in automated tests rather than a preview pane.
 
 Generated pages contain message content, so the writer creates them with owner-only permissions and replaces them atomically. It refuses to overwrite unrelated files or symlinks. Do not publish client messages or put their contents into command-line arguments.
 

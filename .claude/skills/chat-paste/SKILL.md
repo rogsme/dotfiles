@@ -24,7 +24,7 @@ Turn a message into a self-contained browser page with **Copy for Slack** and **
 4. Require exit code 0 and the printed preview path. If formatting is unsupported, explain the specific blocker and preserve the source; do not silently flatten lists, remove unsupported content, or present plain text as a successful rich export. Read `references/clipboard.md` when diagnosing a copy or formatting issue.
 5. The exporter opens the finished preview in the default browser automatically. Pass `--no-open` only when the user asks not to open a browser or an evaluation forbids application launches. Return the printed `file://` URL and absolute path, the recommended copy button, and any relevant formatting notes. If opening fails, report that failure and return the URL. Tell the user to copy and paste normally into the destination's rich-text editor. Keep browser-protocol details out of normal delivery. The skill does not post messages or automatically replace the user's clipboard.
 
-After revisions, regenerate from the updated source; the exporter opens the updated preview. Edits made in the browser are temporary and are not written back to the source file. The page has a light/dark toggle that remembers the choice in browser storage; only the theme is stored.
+After revisions, regenerate from the updated source; the exporter opens the updated preview. Edits made in the browser are temporary and are not written back to the source file. The page defaults to light mode. Its light/dark toggle remembers the choice in browser storage where the browser keeps `file://` storage (Zen does not); only the theme is stored. Copy buttons confirm with a short toast.
 
 ## Input/output contract
 

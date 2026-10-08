@@ -20,7 +20,9 @@
   }
   let savedTheme;
   try { savedTheme = localStorage.getItem(themeKey); } catch (_) { /* Storage may be disabled. */ }
-  setTheme(["light", "dark"].includes(savedTheme) ? savedTheme : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  // Default to light: some browsers (Zen) do not persist file:// storage, so a
+  // system-dark fallback would undo the user's choice on every new preview.
+  setTheme(savedTheme === "dark" ? "dark" : "light");
   themeToggle.addEventListener("click", () => {
     const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     setTheme(theme);
@@ -31,14 +33,20 @@
   source.value = data.text;
   const revisionNote = "Browser edits are temporary and are not written to the source file." + (data.revisionNote ? ` ${data.revisionNote}` : "");
   document.getElementById("edited").textContent = revisionNote;
-  if (data.destination !== "both") {
-    const preferred = document.getElementById(`copy-${data.destination}`);
-    preferred.textContent += " (recommended)";
-  }
 
   function message(text, error = false) {
     status.textContent = text;
     status.className = error ? "error" : "";
+  }
+
+  // Visual confirmation only; #status already announces the result to screen readers.
+  const toast = document.getElementById("toast");
+  let toastTimer;
+  function showToast(text, error = false) {
+    toast.textContent = text;
+    toast.className = error ? "show error" : "show";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.className = error ? "error" : ""; }, 2600);
   }
 
   function update() {
@@ -105,11 +113,13 @@
     }
     if (!success || !wrote || failure) {
       message(`Copy failed. ${failure?.message || "Click the button again and check your browser's clipboard permissions."} No plain-text fallback was used.`, true);
+      showToast("Copy failed", true);
       return;
     }
     if (target === "slack") message("Copied for Slack. Paste normally into Slack.");
     else if (target === "teams") message("Copied for Teams. Paste normally into Teams or Ferdium.");
     else message("Copied plain text; formatting was intentionally removed.");
+    showToast({ slack: "Copied for Slack", teams: "Copied for Teams", plain: "Copied plain text" }[target]);
   }
 
   source.addEventListener("input", update);

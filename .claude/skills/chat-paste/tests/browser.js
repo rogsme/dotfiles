@@ -8,7 +8,7 @@ async page => {
   const check = (condition, label) => { checks.push(label); if (!condition) failures.push(label); };
   page.on("pageerror", error => errors.push(error.message));
   page.on("request", request => requests.push(request.url()));
-  await page.emulateMedia({ colorScheme: "light" });
+  await page.emulateMedia({ colorScheme: "dark" });
   await page.evaluate(() => localStorage.removeItem("chat-paste-theme"));
   await page.reload();
   await page.locator("#copy-slack").waitFor({ state: "visible" });
@@ -19,7 +19,7 @@ async page => {
 
   check(await page.locator("#verify").count() === 0, "Clipboard verification is absent from the UI");
   check(!await page.locator("#source-panel").evaluate(el => el.open), "Source editor is collapsed by default");
-  check(await page.locator("html").getAttribute("data-theme") === "light", "First visit follows the system's light preference");
+  check(await page.locator("html").getAttribute("data-theme") === "light", "First visit defaults to light even with a dark system preference");
   await page.locator("#theme-toggle").click();
   check(await page.locator("html").getAttribute("data-theme") === "dark", "Theme toggle enables dark mode");
   await page.reload();

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;sha256-9CTctQj9+T4BN6lwz86PMgfqLj837KX3VWpSh1aDYyo=&#x27; &#x27;sha256-gmqkZER0ExCEzF4CjEZa++OUF6gVuHM5ndIcJNU5F1o=&#x27; &#x27;sha256-rbPr3eAVvhvDn010PESqkl/l5JK4RjiOAjqexwNpINc=&#x27;; style-src &#x27;unsafe-inline&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
+  <meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;sha256-9CTctQj9+T4BN6lwz86PMgfqLj837KX3VWpSh1aDYyo=&#x27; &#x27;sha256-gmqkZER0ExCEzF4CjEZa++OUF6gVuHM5ndIcJNU5F1o=&#x27; &#x27;sha256-kXerUvRqYIUcGtFZAGrESSZ0d4OQkcEcI+dyXipAgcM=&#x27;; style-src &#x27;unsafe-inline&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;">
   <title>Slack and Teams message</title>
   <style>
     :root { color-scheme:light; font:16px/1.6 system-ui,sans-serif; --bg:#fff; --surface:#f5f5f5; --ink:#202020; --muted:#686868; --border:#dedede; --accent:#245ac1; --error:#b53326; }
@@ -37,6 +37,10 @@
     .subtitle,.note { font-size:.85rem; margin:10px 0 0; }
     details { border-top:1px solid var(--border); padding-top:16px; margin:24px 0; }
     summary { cursor:pointer; color:var(--muted); margin-bottom:12px; }
+    #toast { position:fixed; left:50%; bottom:24px; transform:translate(-50%,12px); max-width:calc(100% - 32px); padding:10px 16px; border-radius:8px; background:var(--ink); color:var(--bg); font-size:.9rem; font-weight:600; box-shadow:0 6px 20px rgba(0,0,0,.18); opacity:0; pointer-events:none; transition:opacity .18s,transform .18s; }
+    #toast.show { opacity:1; transform:translate(-50%,0); }
+    #toast.error { background:var(--error); }
+    @media (prefers-reduced-motion:reduce) { #toast { transition:none; } }
     @media (max-width:600px) { main { margin:24px auto; padding:0 16px; } header { align-items:flex-start; gap:12px; } }
   </style>
 </head>
@@ -59,6 +63,7 @@
   </details>
   <noscript>This formatter requires JavaScript. The message has not been copied.</noscript>
 </main>
+<div id="toast" aria-hidden="true"></div>
 <script type="application/json" id="chat-paste-data">{"text": "Hey team! Here's the latest product update:\n\n## PRODUCT UPDATE 🛠️\n* Readers can now import spreadsheets without losing column names.\n* Small quality-of-life touches:\n  * Long titles wrap cleanly on smaller screens.\n  * Navigation keeps your current filters.\n    * Returning to a search keeps its sorting too.\n\n## NEXT STEPS 🎯\n* Finish testing the upload flow with the sample files.\n\nBusy day, happy with where we got to!\n\n## Internal notes\nINTENTIONAL_NOTES_SENTINEL: this section is deliberately included in this standalone message.", "title": "Slack and Teams message", "destination": "both", "revisionNote": ""}</script>
 <script>/**
  * marked v18.1.0 - a markdown parser
@@ -414,7 +419,9 @@ if (typeof module === "object" && require.main === module) {
   }
   let savedTheme;
   try { savedTheme = localStorage.getItem(themeKey); } catch (_) { /* Storage may be disabled. */ }
-  setTheme(["light", "dark"].includes(savedTheme) ? savedTheme : window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  // Default to light: some browsers (Zen) do not persist file:// storage, so a
+  // system-dark fallback would undo the user's choice on every new preview.
+  setTheme(savedTheme === "dark" ? "dark" : "light");
   themeToggle.addEventListener("click", () => {
     const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     setTheme(theme);
@@ -425,14 +432,20 @@ if (typeof module === "object" && require.main === module) {
   source.value = data.text;
   const revisionNote = "Browser edits are temporary and are not written to the source file." + (data.revisionNote ? ` ${data.revisionNote}` : "");
   document.getElementById("edited").textContent = revisionNote;
-  if (data.destination !== "both") {
-    const preferred = document.getElementById(`copy-${data.destination}`);
-    preferred.textContent += " (recommended)";
-  }
 
   function message(text, error = false) {
     status.textContent = text;
     status.className = error ? "error" : "";
+  }
+
+  // Visual confirmation only; #status already announces the result to screen readers.
+  const toast = document.getElementById("toast");
+  let toastTimer;
+  function showToast(text, error = false) {
+    toast.textContent = text;
+    toast.className = error ? "show error" : "show";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toast.className = error ? "error" : ""; }, 2600);
   }
 
   function update() {
@@ -499,11 +512,13 @@ if (typeof module === "object" && require.main === module) {
     }
     if (!success || !wrote || failure) {
       message(`Copy failed. ${failure?.message || "Click the button again and check your browser's clipboard permissions."} No plain-text fallback was used.`, true);
+      showToast("Copy failed", true);
       return;
     }
     if (target === "slack") message("Copied for Slack. Paste normally into Slack.");
     else if (target === "teams") message("Copied for Teams. Paste normally into Teams or Ferdium.");
     else message("Copied plain text; formatting was intentionally removed.");
+    showToast({ slack: "Copied for Slack", teams: "Copied for Teams", plain: "Copied plain text" }[target]);
   }
 
   source.addEventListener("input", update);
