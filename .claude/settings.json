@@ -199,5 +199,7 @@
   "autoCompactEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false
+  "voiceEnabled": false,
+  "syncClaudeAiSkills": false,
+  "syncClaudeAiPlugins": false
 }
