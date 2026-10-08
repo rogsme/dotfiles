@@ -68,9 +68,9 @@
       "effect": "allow"
     }
   ],
-  "plugins": [
-    "@prevalentware/opencode-goal-plugin"
-  ],
+  // "plugins": [
+  //   "@prevalentware/opencode-goal-plugin"
+  // ],
   "providers": {
     "lazer": {
       "name": "Lazer",
