@@ -22,6 +22,7 @@ Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints tod
 ~/.eod/<client>/client.md             readers, channel, vocabulary, never-mention list
 ~/.eod/<client>/YYYY-MM-DD.notes.md   raw dump, story restatement, PR facts
 ~/.eod/<client>/YYYY-MM-DD.prs.json   PR inventory from todays_prs.py
+~/.eod/<client>/YYYY-MM-DD.tickets.json  ticket pass, when the client has a tracker
 ~/.eod/<client>/YYYY-MM-DD.md         client EOD, plus "## Internal notes" (never pasted)
 ~/.eod/<client>/YYYY-MM-DD-internal.md
 ~/.eod/<client>/YYYY-MM-DD-weekly.md
@@ -61,17 +62,20 @@ On a revision, start again from the dump and the new notes, not from the previou
    - **ACTIVITY** (comments or bot reviews only) and **CLOSED** (closed unmerged) are FYI: list them for Roger in "Before you send", and mention one in the update only if his notes do.
 
    Fetch each required PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url`. Read the Summary for what changed and Risks / Not covered / Known issues for what could bite.
-2. **Reconcile with his notes.** A PR he mentions that the script missed: fetch it and add it to the inventory under the right bucket. He calls a PR merged and it's open (or the reverse): flag it. He says to skip one: keep it in the inventory and pass `--skip-pr owner/repo#number` to the checker. If the script or `gh` fails, say so and ask him to paste the PR list.
-3. **Attachments** (a colleague's call summary, a demo script) inform the update; they are not text to copy.
-4. **Yesterday's log** (the latest dated `.md` before today, internal notes included): promises due today, open asks, things in progress. Used in step 6.
-5. Append one line per gathered PR to `<today>.notes.md`: repo, number, title, real state, one-sentence summary, risks from the body, any skip instruction. If the file exists, append under a timestamp and dedupe PRs by repo and number.
+2. **Tickets.** When `client.md` has a `tracker:`, run the ticket pass in `<skill-dir>/references/tickets.md` right after the PR inventory. It is read-only and runs every time, deeper when the notes talk about tickets.
+3. **Reconcile with his notes.** A PR he mentions that the script missed: fetch it and add it to the inventory under the right bucket. He calls a PR merged and it's open (or the reverse): flag it. He says to skip one: keep it in the inventory and pass `--skip-pr owner/repo#number` to the checker. For a connection failure, retry the failed read once before asking him to paste the PR list. Report a persistent failure; authentication or permission failures need Roger's help rather than repeated retries.
+4. **Attachments** (a colleague's call summary, a demo script) inform the update; they are not text to copy.
+5. **Yesterday's log** (the latest dated `.md` before today, internal notes included): promises due today, open asks, things in progress. Used in step 6.
+6. Append one line per gathered PR to `<today>.notes.md`: repo, number, title, real state, reader-visible change, any useful example or verification evidence, risks from the body, any skip instruction. Distinguish what passed locally from what still needs checking on the client's environment. If the file exists, append under a timestamp and dedupe PRs by repo and number.
+
+When Roger asks about **currently open PRs**, also query `gh pr list --repo <repo> --author <configured author> --state open --limit 100 --json number,title,state,isDraft,body,url`. Today's inventory measures today's activity, not the whole queue. Save additional open PR facts in the notes and cover the requested queue without calling older PRs newly opened today.
 
 ## 4. Decide what the client hears
 
 | Material | Goes where |
 |---|---|
 | Shipped and on the client's environment | main section, told as what they can now do |
-| In progress or in review | same section, marked "still in progress" in the same bullet; drafts say so |
+| In progress or in review | main section or a separate IN REVIEW block for a batch; state "still in progress" beside the PR, or in an explicit lead-in applying to every bullet in that block; drafts say so |
 | Slipped or blocked | owned plainly, with its trade or explanation alongside |
 | Something the client must answer or provide | "SOMETHING WE NEED FROM YOU", specific enough to answer |
 | Plan | "TOMORROW" or "NEXT WEEK" |
@@ -83,6 +87,8 @@ On a revision, start again from the dump and the new notes, not from the previou
 **Merged is not available.** Before saying the app "now" does something, check the client's environment with `gh run list --limit 5`. If the deploy failed, is paused, or is still running, say when it will show up.
 
 **Done depends on the client** when a feature needs something listed under `## Waiting on the client` (files, data, access, a decision): call it ready for their piece ("ready for your logo as soon as we get the files").
+
+**Resolved asks are progress.** Match new client answers to the waiting list. When Roger's notes or approval confirm receipt, acknowledge the person and what they settled in one public line, then move that ask to `## Resolved client inputs` when he accepts the update (step 8). Receipt and implementation have separate states: "Thanks, James, that answers the date question. Recording it in the workbook is still to do." A resolution found only in tracker or attachment evidence stays a question for Roger until he authorizes it. Clear duplicate entries for the same resolved ask; retain any genuinely unanswered part in the private follow-ups.
 
 **Deliberate softening.** When his client notes differ from internal reality ("QA is done" internally, "still testing" for the client), the client version is his call: write it and record the difference in internal notes. PR status stays honest: open is in progress, shipped is shipped.
 
@@ -105,12 +111,12 @@ SECTION NAME <emoji>
 <closing in Roger's own words and mood>
 ```
 
-- The main section header is exactly the client's `main_header`. Add topic sections (a demo, a blocker, an ask, the plan) only when something deserves its own block. Headers are ALL CAPS with one emoji.
+- The main section header is exactly the client's `main_header`. Put the day's story there first. Add topic sections (a demo, an in-review batch, a blocker, an ask, the plan) only when something deserves its own block. Headers are ALL CAPS with one emoji. On a review-heavy day, an IN REVIEW block separates what is being prepared from what is already available.
 - Bullets use `*`; sub-bullets are fine. A lead-in ("Seven updates went in today. The ones you'll notice:") is a plain line above the list.
-- **PR numbers:** every required PR ends its bullet with its number in parentheses, linked to the PR's `url` from the inventory: "([#156](https://github.com/owner/repo/pull/156))". Small ones with the same status share a bullet: "Housekeeping behind the scenes to keep things steady ([#153](…/pull/153), [#154](…/pull/154))". A merged PR and an open one get separate bullets, so each number sits next to its own status. When two repos share a number, the link text is `owner/repo#156`.
+- **PR numbers:** every required PR ends its bullet with its number in parentheses, linked to the PR's `url` from the inventory: "([#156](https://github.com/owner/repo/pull/156))". Group small related housekeeping changes with the same status: "Housekeeping behind the scenes to keep things steady ([#153](…/pull/153), [#154](…/pull/154))". Give distinct client-facing changes separate bullets, even when their status matches. A merged PR and an open one get separate bullets, so each number sits next to its own status. When two repos share a number, the link text is `owner/repo#156`.
 - **Links:** a PR number's own link is the one GitHub link in client text; Linear links stay out. Any other link you include is copied character for character from Roger's notes. If it only opens for members of a channel or workspace, say so in "Before you send".
 - **Voice:** keep his rhythm, humor and phrasing; translate only jargon. "I got into a very productive ticket PR loop and ran out of time, so I owe you the video" keeps its shape with "ticket PR loop" put in everyday words. A line with no jargon stays as he said it.
-- Each bullet carries one connected thought: what changed for the people using the product, plus how or why when useful. Keep numbers he cited.
+- Each client-facing PR bullet explains the effect on the reader, rather than merely restating its title. Add a concrete example, meaningful test result, or remaining check when it helps them understand the change. A short follow-up question or the size of a successfully tested upload can make the work tangible. Use only gathered evidence; a simple change may need just one sentence. Keep numbers Roger cited and translate their meaning.
 - Name client people by first name as Roger does; credit colleagues briefly.
 - **Closing:** his actual mood and wording, tidied ("Super busy day, but firing on all engines!").
 - **Personal stuff:** keep the human bits; trim health or family detail to one reassuring line and tell him what you trimmed.
@@ -124,12 +130,13 @@ SECTION NAME <emoji>
    `python3 <skill-dir>/scripts/check_eod.py ~/.eod/<client>/<today>.md --client ~/.eod/<client>/client.md --prs ~/.eod/<client>/<today>.prs.json`
    plus `--skip-pr owner/repo#number` for each PR Roger told you to skip. Fix every HARD finding and re-run until there are zero; judge SOFT findings yourself.
 3. **Story check:** re-read the dump. Every promise, slip, trade, pride, annoyance, mood and cited number is in a public line, or you have asked Roger about it.
-4. **Continuity with yesterday:** a promise due today and missing gets owned in one plain sentence ("I said I'd merge this today, but I wasn't happy with it, so I kept testing"). A resolved ask gets one line saying it's sorted. A new promise stacked on an unfinished one gets flagged.
-5. Keep `## Internal notes` at the bottom of the log for tomorrow, the internal update and the weekly: promises, open asks, risks, things cut, where the client version differs from reality, skipped PRs with Roger's reason.
+4. **Client-detail check:** ignore the PR links and reread their bullets. Can the reader tell what each distinct change will do for them and whether they can use it yet? Expand title-only summaries with supported examples or next checks; keep routine housekeeping brief. Shortness is useful when it preserves that understanding.
+5. **Continuity with yesterday:** a promise due today and missing gets owned in one plain sentence ("I said I'd merge this today, but I wasn't happy with it, so I kept testing"). Apply the resolved-ask rule under "Decide what the client hears". A new promise stacked on an unfinished one gets flagged.
+6. Keep `## Internal notes` at the bottom of the log for tomorrow, the internal update and the weekly: promises, open asks, risks, things cut, where the client version differs from reality, skipped PRs with Roger's reason.
 
 ## 7. Review
 
-Run `eod-review` (facts, leaks, commitments) and `eod-reader` (what the reader concludes) in parallel. Give each the mode and the paths to the client config, today's notes, the saved draft, and yesterday's log. Weekly mode passes the week's logs and notes instead; internal mode tells the reader to read as the internal lead.
+Run `eod-review` (facts, leaks, commitments) and `eod-reader` (what the reader concludes) in parallel. Give each the mode and the paths to the client config, today's notes, today's `.tickets.json` if any, the saved draft, and yesterday's log. Weekly mode passes the week's logs and notes instead; internal mode tells the reader to read as the internal lead.
 
 Reviews are **advisory**. Show their flags; Roger decides. Fix a flag yourself only when it exposes a HARD checker rule, a false status claim, or a story element from Roger's own notes that the draft dropped. Anything a flag raises from an attachment or a colleague's summary stays a question for Roger. If a reviewer fails or is unavailable, deliver anyway and say so in its status line.
 
@@ -141,7 +148,7 @@ Render a preview of every delivered draft:
 
 `python3 <skill-dir>/scripts/render_eod.py ~/.eod/<client>/<draft>.md --mode client --client ~/.eod/<client>/client.md --open`
 
-Use `--mode internal` or `--mode weekly` for those drafts, and `--no-open` after the first preview of the session. It writes `/tmp/opencode/<draft>.html` with only the public message; Roger copies from it so the PR links paste as real links. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
+Use `--mode internal` or `--mode weekly` for those drafts. Open the copy page with `--open` for every delivered draft, including revisions and a switch from client to internal or weekly. Use `--no-open` for intermediate renders, automated evals, or when Roger requests silent delivery. It writes `/tmp/opencode/<draft>.html` with only the public message; Roger copies from it so the PR links paste as real links. Report browser opening only when the renderer confirms it; a generated file alone isn't proof it opened. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
 
 Reply in this order:
 
@@ -150,8 +157,9 @@ Reply in this order:
    - Merged reviewer flags, tagged `Reviewer`, `Reader`, or both. You may drop a flag that is clearly wrong if you name it and say why. Your own notes come after.
    - One status line per reviewer: `Reviewer: no flags.`, `Reviewer: completed with flags.`, `Reviewer: did not run (<reason>).`, or `Reviewer: previous review still applies (wording-only change).` Same for `Reader:`.
    - FYI PRs: the ACTIVITY and CLOSED PRs from the checker's summary, one line each.
+   - FYI tickets: status mismatches and any CREATED tickets the update leaves out, one line each, or why the tracker was unavailable.
    - The preview path, when one was generated.
 3. `Want the internal one too? Say internal.` unless he already ran it today.
 4. Fridays, when the client has `weekly: true`: `📝 Friday reminder: say weekly to do the Weekly Review.`
 
-Once Roger is happy, update `## Waiting on the client` in `client.md`: add what the update asks for (with the date) and remove what the notes say arrived. Create the section if missing.
+Once Roger is happy, update `client.md`: add what the update asks for to `## Waiting on the client` (with the date), and move what arrived to `## Resolved client inputs` with the date, who answered, what they settled, and any part still open on our side. Create either section if missing.

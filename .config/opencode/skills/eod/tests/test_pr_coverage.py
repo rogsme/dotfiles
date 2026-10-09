@@ -43,7 +43,9 @@ def link(n, repo="owner/app"):
 
 class CoverageTests(unittest.TestCase):
     def test_only_merged_opened_and_worked_on_are_required(self):
-        missing, _, summary = checker.check_pr_coverage("* Updates (#1, #2, #3).", inventory(), [])
+        missing, _, summary = checker.check_pr_coverage(
+            "* Updates (#1, #2, #3).", inventory(), []
+        )
         self.assertEqual(missing, [])
         self.assertIn("3/3 required PRs visible", summary)
         self.assertIn("FYI: owner/app#4, owner/app#5", summary)
@@ -75,10 +77,7 @@ class CoverageTests(unittest.TestCase):
                 )
 
     def test_pr_urls_and_repo_identities_count(self):
-        text = (
-            "* https://github.com/owner/app/pull/1\n"
-            "* owner/app#2\n* PR 3"
-        )
+        text = "* https://github.com/owner/app/pull/1\n* owner/app#2\n* PR 3"
         self.assertEqual(checker.check_pr_coverage(text, inventory(), [])[0], [])
 
     def test_wrong_and_duplicate_numbers_do_not_pass(self):
@@ -157,8 +156,13 @@ class CoverageTests(unittest.TestCase):
         github = hard("* Details: https://github.com/owner/app/pull/1")
         self.assertEqual(len(github), 1)
         self.assertIn("GitHub/Linear link", github[0])
-        self.assertEqual(hard(f"* Shipped ({link(1)}, [owner/app#2]"
-                              "(https://github.com/owner/app/pull/2))."), [])
+        self.assertEqual(
+            hard(
+                f"* Shipped ({link(1)}, [owner/app#2]"
+                "(https://github.com/owner/app/pull/2))."
+            ),
+            [],
+        )
         github = hard("* See [the issue](https://github.com/owner/app/issues/1).")
         self.assertEqual(len(github), 1)
 
@@ -276,7 +280,7 @@ class CoverageTests(unittest.TestCase):
         self.assertIn("2 more for Roger as FYI", output.getvalue())
         for bucket in BUCKETS:
             self.assertIn(f"\n{bucket}\n", output.getvalue())
-        
+
 
 if __name__ == "__main__":
     unittest.main()

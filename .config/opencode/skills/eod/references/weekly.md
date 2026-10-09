@@ -1,6 +1,6 @@
 # Weekly mode
 
-Inputs: this week's client EODs `~/.eod/<client>/YYYY-MM-DD.md` (Monday to today; skip `-internal`, `-test`, `-weekly` and `.notes` files) with their internal notes, plus the `.notes.md` files when you need Roger's own words back. Skip if the client has `weekly: false` unless Roger insists. If days are missing, say which and ask whether to continue or fill them in first.
+Inputs: this week's client EODs `~/.eod/<client>/YYYY-MM-DD.md` (Monday to today; skip `-internal`, `-test`, `-weekly` and `.notes` files) with their internal notes, plus the `.notes.md` files when you need Roger's own words back. When the client has a `tracker:`, run the weekly ticket pass from `tickets.md`. Skip if the client has `weekly: false` unless Roger insists. If days are missing, say which and ask whether to continue or fill them in first.
 
 ## Goal
 
@@ -28,7 +28,7 @@ Vibes & Reflection 😄
 - Headings are themes, not days or tickets: "Asking questions about the numbers", "Your spreadsheets", "Getting the app into your hands".
 - Lead with the week's main story, the biggest milestone when that matches Roger's framing.
 - Name the trend: "the first half was about getting the app in front of you; the second half was back to building".
-- Open items (in progress, waiting on the client), next week's plan and any time off go in the reflection paragraph.
+- Client inputs resolved this week (`## Resolved client inputs`) can earn a thank-you. Open items (in progress, waiting on the client), next week's plan and any time off go in the reflection paragraph.
 - 2 to 5 emojis in the whole recap. Plain-text headings. PR numbers are optional here.
 - Keep his recognizable phrases, humor and mood while condensing technical detail. A resolved daily apology comes back only when it's part of the week's story.
 - Private annotations and sensitive internal details stay out, as in SKILL.md step 4.

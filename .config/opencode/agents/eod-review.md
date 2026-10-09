@@ -14,6 +14,8 @@ permission:
   question: deny
   task: deny
   skill: deny
+  # Reviewers read the saved .tickets.json; they never call the tracker.
+  "linear*_*": deny
   external_directory:
     "*": deny
     "~/.eod/*": allow

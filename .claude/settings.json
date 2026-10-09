@@ -168,7 +168,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "npx -y ccstatusline@latest",
+    "command": "/usr/bin/ccstatusline",
     "padding": 0,
     "refreshInterval": 10
   },

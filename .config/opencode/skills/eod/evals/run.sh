@@ -51,6 +51,17 @@ for c in "${cases[@]}"; do
   else
     prs="- There is no PR inventory for this case. Run the checker without --prs and check by hand that every merged, opened or worked-on PR in the notes appears with its number."
   fi
+  if [ -f "$d/tickets.json" ]; then
+    cp "$d/tickets.json" "$root/$CLIENT/$day.tickets.json"
+    tickets="- The ticket pass output is $root/$CLIENT/$day.tickets.json, as of that day. Use it instead of calling the tracker."
+  else
+    tickets="- Skip the ticket pass and do not call the tracker: its data has moved on since this day."
+  fi
+  facts="- Use gh pr view for descriptions and risks, but take PR states from the case (inventory or notes) as true."
+  if [ -f "$d/pr-facts.md" ]; then
+    cp "$d/pr-facts.md" "$root/$CLIENT/$day.pr-facts.md"
+    facts="- PR descriptions and risks are frozen at $root/$CLIENT/$day.pr-facts.md. Use them instead of gh pr view; do not fetch live PR data."
+  fi
 
   if [ "$VARIANT" = solo ]; then
     reviewer="- Skip the eod-review and eod-reader subagents. Write the \"Before you send\" flags yourself using references/review.md and label them as a solo review."
@@ -61,8 +72,10 @@ for c in "${cases[@]}"; do
   prompt="EVAL MODE (a replay of a past day, not a real one):
 - Today is $TODAY. Ignore the system clock and the date check against it; still check the stated date in the notes against $TODAY.
 - The log root is $root/ instead of ~/.eod/. Read and write only there; previews in /tmp/opencode are the one exception. Start with eod_context.py --root $root. The client is $CLIENT.
-- PRs have moved on since this day. Do not run todays_prs.py: today is in the past. Use gh pr view for descriptions and risks, but take PR states from the case (inventory or notes) as true.
+- PRs have moved on since this day. Do not run todays_prs.py: today is in the past.
+$facts
 $prs
+$tickets
 $reviewer
 - Render the preview with --no-open.
 - Nobody can answer questions during this run. Where the skill says to ask Roger, make your best call, keep going, and list the question in \"Before you send\".

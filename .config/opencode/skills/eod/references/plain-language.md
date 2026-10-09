@@ -8,7 +8,7 @@ Roger's story comes first (SKILL.md step 2). Translate technical terms so the cl
 - Swap jargon for the everyday thing it stands for (table below). If there's no everyday word, explain it in half a sentence the first time.
 - Keep numbers Roger cited and their meaning, even when they describe engineering work. Translate their significance without silently dropping them; ask if a number is sensitive or unclear. Choose useful supporting numbers from PR descriptions ("30,000 figures, 36 exchange rates, all 50 markets", "946 articles searchable") rather than adding irrelevant hashes or limits.
 - Keep safety and trust properties; clients care a lot about them: "it can only read the data, never change it", "each client only sees what they have access to", "it never guesses a number to fill the gap", "if something doesn't add up, it stops and tells us".
-- One connected thought per bullet. An apology followed by "but" or "though" and its trade or defense is one thought; keep it together or explicitly link adjacent bullets. If a PR did four unrelated things, keep the one or two the client would notice and call the rest "some housekeeping behind the scenes".
+- One connected thought per bullet. An apology followed by "but" or "though" and its trade or defense is one thought; keep it together or explicitly link adjacent bullets. Distinct user-facing changes get their own explanations, even when all are awaiting review. If a PR did four unrelated things, keep the one or two the client would notice and call the rest "some housekeeping behind the scenes".
 - Pure internal work (CI, review bots, refactors, codec cleanups) gets one brief behind-the-scenes line that carries its PR numbers: "Housekeeping to keep things steady (#153, #154)".
 - Never imply the client slows you down. "A rare day with zero interruptions" reads as "you usually interrupt me", and their calls and bug reports are most of those interruptions. Say the day was focused and leave it there.
 - Infrastructure hiccups: say what the client will notice and when it's back, not what broke on our side. "Publishing to the test site is paused, you'll see today's work tomorrow" is enough; "the automated checks stopped" only makes them wonder.
@@ -59,6 +59,16 @@ These are the patterns that come up most. The client and details are made up; th
 
 **Voice note:** "I deleted the old seed, I pushed the new seed"
 **EOD:** "I hadn't refreshed the test site's sample data after this week's changes. I swapped in the new data and everything works as expected now."
+
+**PR descriptions:** large workbook uploads and topic-aware research follow-ups, both open.
+**Client draft:**
+
+IN REVIEW 📋
+Both changes are still in progress, waiting on review:
+* Fixing the larger-file upload bug so your staff can upload a workbook with its supporting files through the app. A 12 MB delivery passed in local testing, but this still needs checking on the test site ([#201](https://github.com/example/portal/pull/201)).
+* Helping research follow-ups stay on topic. If you ask "Why does it matter?" after an answer, the search will use the earlier conversation to understand what "it" refers to ([#202](https://github.com/example/portal/pull/202)).
+
+The example and test size above are synthetic. In a real draft, use the gathered PR's evidence. Each bullet gives the client a different reason to care; the shared lead-in makes their identical review status clear without repeating it.
 
 **PR risk section:** "38 rows fail validation against the totals sheet... Business confirmation is required"
 **EOD (as an ask):** "When we imported the latest file, 38 totals didn't match the rows they're built from. We won't change your numbers on our own, so that file stays on hold until you let us know which figures are right."

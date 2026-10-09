@@ -15,10 +15,15 @@ Cases contain real client notes, so they never live in this folder. Keep them in
     yesterday.md                optional; the EOD sent the day before (continuity checks)
     client.md                   optional; frozen client config for this case, else ~/.eod/<client>/client.md
     prs.json                    optional; todays_prs.py --json output for that day (enables the coverage check)
+    pr-facts.md                 optional; frozen descriptions, examples and risks, used instead of live gh reads
+    tickets.json                optional; the day's .tickets.json (without it the run skips the ticket pass)
     expected.md                 what a good run must catch, must not do, and should include
+    approved.md                 optional; Roger-approved draft for comparison after the replay, not draft input
 ```
 
 `expected.md` works best as checklists under three headings: **Must catch** (risks the run should flag or handle), **Must not do** (leaks, false alarms, wrong claims) and **Should include**.
+
+`1009-review-detail` preserves a client-approved review-heavy update. It tests distinct PR explanations, concrete examples, clear in-review status and a resolved client ask whose implementation is still pending. Keep the approved text as a comparison reference rather than a template to copy. Pair this with a quiet-day replay when changing detail rules, so a useful batch explanation does not become unnecessary length on every day.
 
 ## Running
 

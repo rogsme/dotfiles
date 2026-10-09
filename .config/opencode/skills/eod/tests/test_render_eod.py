@@ -149,6 +149,19 @@ class RenderTests(unittest.TestCase):
         self.assertIn("## Vibes & Reflection 😄", prepared)
         self.assertNotIn("## Hey team!", prepared)
 
+    def test_review_batch_status_leadin_stays_a_paragraph(self):
+        source = (
+            "Hey team!\n\nIN REVIEW 📋\n"
+            "All changes are still in progress, waiting on review:\n"
+            "* Fixing large uploads.\n* Keeping follow-ups on topic."
+        )
+        prepared = renderer.prepare_message(source, "client")
+        self.assertIn("## IN REVIEW 📋", prepared)
+        self.assertIn(
+            "\nAll changes are still in progress, waiting on review:\n", prepared
+        )
+        self.assertNotIn("## All changes", prepared)
+
     def test_review_flags_are_rejected_only_by_the_eod_adapter(self):
         for label in [
             "Before you send:",
@@ -215,26 +228,30 @@ class RenderTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix="eod-open-") as root:
             source = Path(root) / "2026-10-05.md"
             source.write_text("Ready")
-            for flags in [[], ["--no-open"], ["--open"]]:
-                with (
-                    patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
-                    patch.object(
-                        renderer.sys, "argv", [str(SCRIPT), str(source), *flags]
-                    ),
-                    patch.object(
-                        renderer.subprocess,
-                        "run",
-                        return_value=subprocess.CompletedProcess(
-                            [], 0, stdout="", stderr=""
+            for mode in ["client", "internal", "weekly"]:
+                for flags in [[], ["--no-open"], ["--open"]]:
+                    with (
+                        self.subTest(mode=mode, flags=flags),
+                        patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
+                        patch.object(
+                            renderer.sys,
+                            "argv",
+                            [str(SCRIPT), str(source), "--mode", mode, *flags],
                         ),
-                    ) as call,
-                ):
-                    self.assertEqual(renderer.main(), 0)
-                    command = call.call_args.args[0]
-                    self.assertEqual(
-                        [arg for arg in command if arg in ("--open", "--no-open")],
-                        flags or ["--no-open"],
-                    )
+                        patch.object(
+                            renderer.subprocess,
+                            "run",
+                            return_value=subprocess.CompletedProcess(
+                                [], 0, stdout="", stderr=""
+                            ),
+                        ) as call,
+                    ):
+                        self.assertEqual(renderer.main(), 0)
+                        command = call.call_args.args[0]
+                        self.assertEqual(
+                            [arg for arg in command if arg in ("--open", "--no-open")],
+                            flags or ["--no-open"],
+                        )
 
     def test_eod_delivery_and_checker_work_without_formatter_or_node(self):
         with tempfile.TemporaryDirectory(prefix="eod-standalone-") as root:

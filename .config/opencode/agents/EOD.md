@@ -35,6 +35,12 @@ permission:
     "*": deny
     "eod-review": allow
     "eod-reader": allow
+  # Ticket trackers are read-only (skills/eod/references/tickets.md): any Linear
+  # MCP server's list, get and search tools, nothing that writes.
+  "linear*_*": deny
+  "linear*_list_*": allow
+  "linear*_get_*": allow
+  "linear*_search_*": allow
   # The RTK plugin rewrites gh, git log, ls and grep to `rtk <cmd>` before the
   # permission check, so those are listed in both forms. Scripts are pinned to
   # full paths so a wildcard can't match `python3 -c ... check_eod.py`.

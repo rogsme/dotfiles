@@ -16,6 +16,7 @@ Adds a client, edits one, or archives one. Writes `~/.eod/<client>/client.md` fr
 From the current repo, if there is one:
 - `git remote get-url origin` → `repos:` (as `owner/name`).
 - `gh pr list --state all --limit 40 --json title,headRefName,author` → ticket prefixes (patterns like `ABC-123`) for `ticket_prefixes:`, and whether PRs come from Roger's account or a bot/agent account (add those to `pr_authors:` so the daily PR pull finds them).
+- MCP servers in `.mcp.json`, `opencode.json` or `.opencode/opencode.json`: one whose name or URL points at Linear, Jira or Atlassian gives `tracker:` and `tracker_via: mcp:<server name>`. For Linear, its `list_teams` tool gives `tracker_team:` (pick the team whose key matches `ticket_prefixes`). No server found: leave the three tracker fields out; the EOD works without them.
 - README, `CONTEXT.md`, `AGENTS.md`, `docs/` index: what the product is and the domain terms engineers use. Read the first screen of each, not whole trees.
 
 Draft a slug from the client name in kebab-case (`acme-corp`).
@@ -38,7 +39,7 @@ From the repo docs plus his answer, propose 8 to 15 rows of `internal term | cli
 ### 4. Write and confirm
 
 1. Fill the template and write `~/.eod/<client>/client.md`.
-2. Show Roger a summary, not the file: readers and level, channel, header line, internal lead, weekly yes/no, vocabulary row count, never-mention count. Plus the path.
+2. Show Roger a summary, not the file: readers and level, channel, header line, internal lead, weekly yes/no, tracker (or none found), vocabulary row count, never-mention count. Plus the path.
 3. Offer once: "Want a test EOD from today's merged PRs so you can check the voice?" If yes, run the daily flow with the PRs as notes and mark it as a test (save it as `<today>-test.md` so it doesn't pollute continuity).
 
 ## Rules

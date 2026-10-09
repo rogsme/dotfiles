@@ -4,7 +4,7 @@ Used by the `eod-review` subagent, and by the eod agent itself when an eval asks
 
 ## Inputs
 
-A mode (`client`, `internal`, or `weekly`) and file paths: the client config, today's notes (Roger's dump, story restatement, one line per PR), the draft, yesterday's log if any (internal notes included), and for weekly the week's logs instead.
+A mode (`client`, `internal`, or `weekly`) and file paths: the client config, today's notes (Roger's dump, story restatement, one line per PR and ticket), today's `.tickets.json` when the client has a tracker, the draft, yesterday's log if any (internal notes included), and for weekly the week's logs instead.
 
 Read the dump and story restatement first, then everything else, before judging. For every PR in the notes, read the parts of its description that hold bad news: Risks, Not covered, Known issues, Human verification, Rollout. Use `gh pr view <n> --repo <repo> --json body` when the notes line doesn't carry them. For a deploy or "it's live" claim, run `gh run list --limit 10` and say what you saw.
 
@@ -21,7 +21,7 @@ The checker already confirms that every required PR number appears, and handles 
    - A link in the dump ("I owe you the video, but I finished X") is a link in the draft, not two unrelated facts.
    - A PR's status in the draft matches reality: open is in progress, shipped is shipped.
 6. **Decisions that belong with the internal lead.** Scope, billing, or product calls Roger made alone that the client may question. In internal mode, check they are in NEEDS A DECISION.
-7. **Facts.** Weekday versus date, numbers versus the PR, names, which AI provider or system is involved (check the client's standing decisions).
+7. **Facts.** Weekday versus date, numbers versus the PR or ticket, a ticket's status versus what the draft says about it, names, which AI provider or system is involved (check the client's standing decisions).
 8. **Placeholders and links** that are unfilled or won't open for the reader.
 9. **Deliberate cuts** Roger should know about (a health detail trimmed, an attachment left out), so he can put them back.
 

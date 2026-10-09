@@ -6,7 +6,7 @@ Modeled on how Roger writes these himself: friendly opener, says up front it's t
 
 ## Inputs
 
-1. Today's `<today>.notes.md` (dump, story restatement, PR facts) and `<today>.prs.json`. If they don't exist, treat the words after `internal` as the notes and run SKILL.md steps 2 and 3 first.
+1. Today's `<today>.notes.md` (dump, story restatement, PR and ticket facts), `<today>.prs.json`, and `<today>.tickets.json` when the client has a tracker. If they don't exist, treat the words after `internal` as the notes and run SKILL.md steps 2 and 3 first.
 2. Today's client EOD `<today>.md` and its `## Internal notes`. Without one, still write the internal update and drop "What the client heard".
 3. Yesterday's internal update: risks raised then, asks still unanswered.
 
@@ -29,6 +29,10 @@ SHIPPED
 IN FLIGHT
 • ACME-118/129 (<PR url>): in my final review, merging tomorrow
 
+NEW TICKETS
+• ACME-151 Saved charts (<ticket url>)
+• ACME-152 Tech debt: retry the export job instead of failing (<ticket url>)
+
 RISKS AND CORNERS CUT
 • Staging deploys silently failed for two days; fix merged, redeploy not verified yet
 
@@ -44,6 +48,7 @@ NEEDS A DECISION @<internal_lead>
 - Drop empty sections. A quiet day can be SHIPPED plus one line.
 - Bullets use `•`; headers are ALL CAPS without emojis. Emojis are Slack shortcodes (`:slightly_smiling_face:`, `:sweat_smile:`), one or two in the whole message.
 - Every required PR (MERGED, OPENED, WORKED ON) gets a line: `TICKET-ID short title (url)`.
+- NEW TICKETS lists every CREATED ticket from the ticket pass; ticket status mismatches go under RISKS AND CORNERS CUT.
 - Tag `@<internal_lead>` only on the line with a real ask or decision.
 - "What the client heard" lists every place the client EOD softened, delayed, or left out something the lead should know. The lead can't get this anywhere else, so be precise.
 

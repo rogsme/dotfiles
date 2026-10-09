@@ -5,6 +5,10 @@ status: active
 repos: [<owner/repo>]
 pr_authors: ["@me"]
 ticket_prefixes: [<ABC>]
+# Optional: the ticket tracker, read-only (references/tickets.md). Omit if none.
+tracker: <linear | jira>
+tracker_via: <mcp:server-name | cli:command>
+tracker_team: <team name>
 technical_level: non-technical
 channel: <Microsoft Teams chat | Slack | Email>
 opener: "Hey team! Wrapping up for the day. Here's my EOD update:"
@@ -38,6 +42,9 @@ weekly: true
 
 ## Waiting on the client
 - <what we need from them> (asked <date>)
+
+## Resolved client inputs
+- <date>: <who> settled <what>; <anything still open on our side>
 
 ## Never mention
 - <specific phrase>
