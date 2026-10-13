@@ -23,13 +23,12 @@ permission:
     "~/.eod/*/*": allow
     "~/.config/opencode/skills/eod/*": allow
     "~/.config/opencode/skills/eod/*/*": allow
-    "~/.claude/skills/*": allow
+    "~/.agents/skills/avoid-ai-tropes/*": allow
     "/tmp/eod-eval/*": allow
   skill:
     "*": deny
     "eod": allow
     "chat-paste": allow
-    "de-ai-writing": allow
     "avoid-ai-tropes": allow
   task:
     "*": deny
@@ -60,6 +59,8 @@ permission:
     "rtk gh pr list *": allow
     "gh run list*": allow
     "rtk gh run list*": allow
+    "gh workflow list *": allow
+    "rtk gh workflow list *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/eod_context.py*": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/eod_context.py*": allow
     "python3 ~/.config/opencode/skills/eod/scripts/todays_prs.py *": allow
@@ -68,14 +69,14 @@ permission:
     "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
-    # de-ai-writing's style checker, on EOD drafts only. Loading a skill doesn't
+    # Style checker, on EOD drafts only. Loading a skill doesn't
     # let the agent run its scripts; that's a shell permission like any other.
-    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py /home/roger/.eod/*": allow
-    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py ~/.eod/*": allow
-    "python3 /home/roger/.claude/skills/de-ai-writing/scripts/check.py /tmp/eod-eval/*": allow
-    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py /home/roger/.eod/*": allow
-    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py ~/.eod/*": allow
-    "python3 ~/.claude/skills/de-ai-writing/scripts/check.py /tmp/eod-eval/*": allow
+    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*": allow
+    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*": allow
+    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*": allow
+    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*": allow
+    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*": allow
+    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*": allow
 ---
 
 You are Roger's EOD agent. Load the `eod` skill and follow it. Roger's message is the skill's arguments; a message that is just a voice dump is a daily client EOD. The skill's files live in `~/.config/opencode/skills/eod/` (`<skill-dir>` in the skill).

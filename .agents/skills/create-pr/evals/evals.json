@@ -1,0 +1,82 @@
+{
+  "skill_name": "create-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a PR to dev, assigned to ana. The destination's default branch is main. main has docs/PULL_REQUEST_TEMPLATE/bug.md and feature.md; the parser fix clearly matches bug.md. The feature worktree has an uncommitted .github/pull_request_template.md with different headings. Continue with committed changes only. The forge CLI is authenticated as release-bot, not ana. CONTRIBUTING requires no local checks; npm test exists but was not run. The bug template has Description, Related issue, Validation, and unchecked tests-run and reviewer-approved boxes. Issue 42 is confirmed related, but this change does not resolve it.",
+      "expected_output": "Use main's docs bug template, preserve its sections, keep certifications unchecked and record tests not run; use a neutral issue reference. Preserve pending work, avoid an optional suite, explicitly assign ana rather than the authenticated account, and verify the completed PR rather than trusting the uncommitted template.",
+      "files": [],
+      "expectations": [
+        "Selects the bug template from destination main, not the dirty local override",
+        "Explicitly assigns ana, not the authenticated account",
+        "Publishes a completed body file without a template option",
+        "Keeps tests-run and reviewer-approved unchecked and does not run optional tests",
+        "Verifies the created PR's assignment and identity"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Open a ready PR to main, assigned to ana. There are no destination-owned templates, but the owner's account-wide default repository has a pull request template the forge inherits. The forge's template API field is unsupported on this host. The repository contents lookup works. ana is assignable. Follow the inherited template.",
+      "expected_output": "Fall back to read-only template discovery in the owner's default repository, preserve the inherited sections, submit the completed body file with explicit head, base and repository and ana as assignee, and verify readiness and assignment. Do not use a generic body because the clone has no template.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Create a PR to main assigned to ana and alex. Creation printed https://git.example.com/acme/parser/pulls/73 but exited 1 with a pull request update failure. The exact PR read-back confirms the expected title and body, head commit, main base, and ready state. Only alex is assigned. Adding an assignee is permitted, and a later read-back can confirm both users.",
+      "expected_output": "Treat this as a PR created by this attempt, not a failed creation to retry. Add ana without removing alex, read back and verify the complete result, and report the original metadata failure and the recovery with the same URL. Never create a duplicate.",
+      "files": [],
+      "expectations": [
+        "Recognizes creation succeeded despite the nonzero exit and avoids duplicate creation",
+        "Adds ana without removing alex",
+        "Verifies assignment after recovery",
+        "Reports the same URL with the original error and the recovery outcome"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create a draft PR to acme/parser main from ana/parser main. origin is the fork; upstream is acme/parser. A PR from another fork, contributor/parser main, already targets the same base. Follow acme/parser's templates and push only my source branch.",
+      "expected_output": "Resolve distinct source and destination repositories, allow same-named branches across forks, fetch upstream's base, reject the other fork's PR as an exact duplicate, use the explicit destination repository and the fork head in the forge's form, open it as a draft, and verify the source identity and SHA.",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Create a PR to dev. The destination default branch contains a default template in two supported locations, plus two equally plausible specialized templates. No guidance identifies which specialized template applies, and I did not select one. The CLI template lookup failed with a rate-limit error.",
+      "expected_output": "Distinguish the rate-limit failure from absence, apply the forge's documented location precedence for equivalent defaults, and ask about the genuinely ambiguous template choice. Do not combine templates, select alphabetically, or quietly publish a generic body after failed discovery.",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "Create a PR to main with existing commits only and leave my dirty index and worktree alone. CONTRIBUTING explicitly requires a regression check. The pending worktree fixes a bug that is still present in the commit being pushed, so tests pass in the worktree. There is a staged-only file version and an unrelated untracked file.",
+      "expected_output": "Preserve all pending and index-only content. Run the required check against an isolated committed snapshot or report a blocker. Do not claim passing worktree tests certify the PR, stash, reset or commit pending work, or repair the failing committed code as part of PR creation.",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "Create a PR to main, assigned to ana. The existing exact head and base PR is open, ready, and assigned to alex. ana is not assigned. It existed before this attempt; do not change that PR.",
+      "expected_output": "Return the existing URL, state, draft status and assignment without pushing, duplicating or editing it. Do not mistake the requested assignment for authorization to modify an existing PR.",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "Create a PR to main. docs/agents/forge.md says Assignee: ana under its Pull requests section. The assignee eligibility check says ana cannot be assigned in this repository. The CLI is authenticated as a different user. No branch has been pushed yet.",
+      "expected_output": "Stop before publication and report the assignment blocker. Do not substitute the authenticated account, omit the assignment, switch accounts interactively, or create an unassignable PR.",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "Investigate PR best practices and improve our create-pr skill. Show a preview of an example PR following the repository template. Do not publish or push anything.",
+      "expected_output": "Research or prepare a preview without git push or any creation command, including a dry-run option. Treat this as skill maintenance and description drafting, not permission to publish.",
+      "files": [],
+      "expectations": [
+        "Does not execute publication commands",
+        "Does not recommend a CLI dry-run option as a harmless preview"
+      ]
+    },
+    {
+      "id": 10,
+      "prompt": "Create a PR to dev. dev has advanced since my branch diverged, but a merge analysis is conflict-free. One new committed file is named .env and may contain a credential. A pre-push hook can edit files. A later create request could time out without returning a URL.",
+      "expected_output": "Use fixed fetched-base and head SHAs and a three-dot PR diff, warn about being behind without rebasing, screen for secrets without exposing contents, and block publication of the suspected secret. If publication becomes safe, inspect hook effects and the pushed SHA; resolve any uncertain creation by an exact lookup and stop if verification is unavailable rather than retry blindly.",
+      "files": []
+    }
+  ]
+}
