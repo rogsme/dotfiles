@@ -10,7 +10,7 @@ You turn Roger's messy end-of-day notes into updates he can paste straight into 
 
 Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints today's date, the current repo, the configured clients and the latest log files. Once the client is resolved, run the vault pass (step 1).
 
-**Shell:** one command per call, with no pipes, `;`, `&&` or subshells. The allowlist checks each piece of a chain, so one unlisted piece denies the whole call. When the allowlisted commands can't do something, use the read tool.
+**Tools:** read saved JSON and text with `read`; use `grep` to locate details. Use approved scripts for processing. If those tools cannot complete a step, report the limitation rather than creating a helper script or using inline Python. Shell calls use one command, with no pipes, `;`, `&&` or subshells. The allowlist checks each piece of a chain, so one unlisted piece denies the whole call.
 
 **Eval mode:** a request starting with `EVAL MODE` carries overrides (date, log root, PR handling, reviewers, vault pass). They win over this skill.
 
@@ -22,6 +22,7 @@ Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints tod
 ~/.eod/<client>/client.md             readers, channel, vocabulary, never-mention list
 ~/.eod/<client>/YYYY-MM-DD.notes.md   raw dump, story restatement, PR facts
 ~/.eod/<client>/YYYY-MM-DD.prs.json   PR inventory from todays_prs.py
+~/.eod/<client>/YYYY-MM-DD.<owner>.<repo>.pr-<number>.json  saved PR detail response
 ~/.eod/<client>/YYYY-MM-DD.tickets.json  ticket pass, when the client has a tracker
 ~/.eod/<client>/YYYY-MM-DD.obsidian.md   vault pass: the day's Capture, Log items, meetings
 ~/.eod/<client>/YYYY-MM-DD.md         client EOD, plus "## Internal notes" (never pasted)
@@ -70,7 +71,8 @@ On a revision, start again from the dump and the new notes, not from the previou
    - **MERGED**, **OPENED**, **WORKED ON** are **required**: each one appears in the update (step 5).
    - **ACTIVITY** (comments or bot reviews only) and **CLOSED** (closed unmerged) are FYI: list them for Roger in "Before you send", and mention one in the update only if his notes do.
 
-   Fetch each required PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url`. Read the Summary for what changed and Risks / Not covered / Known issues for what could bite.
+   Fetch each required PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url` and save its response to `~/.eod/<client>/<today>.<owner>.<repo>.pr-<n>.json`. Read the saved response's Summary for what changed and Risks / Not covered / Known issues for what could bite.
+   Reuse saved PR responses for revisions and the internal update. Refresh affected PRs when Roger reports new activity, saved facts conflict, or a current-status claim needs newer evidence; refresh the inventory too if the activity changes a bucket. A saved PR response is not deployment proof: the environment check in step 4 still applies.
 2. **Tickets.** When `client.md` has a `tracker:`, run the ticket pass in `<skill-dir>/references/tickets.md` right after the PR inventory. It is read-only and runs every time, deeper when the notes talk about tickets.
 3. **Vault.** From `<today>.obsidian.md`:
    - **Meetings** tagged `client-attended` feed the update. A decision the client heard can be stated. Roger's own action items go to TOMORROW. The client's action items and open questions are matched against `## Waiting on the client`.

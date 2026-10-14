@@ -28,6 +28,7 @@ Weekly mode uses Monday's start instead of `from_utc` and skips LINKED.
 - "created tickets", "wrote up", "scoped", "broke it down": the CREATED bucket is now part of the story.
 - A topic for tomorrow ("pick up the export stuff"): search Roger's open tickets for it and use the matches to make the plan concrete.
 - "blocked", "waiting on", or a discussion on a ticket: read its comments.
+- Broad completion claims such as "all feedback" or "everything tomorrow": list the whole relevant tag or task group, including unfinished tasks without an open PR, and compare its statuses with the PR batch. If the scopes differ, ask which work the claim or commitment covers before drafting. Save the scope checked, status counts and Roger's answer alongside the gathered facts; carry that answer into both updates.
 
 ## Save
 
