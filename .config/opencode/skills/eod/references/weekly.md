@@ -1,6 +1,6 @@
 # Weekly mode
 
-Inputs: this week's client EODs `~/.eod/<client>/YYYY-MM-DD.md` (Monday to today; skip `-internal`, `-test`, `-weekly` and `.notes` files) with their internal notes, plus the `.notes.md` files when you need Roger's own words back. When the client has a `tracker:`, run the weekly ticket pass from `tickets.md`. Skip if the client has `weekly: false` unless Roger insists. If days are missing, say which and ask whether to continue or fill them in first.
+Inputs: this week's client EODs `~/.eod/<client>/YYYY-MM-DD.md` (Monday to today; skip `-internal`, `-test`, `-weekly` and `.notes` files) with their internal notes, plus the `.notes.md` files when you need Roger's own words back. When the client has a `tracker:`, run the weekly ticket pass from `tickets.md`. Run the vault pass over the week, `python3 <skill-dir>/scripts/obsidian_day.py --client ~/.eod/<client>/client.md --since <monday> --date <today>`, save it to `~/.eod/<client>/<today>-weekly.obsidian.md`, and apply the same gate as SKILL.md step 1. It adds the week's Capture and client meetings; use them like the daily notes, with the same `internal-only` rule. Skip if the client has `weekly: false` unless Roger insists. If days are missing, say which and ask whether to continue or fill them in first.
 
 ## Goal
 

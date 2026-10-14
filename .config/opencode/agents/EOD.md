@@ -69,6 +69,10 @@ permission:
     "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
+    # Read-only window into the Obsidian vault. The agent never reads ~/obsidian
+    # directly (external_directory denies it); this script filters per client.
+    "python3 ~/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
+    "python3 /home/roger/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
     # Style checker, on EOD drafts only. Loading a skill doesn't
     # let the agent run its scripts; that's a shell permission like any other.
     "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*": allow

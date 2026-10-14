@@ -17,6 +17,7 @@ Cases contain real client notes, so they never live in this folder. Keep them in
     prs.json                    optional; todays_prs.py --json output for that day (enables the coverage check)
     pr-facts.md                 optional; frozen descriptions, examples and risks, used instead of live gh reads
     tickets.json                optional; the day's .tickets.json (without it the run skips the ticket pass)
+    obsidian.md                 optional; the day's .obsidian.md vault pass (without it the run skips the vault pass)
     expected.md                 what a good run must catch, must not do, and should include
     approved.md                 optional; Roger-approved draft for comparison after the replay, not draft input
 ```

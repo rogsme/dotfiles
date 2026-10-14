@@ -9,6 +9,7 @@ Modeled on how Roger writes these himself: friendly opener, says up front it's t
 1. Today's `<today>.notes.md` (dump, story restatement, PR and ticket facts), `<today>.prs.json`, and `<today>.tickets.json` when the client has a tracker. If they don't exist, treat the words after `internal` as the notes and run SKILL.md steps 2 and 3 first.
 2. Today's client EOD `<today>.md` and its `## Internal notes`. Without one, still write the internal update and drop "What the client heard".
 3. Yesterday's internal update: risks raised then, asks still unanswered.
+4. Today's `<today>.obsidian.md` (SKILL.md step 1, "Vault"; run the pass if the file is missing). Here `internal-only` meetings are fair game: what was decided internally, what the team owes the client. Other clients still stay out.
 
 ## What changes from the client version
 

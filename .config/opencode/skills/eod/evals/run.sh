@@ -57,6 +57,12 @@ for c in "${cases[@]}"; do
   else
     tickets="- Skip the ticket pass and do not call the tracker: its data has moved on since this day."
   fi
+  if [ -f "$d/obsidian.md" ]; then
+    cp "$d/obsidian.md" "$root/$CLIENT/$day.obsidian.md"
+    vault="- The vault pass output is $root/$CLIENT/$day.obsidian.md, as of that day. Use it instead of running obsidian_day.py."
+  else
+    vault="- Skip the vault pass and do not run obsidian_day.py: the vault has moved on since this day."
+  fi
   facts="- Use gh pr view for descriptions and risks, but take PR states from the case (inventory or notes) as true."
   if [ -f "$d/pr-facts.md" ]; then
     cp "$d/pr-facts.md" "$root/$CLIENT/$day.pr-facts.md"
@@ -76,6 +82,7 @@ for c in "${cases[@]}"; do
 $facts
 $prs
 $tickets
+$vault
 $reviewer
 - Render the preview with --no-open.
 - Nobody can answer questions during this run. Where the skill says to ask Roger, make your best call, keep going, and list the question in \"Before you send\".

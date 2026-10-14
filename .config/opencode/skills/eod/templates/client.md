@@ -16,6 +16,9 @@ main_header: "<CLIENT NAME> 🛠️"
 internal_lead: <name>
 internal_channel: <internal Slack channel>
 weekly: true
+# Optional: uncomment when the client's folder under ~/obsidian/clients/ has a
+# different name from this folder, or set none to skip the vault pass.
+# obsidian: <vault client folder | none>
 ---
 
 # <Client Name>

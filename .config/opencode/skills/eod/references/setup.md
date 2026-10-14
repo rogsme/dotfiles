@@ -21,6 +21,8 @@ From the current repo, if there is one:
 
 Draft a slug from the client name in kebab-case (`acme-corp`).
 
+The Obsidian vault (`~/obsidian/clients/<slug>/`) is matched by this slug. After writing `client.md` (step 4), run `python3 <skill-dir>/scripts/obsidian_day.py --client ~/.eod/<client>/client.md`. `UNAVAILABLE` means the vault has no folder by that name: ask Roger for the vault's folder name for this client and set `obsidian: <that folder>`, or `obsidian: none` if he keeps no vault notes for it. Any other status means the match works; say so in the summary.
+
 ### 2. Ask what can't be discovered
 
 One round of multiple-choice questions with the question tool, four max:
