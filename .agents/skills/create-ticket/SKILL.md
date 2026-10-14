@@ -4,7 +4,6 @@ description: "Audit the code and the tracker, then draft and create independent,
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Create tickets

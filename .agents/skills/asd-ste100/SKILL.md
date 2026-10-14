@@ -4,7 +4,6 @@ description: "Write or rewrite technical documentation in ASD-STE100 Simplified 
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # ASD-STE100 Simplified Technical English (Issue 9, 2025)

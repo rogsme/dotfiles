@@ -4,7 +4,6 @@ description: "Test-driven development. Use when the user wants to build features
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Test-Driven Development

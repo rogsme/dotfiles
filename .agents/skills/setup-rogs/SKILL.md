@@ -5,7 +5,6 @@ license: MIT
 disable-model-invocation: true
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
   opencode/autoinvoke: "false"
 ---
 

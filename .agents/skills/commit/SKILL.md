@@ -5,7 +5,6 @@ license: MIT
 compatibility: Requires Git and a non-interactive shell.
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Commit

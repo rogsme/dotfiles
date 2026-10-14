@@ -4,7 +4,6 @@ description: "Grill the user relentlessly about a plan, design or idea until eve
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Grill with docs

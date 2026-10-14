@@ -4,7 +4,6 @@ description: "Write, proofread and deep-rewrite prose without AI writing tropes:
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Avoid AI writing tropes

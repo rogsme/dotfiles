@@ -4,7 +4,6 @@ description: "Investigate an existing ticket, or the bundle it rides in, read-on
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Start a ticket

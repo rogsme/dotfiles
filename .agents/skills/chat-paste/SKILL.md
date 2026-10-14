@@ -5,7 +5,6 @@ license: MIT
 compatibility: Python 3, Node.js 20+, and Chromium for Slack's native clipboard format.
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Chat paste

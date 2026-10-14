@@ -4,7 +4,6 @@ description: "Independently review one pull request at its exact head against it
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Review a pull request independently

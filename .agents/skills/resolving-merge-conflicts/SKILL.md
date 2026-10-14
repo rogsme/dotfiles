@@ -4,7 +4,6 @@ description: "Resolve an in-progress git merge or rebase conflict hunk by hunk, 
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 1. **See the current state** of the merge or rebase: which operation is in progress (`git status`), the conflicting files, and the history of both sides for those files (`git log --merge`).

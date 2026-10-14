@@ -4,7 +4,6 @@ description: "Generate and maintain an agentic codebase wiki in docs/wiki/ (Deep
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Codebase Wiki Generator

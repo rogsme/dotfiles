@@ -4,7 +4,6 @@ description: "Execute the approved plan for the current ticket or bundle: post t
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Work an approved ticket

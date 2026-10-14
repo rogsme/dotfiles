@@ -5,7 +5,6 @@ license: MIT
 compatibility: Requires Git, a forge CLI or API access authenticated for the host, and network access.
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Create a pull request

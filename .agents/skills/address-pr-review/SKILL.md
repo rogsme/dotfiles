@@ -4,7 +4,6 @@ description: "Verify and address review feedback on the current branch's pull re
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Address review feedback

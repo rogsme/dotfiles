@@ -5,7 +5,6 @@ license: MIT
 compatibility: Requires Bash 4.3+, Git 2.x, and GNU coreutils (sort with NUL support).
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Git Archaeology

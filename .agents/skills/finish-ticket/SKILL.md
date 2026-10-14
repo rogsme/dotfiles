@@ -4,7 +4,6 @@ description: "Merge the current branch's reviewed pull request and complete its 
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Finish a reviewed ticket
