@@ -4,7 +4,6 @@ description: "Diagnosis loop for hard bugs and performance regressions. Use when
 license: MIT
 metadata:
   rogs-skills/contract: "1"
-  opencode/slash: "true"
 ---
 
 # Diagnosing Bugs

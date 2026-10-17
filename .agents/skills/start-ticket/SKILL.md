@@ -36,6 +36,7 @@ need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording 
 on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
 on "Client notes" && has workflow.md "## Client notes"
+on "Plan review" && has workflow.md "## Plan review"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
 true'
 ```
@@ -96,7 +97,11 @@ Distinguish verified facts from unresolved product behavior, and research curren
 
 Ask the user about every material uncertainty that the code, the tests, the ticket and approved references do not resolve. Never silently choose product policy, external behavior, data semantics or compatibility requirements.
 
-## 4. Return the investigation
+## 4. Review the plan
+
+When plan review is on, call the Skill tool with "review-plan" once the plan is complete, before the user sees any of it. Hand over the plan, every ticket with its acceptance criteria and the comments that change its scope, and the worktree root. Continue with the plan it hands back. A plan handed back unreviewed still goes to the user, with its `Not reviewed:` line.
+
+## 5. Return the investigation
 
 Report:
 
@@ -108,6 +113,7 @@ Report:
 - The seams under test, each with one line on what it catches and what it misses. In the test-first areas `## Verification` lists, these are the agreement `tdd` works from during implementation.
 - When the browser pass is on, the pass the work phase will run per `browser-pass.md`: which instance, which criteria it walks, the negative check, and which flows get a video; or the one-line reason the change has no user-visible surface.
 - When model routing is on, a `Model:` line naming the model the work should run on, and whether this session runs on it.
+- When plan review is on, the review section and the findings left for the user to decide, as `review-plan` handed them back, or its `Not reviewed:` line.
 - A final `Status: AWAITING_APPROVAL` line.
 
 Never edit application files, create commits, push, or open a pull request in this phase, even when the session can write. Wait for the user to approve the plan and explicitly start the work phase.

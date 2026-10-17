@@ -11,6 +11,7 @@ How this project runs the ticket lifecycle. Written by `/setup-rogs`; edit it fr
 | Browser pass | {{FILL: on or off}} |
 | Model routing | {{FILL: on or off}} |
 | Client notes | {{FILL: on or off}} |
+| Plan review | {{FILL: on or off}} |
 
 ## Worktrees
 

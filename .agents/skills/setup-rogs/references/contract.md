@@ -101,7 +101,7 @@ Forge operations:
 
 | Heading | Holds |
 |---|---|
-| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`. |
+| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`, `Plan review`. |
 | `## Worktrees` | The rule (branch name equals the worktree directory name equals the lead ticket id), where worktrees usually live, and who creates them (the user, never a skill). |
 | `## Verification` | The format command, the full check, focused checks per area, the areas that are test-first, hook behavior, and any environment notes. A command the project lacks is written as `not configured`. |
 | `## Commits` | Paths never committed, commit rules beyond the defaults, and the attribution policy. |
@@ -110,6 +110,7 @@ Forge operations:
 | `## Review` | Project invariants a review checks, house review standards, and the commands for focused reproduction. |
 | `## Human verification` | The standard every human verification procedure meets. |
 | `## Client notes` | Only when client notes are on: where they live, what to read before planning, and how to cite them. |
+| `## Plan review` | Only when plan review is on: one row per planner vendor with the reviewer model and the command that runs it (`<brief>` marks where the brief's path goes), the time limit, the vendors that may receive the project's code and plans, and the reviewer's read-only access. |
 
 ## domain.md
 
@@ -172,6 +173,7 @@ R is required. F is required only when the feature it belongs to is on. A dash m
 | workflow `## Review` | - | - | - | R | - | - |
 | workflow `## Human verification` | - | - | R | R | R | R |
 | workflow `## Client notes` | F | F | - | - | - | - |
+| workflow `## Plan review` | - | F | - | - | - | - |
 | domain (all four headings) | R | R | R | R | R | - |
 | browser-pass (all four headings) | - | F | F | F | F | F |
 | pull-request (when `## Pull requests` points at it) | - | - | R | R | R | - |
@@ -213,4 +215,4 @@ Two cases get a different second line:
 - The files are missing here but present in the main worktree (the first entry of `git worktree list --porcelain`): "The configuration exists in <main worktree path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch."
 - The marker version differs: "The configuration is version <n>; this skill expects version 1." Then, for an older configuration, "Run /setup-rogs here to update it."; for a newer one, "Run `npx skills update` to update the installed skills."
 
-The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`) read these files when present and never refuse without them.
+The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`) read these files when present and never refuse without them. `review-plan`, which start-ticket calls, reads `## Plan review` and hands the plan back unreviewed when the feature is off.

@@ -33,6 +33,7 @@ Summarize briefly what is present, what is missing, what conflicts, and what the
 
 - Trackers: [Linear](assets/tracker-linear.md), [Kaneo](assets/tracker-kaneo.md), [GitHub Issues](assets/tracker-github.md), [local markdown](assets/tracker-local.md), or [any other tracker](assets/tracker-custom.md) the user describes.
 - Forges: [GitHub](assets/forge-github.md), [Gitea](assets/forge-gitea.md), [GitLab](assets/forge-gitlab.md), or [any other forge](assets/forge-custom.md) the user describes.
+- Plan reviewers, when plan review is on: [Claude Code](assets/reviewer-claude-code.md) or [OpenCode](assets/reviewer-opencode.md).
 
 ## 3. Resolve the open decisions
 
@@ -70,6 +71,7 @@ K. Features, each on or off:
    - Browser pass: which changes it covers, the instances and their start commands and URLs, port allocation, the seed command, and how a model without image input checks a capture. The `playwright-cli` binary and skill must both be present; when the skill is missing, give the user `playwright-cli install --skills` (with `--global` for a home-directory install) and keep the feature off until it is installed.
    - Model routing: the frontier and cheaper models, and the criteria.
    - Client notes: the path, its layout, and whether it exists on this machine.
+   - Plan review: the planner vendors that get a reviewer, each reviewer's model and its command from the reviewer guide, the time limit (at most 10 minutes, the longest a foreground shell call runs in Claude Code), and the vendors that may receive this project's code and plans. Run each chosen guide's check; when one fails, give the user its setup notes and keep the feature off until the check passes.
 
 ## 4. Compose the files
 
@@ -79,7 +81,7 @@ Build each file from its seed in `assets/`, keeping the marker on line 1 and fil
 |---|---|
 | `docs/agents/issue-tracker.md` | `assets/issue-tracker.md`, with the tracker guide's `## Tracker` and `## Operations` sections in place of the two placeholders; then `assets/issue-tracker-bundles.md` appended when bundles are on, and `assets/issue-tracker-model-routing.md` when model routing is on |
 | `docs/agents/forge.md` | `assets/forge.md`, with the forge guide's `## Forge` and `## Operations` sections in place of the two placeholders |
-| `docs/agents/workflow.md` | `assets/workflow.md`, with `assets/workflow-client-notes.md` appended when client notes are on |
+| `docs/agents/workflow.md` | `assets/workflow.md`, with `assets/workflow-client-notes.md` appended when client notes are on, and `assets/workflow-plan-review.md` when plan review is on |
 | `docs/agents/domain.md` | `assets/domain.md` |
 | `docs/agents/browser-pass.md` | `assets/browser-pass.md`, only when the browser pass is on |
 | `docs/agents/pull-request.md` | `assets/pull-request.md`, only when the repository has no template; drop its `## Screenshots` section when the browser pass is off |
@@ -114,7 +116,7 @@ End with `Status: CONFIGURED`.
 Run this after every write, and on its own in check mode:
 
 1. Every lifecycle skill's preflight from the contract passes against the files, for the features that are on.
-2. Live probes: the tracker connection answers and the key and states exist; the forge's base branch and merge style match the file; the CI path filters match the workflow files; every verification command exists; the pull request template carries the required headings, or `pull-request.md` exists; the glossary is where `domain.md` says, or not created yet; `playwright-cli` and its skill are present when the browser pass is on; the client notes path is readable when client notes are on.
+2. Live probes: the tracker connection answers and the key and states exist; the forge's base branch and merge style match the file; the CI path filters match the workflow files; every verification command exists; the pull request template carries the required headings, or `pull-request.md` exists; the glossary is where `domain.md` says, or not created yet; `playwright-cli` and its skill are present when the browser pass is on; the client notes path is readable when client notes are on; each configured reviewer guide's check passes when plan review is on.
 3. The configuration is on the base branch: fetch, then `git diff --quiet <remote>/<base> -- docs/agents <block file>`.
 4. No same-name skill from another source shadows a rogs skill.
 
