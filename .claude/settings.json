@@ -2,7 +2,8 @@
   "syncClaudeAiSkills": false,
   "syncClaudeAiPlugins": false,
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_PLUGIN_DIRS": "/home/roger/.claude/moshi-plugin"
   },
   "attribution": {
     "commit": "",
