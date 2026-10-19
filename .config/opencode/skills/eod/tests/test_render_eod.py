@@ -15,6 +15,51 @@ spec.loader.exec_module(renderer)
 
 
 class RenderTests(unittest.TestCase):
+    def test_formatter_uses_shared_skill_before_legacy_install(self):
+        with tempfile.TemporaryDirectory(prefix="eod-formatter-") as root:
+            home = Path(root)
+            shared = home / ".agents/skills/chat-paste/scripts/render_message.py"
+            legacy = home / ".claude/skills/chat-paste/scripts/render_message.py"
+            for cli in [shared, legacy]:
+                cli.parent.mkdir(parents=True)
+                cli.touch()
+            self.assertEqual(renderer.find_chat_paste_cli(home), shared)
+            shared.unlink()
+            self.assertEqual(renderer.find_chat_paste_cli(home), legacy)
+            legacy.unlink()
+            self.assertEqual(renderer.find_chat_paste_cli(home), shared)
+
+    def test_destination_override_reuses_eod_preparation(self):
+        with tempfile.TemporaryDirectory(prefix="eod-destination-") as root:
+            source = Path(root) / "internal.md"
+            source.write_text("Team update\n\n## Internal notes\nPRIVATE_SENTINEL")
+            with (
+                patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
+                patch.object(
+                    renderer.sys,
+                    "argv",
+                    [
+                        str(SCRIPT),
+                        str(source),
+                        "--mode",
+                        "internal",
+                        "--destination",
+                        "both",
+                    ],
+                ),
+                patch.object(
+                    renderer.subprocess,
+                    "run",
+                    return_value=subprocess.CompletedProcess(
+                        [], 0, stdout="", stderr=""
+                    ),
+                ) as call,
+            ):
+                self.assertEqual(renderer.main(), 0)
+                command = call.call_args.args[0]
+                self.assertEqual(command[command.index("--destination") + 1], "both")
+                self.assertEqual(call.call_args.kwargs["input"], "Team update")
+
     def output_path(self, draft):
         output = Path("/tmp/opencode") / f"{draft.stem}.html"
         self.addCleanup(output.unlink, missing_ok=True)

@@ -12,6 +12,8 @@ Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints tod
 
 **Tools:** read saved JSON and text with `read`; use `grep` to locate details. Use approved scripts for processing. If those tools cannot complete a step, report the limitation rather than creating a helper script or using inline Python. Shell calls use one command, with no pipes, `;`, `&&` or subshells. The allowlist checks each piece of a chain, so one unlisted piece denies the whole call.
 
+**Working directory:** if a shell call fails because the session's checkout was removed, retry the approved command with its working directory set to the absolute `<skill-dir>`. Use the client already resolved in this conversation; repo auto-detection is unavailable from that fallback directory. Keep logs in `~/.eod` and temporary messages in `/tmp/opencode`. A missing checkout does not prevent saving or formatting an update. A permission denial is separate: report the denied action and path without retrying through another tool.
+
 **Eval mode:** a request starting with `EVAL MODE` carries overrides (date, log root, PR handling, reviewers, vault pass). They win over this skill.
 
 ## Where things live
@@ -166,6 +168,8 @@ Render a preview of every delivered draft:
 `python3 <skill-dir>/scripts/render_eod.py ~/.eod/<client>/<draft>.md --mode client --client ~/.eod/<client>/client.md --open`
 
 Use `--mode internal` or `--mode weekly` for those drafts. Open the copy page with `--open` for every delivered draft, including revisions and a switch from client to internal or weekly. Use `--no-open` for intermediate renders, automated evals, or when Roger requests silent delivery. It writes `/tmp/opencode/<draft>.html` with only the public message; Roger copies from it so the PR links paste as real links. Report browser opening only when the renderer confirms it; a generated file alone isn't proof it opened. If it prints that chat-paste is not installed, skip the link. If it fails, report the error and still deliver the plain text.
+
+**Format-only follow-up:** when Roger asks for an existing update through chat-paste, reuse that message without rewriting or gathering again. Save an unsaved message as a final `.md` under `~/.eod/<client>/` or `/tmp/opencode`, excluding the conversational “Before you send” block. Run the same EOD renderer with the message's mode, `--destination slack|teams|both` and `--open`; use `both` when no destination is named. This retains the EOD private-notes filter. Return the printed file URL and path, plus the copy-button instruction. Require a successful exit and a printed preview path before claiming a preview exists.
 
 Reply in this order:
 

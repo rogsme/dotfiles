@@ -2,6 +2,8 @@
 
 These tests cover PR inclusion, EOD preparation, and standalone plain-text delivery. Optional clipboard export is tested through a public CLI when a formatter is installed; formatter-specific browser tests belong to that formatter.
 
+Agent permission tests check the configured allowlist for preview edits, external formatter directories and pinned formatter commands, while retaining denials for unrelated paths and inline Python. They inspect the frontmatter policy, not a running OpenCode session. Renderer tests cover shared-skill discovery with legacy fallback and destination overrides with private-note filtering.
+
 From `~/.config/opencode`, run:
 
 ```sh

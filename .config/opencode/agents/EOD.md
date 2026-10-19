@@ -14,6 +14,7 @@ permission:
     "*": deny
     "~/.eod/*": allow
     "~/.eod/*/*": allow
+    "/tmp/opencode/*": allow
     "/tmp/eod-eval/*": allow
     "/tmp/eod-eval/*/*": allow
     "/tmp/eod-eval/*/*/*": allow
@@ -24,6 +25,9 @@ permission:
     "~/.config/opencode/skills/eod/*": allow
     "~/.config/opencode/skills/eod/*/*": allow
     "~/.agents/skills/avoid-ai-tropes/*": allow
+    "~/.agents/skills/chat-paste/*": allow
+    "~/.claude/skills/chat-paste/*": allow
+    "/tmp/opencode/*": allow
     "/tmp/eod-eval/*": allow
   skill:
     "*": deny
@@ -69,6 +73,19 @@ permission:
     "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
+    # Standalone chat-paste exports accept saved EODs or temporary messages.
+    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
+    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
+    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
+    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
+    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
+    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
+    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
+    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
+    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
+    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
+    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
+    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
     # Read-only window into the Obsidian vault. The agent never reads ~/obsidian
     # directly (external_directory denies it); this script filters per client.
     "python3 ~/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
