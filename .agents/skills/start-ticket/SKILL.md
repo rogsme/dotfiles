@@ -37,6 +37,7 @@ on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
 on "Client notes" && has workflow.md "## Client notes"
 on "Plan review" && has workflow.md "## Plan review"
+on "Plan presentation" && has workflow.md "## Plan presentation"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
 true'
 ```
@@ -97,15 +98,21 @@ Distinguish verified facts from unresolved product behavior, and research curren
 
 Ask the user about every material uncertainty that the code, the tests, the ticket and approved references do not resolve. Never silently choose product policy, external behavior, data semantics or compatibility requirements.
 
-## 4. Review the plan
+Finish the complete report described in step 4 before review, including the overview and its diagrams. Keep diagrams in the candidate plan; presentation adds no new design claims. Planning artifacts may be written only outside every checkout, in a location this planning agent allows.
 
-When plan review is on, call the Skill tool with "review-plan" once the plan is complete, before the user sees any of it. Hand over the plan, every ticket with its acceptance criteria and the comments that change its scope, and the worktree root. Continue with the plan it hands back. A plan handed back unreviewed still goes to the user, with its `Not reviewed:` line.
+## 4. Prepare the investigation report
 
-## 5. Return the investigation
+Open the report with `## Overview`, written for a person who has not read the code:
 
-Report:
+- What changes and why, in a few plain sentences, with no paths, line numbers or function names.
+- Mermaid diagrams wherever a picture explains the change faster than prose, as many as this ticket needs: none for a one-line fix, several for a change across many parts. Candidates are the behavior today next to the behavior after the change, the parts of the system the change touches and how they connect, a sequence or state change, and which plan step covers which acceptance criterion. Each diagram shows only what the plan below says. Prefer `flowchart`: the reviewer can comment on each of its boxes.
+- The main risk, and the decisions the user still needs to make, or "none".
 
-- The title, current state, dependencies and acceptance criteria of the lead and of every rider, with the bundle stated on the first line.
+Keep diagrams local-only: no URLs, images, icons or `%%{` directives, or the presenter shows them as source text. Every claim in the overview restates a detail below it.
+
+After the overview, report:
+
+- The title, current state, dependencies and acceptance criteria of the lead and of every rider, naming the bundle first.
 - The cross-ticket scan: the tickets inspected as possible blockers, and whether this ticket is safe to start independently.
 - The current behavior and the root-cause findings, with code references.
 - Remaining questions, blockers and explicitly unverified surfaces.
@@ -113,8 +120,22 @@ Report:
 - The seams under test, each with one line on what it catches and what it misses. In the test-first areas `## Verification` lists, these are the agreement `tdd` works from during implementation.
 - When the browser pass is on, the pass the work phase will run per `browser-pass.md`: which instance, which criteria it walks, the negative check, and which flows get a video; or the one-line reason the change has no user-visible surface.
 - When model routing is on, a `Model:` line naming the model the work should run on, and whether this session runs on it.
-- When plan review is on, the review section and the findings left for the user to decide, as `review-plan` handed them back, or its `Not reviewed:` line.
-- A final `Status: AWAITING_APPROVAL` line.
+
+## 5. Review the plan
+
+When plan review is on, call the Skill tool with "review-plan" once the complete report is ready, before the user sees any of it. Hand over the report, every ticket with its acceptance criteria and the comments that change its scope, and the worktree root. Continue with the plan it hands back. Append its review section and the findings left for the user to decide unchanged. A plan handed back unreviewed still goes to the user, with its `Not reviewed:` line.
+
+When plan review is off, mark the report `Not reviewed: plan review is off in this repository.` Presentation never implies adversarial review.
+
+## 6. Present and hand off
+
+When plan presentation is on, call the Skill tool with "present-plan" after step 5, handing over the complete settled report, the unchanged review section or warning, the main repository and worktree roots, the lead and riders, and `## Plan presentation` settings. A missing feature row means off. When off, return the report in the terminal as before.
+
+For browser feedback, verify each request against the ticket, code and recorded decisions before revising the canonical report. A substantive human-requested change creates a new finished candidate: when plan review is on, call the Skill tool with "review-plan" once for that candidate, settle its findings, then call the Skill tool with "present-plan" for the same owned session. This is one round per human-requested candidate, never an automatic review retry loop. Layout-only changes preserve the plan and review result without another model review. Ask about stale or ambiguous feedback instead of applying it to a newer revision.
+
+When presentation succeeds, return a short handoff with the ticket/bundle, current canonical source path and revision/digest, browser URL and HTML path, adversarial-review outcome, and remaining questions. Keep rejected blockers or risks available in the browser and identify any still needing a decision. Do not repeat the full report unless requested. When presentation fails, return `Not presented: <reason>` and the complete report, retaining the review table or `Not reviewed:` line.
+
+Browser feedback, closing the review, `Send & End`, and delivery receipts do not approve a plan. Wait for explicit approval of the current canonical content in this conversation; the user still starts `work-ticket` separately. End every completed handoff with `Status: AWAITING_APPROVAL`.
 
 Never edit application files, create commits, push, or open a pull request in this phase, even when the session can write. Wait for the user to approve the plan and explicitly start the work phase.
 

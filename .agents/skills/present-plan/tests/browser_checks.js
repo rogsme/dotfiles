@@ -1,0 +1,51 @@
+async (page) => {
+  const config = __CONFIG__;
+  const external = [];
+  page.__presentPlanExternal = external;
+  await page.context().route("**/*", async (route) => {
+    const url = new URL(route.request().url());
+    if (url.hostname === "127.0.0.1") return route.continue();
+    external.push(url.href);
+    return route.abort();
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto(config.url);
+  const frame = page.frameLocator("#artifact");
+  await frame.getByRole("heading", { name: "ACM-123: Pagination", exact: true }).waitFor();
+  const overview = frame.locator("#panel-overview");
+  const full = frame.locator("#panel-full");
+  if (await full.isVisible()) throw new Error("The Full plan tab is not hidden by default.");
+  await overview.locator(".review-warning").filter({ hasText: "Not reviewed:" }).waitFor();
+  if (await frame.locator("script:not([src])").count()) throw new Error("The plan executed source HTML.");
+  if (await frame.locator("img").count()) throw new Error("Remote image was not rendered as a reference.");
+  await overview.locator(".badge.sev-blocker").filter({ hasText: "blocker" }).waitFor();
+  if (!(await overview.locator("table").textContent()).includes("Empty page test")) throw new Error("Review finding missing.");
+  const node = overview.locator(".diagram svg g.node").filter({ hasText: "API" });
+  await node.waitFor({ timeout: 30_000 });
+  if (await frame.locator('iframe[data-lavish-ui="whiteboard-inline"]').count()) throw new Error("A diagram became a whiteboard instead of an SVG.");
+  await page.locator("#layoutGateOverlay").waitFor({ state: "hidden", timeout: 30_000 });
+  await frame.getByText("Preserve the current response format.", { exact: true }).click();
+  const card = frame.locator("textarea");
+  await card.fill("Keep the response format stable.");
+  await card.press("Enter");
+  await page.locator("#queuedLog").getByText("Keep the response format stable.", { exact: true }).waitFor();
+  await node.click();
+  const nodeCard = frame.locator("textarea");
+  await nodeCard.fill("Split the API box into read and write paths.");
+  await nodeCard.press("Enter");
+  await page.locator("#queuedLog").getByText(/Split the API box/).waitFor({ timeout: 30_000 });
+  await frame.getByRole("tab", { name: "Full plan" }).click();
+  await full.getByRole("heading", { name: "Implementation", exact: true }).waitFor();
+  if (await overview.isVisible()) throw new Error("The Overview tab stayed visible after switching.");
+  await full.getByText(/This diagram needs local-only source/).waitFor();
+  // A diagram hidden at load renders once its tab is shown.
+  await full.locator(".diagram svg g.node").filter({ hasText: "Cursor" }).waitFor({ timeout: 30_000 });
+  await page.locator("#send").click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  const artifact = page.frames().find((candidate) => candidate.url().includes("/artifact/"));
+  const geometry = await artifact.evaluate(() => ({ width: innerWidth, content: document.documentElement.scrollWidth }));
+  if (geometry.content > geometry.width + 1) throw new Error(`Mobile page overflows: ${JSON.stringify(geometry)}`);
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  if (external.length) throw new Error(`External asset requests: ${external.join(", ")}`);
+  return { passed: true, localAssets: true, annotationSent: true, diagramNodeNote: true, tabs: true, fullPlanDiagram: true, mobile: geometry };
+}

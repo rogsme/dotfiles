@@ -12,6 +12,7 @@ How this project runs the ticket lifecycle. Written by `/setup-rogs`; edit it fr
 | Model routing | {{FILL: on or off}} |
 | Client notes | {{FILL: on or off}} |
 | Plan review | {{FILL: on or off}} |
+| Plan presentation | {{FILL: on or off; missing in older configurations means off}} |
 
 ## Worktrees
 

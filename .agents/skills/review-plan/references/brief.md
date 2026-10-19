@@ -15,7 +15,7 @@ Severity:
 - `risk`: the plan likely works but leaves a probable failure unhandled, such as an untested failure path, a race, an irreversible step with no way back, or an unchecked assumption about existing code.
 - `nit`: wording, ordering or a small improvement that leaves the outcome the same.
 
-Check that every acceptance criterion maps to a step, that the plan's claims about the current code are true, that every caller and contract the change touches is covered, that the tests exercise the seams the plan names (failure paths included), and that each step comes after the steps it depends on.
+Check that every acceptance criterion maps to a step, that the `## Overview` and its diagrams say the same as the detailed steps, that the plan's claims about the current code are true, that every caller and contract the change touches is covered, that the tests exercise the seams the plan names (failure paths included), and that each step comes after the steps it depends on.
 
 ## Output
 

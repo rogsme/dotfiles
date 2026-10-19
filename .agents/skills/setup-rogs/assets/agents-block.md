@@ -23,5 +23,6 @@ finish-ticket       merge, verify, complete the tickets     Status: DONE
 - The implementer never reviews its own change, the fixer never resolves review threads, the reviewer never writes to the tracker, and only `finish-ticket` merges.
 - Every claim (CI is green, reviewed, verified) names the exact head SHA, and that head contains the current base.
 - After a plan is approved, "go" or "do it" means `work-ticket`, never a generic implementation flow.
+- When plan presentation is on, `present-plan` shows the settled plan after optional adversarial review. Browser feedback and ending the session never approve it; explicit approval stays in this conversation and the user starts `work-ticket` separately.
 - Run `/setup-rogs` to change this configuration, or ask it to check the setup for drift.
 <!-- rogs-skills:end -->

@@ -72,6 +72,7 @@ K. Features, each on or off:
    - Model routing: the frontier and cheaper models, and the criteria.
    - Client notes: the path, its layout, and whether it exists on this machine.
    - Plan review: the planner vendors that get a reviewer, each reviewer's model and its command from the reviewer guide, the time limit (at most 10 minutes, the longest a foreground shell call runs in Claude Code), and the vendors that may receive this project's code and plans. Run each chosen guide's check; when one fails, give the user its setup notes and keep the feature off until the check passes.
+   - Plan presentation: local browser review through `present-plan`, or the existing terminal delivery. Lavish runs through pinned `npx`, with no local or global install. Resolve the external Marked/Mermaid renderer runtime, artifact root permitted by the planning agent, private server state directory and unprivileged port. Call the Skill tool with "present-plan" with a check-only request and those settings. Its version probe may populate npm's cache but opens no browser or review. Keep the feature off until checks pass; renderer preparation is a separate user action. Setup never installs local packages, upstream skills or global hooks. Approval remains in the agent conversation. Preserve existing choices; an absent row in an older configuration means off.
 
 ## 4. Compose the files
 
@@ -81,7 +82,7 @@ Build each file from its seed in `assets/`, keeping the marker on line 1 and fil
 |---|---|
 | `docs/agents/issue-tracker.md` | `assets/issue-tracker.md`, with the tracker guide's `## Tracker` and `## Operations` sections in place of the two placeholders; then `assets/issue-tracker-bundles.md` appended when bundles are on, and `assets/issue-tracker-model-routing.md` when model routing is on |
 | `docs/agents/forge.md` | `assets/forge.md`, with the forge guide's `## Forge` and `## Operations` sections in place of the two placeholders |
-| `docs/agents/workflow.md` | `assets/workflow.md`, with `assets/workflow-client-notes.md` appended when client notes are on, and `assets/workflow-plan-review.md` when plan review is on |
+| `docs/agents/workflow.md` | `assets/workflow.md`, with `assets/workflow-client-notes.md` appended when client notes are on, `assets/workflow-plan-review.md` when plan review is on, and `assets/workflow-plan-presentation.md` when plan presentation is on |
 | `docs/agents/domain.md` | `assets/domain.md` |
 | `docs/agents/browser-pass.md` | `assets/browser-pass.md`, only when the browser pass is on |
 | `docs/agents/pull-request.md` | `assets/pull-request.md`, only when the repository has no template; drop its `## Screenshots` section when the browser pass is off |
@@ -119,5 +120,6 @@ Run this after every write, and on its own in check mode:
 2. Live probes: the tracker connection answers and the key and states exist; the forge's base branch and merge style match the file; the CI path filters match the workflow files; every verification command exists; the pull request template carries the required headings, or `pull-request.md` exists; the glossary is where `domain.md` says, or not created yet; `playwright-cli` and its skill are present when the browser pass is on; the client notes path is readable when client notes are on; each configured reviewer guide's check passes when plan review is on.
 3. The configuration is on the base branch: fetch, then `git diff --quiet <remote>/<base> -- docs/agents <block file>`.
 4. No same-name skill from another source shadows a rogs skill.
+5. When plan presentation is on, call the Skill tool with "present-plan" for a check-only probe of its recorded renderer/state/port and pinned npx execution. Confirm the artifact root is external to every worktree and permitted by the planning agent. This check opens no browser and makes no local installation; npm's cache may be populated. Browser interaction is verified separately. Report presentation drift without changing the independent plan-review setting.
 
 Report a table with one row per check marked OK, DRIFT or MISSING, with the evidence for each. End with `Status: SETUP_OK` when every row is OK, otherwise `Status: SETUP_DRIFT` and the fix for each row (usually running `/setup-rogs` again).

@@ -60,6 +60,7 @@ From here on, "the tracker", "the forge" and every operation named in backticks 
 ## 1. Preconditions
 
 1. Require an implementation-ready plan and the user's explicit approval of it: the plan approved in this session, or an `## Approved implementation plan` comment already on the lead ticket when resuming in a fresh session. When neither exists, stop, tell the user to run `/start-ticket <id>` first, and end with `Status: BLOCKED` and `Reason: no approved plan`.
+   A browser URL alone is not a plan. For a new browser-presented approval, read the canonical source, check its revision/digest, and require approval of that exact content in the agent conversation. Browser session state, ordinary feedback, `Send & End`, and delivery receipts are not approval. Older conversation-based plans remain valid without presentation metadata. Post the approved content in the plan comment, never a temporary local link in its place. On resumption, that full approved-plan comment is authoritative even when local presentation artifacts are unavailable.
 2. Derive the lead id from the plan and require both the current branch and the checkout directory's basename to equal it exactly (`## Worktrees`).
 3. Confirm that `git worktree list --porcelain` lists this checkout. Stop rather than switching or creating a worktree when it is wrong.
 4. `resolve` and `load` the ticket with its relations and every comment, and verify the team or project. When bundles are on, resolve the bundle again and require the members the plan names; stop when the bundle changed.

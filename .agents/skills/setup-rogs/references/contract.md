@@ -101,7 +101,7 @@ Forge operations:
 
 | Heading | Holds |
 |---|---|
-| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`, `Plan review`. |
+| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`, `Plan review`, `Plan presentation`. An absent `Plan presentation` row in an older v1 configuration means off. |
 | `## Worktrees` | The rule (branch name equals the worktree directory name equals the lead ticket id), where worktrees usually live, and who creates them (the user, never a skill). |
 | `## Verification` | The format command, the full check, focused checks per area, the areas that are test-first, hook behavior, and any environment notes. A command the project lacks is written as `not configured`. |
 | `## Commits` | Paths never committed, commit rules beyond the defaults, and the attribution policy. |
@@ -111,6 +111,9 @@ Forge operations:
 | `## Human verification` | The standard every human verification procedure meets. |
 | `## Client notes` | Only when client notes are on: where they live, what to read before planning, and how to cite them. |
 | `## Plan review` | Only when plan review is on: one row per planner vendor with the reviewer model and the command that runs it (`<brief>` marks where the brief's path goes), the time limit, the vendors that may receive the project's code and plans, and the reviewer's read-only access. |
+| `## Plan presentation` | Only when plan presentation is on: the `present-plan` presenter using pinned npx execution for Lavish, checked external Marked/Mermaid renderer runtime, external artifact root permitted by the planning agent, private server state directory and port, terminal fallback policy, conversation-only approval and local-only data boundary. Lavish needs no local installation path. Presentation follows optional adversarial review and preserves its report or failure warning. |
+
+Plan presentation is additive and optional under contract v1. It never changes the meaning of plan review or requires older projects to add a heading while the feature is absent or off. A presentation failure returns the complete report in the terminal; browser state and delivery receipts never authorize implementation. Planning may write private review artifacts outside every checkout, within the agent's allowed paths, while application files and tracker state stay unchanged.
 
 ## domain.md
 
@@ -174,6 +177,7 @@ R is required. F is required only when the feature it belongs to is on. A dash m
 | workflow `## Human verification` | - | - | R | R | R | R |
 | workflow `## Client notes` | F | F | - | - | - | - |
 | workflow `## Plan review` | - | F | - | - | - | - |
+| workflow `## Plan presentation` | - | F | - | - | - | - |
 | domain (all four headings) | R | R | R | R | R | - |
 | browser-pass (all four headings) | - | F | F | F | F | F |
 | pull-request (when `## Pull requests` points at it) | - | - | R | R | R | - |
@@ -196,6 +200,7 @@ An operation marked `Capability: Unsupported` still satisfies the heading check.
 | No threaded replies | Answer each thread with a conversation comment that quotes its `path:line` and links its first comment. |
 | Merges go through a queue or train | `finish-ticket` checks the packet, asks the user to merge through the queue or train, and completes the tickets on its next run, when it finds the pull request merged. |
 | No CI | Say so in the handoff and the review instead of linking checks. |
+| Plan presentation is unavailable or unsafe | Return `Not presented: <reason>` and the full canonical report in the terminal, preserving adversarial findings or `Not reviewed:`. Approval still happens in the conversation. |
 
 ## Preflight (step 0 of every lifecycle skill)
 
@@ -215,4 +220,4 @@ Two cases get a different second line:
 - The files are missing here but present in the main worktree (the first entry of `git worktree list --porcelain`): "The configuration exists in <main worktree path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch."
 - The marker version differs: "The configuration is version <n>; this skill expects version 1." Then, for an older configuration, "Run /setup-rogs here to update it."; for a newer one, "Run `npx skills update` to update the installed skills."
 
-The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`) read these files when present and never refuse without them. `review-plan`, which start-ticket calls, reads `## Plan review` and hands the plan back unreviewed when the feature is off.
+The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`) read these files when present and never refuse without them. `review-plan`, which start-ticket calls, reads `## Plan review` and hands the plan back unreviewed when the feature is off. `present-plan` reads `## Plan presentation` for lifecycle handovers; explicit standalone requests can supply their settings without lifecycle configuration.
