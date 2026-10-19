@@ -16,8 +16,10 @@ command = "opencode run -m lazer/glm-5.2 --variant low"
 pager = "delta --paging=never --width=$COLUMNS"
 
 # Copy gitignored files (deps, .env, caches) from the primary worktree
-# so a new worktree can run the full server immediately.
-[post-start]
+# so a new worktree can run the full server immediately. pre-start blocks
+# until the copy finishes, so an agent started right after `wt switch`
+# (tkt start) finds .env, node_modules, sources/ and docs/ in place.
+[pre-start]
 copy = "wt step copy-ignored"
 
 # Aliases — run as `wt <name>`.
