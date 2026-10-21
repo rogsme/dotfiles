@@ -57,7 +57,7 @@ From here on, "the tracker", "the forge" and every operation named in backticks 
 
 ## 1. Verify the ticket worktree
 
-Extract the full ticket id from the request, in the format `## Tracker` gives. Ask when it is missing or ambiguous.
+Extract the full ticket id from the request, in the format `## Tracker` gives. Ask when it is missing or ambiguous. When the request says the run is unattended, follow [Unattended runs](#unattended-runs) from here on.
 
 Before reading the tracker:
 
@@ -129,7 +129,7 @@ When plan review is off, mark the report `Not reviewed: plan review is off in th
 
 ## 6. Present and hand off
 
-When plan presentation is on, call the Skill tool with "present-plan" after step 5, handing over the complete settled report, the unchanged review section or warning, the main repository and worktree roots, the lead and riders, and `## Plan presentation` settings. A missing feature row means off. When off, return the report in the terminal as before.
+When plan presentation is on, outside an unattended run, call the Skill tool with "present-plan" after step 5, handing over the complete settled report, the unchanged review section or warning, the main repository and worktree roots, the lead and riders, and `## Plan presentation` settings. A missing feature row means off. When off, return the report in the terminal as before.
 
 For browser feedback, verify each request against the ticket, code and recorded decisions before revising the canonical report. A substantive human-requested change creates a new finished candidate: when plan review is on, call the Skill tool with "review-plan" once for that candidate, settle its findings, then call the Skill tool with "present-plan" for the same owned session. This is one round per human-requested candidate, never an automatic review retry loop. Layout-only changes preserve the plan and review result without another model review. Ask about stale or ambiguous feedback instead of applying it to a newer revision.
 
@@ -138,6 +138,14 @@ When presentation succeeds, return a short handoff with the ticket/bundle, curre
 Browser feedback, closing the review, `Send & End`, and delivery receipts do not approve a plan. Wait for explicit approval of the current canonical content in this conversation; the user still starts `work-ticket` separately. End every completed handoff with `Status: AWAITING_APPROVAL`.
 
 Never edit application files, create commits, push, or open a pull request in this phase, even when the session can write. Wait for the user to approve the plan and explicitly start the work phase.
+
+## Unattended runs
+
+An unattended run is one whose request says so. The runner that sent the request approves the plan itself, with nobody reading it first, and calls the user only when this session waits on a question. In an unattended run:
+
+- Ask every question through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode): a pending question is what the runner watches for. Without such a tool, ask in plain text and end the turn there, with no status line.
+- Settle everything before the handoff. Every remaining question, open decision and review finding left for the user becomes a question asked that way, and its answer goes into the report. An answer that changes the plan substantively is a human-requested change: give it the single review round step 6 describes. `Status: AWAITING_APPROVAL` then means nothing is left to decide.
+- Skip plan presentation even when it is on, since nobody watches the browser. Return the complete report in the terminal, with its review section or `Not reviewed:` line, marked `Not presented: unattended run.`
 
 ## Gotchas
 

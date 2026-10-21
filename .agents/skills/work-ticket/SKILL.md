@@ -57,6 +57,8 @@ When the check reports files missing here that exist in the main worktree (the f
 
 From here on, "the tracker", "the forge" and every operation named in backticks (`comment`, `push`, `ci`, ...) mean what those files define, under their operating rules. When an operation says `Capability: Unsupported`, follow its fallback; stop with `Status: BLOCKED` and a `Reason:` line when no way forward exists. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
+Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
 ## 1. Preconditions
 
 1. Require an implementation-ready plan and the user's explicit approval of it: the plan approved in this session, or an `## Approved implementation plan` comment already on the lead ticket when resuming in a fresh session. When neither exists, stop, tell the user to run `/start-ticket <id>` first, and end with `Status: BLOCKED` and `Reason: no approved plan`.

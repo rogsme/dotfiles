@@ -50,6 +50,8 @@ When the check reports files missing here that exist in the main worktree (the f
 
 From here on, "the tracker", "the forge" and every operation named in backticks (`merge`, `transition`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
+Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
 ## 1. Verify authorization and context
 
 1. Require an explicit instruction from the user to merge this pull request. A green check or a reviewer's verdict is not merge authorization.

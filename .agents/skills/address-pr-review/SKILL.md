@@ -1,6 +1,6 @@
 ---
 name: address-pr-review
-description: "Verify and address review feedback on the current branch's pull request: fix the valid findings at their root cause, push back with evidence on the rest, push, get green CI on the exact head, and reply to every comment, at most two rounds per run and never resolving threads. Also brings the branch up to date when the base moved after a review. Use when the user says \"address the review\", \"fix the PR comments\", \"I added comments to the PR\", or \"sync the PR with the base\"."
+description: "First bring the current branch's pull request up to date with its base, then verify and address its review feedback: fix the valid findings at their root cause, push back with evidence on the rest, push, get green CI on the exact head, and reply to every comment, at most two rounds per run and never resolving threads. Use when the user says \"address the review\", \"fix the PR comments\", \"I added comments to the PR\", or \"sync the PR with the base\"."
 license: MIT
 metadata:
   rogs-skills/contract: "1"
@@ -10,7 +10,7 @@ metadata:
 
 Treat review comments as claims to verify, not instructions to apply blindly. Make the smallest justified fixes, push them before replying, and answer every feedback channel. The tracker stays read-only, apart from replacement captures.
 
-One run performs at most two address rounds, then stops. A round is steps 3 to 7 against one head: collect the unanswered feedback, classify it, fix the accepted findings, push, wait for the exact-head CI, and reply. Step 8 decides whether a second round happens and enforces the cap. When there is no feedback but the base moved, the run does the sync-only pass in step 9 instead.
+Every run first syncs the branch with its base (step 3), then performs at most two address rounds and stops. A request to address the review and a request to sync the pull request start the same run. A round is steps 4 to 8 against one head: collect the unanswered feedback, classify it, fix the accepted findings, push, wait for the exact-head CI, and reply. Step 9 decides whether a second round happens and enforces the cap.
 
 ## 0. Configuration preflight
 
@@ -54,6 +54,8 @@ When the check reports files missing here that exist in the main worktree (the f
 
 From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `reply`, `push`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
+Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
 ## 1. Verify the branch and the pull request
 
 1. Read the current branch and require the checkout directory's basename to match it (`## Worktrees`).
@@ -72,18 +74,29 @@ Derive the pull request's tickets: the lead is the head branch when it matches t
 
 Build a requirements ledger from the acceptance criteria, the scope, the approved plan, explicit decisions and clarifications in comments, dependency states, and the limitations the handoff names. Later decisions may supersede older ones when their authority and intent are clear. Treat unclear or conflicting comments as open questions rather than requirements.
 
-## 3. Collect all feedback
+## 3. Sync with the base
+
+Every run syncs before it collects feedback, including a run after a review or a merge attempt that stopped with `Status: BLOCKED_FOR_SYNC`.
+
+1. Confirm the worktree is clean apart from explicitly unrelated pre-existing files.
+2. Fetch the base and read the pull request with `read-pr`. When `<remote>/<base>` is an ancestor of `HEAD` and the pull request does not conflict, the branch is up to date: continue with step 4.
+3. Otherwise sync per `## Sync`: merge the base. When the merge stops on conflicts, call the Skill tool with "resolving-merge-conflicts" with the constraints that it stays a merge, stages only resolved paths and asks about any hunk that decides product behavior; then conclude it with `git commit --no-edit`.
+4. Rerun the focused checks for the code the merge changed. Commit nothing beyond the merge.
+
+The merge stays local until step 6 pushes it with the round's fixes, or step 4 pushes it alone when no feedback is waiting.
+
+## 4. Collect all feedback
 
 Refresh and record the pull request number and head commit, then collect every channel with `feedback`: each inline review comment and its replies, review-summary bodies (including requested changes outside the diff), conversation comments, and thread states. Keep the comment ids, so replies land in the original threads.
 
-A reply this skill posted starts with one of the four prefixes in step 6. Treat a comment as answered when such a reply follows it, unless the reviewer added new feedback after that reply. A conversation comment from `finish-ticket` recording a failed human verification step (`HUMAN_QA_FAILED`) is feedback like any other.
+A reply this skill posted starts with one of the four prefixes in step 7. Treat a comment as answered when such a reply follows it, unless the reviewer added new feedback after that reply. A conversation comment from `finish-ticket` recording a failed human verification step (`HUMAN_QA_FAILED`) is feedback like any other.
 
 When there is no unanswered feedback:
 
-- If the base moved past the pull request (the fetched base is not an ancestor of the head), which is also what a review or a merge attempt that stopped with `BLOCKED_FOR_SYNC` found, run the sync-only pass in step 9.
-- Otherwise report that and stop, without creating commits or comments, ending with `Status: READY_FOR_REVIEW`: the pull request is still waiting for review.
+- If step 3 merged the base, finish the sync. Fetch and require the base to still be an ancestor of `HEAD`, syncing again as in step 3 when it moved, then `push` and wait with `ci` for the new head. Require green gate checks and a mergeable pull request. Refresh the `## Review brief` in the body with `edit-pr`, pinned to the new head and base SHAs. Post one conversation comment only when the merge changed what the human verification covers. End with `Status: READY_FOR_REVIEW`.
+- Otherwise report that the branch already contains the base and no feedback is waiting, and stop without creating commits or comments, ending with `Status: READY_FOR_REVIEW`: the pull request is still waiting for review.
 
-## 4. Validate each comment
+## 5. Validate each comment
 
 Classify every unanswered point as accepted, partially accepted, rejected, or no code change. Trace the changed code, every relevant caller, the repository's contracts and the tests before deciding.
 
@@ -96,7 +109,7 @@ Classify every unanswered point as accepted, partially accepted, rejected, or no
 
 Ask the user only when a decision needs unresolved product policy or unavailable external evidence. Uncertainty is never a reason to accept every suggestion.
 
-## 5. Implement the accepted fixes
+## 6. Implement the accepted fixes
 
 Fix each accepted issue at its shared root cause, with the smallest regression test; in the test-first areas `## Verification` lists, call the Skill tool with "tdd" for it. When an accepted bug's root cause is not evident from the comment and the code, as with a failed human verification step, call the Skill tool with "diagnosing-bugs" first. Preserve unrelated work, and follow `AGENTS.md` (or `CLAUDE.md`) and the rule files `## Project rules` lists for the touched areas.
 
@@ -106,13 +119,11 @@ When the browser pass is on and an accepted fix changes what a page shows, rerun
 
 After the fixes, run the format command and commit any intended changes it makes, then run the focused checks that prove the fixes. Reuse the pull request's CI gate instead of rerunning the full check locally.
 
-Confirm the worktree is clean apart from explicitly unrelated pre-existing files, then sync per `## Sync`: merge the base. When the merge stops on conflicts, call the Skill tool with "resolving-merge-conflicts" with the constraints that it stays a merge, stages only resolved paths and asks about any hunk that decides product behavior; then conclude it with `git commit --no-edit`. Rerun the affected focused checks when the sync changed code.
+Confirm the worktree is clean apart from explicitly unrelated pre-existing files. Immediately before pushing, fetch and require `<remote>/<base>` to still be an ancestor of `HEAD`; when the base moved (`## CI gate` names the automation that moves it), sync again as in step 3 first.
 
-Immediately before pushing, fetch and require `<remote>/<base>` to still be an ancestor of `HEAD`; when the base moved (`## CI gate` names the automation that moves it), sync again first.
+`push` before replying, so the round's fixes and any merge from step 3 reach the pull request together. Never force-push. Record the new head SHA and wait with `ci`, always through that operation rather than an invented alternative. Require successful gate checks for that exact SHA and a mergeable pull request, applying the path-filter rule in `## CI gate`. Fix deterministic failures inside the round and repeat; report infrastructure, permission or unavailable-service failures with `Status: BLOCKED`, the check URL and the exact partial state.
 
-`push` before replying. Never force-push. Record the new head SHA and wait with `ci`, always through that operation rather than an invented alternative. Require successful gate checks for that exact SHA and a mergeable pull request, applying the path-filter rule in `## CI gate`. Fix deterministic failures inside the round and repeat; report infrastructure, permission or unavailable-service failures with `Status: BLOCKED`, the check URL and the exact partial state.
-
-## 6. Reply to every unanswered comment
+## 7. Reply to every unanswered comment
 
 After pushing, refresh the feedback and re-read every ticket with its relations, state and comments, so new feedback is not missed, existing replies are not duplicated, and every classification still matches the current requirements.
 
@@ -129,7 +140,7 @@ Post one conversation comment only when the fixes require human verification aga
 
 Never resolve a thread. The reviewer owns resolution after evaluating the response.
 
-## 7. Verify the round
+## 8. Verify the round
 
 Confirm all of these before the round counts as done:
 
@@ -140,27 +151,17 @@ Confirm all of these before the round counts as done:
 - This skill resolved no thread.
 - Every member was read again, still belongs to the configured team or project, and is still `in-review`, and no tracker write other than replacement captures happened. Report state drift instead of correcting it.
 
-## 8. Round limit: two, then stop
+## 9. Round limit: two, then stop
 
 Fixing deterministic CI failures inside a round is part of that round, not an extra one: a round is complete only when its CI is green and its replies are posted, so the cap never cuts a round in half.
 
-After round 1, refresh the feedback once (step 3). When new unanswered feedback exists on the current head, run exactly one more round, steps 3 to 7, and stop when it completes.
+After round 1, refresh the feedback once (step 4). When new unanswered feedback exists on the current head, run exactly one more round, steps 4 to 8, and stop when it completes.
 
 Two rounds is the hard cap for one run of this skill. An automated reviewer can be very insistent, and a third round never starts: not when the reviewer comments again, not when a thread feels unanswered, not when finishing looks one small fix away. When feedback remains after round 2, list it as unaddressed in the report; the user can run this skill again for two more rounds.
 
-## 9. Sync-only pass
-
-When there is no unanswered feedback but the base moved past the pull request, this pass replaces the address rounds:
-
-1. Sync per `## Sync`, using "resolving-merge-conflicts" for conflicts as in step 5.
-2. Rerun the focused checks for the code the sync changed. Commit nothing beyond the merge.
-3. Fetch and require the base to be an ancestor of `HEAD`, `push`, and wait with `ci` for the new head. Require green gate checks and a mergeable pull request.
-4. Refresh the `## Review brief` in the body with `edit-pr`, pinned to the new head and base SHAs.
-5. Post one conversation comment only when the sync changed what the human verification covers.
-
 ## Report
 
-Return the classifications, the commits, the push result, the verification performed, links to the replies, and any behavior intentionally left unchanged, or for a sync-only pass, the new head and its CI result. End with `Status: READY_FOR_REVIEW`, so a fresh review session can revalidate the head and resolve the threads.
+Return whether step 3 merged the base, the classifications, the commits, the push result, the verification performed, links to the replies, and any behavior intentionally left unchanged. When there was no feedback, return the new head and its CI result instead, or that the branch was already up to date. End with `Status: READY_FOR_REVIEW`, so a fresh review session can revalidate the head and resolve the threads.
 
 ## Gotchas
 
