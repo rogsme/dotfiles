@@ -38,17 +38,28 @@ personalization. It doesn't affect Polybar's functionality.
 :END:
 Defines the color palette used throughout the Polybar configuration. These variables make it easy to
 maintain a consistent theme and can be referenced in other sections using `${colors.variable_name}`.
+
+The colors are the dark =rogs= palette from my opencode theme (=~/.config/opencode/themes/rogs.json=),
+the same one the Claude Code, Ghostty and Herdr themes use. The scripts =btc.sh= and =music=, and
+=~/.config/polybar-claude-usage/config.ini=, hardcode the same colors because they print their own
+color tags.
 #+begin_src conf
 [colors]
-accent = #75d85a
-background = #AA000000
-foreground = #ffffff
-urgent = #990000
-urgent-underline = #990000
-dimmed = #888888
+# Green accent: focused workspace and underlines.
+accent = #50fa7b
+# Ghostty's near-black at 80% opacity (#AARRGGBB, CC = 80%).
+background = #DD0a0a0a
+foreground = #eeeeee
+# Text drawn on top of a colored background, such as the urgent workspace.
+inverse = #0a0a0a
+urgent = #e06c75
+urgent-underline = #e06c75
+dimmed = #808080
 highlight = #e5c07b
-success = #55ffffff
-muted = #666666
+# Workspaces visible on another monitor.
+success = #b5b5b5
+muted = #4c4c4c
+warning = #d19a66
 #+end_src
 
 ** Bar Configuration
@@ -85,10 +96,11 @@ font-2 = Termsynu:size=10;0
 font-3 = Siji:pixelsize=10;1
 font-4 = FontAwesome:size=10;0
 font-5 = Noto Color Emoji:scale=12;0
+font-6 = Noto Sans Symbols 2:size=10;2
 
 modules-left = i3 music
 modules-center = xwindow
-modules-right = crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
+modules-right = claude-usage crypto pulseaudio xkeyboard cpu memory wireless-network protonvpn-status dnd battery clock
 #+end_src
 
 ** i3 Module
@@ -118,7 +130,7 @@ label-unfocused-font = 0
 label-unfocused-padding = 3
 
 label-urgent =  %name%
-label-urgent-foreground = ${colors.foreground}
+label-urgent-foreground = ${colors.inverse}
 label-urgent-background = ${colors.urgent}
 label-urgent-underline = ${colors.urgent-underline}
 label-urgent-font = 1
@@ -181,13 +193,13 @@ format-connected = 📶 <label-connected>
 format-disconnected = <label-disconnected>
 format-packetloss = <animation-packetloss> <label-connected>
 label-connected = %essid% %netspeed:9%
-label-connected-foreground = #eefafa
+label-connected-foreground = ${colors.foreground}
 label-disconnected = 🚫 not connected
 label-disconnected-foreground = ${colors.dimmed}
 animation-packetloss-0 = ⚠
-animation-packetloss-0-foreground = #ffa64c
+animation-packetloss-0-foreground = ${colors.warning}
 animation-packetloss-1 = 📶
-animation-packetloss-1-foreground = #000000
+animation-packetloss-1-foreground = ${colors.background}
 animation-packetloss-framerate = 500
 #+end_src
 
@@ -379,6 +391,23 @@ seconds.
 type = custom/script
 exec = ~/.config/polybar/btc.sh
 interval = 60
+#+end_src
+
+** Claude Usage Module
+:PROPERTIES:
+:ID:       cdf4dd06-ec7b-4b1b-84a4-595a56fd5e20
+:END:
+Shows how much of the Claude usage limits is used, through the =polybar-claude-usage= script. The script
+runs continuously (=tail = true=) and reads its settings, including its colors, from
+=~/.config/polybar-claude-usage/config.ini=. Its icon uses =font-6= (Noto Sans Symbols 2). Left-click
+shows the details in a notification; right-click makes it check again right away.
+#+begin_src conf
+[module/claude-usage]
+type = custom/script
+exec = ~/.local/bin/polybar-claude-usage
+tail = true
+click-left = ~/.local/bin/polybar-claude-usage --notify
+click-right = kill -USR1 %pid%
 #+end_src
 
 * Setting Up Auto-Tangle

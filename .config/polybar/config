@@ -7,15 +7,21 @@
 # ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
 
 [colors]
-accent = #75d85a
-background = #AA000000
-foreground = #ffffff
-urgent = #990000
-urgent-underline = #990000
-dimmed = #888888
+# Green accent: focused workspace and underlines.
+accent = #50fa7b
+# Ghostty's near-black at 80% opacity (#AARRGGBB, CC = 80%).
+background = #DD0a0a0a
+foreground = #eeeeee
+# Text drawn on top of a colored background, such as the urgent workspace.
+inverse = #0a0a0a
+urgent = #e06c75
+urgent-underline = #e06c75
+dimmed = #808080
 highlight = #e5c07b
-success = #55ffffff
-muted = #666666
+# Workspaces visible on another monitor.
+success = #b5b5b5
+muted = #4c4c4c
+warning = #d19a66
 
 [bar/top]
 monitor = ${env:MONITOR:}
@@ -66,7 +72,7 @@ label-unfocused-font = 0
 label-unfocused-padding = 3
 
 label-urgent =  %name%
-label-urgent-foreground = ${colors.foreground}
+label-urgent-foreground = ${colors.inverse}
 label-urgent-background = ${colors.urgent}
 label-urgent-underline = ${colors.urgent-underline}
 label-urgent-font = 1
@@ -101,13 +107,13 @@ format-connected = 📶 <label-connected>
 format-disconnected = <label-disconnected>
 format-packetloss = <animation-packetloss> <label-connected>
 label-connected = %essid% %netspeed:9%
-label-connected-foreground = #eefafa
+label-connected-foreground = ${colors.foreground}
 label-disconnected = 🚫 not connected
 label-disconnected-foreground = ${colors.dimmed}
 animation-packetloss-0 = ⚠
-animation-packetloss-0-foreground = #ffa64c
+animation-packetloss-0-foreground = ${colors.warning}
 animation-packetloss-1 = 📶
-animation-packetloss-1-foreground = #000000
+animation-packetloss-1-foreground = ${colors.background}
 animation-packetloss-framerate = 500
 
 [module/clock]

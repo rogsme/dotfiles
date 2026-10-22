@@ -23,8 +23,8 @@ formatted_price=$(printf "%.2f" "$price")
 # Check if change is negative (starts with -)
 if [[ $change == -* ]]; then
     # Red for negative
-    printf "%%{F#BB0000}₿: \$%s%%{F-}\n" "$formatted_price"
+    printf "%%{F#e06c75}₿: \$%s%%{F-}\n" "$formatted_price"
 else
     # Green for positive
-    printf "%%{F#00BB00}₿: \$%s%%{F-}\n" "$formatted_price"
+    printf "%%{F#50fa7b}₿: \$%s%%{F-}\n" "$formatted_price"
 fi
