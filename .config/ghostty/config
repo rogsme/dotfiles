@@ -15,7 +15,7 @@
 # Use Ghostty's custom titlebar instead of the GTK default.
 gtk-titlebar = false
 # Set the terminal background transparency (0.0=fully transparent, 1.0=fully opaque).
-background-opacity = 0.80
+background-opacity = 0.98
 # Set the TERM environment variable value reported by the terminal.
 term = xterm-256color
 # Disable confirmation dialog when closing a terminal window/tab.
@@ -36,54 +36,10 @@ font-thicken = true
 # Colors #
 ##########
 
-# Default background color (black).
-background = #000000
-# Default text color (light gray).
-foreground = #d0d0d0
-# Background color for selected text (medium gray).
-selection-background = #555555
-
-# Normal colors
-# Black
-palette = 0=#282a36
-# Red
-palette = 1=#f07178
-# Green
-palette = 2=#c3e88d
-# Yellow
-palette = 3=#ffcb6b
-# Blue
-palette = 4=#82aaff
-# Magenta
-palette = 5=#c792ea
-# Cyan
-palette = 6=#89ddff
-# White
-palette = 7=#d0d0d0
-
-# Bright colors
-# Black
-palette = 8=#434758
-# Red
-palette = 9=#ff8b92
-# Green
-palette = 10=#ddffa7
-# Yellow
-palette = 11=#ffe585
-# Blue
-palette = 12=#9cc4ff
-# Magenta
-palette = 13=#e1acff
-# Cyan
-palette = 14=#a3f7ff
-# White
-palette = 15=#ffffff
+# Use themes/rogs-light in light mode and themes/rogs in dark mode.
+theme = light:rogs-light,dark:rogs
 
 # Cursor
-# The color of the cursor itself (white).
-cursor-color = #FFFFFF
-# The color of the text character under the cursor (black).
-cursor-text = #000000
 # Disable cursor blinking.
 cursor-style-blink = false
 # Set the cursor shape to a solid block.
@@ -93,7 +49,7 @@ cursor-style = block
 # with 'no-' to disable it.
 shell-integration-features = no-cursor
 # Note: 'cursor-invert-fg-bg' is not a valid Ghostty option and has been removed.
-# To invert instead of using fixed colors, drop cursor-color/cursor-text above and
-# set: cursor-color = cell-foreground  and  cursor-text = cell-background
+# To invert instead of using fixed colors, set these in the theme files instead:
+# cursor-color = cell-foreground  and  cursor-text = cell-background
 
 mouse-scroll-multiplier = precision:1,discrete:1.5

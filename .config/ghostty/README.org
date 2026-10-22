@@ -50,7 +50,7 @@ This section covers fundamental appearance and behavior settings for the termina
 # Use Ghostty's custom titlebar instead of the GTK default.
 gtk-titlebar = false
 # Set the terminal background transparency (0.0=fully transparent, 1.0=fully opaque).
-background-opacity = 0.80
+background-opacity = 0.98
 # Set the TERM environment variable value reported by the terminal.
 term = xterm-256color
 # Disable confirmation dialog when closing a terminal window/tab.
@@ -72,28 +72,47 @@ font-thicken = true
 :PROPERTIES:
 :ID:       e0d66d24-0727-4fae-9c7b-207f58c60bed
 :END:
-Defines the core color elements of the terminal interface.
+The colors live in two theme files under =themes/=, one for dark mode and one for light mode. Ghostty
+picks one based on the desktop's light or dark setting and switches when it changes. Both themes match
+the =rogs= themes for opencode and Claude Code.
+
+The main config must not set any color options itself: Ghostty applies them on top of the theme, so they
+would override both themes.
 
 #+begin_src conf
 ##########
 # Colors #
 ##########
 
-# Default background color (black).
-background = #000000
+# Use themes/rogs-light in light mode and themes/rogs in dark mode.
+theme = light:rogs-light,dark:rogs
+#+end_src
+
+** Dark Theme
+:PROPERTIES:
+:ID:       dfef606f-3834-4837-83c4-f052bf4f8b02
+:END:
+Tangled into =themes/rogs=.
+
+#+begin_src conf :tangle themes/rogs
+# rogs (dark) Ghostty theme.
+# Tangled from ~/.config/ghostty/README.org. Edit that file, not this one.
+
+# Default background color (near-black, matches the rogs theme).
+background = #0a0a0a
 # Default text color (light gray).
 foreground = #d0d0d0
 # Background color for selected text (medium gray).
 selection-background = #555555
 #+end_src
 
-** Normal Colors
+*** Normal Colors
 :PROPERTIES:
 :ID:       43c754d2-a6ae-4dc0-8a5f-099e5db52085
 :END:
 These are the standard 8 ANSI colors used by many terminal applications.
 
-#+begin_src conf
+#+begin_src conf :tangle themes/rogs
 # Normal colors
 # Black
 palette = 0=#282a36
@@ -113,13 +132,13 @@ palette = 6=#89ddff
 palette = 7=#d0d0d0
 #+end_src
 
-** Bright Colors
+*** Bright Colors
 :PROPERTIES:
 :ID:       ebc101e5-ef7a-4e04-b17c-b362535e15d7
 :END:
 These are the brighter variants of the standard 8 ANSI colors.
 
-#+begin_src conf
+#+begin_src conf :tangle themes/rogs
 # Bright colors
 # Black
 palette = 8=#434758
@@ -139,18 +158,111 @@ palette = 14=#a3f7ff
 palette = 15=#ffffff
 #+end_src
 
-** Cursor Settings
+*** Cursor Colors
 :PROPERTIES:
-:ID:       4d4c0742-314e-4ffa-b297-c9b23f2ebd51
+:ID:       d0a3c49c-5d7b-4d48-bff4-5c1d8f73ad90
 :END:
-Controls the appearance and behavior of the text cursor within the terminal.
 
-#+begin_src conf
+#+begin_src conf :tangle themes/rogs
 # Cursor
 # The color of the cursor itself (white).
 cursor-color = #FFFFFF
 # The color of the text character under the cursor (black).
 cursor-text = #000000
+#+end_src
+
+** Light Theme
+:PROPERTIES:
+:ID:       28de0cdc-ee24-4a10-9e4c-6b5ed92f08ba
+:END:
+Tangled into =themes/rogs-light=. The colors come from the light variant of the opencode =rogs= theme.
+On a white background the "white" palette entries (7 and 15) are mid grays, so text drawn in them stays
+readable.
+
+#+begin_src conf :tangle themes/rogs-light
+# rogs (light) Ghostty theme.
+# Tangled from ~/.config/ghostty/README.org. Edit that file, not this one.
+
+# Default background color (white).
+background = #ffffff
+# Default text color (near-black).
+foreground = #1a1a1a
+# Background color for selected text (pale green).
+selection-background = #bdeec5
+#+end_src
+
+*** Normal Colors
+:PROPERTIES:
+:ID:       15b0fee9-23ef-4406-b448-82bc132517c7
+:END:
+
+#+begin_src conf :tangle themes/rogs-light
+# Normal colors
+# Black
+palette = 0=#1a1a1a
+# Red
+palette = 1=#d1383d
+# Green
+palette = 2=#1a7a3a
+# Yellow
+palette = 3=#b0851f
+# Blue
+palette = 4=#0062d1
+# Magenta
+palette = 5=#6c5999
+# Cyan
+palette = 6=#318795
+# White
+palette = 7=#6e6e6e
+#+end_src
+
+*** Bright Colors
+:PROPERTIES:
+:ID:       9a41c8a7-ac79-445e-9f9d-ff59071a3186
+:END:
+
+#+begin_src conf :tangle themes/rogs-light
+# Bright colors
+# Black
+palette = 8=#4e4e4e
+# Red
+palette = 9=#c53b53
+# Green
+palette = 10=#3c8d50
+# Yellow
+palette = 11=#c99a2e
+# Blue
+palette = 12=#2c78e0
+# Magenta
+palette = 13=#8673b6
+# Cyan
+palette = 14=#4c97a4
+# White
+palette = 15=#8a8a8a
+#+end_src
+
+*** Cursor Colors
+:PROPERTIES:
+:ID:       000bfa32-4555-4666-b987-b96d5f416cf9
+:END:
+
+#+begin_src conf :tangle themes/rogs-light
+# Cursor
+# The color of the cursor itself (near-black).
+cursor-color = #1a1a1a
+# The color of the text character under the cursor (white).
+cursor-text = #ffffff
+#+end_src
+
+** Cursor Settings
+:PROPERTIES:
+:ID:       4d4c0742-314e-4ffa-b297-c9b23f2ebd51
+:END:
+Controls the appearance and behavior of the text cursor within the terminal. The cursor colors are set in
+each theme above.
+
+#+begin_src conf
+# Cursor
 # Disable cursor blinking.
 cursor-style-blink = false
 # Set the cursor shape to a solid block.
@@ -160,8 +272,8 @@ cursor-style = block
 # with 'no-' to disable it.
 shell-integration-features = no-cursor
 # Note: 'cursor-invert-fg-bg' is not a valid Ghostty option and has been removed.
-# To invert instead of using fixed colors, drop cursor-color/cursor-text above and
-# set: cursor-color = cell-foreground  and  cursor-text = cell-background
+# To invert instead of using fixed colors, set these in the theme files instead:
+# cursor-color = cell-foreground  and  cursor-text = cell-background
 #+end_src
 
 ** Scroll

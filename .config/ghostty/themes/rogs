@@ -1,0 +1,51 @@
+# rogs (dark) Ghostty theme.
+# Tangled from ~/.config/ghostty/README.org. Edit that file, not this one.
+
+# Default background color (near-black, matches the rogs theme).
+background = #0a0a0a
+# Default text color (light gray).
+foreground = #d0d0d0
+# Background color for selected text (medium gray).
+selection-background = #555555
+
+# Normal colors
+# Black
+palette = 0=#282a36
+# Red
+palette = 1=#f07178
+# Green
+palette = 2=#c3e88d
+# Yellow
+palette = 3=#ffcb6b
+# Blue
+palette = 4=#82aaff
+# Magenta
+palette = 5=#c792ea
+# Cyan
+palette = 6=#89ddff
+# White
+palette = 7=#d0d0d0
+
+# Bright colors
+# Black
+palette = 8=#434758
+# Red
+palette = 9=#ff8b92
+# Green
+palette = 10=#ddffa7
+# Yellow
+palette = 11=#ffe585
+# Blue
+palette = 12=#9cc4ff
+# Magenta
+palette = 13=#e1acff
+# Cyan
+palette = 14=#a3f7ff
+# White
+palette = 15=#ffffff
+
+# Cursor
+# The color of the cursor itself (white).
+cursor-color = #FFFFFF
+# The color of the text character under the cursor (black).
+cursor-text = #000000
