@@ -14,14 +14,72 @@ onboarding = false
 
 [theme]
 name = "catppuccin"
+auto_switch = true
+dark_name = "catppuccin"
+light_name = "catppuccin-latte"
+
+[theme.custom.dark]
+# Primary accent: active borders and highlights (green).
+accent = "#50fa7b"
+# Tab bar, floating panels, overlays and modals (raised).
+panel_bg = "#141414"
+# Active workspace and focused agent rows.
+active_row_bg = "#141414"
+# Navigate-mode cursor row in the sidebar.
+selection_bg = "#1e1e1e"
+# Selected and focused items, then hover and active states.
+surface0 = "#1e1e1e"
+surface1 = "#4c4c4c"
+# Separators.
+surface_dim = "#141414"
+# Muted text, then slightly brighter muted text.
+overlay0 = "#808080"
+overlay1 = "#b5b5b5"
+# Main text, then dim labels.
+text = "#eeeeee"
+subtext0 = "#b5b5b5"
+# Branch names and special labels (purple).
+mauve = "#bdabf0"
+# Done and idle.
+green = "#50fa7b"
+# Working and running.
+yellow = "#e5c07b"
+# Needs attention and blocked.
+red = "#e06c75"
+# Unseen and done notifications.
+blue = "#6ba1e6"
+# Notification accent and unseen markers.
+teal = "#56b6c2"
+# Interrupted and warnings.
+peach = "#d19a66"
+
+[theme.custom.light]
+accent = "#1a7a3a"
+panel_bg = "#fff7f1"
+active_row_bg = "#f5f0eb"
+selection_bg = "#bdeec5"
+surface0 = "#f5f0eb"
+surface1 = "#bebcb9"
+surface_dim = "#f5f0eb"
+overlay0 = "#8a8a8a"
+overlay1 = "#4e4e4e"
+text = "#1a1a1a"
+subtext0 = "#4e4e4e"
+mauve = "#6c5999"
+green = "#1a7a3a"
+yellow = "#b0851f"
+red = "#d1383d"
+blue = "#0062d1"
+teal = "#318795"
+peach = "#c4621b"
 
 [terminal]
 new_cwd = "follow"
 
 [ui]
 prompt_new_tab_name = false
-
 agent_panel_sort = "spaces"
+
 [keys]
 detach = "prefix+d"
 rename_workspace = "prefix+$"

@@ -17,8 +17,8 @@ file is saved in Emacs (see the [[*Setting Up Auto-Tangle][Setting Up Auto-Tangl
 well-documented and easier to manage.
 
 The config lives at =~/.config/herdr/config.toml= (XDG-compliant). Herdr works without a config file;
-this one exists to mirror my tmux muscle memory as closely as Herdr allows, keep the Catppuccin theme I
-use everywhere else, and stay out of the way the rest of the time.
+this one exists to mirror my tmux muscle memory as closely as Herdr allows, use the same =rogs= colors as
+my opencode, Claude Code and Ghostty themes, and stay out of the way the rest of the time.
 
 ** Installation
 :PROPERTIES:
@@ -192,11 +192,84 @@ onboarding = false
 :PROPERTIES:
 :ID:       d4a6c9e3-5f7b-6da4-c8e1-3a9b4f0d2c6e
 :END:
-Catppuccin mocha, matching my tmux and Neovim setups. Herdr ships Catppuccin as a built-in theme.
+The =rogs= colors from my opencode theme (=~/.config/opencode/themes/rogs.json=), the same ones the
+Claude Code and Ghostty themes use. Herdr has no custom theme files, so this starts from the built-in
+Catppuccin themes and overrides every color token.
+
+With =auto_switch= on, Herdr follows the light or dark appearance that Ghostty reports, so it switches
+together with Ghostty's =rogs= / =rogs-light= themes. The =dark= and =light= tables are applied on top of
+the matching base theme.
 
 #+begin_src conf
 [theme]
 name = "catppuccin"
+auto_switch = true
+dark_name = "catppuccin"
+light_name = "catppuccin-latte"
+#+end_src
+
+*** Dark Colors
+=sidebar_bg= stays unset, so the sidebar uses Ghostty's =#0a0a0a= background.
+
+#+begin_src conf
+[theme.custom.dark]
+# Primary accent: active borders and highlights (green).
+accent = "#50fa7b"
+# Tab bar, floating panels, overlays and modals (raised).
+panel_bg = "#141414"
+# Active workspace and focused agent rows.
+active_row_bg = "#141414"
+# Navigate-mode cursor row in the sidebar.
+selection_bg = "#1e1e1e"
+# Selected and focused items, then hover and active states.
+surface0 = "#1e1e1e"
+surface1 = "#4c4c4c"
+# Separators.
+surface_dim = "#141414"
+# Muted text, then slightly brighter muted text.
+overlay0 = "#808080"
+overlay1 = "#b5b5b5"
+# Main text, then dim labels.
+text = "#eeeeee"
+subtext0 = "#b5b5b5"
+# Branch names and special labels (purple).
+mauve = "#bdabf0"
+# Done and idle.
+green = "#50fa7b"
+# Working and running.
+yellow = "#e5c07b"
+# Needs attention and blocked.
+red = "#e06c75"
+# Unseen and done notifications.
+blue = "#6ba1e6"
+# Notification accent and unseen markers.
+teal = "#56b6c2"
+# Interrupted and warnings.
+peach = "#d19a66"
+#+end_src
+
+*** Light Colors
+
+#+begin_src conf
+[theme.custom.light]
+accent = "#1a7a3a"
+panel_bg = "#fff7f1"
+active_row_bg = "#f5f0eb"
+selection_bg = "#bdeec5"
+surface0 = "#f5f0eb"
+surface1 = "#bebcb9"
+surface_dim = "#f5f0eb"
+overlay0 = "#8a8a8a"
+overlay1 = "#4e4e4e"
+text = "#1a1a1a"
+subtext0 = "#4e4e4e"
+mauve = "#6c5999"
+green = "#1a7a3a"
+yellow = "#b0851f"
+red = "#d1383d"
+blue = "#0062d1"
+teal = "#318795"
+peach = "#c4621b"
 #+end_src
 
 ** Terminal
@@ -216,11 +289,13 @@ new_cwd = "follow"
 :ID:       f6c8eb05-7b9d-8fc6-ea03-5c1d6b2f4e8a
 :END:
 Herdr is mouse-native by default, matching the tmux config's =set -g mouse on=. Tabs are created
-immediately with generated names (tmux's default behavior) rather than prompting for a name first.
+immediately with generated names (tmux's default behavior) rather than prompting for a name first. The
+agent panel groups agents by space.
 
 #+begin_src conf
 [ui]
 prompt_new_tab_name = false
+agent_panel_sort = "spaces"
 #+end_src
 
 ** Key Bindings
