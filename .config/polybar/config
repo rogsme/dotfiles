@@ -9,7 +9,7 @@
 [colors]
 # Green accent: focused workspace and underlines.
 accent = #50fa7b
-# Ghostty's near-black at 80% opacity (#AARRGGBB, CC = 80%).
+# Ghostty's near-black at 87% opacity (#AARRGGBB, DD = 87%).
 background = #DD0a0a0a
 foreground = #eeeeee
 # Text drawn on top of a colored background, such as the urgent workspace.

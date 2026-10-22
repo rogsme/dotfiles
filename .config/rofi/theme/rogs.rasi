@@ -8,38 +8,52 @@
  * ROFI Color theme
  * User: rogs
  * Copyright: Roger Gonzalez
+ *
+ * Colors from the dark rogs opencode theme (~/.config/opencode/themes/rogs.json), the same ones the
+ * Claude Code, Ghostty, Herdr and Polybar themes use. The window is a raised dialog, like opencode's.
  */
 * {
-    selected-normal-foreground:  rgba ( 51, 51, 51, 100 % );
-    foreground:                  #75D85A;
-    normal-foreground:           @foreground;
-    alternate-normal-background: rgba ( 255, 255, 255, 7 % );
-    red:                         rgba ( 220, 50, 47, 100 % );
-    selected-urgent-foreground:  rgba ( 51, 51, 51, 100 % );
-    blue:                        rgba ( 38, 139, 210, 100 % );
-    urgent-foreground:           rgba ( 255, 153, 153, 100 % );
-    alternate-urgent-background: rgba ( 255, 255, 255, 7 % );
-    active-foreground:           #118200;
-    lightbg:                     rgba ( 238, 232, 213, 100 % );
-    selected-active-foreground:  rgba ( 51, 51, 51, 100 % );
-    alternate-active-background: rgba ( 255, 255, 255, 7 % );
-    background:                  #118200;
-    bordercolor:                 rgba ( 17, 170, 170, 100 % );
-    alternate-normal-foreground: @foreground;
-    normal-background:           #5fb34c;
-    lightfg:                     rgba ( 88, 104, 117, 100 % );
-    selected-normal-background:  #74ff00;
-    border-color:                @foreground;
+    /* rogs palette */
+    green:                       #50fa7b;
+    text:                        #eeeeee;
+    muted:                       #808080;
+    subtle:                      #4c4c4c;
+    raised:                      #141414;
+    inverse:                     #0a0a0a;
+    red:                         #e06c75;
+    blue:                        #6ba1e6;
+    cyan:                        #56b6c2;
+    lightbg:                     #fff7f1;
+    lightfg:                     @muted;
+
+    foreground:                  @text;
+    background:                  @raised;
+    background-color:            transparent;
+    border-color:                @green;
+    bordercolor:                 @green;
+    separatorcolor:              @subtle;
     spacing:                     2;
-    separatorcolor:              rgba ( 17, 170, 170, 100 % );
-    urgent-background:           rgba ( 0, 0, 0, 0 % );
-    selected-urgent-background:  rgba ( 255, 153, 153, 100 % );
-    alternate-urgent-foreground: @urgent-foreground;
-    background-color:            rgba ( 0, 0, 0, 0 % );
+
+    normal-foreground:           @foreground;
+    normal-background:           transparent;
+    alternate-normal-foreground: @foreground;
+    alternate-normal-background: transparent;
+    selected-normal-foreground:  @inverse;
+    selected-normal-background:  @green;
+
+    active-foreground:           @cyan;
+    active-background:           transparent;
     alternate-active-foreground: @active-foreground;
-    active-background:           rgba ( 0, 0, 0, 0 % );
-    active-background:           #41D315;
-    selected-active-background:  #74ff00;
+    alternate-active-background: transparent;
+    selected-active-foreground:  @inverse;
+    selected-active-background:  @green;
+
+    urgent-foreground:           @red;
+    urgent-background:           transparent;
+    alternate-urgent-foreground: @urgent-foreground;
+    alternate-urgent-background: transparent;
+    selected-urgent-foreground:  @inverse;
+    selected-urgent-background:  @red;
 }
 #window {
     background-color: @background;
@@ -94,7 +108,11 @@
     background-color: @selected-active-background;
     text-color:       @selected-active-foreground;
 }
-#element alternate.normal {
+#element-text, element-icon {
+    background-color: inherit;
+    text-color:       inherit;
+}
+#element.alternate.normal {
     background-color: @alternate-normal-background;
     text-color:       @alternate-normal-foreground;
 }
@@ -135,7 +153,7 @@
 }
 #prompt {
     spacing:    0;
-    text-color: @normal-foreground;
+    text-color: @green;
 }
 #inputbar {
     children:   [ prompt,textbox-prompt-colon,entry,case-indicator ];
@@ -144,5 +162,5 @@
     expand:     false;
     str:        ":";
     margin:     0px 0.3em 0em 0em ;
-    text-color: @normal-foreground;
+    text-color: @muted;
 }
