@@ -21,6 +21,7 @@ azure-cli
 b43-fwcutter
 base
 bash-completion
+bcc-libbpf-tools
 blueman
 bluez-utils
 bmenu
@@ -113,11 +114,14 @@ inetutils
 install-grub
 intel-ucode
 inxi
+iperf3
 jfsutils
 jq
 just
 kdeconnect
+kdenlive
 ksnip
+ldns
 less
 lib32-libva-intel-driver
 lib32-mesa
@@ -171,9 +175,9 @@ menulibre
 mesa-utils
 mhwd
 mhwd-db
-micro
 mkinitcpio-openswap
 modemmanager
+mosh
 mousepad
 mpv
 mtpfs
@@ -189,6 +193,7 @@ networkmanager-openconnect
 networkmanager-openvpn
 networkmanager-vpnc
 nfs-utils
+ngrok
 nodejs
 noto-fonts
 noto-fonts-cjk
@@ -199,8 +204,12 @@ ntfs-3g
 ntp
 numlockx
 nvtop
+obsidian
+obsidian-2-theme-git
 openresolv
+openscad
 openssh
+orca
 os-prober
 pamac-gtk3
 pandoc-cli
@@ -219,6 +228,7 @@ pnpm
 polybar
 poppler-data
 poppler-glib
+postgresql-libs
 powerline-fonts
 powertop
 proton-vpn-gtk-app
@@ -248,6 +258,8 @@ swaylock-effects
 syncthing
 sysfsutils
 system-config-printer
+tcpdump
+tea
 terminus-font
 texinfo
 thunar
@@ -295,6 +307,7 @@ whois
 wireless-regdb
 wl-clipboard
 woeusb
+worktrunk
 wpa_supplicant
 xclip
 xcursor-simpleandsoft
