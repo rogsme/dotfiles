@@ -1,0 +1,55 @@
+/* rogs notification theme for xfce4-notifyd.
+ *
+ * Colors from the dark rogs opencode theme (~/.config/opencode/themes/rogs.json), the same ones the
+ * Claude Code, Ghostty, Herdr, Polybar, Rofi and fish themes use. The window is a raised panel with
+ * a green border, like the Rofi launcher. */
+
+#XfceNotifyWindow {
+    background-color: #141414;
+    border: 1px solid #50fa7b;
+    border-radius: 6px;
+    padding: 12px;
+}
+
+#XfceNotifyWindow:hover {
+    background-color: #1e1e1e;
+}
+
+#XfceNotifyWindow label,
+#XfceNotifyWindow image {
+    color: #eeeeee;
+}
+
+#XfceNotifyWindow label#summary {
+    color: #50fa7b;
+    font-weight: Bold;
+}
+
+#XfceNotifyWindow label#body {
+    color: #b5b5b5;
+}
+
+#XfceNotifyWindow button {
+    border: none;
+    background-image: none;
+    background-color: #1e1e1e;
+    color: #eeeeee;
+}
+
+#XfceNotifyWindow button:hover {
+    border: none;
+    background-image: none;
+    background-color: #50fa7b;
+    color: #0a0a0a;
+}
+
+#XfceNotifyWindow progressbar progress {
+    background-image: none;
+    background-color: #50fa7b;
+    border-color: #50fa7b;
+}
+
+#XfceNotifyWindow progressbar trough {
+    background-image: none;
+    background-color: #1e1e1e;
+}
