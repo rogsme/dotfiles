@@ -19,6 +19,11 @@ set -x EDITOR nvim
 # Set the default visual editor (often used by programs like git) to Vim
 set -x VISUAL nvim
 
+# Load the rogs syntax highlighting theme (themes/rogs.theme)
+if status is-interactive
+    fish_config theme choose rogs
+end
+
 # Alias for managing dotfiles using a bare Git repository
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 # Add interactive confirmation prompts before removing files
@@ -73,16 +78,12 @@ alias update-aider="uv tool install --force --python python3.12 --with pip aider
 # Sources the script provided by Google Cloud SDK to add its tools to the PATH.
 if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end
 
-# Ngrok completion
-# Enables command-line completion for the ngrok tool if it's installed.
-if command -v ngrok >/dev/null
-    eval (ngrok completion | source)
-end
+# No ngrok completion: `ngrok completion` only generates bash and zsh scripts, which fish can't source.
 
 # Kubectl completion
 # Enables command-line completion for the kubectl (Kubernetes CLI) tool if it's installed.
 if command -v kubectl >/dev/null
-    eval (kubectl completion fish | source)
+    kubectl completion fish | source
 end
 
 # opencode

@@ -86,6 +86,212 @@ set -x EDITOR nvim
 set -x VISUAL nvim
 #+end_src
 
+** Colors
+The =rogs= colors from my opencode theme (=~/.config/opencode/themes/rogs.json=), the same ones the
+Claude Code, Ghostty, Herdr, Polybar and Rofi themes use.
+
+*** Syntax Highlighting
+The syntax colors live in =themes/rogs.theme=. It has a dark and a light variant, and fish picks the one
+that matches the terminal's background (=fish_terminal_color_theme=), so it switches together with
+Ghostty. Terminals that don't report their background get the dark colors.
+#+begin_src fish
+# Load the rogs syntax highlighting theme (themes/rogs.theme)
+if status is-interactive
+    fish_config theme choose rogs
+end
+#+end_src
+
+Theme files don't allow =#= before hex colors, because =#= starts a comment.
+#+begin_src conf :tangle themes/rogs.theme
+# name: 'rogs'
+# Tangled from ~/.config/fish/README.org. Edit that file, not this one.
+
+[dark]
+# preferred_background: 0a0a0a
+fish_color_normal eeeeee
+fish_color_command 79fb9b
+fish_color_keyword 50fa7b
+fish_color_param eeeeee
+fish_color_option 56b6c2
+fish_color_quote 6ba1e6
+fish_color_redirection 56b6c2
+fish_color_end 56b6c2
+fish_color_operator e5c07b
+fish_color_escape e5c07b
+fish_color_comment 808080
+fish_color_autosuggestion 808080
+fish_color_error e06c75
+fish_color_cancel --reverse
+fish_color_cwd 6ba1e6
+fish_color_cwd_root e06c75
+fish_color_user 50fa7b
+fish_color_host eeeeee
+fish_color_host_remote e5c07b
+fish_color_status e06c75
+fish_color_match 50fa7b
+fish_color_history_current --bold
+fish_color_valid_path --underline
+fish_color_search_match --background=0a501f
+fish_color_selection --background=0a501f
+fish_pager_color_completion eeeeee
+fish_pager_color_description 808080
+fish_pager_color_prefix 50fa7b --bold --underline
+fish_pager_color_progress 0a0a0a --background=50fa7b
+fish_pager_color_selected_background --background=1e1e1e
+
+[light]
+# preferred_background: ffffff
+fish_color_normal 1a1a1a
+fish_color_command 14602e
+fish_color_keyword 1a7a3a
+fish_color_param 1a1a1a
+fish_color_option 318795
+fish_color_quote 0062d1
+fish_color_redirection 318795
+fish_color_end 318795
+fish_color_operator b0851f
+fish_color_escape b0851f
+fish_color_comment 8a8a8a
+fish_color_autosuggestion 8a8a8a
+fish_color_error d1383d
+fish_color_cancel --reverse
+fish_color_cwd 0062d1
+fish_color_cwd_root d1383d
+fish_color_user 1a7a3a
+fish_color_host 1a1a1a
+fish_color_host_remote b0851f
+fish_color_status d1383d
+fish_color_match 1a7a3a
+fish_color_history_current --bold
+fish_color_valid_path --underline
+fish_color_search_match --background=bdeec5
+fish_color_selection --background=bdeec5
+fish_pager_color_completion 1a1a1a
+fish_pager_color_description 8a8a8a
+fish_pager_color_prefix 1a7a3a --bold --underline
+fish_pager_color_progress ffffff --background=1a7a3a
+fish_pager_color_selected_background --background=f5f0eb
+
+[unknown]
+fish_color_normal eeeeee
+fish_color_command 79fb9b
+fish_color_keyword 50fa7b
+fish_color_param eeeeee
+fish_color_option 56b6c2
+fish_color_quote 6ba1e6
+fish_color_redirection 56b6c2
+fish_color_end 56b6c2
+fish_color_operator e5c07b
+fish_color_escape e5c07b
+fish_color_comment 808080
+fish_color_autosuggestion 808080
+fish_color_error e06c75
+fish_color_cancel --reverse
+fish_color_cwd 6ba1e6
+fish_color_cwd_root e06c75
+fish_color_user 50fa7b
+fish_color_host eeeeee
+fish_color_host_remote e5c07b
+fish_color_status e06c75
+fish_color_match 50fa7b
+fish_color_history_current --bold
+fish_color_valid_path --underline
+fish_color_search_match --background=0a501f
+fish_color_selection --background=0a501f
+fish_pager_color_completion eeeeee
+fish_pager_color_description 808080
+fish_pager_color_prefix 50fa7b --bold --underline
+fish_pager_color_progress 0a0a0a --background=50fa7b
+fish_pager_color_selected_background --background=1e1e1e
+#+end_src
+
+*** Tide Prompt
+Tide keeps its colors in universal variables, because it draws the prompt in a background fish process
+that only sees universal variables. =rogs_tide_colors= sets them all. Run it once, and again after
+=tide configure=, which resets the colors. Tide has no light variant, so these are the dark colors.
+
+The left side uses colored segments with dark text: the vi mode, the OS icon on a dark segment, the path
+in blue, and git in green, yellow when there are changes, or red when something needs attention. The
+right side uses dark segments with colored text, apart from a red segment when the last command failed.
+#+begin_src fish :tangle functions/rogs_tide_colors.fish
+function rogs_tide_colors --description 'Set the tide prompt colors to the rogs palette'
+    set -l dark 0A0A0A
+    set -l raised 1E1E1E
+
+    # Vi mode: blue for normal, green for insert, red for replace, purple for visual
+    set -U tide_vi_mode_bg_color_default 6BA1E6
+    set -U tide_vi_mode_bg_color_insert 50FA7B
+    set -U tide_vi_mode_bg_color_replace E06C75
+    set -U tide_vi_mode_bg_color_visual BDABF0
+    set -U tide_vi_mode_color_default $dark
+    set -U tide_vi_mode_color_insert $dark
+    set -U tide_vi_mode_color_replace $dark
+    set -U tide_vi_mode_color_visual $dark
+
+    # OS icon in green on a dark segment
+    set -U tide_os_bg_color $raised
+    set -U tide_os_color 50FA7B
+
+    # Path in blue
+    set -U tide_pwd_bg_color 6BA1E6
+    set -U tide_pwd_color_anchors $dark
+    set -U tide_pwd_color_dirs $dark
+    set -U tide_pwd_color_truncated_dirs 18355B
+
+    # Git: green when clean, yellow with changes, red for conflicts and operations
+    set -U tide_git_bg_color 50FA7B
+    set -U tide_git_bg_color_unstable E5C07B
+    set -U tide_git_bg_color_urgent E06C75
+    for v in branch conflicted dirty operation staged stash untracked upstream
+        set -U tide_git_color_$v $dark
+    end
+
+    # Prompt character, frame and separators
+    set -U tide_character_color 50FA7B
+    set -U tide_character_color_failure E06C75
+    set -U tide_prompt_color_frame_and_connection 4C4C4C
+    set -U tide_prompt_color_separator_same_color 808080
+
+    # Status: green check on a dark segment, red segment when the last command failed
+    set -U tide_status_bg_color $raised
+    set -U tide_status_color 50FA7B
+    set -U tide_status_bg_color_failure E06C75
+    set -U tide_status_color_failure $dark
+
+    # Right side: dark segments with colored text
+    set -U tide_cmd_duration_bg_color $raised
+    set -U tide_cmd_duration_color E5C07B
+    set -U tide_context_bg_color $raised
+    set -U tide_context_color_default B5B5B5
+    set -U tide_context_color_root E06C75
+    set -U tide_context_color_ssh E5C07B
+    set -U tide_jobs_bg_color $raised
+    set -U tide_jobs_color 56B6C2
+    set -U tide_time_bg_color $raised
+    set -U tide_time_color B5B5B5
+    set -U tide_shlvl_bg_color $raised
+    set -U tide_shlvl_color E5C07B
+    set -U tide_private_mode_bg_color $raised
+    set -U tide_private_mode_color EEEEEE
+    set -U tide_direnv_bg_color $raised
+    set -U tide_direnv_color E5C07B
+    set -U tide_direnv_bg_color_denied E06C75
+    set -U tide_direnv_color_denied $dark
+
+    # Languages and tools, each in the palette color closest to its brand color
+    for pair in aws:D19A66 bun:EEEEEE crystal:EEEEEE distrobox:BDABF0 docker:6BA1E6 elixir:BDABF0 \
+            gcloud:6BA1E6 go:56B6C2 java:D19A66 kubectl:6BA1E6 nix_shell:6BA1E6 node:50FA7B \
+            php:BDABF0 pulumi:E5C07B python:6BA1E6 ruby:E06C75 rustc:D19A66 terraform:BDABF0 \
+            toolbox:BDABF0 zig:D19A66
+        string split : $pair | read -l -L item color
+        set -U tide_"$item"_bg_color $raised
+        set -U tide_"$item"_color $color
+    end
+
+    tide reload
+end
+#+end_src
+
 ** Aliases
 :PROPERTIES:
 :ID:       ed262dc3-f58f-44f0-8bde-ac57c457b706
@@ -179,16 +385,12 @@ and setting up environment variables.
 # Sources the script provided by Google Cloud SDK to add its tools to the PATH.
 if [ -f '/home/roger/.google-cloud-sdk/path.fish.inc' ]; . '/home/roger/.google-cloud-sdk/path.fish.inc'; end
 
-# Ngrok completion
-# Enables command-line completion for the ngrok tool if it's installed.
-if command -v ngrok >/dev/null
-    eval (ngrok completion | source)
-end
+# No ngrok completion: `ngrok completion` only generates bash and zsh scripts, which fish can't source.
 
 # Kubectl completion
 # Enables command-line completion for the kubectl (Kubernetes CLI) tool if it's installed.
 if command -v kubectl >/dev/null
-    eval (kubectl completion fish | source)
+    kubectl completion fish | source
 end
 
 # opencode
