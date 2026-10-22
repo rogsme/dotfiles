@@ -3,49 +3,49 @@
 
 # Default background color (near-black, matches the rogs theme).
 background = #0a0a0a
-# Default text color (light gray).
-foreground = #d0d0d0
-# Background color for selected text (medium gray).
-selection-background = #555555
+# Default text color (near-white).
+foreground = #eeeeee
+# Background color for selected text (dark green, like the Claude Code and fish selection).
+selection-background = #0a501f
 
 # Normal colors
 # Black
-palette = 0=#282a36
+palette = 0=#1e1e1e
 # Red
-palette = 1=#f07178
+palette = 1=#e06c75
 # Green
-palette = 2=#c3e88d
+palette = 2=#50fa7b
 # Yellow
-palette = 3=#ffcb6b
+palette = 3=#e5c07b
 # Blue
-palette = 4=#82aaff
+palette = 4=#6ba1e6
 # Magenta
-palette = 5=#c792ea
+palette = 5=#bdabf0
 # Cyan
-palette = 6=#89ddff
+palette = 6=#56b6c2
 # White
-palette = 7=#d0d0d0
+palette = 7=#b5b5b5
 
 # Bright colors
 # Black
-palette = 8=#434758
+palette = 8=#808080
 # Red
-palette = 9=#ff8b92
+palette = 9=#f0848c
 # Green
-palette = 10=#ddffa7
+palette = 10=#79fb9b
 # Yellow
-palette = 11=#ffe585
+palette = 11=#f2d49b
 # Blue
-palette = 12=#9cc4ff
+palette = 12=#84b9fd
 # Magenta
-palette = 13=#e1acff
+palette = 13=#d4c6f7
 # Cyan
-palette = 14=#a3f7ff
+palette = 14=#68d0dd
 # White
-palette = 15=#ffffff
+palette = 15=#eeeeee
 
 # Cursor
-# The color of the cursor itself (white).
-cursor-color = #FFFFFF
-# The color of the text character under the cursor (black).
-cursor-text = #000000
+# The color of the cursor itself (green accent).
+cursor-color = #50fa7b
+# The color of the text character under the cursor (near-black).
+cursor-text = #0a0a0a

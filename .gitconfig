@@ -15,6 +15,22 @@
 [delta]
     navigate = true  # use n and N to move between diff sections
     dark = true      # or light = true, or omit for auto-detection
+    # rogs colors: the same diff backgrounds as the rogs Claude Code theme, and OneHalfDark syntax
+    # highlighting, which uses the same red, yellow and cyan as the opencode theme
+    syntax-theme = OneHalfDark
+    plus-style = syntax "#1a2a3d"
+    plus-emph-style = syntax "#274975"
+    minus-style = syntax "#37222c"
+    minus-emph-style = syntax "#5e2a36"
+    file-style = "#50fa7b" bold
+    file-decoration-style = "#50fa7b" ul
+    hunk-header-style = file line-number syntax
+    hunk-header-decoration-style = "#4c4c4c" box
+    hunk-header-file-style = "#56b6c2"
+    hunk-header-line-number-style = "#808080"
+    line-numbers-minus-style = "#e06c75"
+    line-numbers-plus-style = "#6ba1e6"
+    line-numbers-zero-style = "#4c4c4c"
 
 [merge]
     conflictStyle = zdiff3

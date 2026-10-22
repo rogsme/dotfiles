@@ -323,8 +323,8 @@ bindsym $aux+p exec --no-startup-id "tr -dc 'A-Za-z0-9!#$%&'\''()*+,-./:;<=>?@[\
 
 # Window colors
 # class                 border  backgr. text    indicator child_border
-client.focused          #75D85A #75D85A #424242 #75D85A   #75D85A
-client.focused_inactive #3B4B58 #3B4B58 #ffffff #3B4B58   #3B4B58
-client.unfocused        #202932 #202932 #7A7A7A #202932   #202932
-client.urgent           #990000 #990000 #ffffff #990000   #990000
-client.placeholder      #0c0c0c #0c0c0c #ffffff #000000   #0c0c0c
+client.focused          #50fa7b #50fa7b #0a0a0a #79fb9b   #50fa7b
+client.focused_inactive #1e1e1e #1e1e1e #b5b5b5 #1e1e1e   #1e1e1e
+client.unfocused        #141414 #141414 #808080 #141414   #141414
+client.urgent           #e06c75 #e06c75 #0a0a0a #e06c75   #e06c75
+client.placeholder      #0a0a0a #0a0a0a #eeeeee #0a0a0a   #0a0a0a
