@@ -68,6 +68,12 @@ Capability: Supported
 
 Capability: Supported
 
+### list-ready
+
+`list_tasks` with `projectId: "<project id>"` and `status: "<new slug>"`, every page; then the same with the ready slug, when `## States` maps one.
+
+Capability: Supported
+
 ### metadata
 
 - States: `list_project_columns` with `projectId`; each column's `slug` is the status value that `create_task` and `update_task_status` take.

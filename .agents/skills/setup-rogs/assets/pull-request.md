@@ -17,6 +17,10 @@ Next: <!-- The specific next action for the human, linking the relevant finding 
 
 <!-- Implementation details the brief does not cover, in a few bullets. -->
 
+## Changelog
+
+<!-- One or two lines a user of the project would care about, in the voice of its changelog; "None" when users cannot notice the change. A later job gathers these lines into the changelog. -->
+
 ## Related work
 
 <!-- One line per ticket this pull request delivers, lead first, in the format docs/agents/forge.md names. -->

@@ -10,7 +10,7 @@ metadata:
 
 # Set up rogs-skills
 
-Write the prose configuration the lifecycle skills (`create-ticket`, `start-ticket`, `work-ticket`, `review-pr`, `address-pr-review`, `finish-ticket`) read in this repository: where tickets live, how the forge is driven, how the code is verified, where the domain docs are, and which optional features are on. [references/contract.md](references/contract.md) defines every file and heading; the seeds and built-in guides in `assets/` follow it.
+Write the prose configuration the lifecycle skills (`create-ticket`, `suggest-tickets`, `start-ticket`, `work-ticket`, `review-pr`, `address-pr-review`, `finish-ticket`) read in this repository: where tickets live, how the forge is driven, how the code is verified, where the domain docs are, and which optional features are on. [references/contract.md](references/contract.md) defines every file and heading; the seeds and built-in guides in `assets/` follow it.
 
 This is a prompt-driven skill. Explore, record what the repository and the live checks settle, ask only the decisions they leave open, show a summary of the drafts, then write. Running it again is always safe: it updates its own files in place, never duplicates anything, never overwrites an edit without showing it, and never deletes a file.
 
@@ -48,7 +48,7 @@ Settle section A's connection first, and stop when its check fails. Then ask the
 
 A. Tracker: which tracker, the connection (the exact MCP server name, the CLI and host, or the directory), and the identity (workspace, team or project, ticket key and id format). Then run the guide's connection check. When it fails, stop: write nothing, explain that setup records the connection but never edits the harness configuration, tell the user how to add it (the guide's setup notes say how), and ask them to run `/setup-rogs` again afterwards. End with `Status: BLOCKED` and a one-line `Reason:`; every other stop in this skill ends the same way.
 
-B. States: map each lifecycle role (`new`, `ready`, `in-progress`, `in-review`, `done`, `canceled`, `blocked`) to the live states, and ask whether the tracker moves tickets on its own, for example when a pull request opens or merges.
+B. States: map each lifecycle role (`new`, `ready`, `in-progress`, `in-review`, `done`, `canceled`, `blocked`) to the live states, and ask whether the tracker moves tickets on its own, for example when a pull request opens or merges. When the tracker has no blocked state, say that a ticket that waits on a blocker then keeps its state and shows the block only in its `## Blocked` comment, and that adding one makes the board show it.
 
 C. Labels and ticket conventions: the priority map, the label groups every ticket carries, the default state and assignee of new tickets, the title style, extra body lines, and tickets to ignore.
 
@@ -73,6 +73,8 @@ K. Features, each on or off:
    - Client notes: the path, its layout, and whether it exists on this machine.
    - Plan review: the planner vendors that get a reviewer, each reviewer's model and its command from the reviewer guide, the time limit (at most 10 minutes, the longest a foreground shell call runs in Claude Code), and the vendors that may receive this project's code and plans. Run each chosen guide's check; when one fails, give the user its setup notes and keep the feature off until the check passes.
    - Plan presentation: local browser review through `present-plan`, or the existing terminal delivery. Lavish runs through pinned `npx`, with no local or global install. Resolve the external Marked/Mermaid renderer runtime, artifact root permitted by the planning agent, private server state directory and unprivileged port. Call the Skill tool with "present-plan" with a check-only request and those settings. Its version probe may populate npm's cache but opens no browser or review. Keep the feature off until checks pass; renderer preparation is a separate user action. Setup never installs local packages, upstream skills or global hooks. Approval remains in the agent conversation. Preserve existing choices; an absent row in an older configuration means off.
+   - Taste pass: whether `work-ticket` hands the branch to `simplify-branch` after the last implementation commit, for cleanups that keep behavior. Keep the feature off until the `simplify-branch` skill is installed. An absent row in an older configuration means off.
+   - Changelog: whether every pull request body carries a `## Changelog` section, one or two lines a user would care about, for a later job to gather into the project's changelog. An absent row in an older configuration means off.
 
 ## 4. Compose the files
 
@@ -85,7 +87,7 @@ Build each file from its seed in `assets/`, keeping the marker on line 1 and fil
 | `docs/agents/workflow.md` | `assets/workflow.md`, with `assets/workflow-client-notes.md` appended when client notes are on, `assets/workflow-plan-review.md` when plan review is on, and `assets/workflow-plan-presentation.md` when plan presentation is on |
 | `docs/agents/domain.md` | `assets/domain.md` |
 | `docs/agents/browser-pass.md` | `assets/browser-pass.md`, only when the browser pass is on |
-| `docs/agents/pull-request.md` | `assets/pull-request.md`, only when the repository has no template; drop its `## Screenshots` section when the browser pass is off |
+| `docs/agents/pull-request.md` | `assets/pull-request.md`, only when the repository has no template; drop its `## Screenshots` section when the browser pass is off, and its `## Changelog` section when the changelog is off |
 | The `## Ticket lifecycle` block | `assets/agents-block.md` |
 
 A guide's `## Setup notes` stay in the guide. When a guide offers variants (states kept in labels or in a project field, for example), copy only the variant the user chose. For a tracker or forge with no guide, write the sections from the user's description using the custom guide's skeleton: every operation gets a described procedure or an honest `Capability: Unsupported` or `Capability: Fallback: ...` line, never a guess.
@@ -117,7 +119,7 @@ End with `Status: CONFIGURED`.
 Run this after every write, and on its own in check mode:
 
 1. Every lifecycle skill's preflight from the contract passes against the files, for the features that are on.
-2. Live probes: the tracker connection answers and the key and states exist; the forge's base branch and merge style match the file; the CI path filters match the workflow files; every verification command exists; the pull request template carries the required headings, or `pull-request.md` exists; the glossary is where `domain.md` says, or not created yet; `playwright-cli` and its skill are present when the browser pass is on; the client notes path is readable when client notes are on; each configured reviewer guide's check passes when plan review is on.
+2. Live probes: the tracker connection answers and the key and states exist; the forge's base branch and merge style match the file; the CI path filters match the workflow files; every verification command exists; the pull request template carries the required headings, or `pull-request.md` exists; the glossary is where `domain.md` says, or not created yet; `playwright-cli` and its skill are present when the browser pass is on; the `simplify-branch` skill is installed when the taste pass is on; the client notes path is readable when client notes are on; each configured reviewer guide's check passes when plan review is on.
 3. The configuration is on the base branch: fetch, then `git diff --quiet <remote>/<base> -- docs/agents <block file>`.
 4. No same-name skill from another source shadows a rogs skill.
 5. When plan presentation is on, call the Skill tool with "present-plan" for a check-only probe of its recorded renderer/state/port and pinned npx execution. Confirm the artifact root is external to every worktree and permitted by the planning agent. This check opens no browser and makes no local installation; npm's cache may be populated. Browser interaction is verified separately. Report presentation drift without changing the independent plan-review setting.

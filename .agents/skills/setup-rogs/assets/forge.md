@@ -31,7 +31,7 @@ Rules for every forge call:
 ## Pull requests
 
 - Body format: {{FILL: "the template at <path> on the base branch" or "docs/agents/pull-request.md"}}.
-- Every body contains `## Review brief`, `## Related work`, `## Attribution`, `## Validation` and `## Human verification`, plus `## Screenshots` when the browser pass is on. When the template lacks one of these, add it to the body you write; never edit the template file.
+- Every body contains `## Review brief`, `## Related work`, `## Attribution`, `## Validation` and `## Human verification`, plus `## Screenshots` when the browser pass is on and `## Changelog` when the changelog is on. When the template lacks one of these, add it to the body you write; never edit the template file.
 - Title: `<lead id>[, <rider ids>]: <title>`, with every ticket id first so the tracker can link the pull request.
 - Related work: one line per ticket, lead first, in this format: {{FILL: for example "`Ticket: [ACM-123](<ticket url>)`"}}.
 - Closing keywords: never. Reference tickets plainly (`Refs ACM-123`); only `finish-ticket` completes tickets.

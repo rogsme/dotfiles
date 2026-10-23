@@ -29,11 +29,11 @@ Where this project's tickets live and how the lifecycle skills read and change t
 |---|---|
 | new | {{FILL: where new tickets land}} |
 | ready | {{FILL: another not-started state treated like new, or "none"}} |
-| in-progress | {{FILL: the state for active implementation}} |
+| in-progress | {{FILL: the state for a ticket being planned or implemented}} |
 | in-review | {{FILL: the state while a pull request is under review}} |
 | done | {{FILL: the completed state}} |
 | canceled | {{FILL: the canceled state}} |
-| blocked | {{FILL: a blocked state, or "none"}} |
+| blocked | {{FILL: the state for a ticket that waits on a blocker, or "none"}} |
 
 Terminal states: {{FILL: done, canceled and any other terminal states}}. A state missing from this table is unexpected: ask before working on a ticket in it.
 

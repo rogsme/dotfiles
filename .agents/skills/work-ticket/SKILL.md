@@ -1,6 +1,6 @@
 ---
 name: work-ticket
-description: "Execute the approved plan for the current ticket or bundle: post the plan and move to in-progress, implement test-first where configured, commit in atomic units, sync with the base, run the browser pass, open the pull request, get green CI on its exact head, hand off in the tracker and move to in-review. Use after start-ticket when the user approves the plan and says \"go\", \"do it\", \"execute the plan\", \"build this ticket\" or \"continue ACM-123\"."
+description: "Execute the approved plan for the current ticket or bundle: post the plan, implement test-first where configured, commit in atomic units, run the taste pass where configured, sync with the base, run the browser pass, open the pull request, get green CI on its exact head, move to in-review and hand off in the tracker. Use after start-ticket when the user approves the plan and says \"go\", \"do it\", \"execute the plan\", \"build this ticket\" or \"continue ACM-123\"."
 license: MIT
 metadata:
   rogs-skills/contract: "1"
@@ -10,7 +10,7 @@ metadata:
 
 Implement the approved plan through a verified pull request and a tracker handoff. The work is complete only when the pull request exists, its exact head passes the CI gate, and every ticket reads `in-review`; a local commit without the pull request is a partial state, not a finish.
 
-This skill grants permission to create the commits, push the branch and open the pull request the workflow needs. Its only tracker writes are the ones listed here: the plan comment with the `in-progress` transition, the capture attachments, and the handoff comment with the `in-review` transition. The user's approval of the plan lifts any earlier instruction that kept the tracker read-only for these writes; make them without asking again.
+This skill grants permission to create the commits, push the branch and open the pull request the workflow needs. Its only tracker writes are the ones listed here: the plan comment with the `in-progress` transition of any member not there yet, the capture attachments, the `in-review` transition with the handoff comment, and the moves into and out of `blocked` with their comments ([Blocked tickets](#blocked-tickets)). The user's approval of the plan lifts any earlier instruction that kept the tracker read-only for these writes; make them without asking again.
 
 When bundles are on, every rule that names "the ticket" applies to each member: the full comments go on the lead, each rider gets a pointer comment naming the lead and the pull request, and every member makes each transition together.
 
@@ -66,9 +66,9 @@ Ask the user through the harness's structured question tool (`AskUserQuestion` i
 2. Derive the lead id from the plan and require both the current branch and the checkout directory's basename to equal it exactly (`## Worktrees`).
 3. Confirm that `git worktree list --porcelain` lists this checkout. Stop rather than switching or creating a worktree when it is wrong.
 4. `resolve` and `load` the ticket with its relations and every comment, and verify the team or project. When bundles are on, resolve the bundle again and require the members the plan names; stop when the bundle changed.
-5. Refresh every declared blocker and run `list-in-flight`. Load more detail only for plausible conflicts with the approved scope or its coupled contracts. Stop when an unresolved prerequisite or an unsafe in-flight conflict exists. Ask before adding a blocked-by relation for a real blocker that is not recorded.
+5. Refresh every declared blocker and run `list-in-flight`. Load more detail only for plausible conflicts with the approved scope or its coupled contracts. When an unresolved prerequisite or an unsafe in-flight conflict exists, mark the ticket blocked as [Blocked tickets](#blocked-tickets) says. Ask before adding a blocked-by relation for a real blocker that is not recorded.
 6. When model routing is on and the plan's `Model:` line names a model other than the one this session runs on, ask before continuing.
-7. Before the first edit, persist the plan: post one `## Approved implementation plan` comment on the lead with `comment`, reusing an equivalent existing comment, holding the goal, non-goals, affected areas, acceptance criteria, test strategy (the agreed seams) and known risks. Then `transition` every member that is `new` or `ready` to `in-progress`. Read the comment and the states back before the first edit.
+7. Before the first edit, `transition` every member still `new`, `ready` or `blocked` to `in-progress`; start-ticket moves them when planning starts, and [Blocked tickets](#blocked-tickets) says when a blocked one comes back. Then persist the plan: post one `## Approved implementation plan` comment on the lead with `comment`, reusing an equivalent existing comment, holding the goal, non-goals, affected areas, acceptance criteria, test strategy (the agreed seams) and known risks. Read the states and the comment back before the first edit.
 8. Continue when the readback reports `in-progress`. Ask before reopening a ticket from any later or terminal state.
 9. Read `git status --short --branch`. Never revert, overwrite, stage or commit unrelated existing changes; ask when they overlap the planned work or would prevent a safe sync.
 
@@ -80,7 +80,7 @@ In the test-first areas `## Verification` lists, call the Skill tool with "tdd" 
 
 When the ticket is a bug whose cause the approved plan leaves open, call the Skill tool with "diagnosing-bugs" and find the cause with a loop that goes red before you write the fix.
 
-Ask when a material unknown appears; never turn an unresolved product decision or external behavior into an implementation assumption. Don't interrupt for ordinary implementation choices the plan covers; record minor assumptions in the pull request. Stop only for unresolved product behavior, missing access, destructive operations, unsafe git divergence, newly discovered blockers, or evidence that the ticket itself is wrong.
+Ask when a material unknown appears; never turn an unresolved product decision or external behavior into an implementation assumption. Don't interrupt for ordinary implementation choices the plan covers; record minor assumptions in the pull request. Stop only for unresolved product behavior, missing access, destructive operations, unsafe git divergence, newly discovered blockers, or evidence that the ticket itself is wrong. A newly discovered blocker marks the ticket blocked, as [Blocked tickets](#blocked-tickets) says.
 
 Prefer the smallest complete change. Add the smallest test that proves each non-trivial fix, and run the focused checks from `## Verification` while working. Verification is discovered, not assumed: report a command marked `not configured` as such, and when an acceptance criterion needs verification no configured command can provide, report that gap in the handoff instead of claiming it passed.
 
@@ -97,17 +97,21 @@ Commit each coherent unit as it becomes complete instead of accumulating one bul
 
 Keep coupled implementation and tests in one unit when splitting them would leave a broken commit, and separate independent features, harnesses, formatting and documentation. Never commit the paths `## Commits` excludes. Don't split one logical change merely to raise the commit count.
 
-## 4. Finalize the branch
+## 4. Run the taste pass
+
+When the taste pass is on, call the Skill tool with "simplify-branch" once the last implementation unit is committed. Hand over the remote and base from `## Forge`, and these constraints: keep behavior, the approved plan's interfaces and the agreed seams as they are; commit through "commit" under the constraints in step 3; push nothing. Its commits are part of this change, so the finalize step, the browser pass and the review cover them. A finding it leaves unapplied because it would change behavior is an implementation choice like any other: make it when the approved plan covers it, and ask when it would change the plan.
+
+## 5. Finalize the branch
 
 1. Run the format command, inspect what it changed, and commit those changes with their logical change.
 2. Run the full check.
 3. Confirm every intended change is committed and nothing unrelated is staged. Stop before syncing when the worktree is not safely clean.
 4. Sync per `## Sync`: merge the base. When the merge stops on conflicts, call the Skill tool with "resolving-merge-conflicts" and state the constraints: this is a merge and stays one; stage only resolved paths; ask the user about any hunk that decides product behavior. Once it reports back, conclude the merge with `git commit --no-edit` and confirm it in `git log`.
 5. When the sync changed the branch, rerun the complete verification.
-6. Immediately before pushing, fetch and require `<remote>/<base>` to be an ancestor of `HEAD`. When the base moved in the meantime (`## CI gate` names the automation that moves it), repeat step 4 first.
+6. Immediately before pushing, fetch and require `<remote>/<base>` to be an ancestor of `HEAD`. When the base moved in the meantime (`## CI gate` names the automation that moves it), repeat item 4 first.
 7. `push`. Never force-push.
 
-## 5. Verify in the browser
+## 6. Verify in the browser
 
 When the browser pass is on and the change has a user-visible surface per `browser-pass.md` `## When it applies`, call the Skill tool with "playwright-cli" and run the pass the approved plan names, exactly as `browser-pass.md` defines it, on the finalized and pushed head. The pass is done when every visible acceptance criterion of every member has a capture, the negative check passed, and every instance started for it is stopped. A change with no user-visible surface records its one-line reason instead.
 
@@ -115,7 +119,7 @@ A failure sends the work back to step 2. Captures from an older head are discard
 
 Upload every capture to the lead ticket with the tracker's `attach` and to the forge with its `attach`, titled with the criterion it proves, and link the forge's permanent URL from the pull request and the handoff. When one side cannot attach, follow its fallback.
 
-## 6. Create or reuse the pull request
+## 7. Create or reuse the pull request
 
 Follow [references/open-pr.md](references/open-pr.md): write the body in the format `## Pull requests` names, call the Skill tool with "create-pr" with the handover it lists, then verify every field with `read-pr`. The create-pr skill finds an existing pull request before anything else, publishes at most once, and assigns the configured assignee or nobody.
 
@@ -126,10 +130,11 @@ Write the body from the final diff and the actual verification results:
 - `## Attribution` names the harness and model actually in use, never a placeholder or a copied example.
 - `## Human verification` holds one concrete procedure that meets the standard in `workflow.md` `## Human verification`, derived from the final behavior and the acceptance criteria automation cannot prove. The same procedure goes into the handoff.
 - With the browser pass on, `## Screenshots` links every capture by the criterion it proves, or gives the one-line reason the change has no visible surface.
+- With the changelog on, `## Changelog` holds one or two lines a user of the project would care about, written from the final behavior, or `None` when users cannot notice the change.
 
 Never claim that a command, surface or platform was tested when it was not, and never claim the human steps were performed.
 
-## 7. Pass the exact-head CI gate
+## 8. Pass the exact-head CI gate
 
 Apply `## CI gate`. When the diff touches none of its path filters, no checks is a pass: confirm it from the changed files and state it in the handoff instead of a CI link. In no-CI mode, say "no CI configured".
 
@@ -137,22 +142,32 @@ Otherwise record the pull request's head SHA and wait with `ci`. Refresh the pul
 
 - Fix deterministic failures yourself: reproduce with the smallest relevant local command, commit the fix through "commit", push, and wait again for the new head. When the failing output does not show the cause, call the Skill tool with "diagnosing-bugs" before you change code.
 - Report infrastructure, permission, quota or unavailable-service failures with `Status: BLOCKED`, the check URL and the exact partial state. Never ask the user to diagnose ordinary code failures.
-- Require the pull request to be mergeable before the handoff. When the base advanced or the pull request conflicts, sync as in step 4 without force-pushing, rerun the verification, push, and wait for the new head's checks.
+- Require the pull request to be mergeable before the handoff. When the base advanced or the pull request conflicts, sync as in step 5 without force-pushing, rerun the verification, push, and wait for the new head's checks.
 
 Never move a ticket to `in-review` while the current head's gate is pending, failing or stale.
 
 Once the gate passes, stop changing code. Review comments that arrive while CI runs are normal (an automated reviewer may comment on every push): list them in the handoff's limitations with their count and where to read them, and leave every fix and reply to `address-pr-review`, which runs only when the user asks. A green gate with unaddressed review comments is a complete, expected end state for this skill.
 
-## 8. Hand off in the tracker
+## 9. Hand off in the tracker
+
+First `transition` every member from `in-progress` to `in-review` and read the states back, so the board shows the pull request ready for review as soon as its gate passes.
 
 Determine the agent product and the exact model from the session. Write `Unknown` when the harness does not expose one; never guess, and never interrupt the handoff over it.
 
-Post the handoff on the lead with `comment`, following [references/handoff.md](references/handoff.md) and reusing an equivalent existing comment, and a pointer comment on each rider. Then `transition` every member from `in-progress` to `in-review`, and read both the comments and the states back.
+Post the handoff on the lead with `comment`, following [references/handoff.md](references/handoff.md) and reusing an equivalent existing comment, and a pointer comment on each rider. Read the comments back.
 
 When `## States` names tracker automation that moves tickets on pull request events, check whether it moved any member before the gate passed, and report it if so.
 
 When a push, the pull request, a comment or a transition fails, report the exact partial state. On a retry, reuse every artifact that already exists instead of creating duplicate pull requests or comments.
 
-## 9. Completion report
+## 10. Completion report
 
 Return the commit subjects, the verification results, the browser-pass captures, the pull request URL, the tracker comment results, the final state of every member, the remaining limitations, and the review comments left for `address-pr-review`. End with `Status: READY_FOR_REVIEW`.
+
+## Blocked tickets
+
+A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket.
+
+To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
+
+A member in `blocked` comes back once every blocker its `## Blocked` comment names is cleared: `transition` it to the state this run works in (`in-progress` in start-ticket and work-ticket, `in-review` in address-pr-review), and post an `## Unblocked` comment beside the `## Blocked` one that says what cleared each blocker. When a blocker is still open, refresh the `## Blocked` comment and stop as above. Ask before working on a member in `blocked` that has no `## Blocked` comment.

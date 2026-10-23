@@ -9,7 +9,7 @@ For setup-rogs only; this section is not copied into the project. GitHub Issues 
 - Version: `relate` and `attach` use `--add-blocked-by`, `--parent` and `--attach`, which gh 2.100.0 has. When `gh issue edit --help` lacks the first two, `relate` uses its API calls; when `gh issue comment --help` lacks `--attach`, ask the user to update gh, or mark `attach` Unsupported.
 - Key: GitHub numbers issues `#123`, which cannot name a branch or a directory, so ask the user for a short uppercase key (for example `ACM`); ticket ids become `<key>-<number>`. Suggest an autolink, so `ACM-123` in pull requests and commits links to issue 123, as a command for the user to run (it needs the admin role): `gh repo autolink create ACM- "https://<host>/<owner>/<name>/issues/<num>" --numeric --repo <repo>`.
 - Discover: run the calls in `metadata`, and `gh project list --owner <project owner> --format json` to find the project when states live in a Status field.
-- States: ask whether states live in labels or in a project's Status field, and keep only that variant of `load`, `list-in-flight`, `create` and `transition` when copying the operations. Labels: new is "open, with no state label"; ready is none, or a label such as `status: ready`; in-progress is `status: in-progress`; in-review is `status: in-review`; done is "closed as completed"; canceled is "closed as not planned"; blocked is `status: blocked`, or none. A state label must exist before `transition` can add it: list the missing ones and give the user a `gh label create "<name>" --repo <repo> --color <hex> --description "<text>"` command for each. Project field: each open role maps to a Status option, and done and canceled also close the issue. Terminal states: closed, with any reason.
+- States: ask whether states live in labels or in a project's Status field, and keep only that variant of `load`, `list-in-flight`, `list-ready`, `create` and `transition` when copying the operations. Labels: new is "open, with no state label"; ready is none, or a label such as `status: ready`; in-progress is `status: in-progress`; in-review is `status: in-review`; done is "closed as completed"; canceled is "closed as not planned"; blocked is `status: blocked`, or none. A state label must exist before `transition` can add it: list the missing ones and give the user a `gh label create "<name>" --repo <repo> --color <hex> --description "<text>"` command for each. Project field: each open role maps to a Status option, and done and canceled also close the issue. Terminal states: closed, with any reason.
 - Automation: a pull request merged into the default branch closes every issue it names with a closing keyword (`Fixes #123`) or links under Development; a project's built-in workflows can set Status when an item closes or its pull request merges. Record each that applies under Automation.
 - Priority: GitHub has none. Offer labels (`priority: P0` to `priority: P3`), a project field, or none. When the organization defines issue types, offer them (`--type`) for the type label group.
 - Bundles: none. GitHub has no related relation, so the `Delivers with:` lines alone encode a bundle.
@@ -60,6 +60,14 @@ Capability: Supported
 With labels: `gh issue list --repo <repo> --state open --label "<in-progress label>" --limit 1000 --json number,title,labels,assignees,url`, then the same with the in-review label. When the count equals `--limit`, raise it and list again.
 
 With a project field: `gh issue list --repo <repo> --state open --limit 1000 --json number,title,assignees,projectItems,url`, keeping the issues whose `projectItems` entry with the project's `title` has the in-progress or in-review option as its `status.name`.
+
+Capability: Supported
+
+### list-ready
+
+With labels: `gh issue list --repo <repo> --state open --limit 1000 --json number,title,labels,assignees,url`, keeping the issues that carry no state label, plus the ones with the ready label when `## States` maps one. When the count equals `--limit`, raise it and list again.
+
+With a project field: the same call with `projectItems` added to `--json`, keeping the issues whose `projectItems` entry with the project's `title` has the new or ready option as its `status.name`.
 
 Capability: Supported
 

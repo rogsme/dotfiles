@@ -76,6 +76,12 @@ Capability: Supported
 
 Capability: Supported
 
+### list-ready
+
+`grep -lx -e 'Status: <new state>' <directory>/*.md`, with a second `-e 'Status: <ready state>'` when `## States` maps one.
+
+Capability: Supported
+
 ### metadata
 
 - States: the words in `## States`; `grep -h '^Status:' <directory>/*.md | sort | uniq -c` shows the ones in use.

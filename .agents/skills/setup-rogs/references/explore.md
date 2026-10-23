@@ -53,6 +53,8 @@ Read only. Run every command from the repository root (`git rev-parse --show-top
 - Model routing: `## Model routing` sections in existing tickets, or routing notes in the agent docs.
 - Bundles: `Delivers with:` lines in existing tickets.
 - Plan review: which agent CLIs answer `--version` (`claude`, `opencode`), whether `opencode debug agents` lists a `plan-review` agent, the models plans are written with here, and data boundaries or client terms in the agent docs that limit which vendors may see the code. The guides are `../assets/reviewer-claude-code.md` and `../assets/reviewer-opencode.md`.
+- Taste pass: whether the `simplify-branch` skill is installed (`npx skills list`, or the harness's skill list). A missing feature row means off.
+- Changelog: a `CHANGELOG.md` or release notes in the repository, a changelog tool's configuration, and `## Changelog` sections in recent pull request bodies. A missing feature row means off.
 - Plan presentation: an existing `## Plan presentation` section, `npx` availability, a separately prepared Marked/Mermaid renderer runtime, an external artifact root allowed by the planning agent, and the state directory/port of any existing presentation service. Lavish runs through pinned `npx`, not a local installation. A missing feature row means off. Call the Skill tool with "present-plan" for a check-only probe when paths are known; it owns the concrete commands and setup notes. Its version probe may populate npm's cache. Make no local installation, open no review, and preserve shared services and global agent settings.
 
 ## Installed skills

@@ -29,7 +29,7 @@ need() { f="docs/agents/$1"; id="$2"; shift 2
 has() { f="docs/agents/$1"; shift; [ -f "$f" ] || return 0
   for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
 on() { grep -qiE "^[|] *$1 *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
-need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### search" "### metadata" "### create" "### update" "### relate" "## States" "## Labels and priority" "## Ticket conventions"
+need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### search" "### metadata" "### create" "### update" "### relate" "### comment" "## States" "## Labels and priority" "## Ticket conventions"
 need workflow.md workflow "## Features" "## Project rules"
 need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
 on Bundles && has issue-tracker.md "## Bundles"
@@ -78,7 +78,7 @@ Run `search` across open, closed and archived tickets with title terms, area ter
 
 ## 4. Verify tracker metadata
 
-Resolve the team or project, the ticket key, the state mapped to `new`, active members, labels and projects live with `metadata`. Stop and ask when the key or another value in `## Tracker` changed in a way that affects the request.
+Resolve the team or project, the ticket key, the states mapped to `new` and `blocked`, active members, labels and projects live with `metadata`. Stop and ask when the key or another value in `## Tracker` changed in a way that affects the request.
 
 ## 5. Choose ticket boundaries
 
@@ -105,7 +105,7 @@ Title each ticket per `## Ticket conventions`, never with an id: the tracker ass
 
 ## 8. Preview and gate creation
 
-Present the breakdown as a numbered list. For each ticket show the title, priority, labels, project, assignee or `Unassigned`, the tickets that block it, what it delivers, whether it is conditional, and its model routing when that is on. Never invent ids.
+Present the breakdown as a numbered list. For each ticket show the title, priority, labels, project, assignee or `Unassigned`, the tickets that block it, the state it starts in, what it delivers, whether it is conditional, and its model routing when that is on. Never invent ids.
 
 Ask whether the granularity is right, whether each blocking edge is real, and whether any ticket should merge or split. Iterate until the user approves. While waiting, end with `Status: AWAITING_CREATE_APPROVAL`.
 
@@ -113,7 +113,7 @@ Before the first tracker write, confirm all of these:
 
 - The user explicitly authorized creation.
 - The team or project still resolves with the expected key.
-- The target state is the one mapped to `new`, unless the user chose another.
+- Each ticket starts in the state mapped to `new`, or in the one mapped to `blocked` when `## States` maps one and a ticket outside its bundle that blocks it is not `done`, unless the user chose another.
 - Assignment follows `## Ticket conventions` and is checked against active members.
 - The duplicate search is complete.
 - Labels, project, priorities, descriptions and dependencies are resolved.
@@ -122,12 +122,13 @@ Ask instead of creating a partial batch when anything is unresolved.
 
 ## 9. Create and link
 
-1. Create the tickets with `create`, blockers first, in the configured team or project and state.
+1. Create the tickets with `create`, blockers first, in the configured team or project, each in the state the preview shows.
 2. Apply the assignee (or none), priority, labels and project.
 3. Record every returned id and URL.
 4. After the ids exist, add the blocked-by relations with `relate`, then the bundle relations and `Delivers with:` lines.
-5. Keep the dependency prose in descriptions, but never as a substitute for relations the tracker supports.
-6. When the source was an existing ticket, attach each new ticket to it as a child where the tracker supports that. Never close or modify the parent.
+5. On each ticket created in `blocked`, post a `## Blocked` comment with `comment`: each open blocker, what would clear it, and the state mapped to `new` as the state it had: the merge that clears its last blocker moves it there.
+6. Keep the dependency prose in descriptions, but never as a substitute for relations the tracker supports.
+7. When the source was an existing ticket, attach each new ticket to it as a child where the tracker supports that. Never close or modify the parent.
 
 Perform no other mutation.
 
@@ -139,6 +140,7 @@ Read every created ticket back with `load` rather than trusting the write respon
 - Every id matches the format in `## Tracker`.
 - State, priority, labels, project and assignee are what the preview promised.
 - Every blocked-by and bundle relation exists on the ticket that should carry it.
+- Every ticket created in `blocked` carries its `## Blocked` comment.
 
 Report the ids and URLs concisely. The work is complete only when this verification passes; then end with `Status: TICKETS_CREATED`.
 

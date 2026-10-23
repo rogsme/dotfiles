@@ -56,6 +56,12 @@ Capability: Supported
 
 Capability: Supported
 
+### list-ready
+
+`list_issues` with `team: "<team id>"`, `state: "<new state name>"`, `includeArchived: false` and `limit: 250`, following the cursor to the end; then the same call with the ready state name, when `## States` maps one.
+
+Capability: Supported
+
 ### metadata
 
 - States: `list_issue_statuses` with `team: "<team id>"`.

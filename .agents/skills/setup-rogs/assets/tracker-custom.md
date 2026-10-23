@@ -6,12 +6,12 @@ For setup-rogs only; this section is not copied into the project. A skeleton for
 
 - Detect: the user names a tracker that no built-in guide covers, or a built-in guide's connection check shows the project uses something else.
 - Ask: one question per operation, in the order of `## Operations`. Each question quotes the operation's contract from `references/contract.md` and the `{{FILL: ...}}` text below, which lists what the answer must give: the exact tool or command with its parameters, the ids it needs, how its pagination ends, and how to read the result back. Move to the next operation only when the current answer is complete.
-- Connection check: run the `resolve` and `load` the user described on one ticket the user names, and compare the result with what the user sees in the tracker. Check `search`, `list-in-flight` and `metadata` live the same way. When the connection is missing (no tools, CLI or credentials in this session), the user sets it up in their own harness or environment and runs `/setup-rogs` again; a read the session still cannot run stays unchecked, and the report says so. Setup runs reads only; each write is confirmed the first time a lifecycle skill makes it and reads it back.
+- Connection check: run the `resolve` and `load` the user described on one ticket the user names, and compare the result with what the user sees in the tracker. Check `search`, `list-in-flight`, `list-ready` and `metadata` live the same way. When the connection is missing (no tools, CLI or credentials in this session), the user sets it up in their own harness or environment and runs `/setup-rogs` again; a read the session still cannot run stays unchecked, and the report says so. Setup runs reads only; each write is confirmed the first time a lifecycle skill makes it and reads it back.
 - Discover: run the described `metadata` to fill `## States` and `## Labels and priority`, and ask for whatever it cannot read.
 - States: ask where each role lives: native states, labels, a field, or open and closed. A tracker without native states maps the roles to whatever it has, under the contract's rule for trackers without native states.
 - Priority: ask for the tracker's native priority values and map P0 to P3 onto them; when it has none, ask whether labels carry priority.
 - Bundles: ask for the relation that links bundle members; when the tracker has no relations, write that the `Delivers with:` lines alone encode a bundle.
-- Gaps: an operation the tracker cannot perform gets `Capability: Unsupported`, or `Capability: Fallback: <what to do instead>` when one of the contract's gap rules fits: `attach` (upload to the forge only), `relate` (the `Blocked by:` and `Delivers with:` lines alone), comment edits (a new comment that links the one it supersedes), and search that misses archived tickets (search what is visible and state the limit). `resolve`, `load`, `list-in-flight`, `metadata`, `create`, `update` and `transition` have no gap rule: a skill that needs one of them and finds it Unsupported stops with `Status: BLOCKED`, so tell the user which skills that stops, from the contract's "Which skill needs what" table.
+- Gaps: an operation the tracker cannot perform gets `Capability: Unsupported`, or `Capability: Fallback: <what to do instead>` when one of the contract's gap rules fits: `attach` (upload to the forge only), `relate` (the `Blocked by:` and `Delivers with:` lines alone), comment edits (a new comment that links the one it supersedes), and search that misses archived tickets (search what is visible and state the limit). `resolve`, `load`, `list-in-flight`, `list-ready`, `metadata`, `create`, `update` and `transition` have no gap rule: a skill that needs one of them and finds it Unsupported stops with `Status: BLOCKED`, so tell the user which skills that stops, from the contract's "Which skill needs what" table.
 - Unknown operations: write a procedure only from the user's description and what setup observed. An operation the user cannot describe is handled as one the tracker cannot perform (see Gaps), with the body "Not described at setup."; running `/setup-rogs` again with a description replaces it.
 - Ticket ids: branch and directory names carry the id, so it holds only letters, digits and hyphens. When the tracker's own ids do not (for example `#123`), choose a key with the user and write ids as `<key>-<number>`.
 
@@ -47,6 +47,12 @@ Capability: {{FILL: Supported, or Fallback: <what to do instead>, or Unsupported
 ### list-in-flight
 
 {{FILL: the call that lists the tickets in the in-progress and in-review states, with its filter parameters and pagination}}
+
+Capability: {{FILL: Supported, or Fallback: <what to do instead>, or Unsupported}}
+
+### list-ready
+
+{{FILL: the call that lists the tickets in the new and ready states, with its filter parameters and pagination}}
 
 Capability: {{FILL: Supported, or Fallback: <what to do instead>, or Unsupported}}
 

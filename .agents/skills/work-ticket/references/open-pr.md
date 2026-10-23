@@ -4,7 +4,7 @@ The create-pr skill publishes; this file holds what the lifecycle adds around it
 
 ## Before the handover
 
-1. Fetch the base and require `<remote>/<base>` to be an ancestor of `HEAD`. Otherwise sync first, as step 4 of the skill describes.
+1. Fetch the base and require `<remote>/<base>` to be an ancestor of `HEAD`. Otherwise sync first, as step 5 of the skill describes.
 2. Run `find-pr` for the exact head repository, head branch and base, so you know whether this run creates the pull request or refreshes an existing one.
 
 ## The body

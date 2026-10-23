@@ -10,7 +10,7 @@ metadata:
 
 start-ticket hands over a finished plan before the user sees it. Send it to one reviewer from a different vendor than the model this session runs on, settle every finding against the code, and hand back the revised plan with a review table. A model reviewing its own plan shares the blind spots that wrote it; a model from another vendor brings different ones.
 
-The review is one round. Planning stays read-only: the brief lives outside the repository, and the reviewer can only read. A review that fails never holds the plan back; the plan goes to the user marked as not reviewed.
+The review is one round. The review stays read-only: the brief lives outside the repository, and the reviewer can only read. A review that fails never holds the plan back; the plan goes to the user marked as not reviewed.
 
 ## Handover
 

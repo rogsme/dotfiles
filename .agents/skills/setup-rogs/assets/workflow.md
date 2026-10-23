@@ -13,6 +13,8 @@ How this project runs the ticket lifecycle. Written by `/setup-rogs`; edit it fr
 | Client notes | {{FILL: on or off}} |
 | Plan review | {{FILL: on or off}} |
 | Plan presentation | {{FILL: on or off; missing in older configurations means off}} |
+| Taste pass | {{FILL: on or off; missing in older configurations means off}} |
+| Changelog | {{FILL: on or off; missing in older configurations means off}} |
 
 ## Worktrees
 

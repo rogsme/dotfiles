@@ -8,7 +8,7 @@ metadata:
 
 # Address review feedback
 
-Treat review comments as claims to verify, not instructions to apply blindly. Make the smallest justified fixes, push them before replying, and answer every feedback channel. The tracker stays read-only, apart from replacement captures.
+Treat review comments as claims to verify, not instructions to apply blindly. Make the smallest justified fixes, push them before replying, and answer every feedback channel. The tracker stays read-only, apart from replacement captures and the moves [Blocked tickets](#blocked-tickets) describes.
 
 Every run first syncs the branch with its base (step 3), then performs at most two address rounds and stops. A request to address the review and a request to sync the pull request start the same run. A round is steps 4 to 8 against one head: collect the unanswered feedback, classify it, fix the accepted findings, push, wait for the exact-head CI, and reply. Step 9 decides whether a second round happens and enforces the cap.
 
@@ -31,7 +31,7 @@ need() { f="docs/agents/$1"; id="$2"; shift 2
 has() { f="docs/agents/$1"; shift; [ -f "$f" ] || return 0
   for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
 on() { grep -qiE "^[|] *$1 *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
-need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "## States"
+need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### comment" "### transition" "## States"
 need forge.md forge "## Forge" "## Operations" "### find-pr" "### push" "### read-pr" "### edit-pr" "### ci" "### feedback" "### reply" "### comment" "## CI gate" "## Pull requests"
 need workflow.md workflow "## Features" "## Worktrees" "## Verification" "## Commits" "## Sync" "## Project rules" "## Human verification"
 need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
@@ -70,7 +70,7 @@ Never edit from the wrong worktree, and never create a replacement pull request.
 
 Derive the pull request's tickets: the lead is the head branch when it matches the id format in `## Tracker`, otherwise the first id in the title. When bundles are on, the riders are the other ids in the title and the related-work lines, checked against the bundle the tracker records (`## Bundles`). Stop and ask when they disagree or no id exists; never fuzzy-match the title.
 
-`load` every member in full: relations, every comment, and the current state of every blocking ticket. Verify the team or project, and request more blocker detail only when its scope affects the feedback. Expect every member in `in-review`; report and ask before editing when one is in another state. Never repair or transition tracker state from this skill.
+`load` every member in full: relations, every comment, and the current state of every blocking ticket. Verify the team or project, and request more blocker detail only when its scope affects the feedback. Expect every member in `in-review`, or in `blocked` as [Blocked tickets](#blocked-tickets) describes; report and ask before editing when one is in another state. Make no other transition, and never repair tracker state.
 
 Build a requirements ledger from the acceptance criteria, the scope, the approved plan, explicit decisions and clarifications in comments, dependency states, and the limitations the handoff names. Later decisions may supersede older ones when their authority and intent are clear. Treat unclear or conflicting comments as open questions rather than requirements.
 
@@ -109,13 +109,15 @@ Classify every unanswered point as accepted, partially accepted, rejected, or no
 
 Ask the user only when a decision needs unresolved product policy or unavailable external evidence. Uncertainty is never a reason to accept every suggestion.
 
+An accepted finding whose fix waits on a blocker, such as another ticket that has to land first, stays unfixed this round: reply with the blocker, and once the round is done, mark the ticket blocked as [Blocked tickets](#blocked-tickets) says instead of ending with `Status: READY_FOR_REVIEW`.
+
 ## 6. Implement the accepted fixes
 
 Fix each accepted issue at its shared root cause, with the smallest regression test; in the test-first areas `## Verification` lists, call the Skill tool with "tdd" for it. When an accepted bug's root cause is not evident from the comment and the code, as with a failed human verification step, call the Skill tool with "diagnosing-bugs" first. Preserve unrelated work, and follow `AGENTS.md` (or `CLAUDE.md`) and the rule files `## Project rules` lists for the touched areas.
 
 Commit each fix with its test as one unit: state the exact paths, the constraints (never amend; no AI attribution and no co-author trailers unless `## Commits` says otherwise; never bypass a hook; leave every other path untouched) and the intent, then call the Skill tool with "commit" and confirm the commit with `git log`. Create no commit for a rejected or no-code-change comment.
 
-When the browser pass is on and an accepted fix changes what a page shows, rerun the affected part of the pass per `browser-pass.md` after the push below, upload the new captures to the lead ticket and to the forge with their `attach` operations, and point the pull request's screenshot links at them. Replacement captures are the only tracker write this skill makes.
+When the browser pass is on and an accepted fix changes what a page shows, rerun the affected part of the pass per `browser-pass.md` after the push below, upload the new captures to the lead ticket and to the forge with their `attach` operations, and point the pull request's screenshot links at them. Replacement captures and the moves into and out of `blocked` are the only tracker writes this skill makes.
 
 After the fixes, run the format command and commit any intended changes it makes, then run the focused checks that prove the fixes. Reuse the pull request's CI gate instead of rerunning the full check locally.
 
@@ -134,7 +136,7 @@ Reply directly to every previously unanswered comment: `reply` on the original c
 - Concise evidence and reasoning for a partial acceptance or a pushback, citing the decision record or contract when one decides it.
 - Any boundary intentionally left unverified, or follow-up evidence still needed.
 
-After each pushed round, update the pull request body in place with `edit-pr`: pin the `## Review brief` and its evidence to the new head, and update the `## Human verification` procedure when a fix changed its setup, navigation, actions, expected results, regression checks, cleanup or coverage.
+After each pushed round, update the pull request body in place with `edit-pr`: pin the `## Review brief` and its evidence to the new head, and update the `## Human verification` procedure when a fix changed its setup, navigation, actions, expected results, regression checks, cleanup or coverage. With the changelog on, update the `## Changelog` lines when a fix changed what users notice.
 
 Post one conversation comment only when the fixes require human verification again. It carries the new head SHA, the base SHA it contains, the CI result (or the path-filter note), the focused checks, the acceptance evidence the fixes affected, the current numbered procedure, and the hand-off to a fresh review. Post no generic summary comment otherwise.
 
@@ -149,7 +151,7 @@ Confirm all of these before the round counts as done:
 - The successful checks belong to the current head, and the pull request is mergeable.
 - Every previously unanswered inline, review-body and conversation point received exactly one direct reply, and a conversation comment exists only when human verification changed.
 - This skill resolved no thread.
-- Every member was read again, still belongs to the configured team or project, and is still `in-review`, and no tracker write other than replacement captures happened. Report state drift instead of correcting it.
+- Every member was read again, still belongs to the configured team or project, and is still `in-review`, or `blocked` by this run, and no tracker write other than replacement captures and the blocked moves happened. Report state drift instead of correcting it.
 
 ## 9. Round limit: two, then stop
 
@@ -162,6 +164,14 @@ Two rounds is the hard cap for one run of this skill. An automated reviewer can 
 ## Report
 
 Return whether step 3 merged the base, the classifications, the commits, the push result, the verification performed, links to the replies, and any behavior intentionally left unchanged. When there was no feedback, return the new head and its CI result instead, or that the branch was already up to date. End with `Status: READY_FOR_REVIEW`, so a fresh review session can revalidate the head and resolve the threads.
+
+## Blocked tickets
+
+A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket.
+
+To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
+
+A member in `blocked` comes back once every blocker its `## Blocked` comment names is cleared: `transition` it to the state this run works in (`in-progress` in start-ticket and work-ticket, `in-review` in address-pr-review), and post an `## Unblocked` comment beside the `## Blocked` one that says what cleared each blocker. When a blocker is still open, refresh the `## Blocked` comment and stop as above. Ask before working on a member in `blocked` that has no `## Blocked` comment.
 
 ## Gotchas
 

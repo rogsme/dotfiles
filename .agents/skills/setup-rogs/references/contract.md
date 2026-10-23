@@ -1,6 +1,6 @@
 # The configuration contract (v1)
 
-The lifecycle skills are general. Everything they need to know about one project lives in prose files that `setup-rogs` writes into that project. This file defines those files: their paths, their required headings, what each heading holds, and which skill reads what. It is the single source of truth; the seeds in `../assets/` follow it, and so do the six lifecycle skills.
+The lifecycle skills are general. Everything they need to know about one project lives in prose files that `setup-rogs` writes into that project. This file defines those files: their paths, their required headings, what each heading holds, and which skill reads what. It is the single source of truth; the seeds in `../assets/` follow it, and so do the lifecycle skills.
 
 ## Files
 
@@ -26,7 +26,7 @@ Line 1 of every file is a marker:
 
 The block sits between `<!-- rogs-skills:begin config v1 -->` and `<!-- rogs-skills:end -->`.
 
-The version is one integer for the whole contract. It changes only for a breaking change: a new required heading, a renamed heading, or a heading whose meaning changes. When a skill finds a lower version than it expects, it tells the user to run `/setup-rogs`; a higher one means the installed skills are older than the configuration, and it tells the user to run `npx skills update`.
+The version is one integer for the whole contract. It changes only for a breaking change: a new required heading, a renamed heading, or a heading whose meaning changes. A heading that only a skill new to the lifecycle requires is not one: older configurations still satisfy every other skill, and the new skill's preflight sends the user to `/setup-rogs`, as with `list-ready`. When a skill finds a lower version than it expects, it tells the user to run `/setup-rogs`; a higher one means the installed skills are older than the configuration, and it tells the user to run `npx skills update`.
 
 Seeds mark every value setup still has to fill as `{{FILL: what goes here}}`. A file that still contains `{{FILL:` is incomplete.
 
@@ -59,6 +59,7 @@ Tracker operations:
 | `load` | Description, state, labels, priority, assignee, relations (with each related ticket's state), attachments, and every comment, following pagination until it ends. |
 | `search` | Text search over open and closed tickets, archived ones included when the tracker keeps them, every page. |
 | `list-in-flight` | The tickets currently in the `in-progress` and `in-review` roles. |
+| `list-ready` | The tickets currently in the `new` and `ready` roles. |
 | `metadata` | States, labels, members and projects, read live at use time. |
 | `create` | Title, description, state, priority, labels, assignee and project; returns the new id and URL. |
 | `update` | Change a ticket's description or fields; states whether label writes replace the whole set. |
@@ -66,6 +67,8 @@ Tracker operations:
 | `comment` | Find an existing comment by its first-line heading and reuse or edit it; otherwise create one; read it back. |
 | `transition` | Move a ticket to the state mapped to a role, then read the state back. |
 | `attach` | Upload a file to a ticket. The body says whether the returned URL is permanent; when it is not, the skills link the forge's permanent URL for the same file instead. |
+
+`list-ready` came after the first v1 configurations. A configuration without it still satisfies every skill but `suggest-tickets`, which asks for `/setup-rogs`; setup then adds it from the tracker's guide.
 
 ## forge.md
 
@@ -101,7 +104,7 @@ Forge operations:
 
 | Heading | Holds |
 |---|---|
-| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`, `Plan review`, `Plan presentation`. An absent `Plan presentation` row in an older v1 configuration means off. |
+| `## Features` | A table turning each feature on or off: `Bundles`, `Browser pass`, `Model routing`, `Client notes`, `Plan review`, `Plan presentation`, `Taste pass`, `Changelog`. An absent `Plan presentation`, `Taste pass` or `Changelog` row in an older v1 configuration means off. |
 | `## Worktrees` | The rule (branch name equals the worktree directory name equals the lead ticket id), where worktrees usually live, and who creates them (the user, never a skill). |
 | `## Verification` | The format command, the full check, focused checks per area, the areas that are test-first, hook behavior, and any environment notes. A command the project lacks is written as `not configured`. |
 | `## Commits` | Paths never committed, commit rules beyond the defaults, and the attribution policy. |
@@ -135,7 +138,7 @@ Plan presentation is additive and optional under contract v1. It never changes t
 
 ## pull-request.md
 
-The body skeleton every pull request uses when the repository has no template: `## Review brief`, `## Summary`, `## Related work`, `## Attribution`, `## Validation`, `## Risks and rollout`, `## Human verification`, and `## Screenshots` when the browser pass is on. Instructions for each section live in HTML comments that the author replaces.
+The body skeleton every pull request uses when the repository has no template: `## Review brief`, `## Summary`, `## Related work`, `## Attribution`, `## Validation`, `## Risks and rollout`, `## Human verification`, `## Screenshots` when the browser pass is on, and `## Changelog` when the changelog is on. Instructions for each section live in HTML comments that the author replaces.
 
 When the repository has its own template, `forge.md` names it, and the lifecycle skills add any required heading the template lacks to the body they write. They never edit the template file.
 
@@ -147,40 +150,43 @@ A `## Ticket lifecycle` section between the block markers, in the file both harn
 
 R is required. F is required only when the feature it belongs to is on. A dash means the skill does not read it.
 
-| Section | create-ticket | start-ticket | work-ticket | review-pr | address-pr-review | finish-ticket |
-|---|---|---|---|---|---|---|
-| issue-tracker `## Tracker`, `## Operating rules`, `## States` | R | R | R | R | R | R |
-| issue-tracker `resolve`, `load` | R | R | R | R | R | R |
-| issue-tracker `search`, `metadata`, `create`, `update`, `relate` | R | - | - | - | - | - |
-| issue-tracker `## Labels and priority`, `## Ticket conventions` | R | - | - | - | - | - |
-| issue-tracker `list-in-flight` | - | R | R | - | - | - |
-| issue-tracker `comment`, `transition` | - | - | R | - | - | R |
-| issue-tracker `attach` | - | - | F | - | F | - |
-| issue-tracker `## Bundles` | F | F | F | F | F | F |
-| issue-tracker `## Model routing` | F | F | F | - | - | - |
-| forge `## Forge` | - | R | R | R | R | R |
-| forge `find-pr`, `read-pr`, `ci`, `feedback`, `## CI gate`, `## Pull requests` | - | - | R | R | R | R |
-| forge `push`, `edit-pr` | - | - | R | - | R | - |
-| forge `create-pr`, `assign` | - | - | R | - | - | - |
-| forge `post-review`, `resolve-thread` | - | - | - | R | - | - |
-| forge `reply` | - | - | - | R | R | - |
-| forge `comment` | - | - | - | R | R | R |
-| forge `merge`, `post-merge-ci` | - | - | - | - | - | R |
-| forge `## Identity limits` | - | - | - | R | - | R |
-| forge `attach` | - | - | F | - | F | - |
-| workflow `## Features` | R | R | R | R | R | R |
-| workflow `## Worktrees` | - | R | R | - | R | R |
-| workflow `## Verification` | - | R | R | - | R | - |
-| workflow `## Commits`, `## Sync` | - | - | R | - | R | - |
-| workflow `## Project rules` | R | R | R | R | R | - |
-| workflow `## Review` | - | - | - | R | - | - |
-| workflow `## Human verification` | - | - | R | R | R | R |
-| workflow `## Client notes` | F | F | - | - | - | - |
-| workflow `## Plan review` | - | F | - | - | - | - |
-| workflow `## Plan presentation` | - | F | - | - | - | - |
-| domain (all four headings) | R | R | R | R | R | - |
-| browser-pass (all four headings) | - | F | F | F | F | F |
-| pull-request (when `## Pull requests` points at it) | - | - | R | R | R | - |
+| Section | create-ticket | suggest-tickets | start-ticket | work-ticket | review-pr | address-pr-review | finish-ticket |
+|---|---|---|---|---|---|---|---|
+| issue-tracker `## Tracker`, `## Operating rules`, `## States` | R | R | R | R | R | R | R |
+| issue-tracker `resolve`, `load` | R | R | R | R | R | R | R |
+| issue-tracker `search` | R | - | - | - | - | - | R |
+| issue-tracker `metadata`, `create`, `update`, `relate` | R | - | - | - | - | - | - |
+| issue-tracker `## Labels and priority`, `## Ticket conventions` | R | R | - | - | - | - | - |
+| issue-tracker `list-in-flight` | - | R | R | R | - | - | - |
+| issue-tracker `list-ready` | - | R | - | - | - | - | - |
+| issue-tracker `comment` | R | - | R | R | - | R | R |
+| issue-tracker `transition` | - | - | R | R | - | R | R |
+| issue-tracker `attach` | - | - | - | F | - | F | - |
+| issue-tracker `## Bundles` | F | F | F | F | F | F | F |
+| issue-tracker `## Model routing` | F | F | F | F | - | - | - |
+| forge `## Forge` | - | R | R | R | R | R | R |
+| forge `find-pr`, `read-pr`, `ci`, `feedback`, `## CI gate`, `## Pull requests` | - | - | - | R | R | R | R |
+| forge `push`, `edit-pr` | - | - | - | R | - | R | - |
+| forge `create-pr`, `assign` | - | - | - | R | - | - | - |
+| forge `post-review`, `resolve-thread` | - | - | - | - | R | - | - |
+| forge `reply` | - | - | - | - | R | R | - |
+| forge `comment` | - | - | - | - | R | R | R |
+| forge `merge`, `post-merge-ci` | - | - | - | - | - | - | R |
+| forge `## Identity limits` | - | - | - | - | R | - | R |
+| forge `attach` | - | - | - | F | - | F | - |
+| workflow `## Features` | R | R | R | R | R | R | R |
+| workflow `## Worktrees` | - | R | R | R | - | R | R |
+| workflow `## Verification` | - | - | R | R | - | R | - |
+| workflow `## Commits`, `## Sync` | - | - | - | R | - | R | - |
+| workflow `## Project rules` | R | - | R | R | R | R | - |
+| workflow `## Review` | - | - | - | - | R | - | - |
+| workflow `## Human verification` | - | - | - | R | R | R | R |
+| workflow `## Client notes` | F | - | F | - | - | - | - |
+| workflow `## Plan review` | - | - | F | - | - | - | - |
+| workflow `## Plan presentation` | - | - | F | - | - | - | - |
+| domain (all four headings) | R | - | R | R | R | R | - |
+| browser-pass (all four headings) | - | - | F | F | F | F | F |
+| pull-request (when `## Pull requests` points at it) | - | - | - | R | R | R | - |
 
 An operation marked `Capability: Unsupported` still satisfies the heading check. The skill then follows the gap rules below, and stops with `Status: BLOCKED` when a required operation has no way forward.
 
@@ -220,4 +226,4 @@ Two cases get a different second line:
 - The files are missing here but present in the main worktree (the first entry of `git worktree list --porcelain`): "The configuration exists in <main worktree path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch."
 - The marker version differs: "The configuration is version <n>; this skill expects version 1." Then, for an older configuration, "Run /setup-rogs here to update it."; for a newer one, "Run `npx skills update` to update the installed skills."
 
-The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`) read these files when present and never refuse without them. `review-plan`, which start-ticket calls, reads `## Plan review` and hands the plan back unreviewed when the feature is off. `present-plan` reads `## Plan presentation` for lifecycle handovers; explicit standalone requests can supply their settings without lifecycle configuration.
+The engineering skills (`tdd`, `diagnosing-bugs`, `grill-with-docs`, `resolving-merge-conflicts`, `commit`, `wiki`, `simplify-branch`) read these files when present and never refuse without them. `review-plan`, which start-ticket calls, reads `## Plan review` and hands the plan back unreviewed when the feature is off. `present-plan` reads `## Plan presentation` for lifecycle handovers; explicit standalone requests can supply their settings without lifecycle configuration.

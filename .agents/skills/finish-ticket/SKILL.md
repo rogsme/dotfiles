@@ -1,6 +1,6 @@
 ---
 name: finish-ticket
-description: "Merge the current branch's reviewed pull request and complete its ticket or bundle, only after explicit merge authorization and confirmed human verification: require exact-head CI, a final independent review verdict for the same head and base, and no open feedback; then verify the merge and post-merge CI and move every ticket to done. Use only when the user explicitly says \"merge the PR\", \"finish the ticket\" or \"ship this\"."
+description: "Merge the current branch's reviewed pull request and complete its ticket or bundle, only after explicit merge authorization and confirmed human verification: require exact-head CI, a final independent review verdict for the same head and base, and no open feedback; then verify the merge, move every ticket to done, and verify post-merge CI. Use only when the user explicitly says \"merge the PR\", \"finish the ticket\" or \"ship this\"."
 license: MIT
 metadata:
   rogs-skills/contract: "1"
@@ -8,7 +8,7 @@ metadata:
 
 # Finish a reviewed ticket
 
-Close the lifecycle only after explicit merge authorization. This skill owns one merge and the matching tracker completion. It never implements fixes and never infers that manual testing happened. Its only writes are the merge, a conversation comment recording a failed human verification step, the completion comments, and the move of each member from `in-review` to `done`.
+Close the lifecycle only after explicit merge authorization. This skill owns one merge and the matching tracker completion. It never implements fixes and never infers that manual testing happened. Its only writes are the merge, a conversation comment recording a failed human verification step, the completion comments, the move of each member from `in-review` to `done`, and moving the tickets the merge unblocked out of `blocked`, with their `## Unblocked` comments.
 
 ## 0. Configuration preflight
 
@@ -29,7 +29,7 @@ need() { f="docs/agents/$1"; id="$2"; shift 2
 has() { f="docs/agents/$1"; shift; [ -f "$f" ] || return 0
   for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
 on() { grep -qiE "^[|] *$1 *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
-need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### comment" "### transition" "## States"
+need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### search" "### comment" "### transition" "## States"
 need forge.md forge "## Forge" "## Operations" "### find-pr" "### read-pr" "### ci" "### feedback" "### comment" "### merge" "### post-merge-ci" "## CI gate" "## Pull requests" "## Identity limits"
 need workflow.md workflow "## Features" "## Worktrees" "## Human verification"
 on Bundles && has issue-tracker.md "## Bundles"
@@ -74,6 +74,8 @@ For an open pull request, refresh it with `read-pr` immediately before merging a
 
 When human steps remain and the merge instruction did not confirm them, ask one concise question that lists only those step numbers and actions. When any step failed, do not merge: post one conversation comment with `comment` that records the failed step, what the user observed, and the reviewed head SHA, so `address-pr-review` picks it up as feedback; leave the tracker unchanged; and end with `Status: HUMAN_QA_FAILED`. Never infer that a step passed, invent observations, or accept a verdict for an older head.
 
+A confirmation counts for the head it names, or, when it names none, for the head of the final review summary the user had when they gave it. A confirmation given on an earlier head still counts when every commit after that head is a clean merge of the base and the final review summary asks the same steps as the summary for the confirmed head, matched by action and expected result rather than by number; a step that is new, or whose action or expected result changed, needs its own confirmation. A clean merge of the base is a merge commit whose second parent is an ancestor of the base, and whose tree (`git rev-parse <merge>^{tree}`) equals the one `git merge-tree --write-tree <merge>^1 <merge>^2` prints; check each one yourself. The commits after a head are the branch's own, the ones `git rev-list --first-parent <that head>..<the current head>` lists, and the oldest of them has that head as its first parent; the base's commits come in through each merge's second parent. Any other commit after the confirmed head, such as a fix or a conflict resolution, voids the confirmations given before it.
+
 Fetch the base and require its SHA to equal the base SHA in the final verdict. When the base moved at all after the review, stop with `Status: BLOCKED_FOR_SYNC`: even a clean merge would produce an integration nobody reviewed. Never re-sync, re-verify or re-review from this skill, even when the gap looks mechanical; `address-pr-review` brings the branch up to date, and a fresh review follows.
 
 When the pull request is already merged, this run is recovering from a partial earlier one. Load the latest `Verdict: READY_FOR_HUMAN` summary, reuse its reviewed head and base and the recorded merge commit, skip the merge, and continue with the verification in step 3. Stop when that review summary is absent. Never create a second pull request or a second merge. Recovery does not waive human QA: require the same numbered procedure, and an explicit pass or reasoned waiver for every step, before completing any ticket.
@@ -82,7 +84,7 @@ When the pull request is already merged, this run is recovering from a partial e
 
 Merge with `merge`, using the style `## Forge` names. Never enable auto-merge, bypass protections, force-push, delete branches, or alter the active worktree.
 
-When `merge` is a fallback that hands the merge to a person (a merge queue or a merge train), stop here instead: tell the user to merge through the queue or train, and to run `/finish-ticket` again once the pull request shows as merged. That run takes the already-merged path above. A queue can merge onto a newer base than the reviewed one, so on that path step 4 below reports the merge commit's actual parents instead of requiring the reviewed base, and the post-merge CI in step 5 is required. When the forge rejects the merge because the base moved or the pull request became unmergeable, do not retry: end with `Status: BLOCKED_FOR_SYNC`.
+When `merge` is a fallback that hands the merge to a person (a merge queue or a merge train), stop here instead: tell the user to merge through the queue or train, and to run `/finish-ticket` again once the pull request shows as merged. That run takes the already-merged path above. A queue can merge onto a newer base than the reviewed one, so on that path step 4 below reports the merge commit's actual parents instead of requiring the reviewed base, and the post-merge CI in step 6 is required. When the forge rejects the merge because the base moved or the pull request became unmergeable, do not retry: end with `Status: BLOCKED_FOR_SYNC`.
 
 After the merge:
 
@@ -90,8 +92,9 @@ After the merge:
 2. Fetch the base and verify the merge commit is an ancestor of it.
 3. Verify the pull request's merged head equals the reviewed head SHA.
 4. Inspect the merge commit. With the `merge` style its parents are the reviewed base and the reviewed head; with `squash` its only parent is the reviewed base. Under either style its tree equals the reviewed head's tree (`git rev-parse <merge commit>^{tree}` against `<reviewed head>^{tree}`): the reviewed head already contained the reviewed base, so nothing else may differ. After a merge through a queue or train, require only that the merged head is the reviewed head, and record the actual parents in the completion comment.
-5. Post-merge CI: when the merged diff touches a path in the `## CI gate` filters, wait with `post-merge-ci` and require success for the merge commit; when it touches none, record that no post-merge run is expected; in the no-CI mode, record that.
-6. When the merge or the post-merge check is not proven, report the exact partial state and leave the tracker unchanged. A failed post-merge gate ends with `Status: BLOCKED_POST_MERGE`.
+5. Once items 1 to 4 prove the merge, `transition` every member from `in-review` to `done` and read each state back, before any wait: the change is merged, and the board shows it. When tracker automation already moved a member to `done` on the merge (`## States`), verify the state and skip that transition.
+6. Post-merge CI: when the merged diff touches a path in the `## CI gate` filters, wait with `post-merge-ci` and require success for the merge commit; when it touches none, record that no post-merge run is expected; in the no-CI mode, record that.
+7. When the merge is not proven, report the exact partial state and leave the tracker unchanged. When the post-merge check is not proven, report the exact partial state; the members stay `done`, since their change is merged. A failed post-merge gate ends with `Status: BLOCKED_POST_MERGE`.
 
 ## 4. Complete the tickets
 
@@ -109,16 +112,20 @@ Post this on the lead with `comment`, reusing an equivalent existing completion 
 
 ### Human verification
 
-- Step {number}: {passed, and who confirmed it; or waived, with the reason}
+- Step {number}: {passed on `{the head it was confirmed on}`, and who confirmed it; or waived, with the reason}
 - Observed limitations: {any limitation the user reported, or None}
 ```
 
-On each rider, post a `## Completion` comment with only the pull request URL, the merge commit, and a link to the lead's comment. Then `transition` every member from `in-review` to `done` and read each one back: the comment, the pull request link and the `done` state. When tracker automation already moved a member to `done` on the merge (`## States`), verify the state and skip that transition.
+On each rider, post a `## Completion` comment with only the pull request URL, the merge commit, and a link to the lead's comment. Read each comment back, with its pull request link.
 
 On a retry, accept an already merged pull request and already completed members, repair only the members still missing their comment or transition, and never attempt a duplicate merge or transition.
 
+Then find what the merge unblocked. Take the tickets each member blocks: from the relations `load` returns, and, where the tracker keeps blockers only as `Blocked by:` lines, from `search` for the lines that name the member. Leave out the members themselves, every ticket in a terminal state, and every ticket already in progress or in review. `load` each one left and read its blockers: it is unblocked when every one of them is now `done`, this merge's members included. A canceled blocker keeps it blocked, since start-ticket treats one as an open question. With bundles on, judge a ticket's whole bundle, resolved as `## Bundles` defines: it is unblocked when the blockers of all its members outside the bundle are, since a blocked-by relation between two members is build order, and it goes by its lead's id, the one start-ticket starts.
+
+A ticket the merge unblocked can sit in `blocked`. When every blocker its `## Blocked` comment names is a ticket that is now `done`, `transition` each of its members back to the state that comment records, and post an `## Unblocked` comment beside the `## Blocked` one naming this merge. Leave a ticket blocked for anything else as it is. The report names each ticket moved.
+
 ## 5. Report
 
-Return the pull request URL, the reviewed head, the merge commit, the verification evidence, the tracker result for every member, and any remaining cleanup. End with `Status: DONE`.
+Return the pull request URL, the reviewed head, the merge commit, the verification evidence, the tracker result for every member, and any remaining cleanup. Then name the tickets the merge unblocked on one line, `Unblocked: ACM-15, ACM-16`, or `Unblocked: none`, and end with `Status: DONE`. When the tracker cannot answer for them after the merge, write `Unblocked: unknown` and the reason instead; the merge still ends with `Status: DONE`.
 
 Never delete branches, remove the active worktree, or switch checkouts. Report the worktree's path for the user to remove when they are ready.
