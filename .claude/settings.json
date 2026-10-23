@@ -198,10 +198,10 @@
     "mode": "hold"
   },
   "skipDangerousModePermissionPrompt": true,
+  "theme": "custom:rogs",
   "editorMode": "normal",
   "autoCompactEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
-  "voiceEnabled": false,
-  "theme": "custom:rogs"
+  "voiceEnabled": false
 }
