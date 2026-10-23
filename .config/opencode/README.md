@@ -154,8 +154,8 @@ The main model and agent overrides in [opencode.json](opencode.json) are:
   "agents": {
     "plan": { "model": "openai/gpt-6.1-sol#max" },
     "build": { "model": "openai/gpt-6.1-sol#high" },
-    "title": { "model": "lazer/glm-5.3-flash" },
-    "explore": { "model": "lazer/glm-5.3-flash#low" },
+    "title": { "model": "lazer/deepseek-v4.1-flash-1017" },
+    "explore": { "model": "lazer/deepseek-v4.1-flash-1017#low" },
     "general": { "model": "openai/gpt-6.1-sol#high" }
   },
   "compaction": { "keep": { "tokens": 24000 } },
@@ -171,8 +171,8 @@ This is an excerpt, not a replacement for the complete file.
 | Plan agent | GPT-6.1 Sol with the `max` variant |
 | Build agent | GPT-6.1 Sol with the `high` variant |
 | General agent | GPT-6.1 Sol with the `high` variant |
-| Title agent | GLM 5.3 Flash through Lazer |
-| Explore agent | GLM 5.3 Flash with the `low` variant through Lazer |
+| Title agent | DeepSeek V4.1 Flash 1017 through Lazer |
+| Explore agent | DeepSeek V4.1 Flash 1017 with the `low` variant through Lazer |
 | Compaction tokens | 24,000 tokens of recent context retained by compaction |
 | Subagent depth | Experimental nesting limit set to `2` |
 
@@ -189,16 +189,15 @@ under `providers.lazer.models`.
 
 | Family | Configured model IDs |
 | --- | --- |
-| DeepSeek | `deepseek-v4-pro`, `deepseek-v4-flash`, `deepseek-v4.1-flash` |
-| Gemini | `gemini-3.1-pro`, `gemini-3.8-flash` |
-| Gemma | `gemma-4-31b` |
+| DeepSeek | `deepseek-v4-pro`, `deepseek-v4.1-flash-1017` |
+| Gemini | `gemini-4-argon`, `gemini-3.8-flash` |
 | GPT OSS | `gpt-oss-120b` |
 | GLM | `glm-5.3`, `glm-5.3-flash` |
 | Kimi | `kimi-k3` |
-| MiniMax | `minimax-m3` |
+| MiniMax | `minimax-m3.1-flash` |
 | Qwen | `qwen-3.7-plus`, `qwen-3.8-max` |
-| Claude | `claude-sonnet-5.5`, `claude-opus-5.5`, `claude-haiku-4.5` |
-| GPT | `gpt-5.6-terra`, `gpt-6-astra`, `gpt-6-sol`, `gpt-6.1-sol`, `gpt-6-luna` |
+| Claude | `claude-sonnet-5.5`, `claude-opus-5.5`, `claude-haiku-5.5` |
+| GPT | `gpt-5.6-terra`, `gpt-6-astra`, `gpt-6.1-sol`, `gpt-6-luna` |
 | Grok | `grok-4.7` |
 
 Each definition records capabilities, token limits, and pricing metadata. Most
@@ -207,7 +206,7 @@ model; check the individual entry before copying settings between models.
 DeepSeek V4 Pro is explicitly configured without tool support.
 
 Several models use `compatibility.reasoningField: "reasoning_content"`.
-Gemma and GPT OSS variants use `reasoning_effort`, while most other variant
+GPT OSS variants use `reasoning_effort`, while most other variant
 settings use `reasoningEffort`. Preserve these model-specific details when
 updating the catalog. Configured prices and limits are metadata, not a guarantee
 of the proxy's current billing or availability.
