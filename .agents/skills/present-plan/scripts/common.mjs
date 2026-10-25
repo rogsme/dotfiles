@@ -6,14 +6,41 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-export const SCHEMA = "rogs-skills/present-plan/1";
-export const RENDERER_VERSIONS = Object.freeze({ marked: "18.1.0", mermaid: "11.12.1" });
-export const VERSIONS = Object.freeze({ "lavish-axi": "0.1.89", ...RENDERER_VERSIONS });
+export const SCHEMA = "rogs-skills/present-plan/2";
+export const APP = "present-plan-viewer";
+export const DEFAULT_PORT = 4388;
+export const DEFAULT_LISTEN = "all";
+
+// Every file the page or the renderer loads from the CDN, at an exact version with its SRI hash.
+export const CDN = "https://cdn.jsdelivr.net/npm/";
+export const PINS = Object.freeze({
+  marked: { file: "marked@18.1.0/lib/marked.esm.js", integrity: "sha384-snMBC5fa3uu2TE5nbJfoysnXEnXn+BPEHkzGLpV/ptEaRtamTgxGuWQvm0LUGEP1" },
+  mermaid: { file: "mermaid@11.12.1/dist/mermaid.min.js", integrity: "sha384-LlKSgo4Eo5GuF/ZrstLti44dE+GC5XAJ7TSu0Nw9Q3vIZF2QMnkRcK7BUoLabYLF" },
+  fonts: [
+    { file: "@fontsource/fira-sans@5.2.7/latin-400.css", integrity: "sha384-zPaw5kB2GwP35DvNP/DulRjmoCoEwAIcuozJWvQnXxFSFN6VU4wGAYFgZCCUeWkk" },
+    { file: "@fontsource/fira-sans@5.2.7/latin-400-italic.css", integrity: "sha384-V6pdaq3LwsgY0Ys0N/tvOaGfvpDVUrqxqKPj4kBeRkGLUOQT/PImhuhbh20O7eHj" },
+    { file: "@fontsource/fira-sans@5.2.7/latin-700.css", integrity: "sha384-weHrQ2KhyfA8i7TjfIbufKDju7dI3XqiFWadqMFgTVUrX6AdQfLRcAC1DAITKo9S" },
+    { file: "@fontsource/roboto-mono@5.2.9/latin-400.css", integrity: "sha384-JFPHn4664qlsqgjWEgXFsgABYQWx0Pj5JCrm+GsFOXN6jI+pIMWr/g6yglRL3K/6" },
+    { file: "@fontsource/roboto-mono@5.2.9/latin-700.css", integrity: "sha384-Fx8lZDlFtHrHVrXa5xuu5AbcgcfBR0uaWdxH1EPltZfjRf5OF30Q9nWOF/Rbcypv" },
+  ],
+});
+
 export const digest = (value) => createHash("sha256").update(value).digest("hex");
+export const integrityOf = (value) => `sha384-${createHash("sha384").update(value).digest("base64")}`;
 export const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
 })[char]);
 export const inside = (parent, child) => child === parent || child.startsWith(parent + path.sep);
+
+const skillDirectory = fileURLToPath(new URL("..", import.meta.url));
+const VIEWER_FILES = ["scripts/common.mjs", "scripts/server.mjs", "assets/plan.html", "assets/viewer.css", "assets/viewer.js", "assets/tabs.js", "assets/diagrams.js"];
+
+// A running server reports this, so open can tell a server started from older skill files.
+export async function viewerVersion() {
+  const hash = createHash("sha256");
+  for (const file of VIEWER_FILES) hash.update(await readFile(path.join(skillDirectory, file)));
+  return hash.digest("hex").slice(0, 16);
+}
 
 // Node resolves symlinks in the entry module's URL, not in process.argv[1].
 export function invokedDirectly(moduleURL) {
@@ -38,8 +65,8 @@ export async function safePath(value) {
 
 // /tmp is a symlink on macOS, and safePath refuses symlinks, so resolve it first.
 export function defaultArtifactRoot() {
-  try { return path.join(realpathSync("/tmp"), "lavish"); }
-  catch { return path.join(realpathSync(os.tmpdir()), "lavish"); }
+  try { return path.join(realpathSync("/tmp"), "present-plan"); }
+  catch { return path.join(realpathSync(os.tmpdir()), "present-plan"); }
 }
 
 // In a shared parent such as /tmp another user can create the root first; refuse one this user does not own.
@@ -71,16 +98,8 @@ export async function atomicWrite(file, content, { exclusive = false } = {}) {
   }
 }
 
-export async function inspectRuntime(directory) {
+export function checkNode() {
   if (Number(process.versions.node.split(".")[0]) < 22) throw new Error("The presenter needs Node.js 22 or newer.");
-  const runtime = await safePath(directory);
-  for (const [name, version] of Object.entries(RENDERER_VERSIONS)) {
-    const file = path.join(runtime, "node_modules", name, "package.json");
-    await safePath(file);
-    const pkg = await readJSON(file).catch((error) => { throw new Error(`Runtime package ${name} is unavailable: ${error.message}`); });
-    if (pkg.name !== name || pkg.version !== version) throw new Error(`Runtime needs ${name}@${version}; found ${pkg.version || "unknown"}.`);
-  }
-  return runtime;
 }
 
 function git(directory, args) {
@@ -104,34 +123,37 @@ export async function inspectProject(repository, worktree) {
 
 export async function externalDirectory(directory, checkouts) {
   const result = await safePath(directory);
-  if (result === path.parse(result).root || result === os.homedir()) throw new Error("Use a dedicated artifact/runtime directory, not a filesystem root or home directory.");
+  if (result === path.parse(result).root || result === os.homedir()) throw new Error("Use a dedicated artifact directory, not a filesystem root or home directory.");
   for (const checkout of checkouts) {
-    if (inside(checkout, result) || inside(result, checkout)) throw new Error("Artifacts and runtime must stay outside every checkout, in a dedicated directory.");
+    if (inside(checkout, result) || inside(result, checkout)) throw new Error("Artifacts must stay outside every checkout, in a dedicated directory.");
   }
   return result;
 }
 
-export function identityOf({ repository, worktree, ticket, riders = [] }) {
+export function identityOf({ repository, worktree, ticket, riders = [], kind = "ticket" }) {
   if (typeof ticket !== "string" || !ticket.trim() || ticket.length > 200) throw new Error("Supply a ticket id or a short standalone plan name.");
   if (!Array.isArray(riders) || riders.some((id) => typeof id !== "string" || !id || id.length > 200)) throw new Error("Invalid bundle identity.");
-  return { repository, worktree, ticket, riders: [...new Set(riders)].sort() };
+  if (kind !== "ticket" && kind !== "standalone") throw new Error("A plan is either a ticket plan or a standalone document.");
+  if (kind === "standalone" && riders.length) throw new Error("A standalone document has no riders.");
+  return { repository, worktree, ticket, riders: [...new Set(riders)].sort(), kind };
 }
+
+export const SESSION_ID = /^[0-9a-f]{32}$/;
+export const sessionParent = (root, identity) => path.join(root, digest(identity.repository).slice(0, 16), digest(identity.ticket).slice(0, 16));
+export const revisionFile = (revision) => `revision-${String(revision).padStart(4, "0")}.md`;
 
 export async function loadSession(directory, { verifyContent = true } = {}) {
   const session = await safePath(directory);
   const manifest = await readJSON(path.join(session, "session.json")).catch((error) => { throw new Error(`Not an owned presenter session: ${error.message}`); });
   if (manifest.schema !== SCHEMA || manifest.session !== session || !Number.isInteger(manifest.revision) || manifest.revision < 1) throw new Error("Invalid presenter session manifest.");
+  if (!SESSION_ID.test(manifest.id || "") || typeof manifest.token !== "string" || manifest.token.length < 32) throw new Error("Invalid presenter session credentials.");
   const project = await inspectProject(manifest.identity.repository, manifest.identity.worktree);
   const root = await externalDirectory(manifest.artifactRoot, project.checkouts);
   if (!inside(root, session) || session === root) throw new Error("Session escapes its artifact root.");
   await checkOwnedDirectory(root);
-  await externalDirectory(manifest.runtime, project.checkouts);
-  await externalDirectory(manifest.stateDir, project.checkouts);
-  const expectedParent = path.join(root, digest(project.repository).slice(0, 16), digest(manifest.identity.ticket).slice(0, 16));
-  if (path.dirname(session) !== expectedParent || JSON.stringify(identityOf(manifest.identity)) !== JSON.stringify(manifest.identity)) throw new Error("Invalid session identity or location.");
-  if (!Number.isInteger(manifest.port) || manifest.port < 1024 || manifest.port > 65535) throw new Error("Invalid presenter port.");
+  if (path.dirname(session) !== sessionParent(root, manifest.identity) || JSON.stringify(identityOf(manifest.identity)) !== JSON.stringify(manifest.identity)) throw new Error("Invalid session identity or location.");
   if (verifyContent) {
-    const source = path.join(session, `revision-${String(manifest.revision).padStart(4, "0")}.md`);
+    const source = path.join(session, revisionFile(manifest.revision));
     await safePath(source);
     await safePath(path.join(session, "plan.html"));
     if (digest(await readFile(source)) !== manifest.sourceDigest || digest(await readFile(path.join(session, "plan.html"))) !== manifest.htmlDigest) throw new Error("An owned plan file was modified outside the renderer; preserve it and ask before replacing it.");
@@ -144,3 +166,7 @@ export async function makePrivateDirectory(directory) {
   await mkdir(directory, { recursive: true, mode: 0o700 });
   await safePath(directory);
 }
+
+// The viewer's own files under the artifact root: the session registry, preferences and the server log.
+export const viewerDirectory = (root) => path.join(root, "viewer");
+export const registryDirectory = (root) => path.join(viewerDirectory(root), "sessions");

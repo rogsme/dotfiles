@@ -1,12 +1,11 @@
 ## Plan presentation
 
-When plan presentation is on, start-ticket calls `present-plan` after optional plan review to display the complete settled report in a local browser. Plan review and presentation are independent features. A missing `Plan presentation` feature row means off.
+When plan presentation is on, start-ticket calls `present-plan` after optional plan review to display the complete settled report in its plan viewer, where the user comments on it and can approve it. Plan review and presentation are independent features. A missing `Plan presentation` feature row means off.
 
-- Presenter: `present-plan`, invoking pinned Lavish through `npx`. No local or global Lavish installation, upstream skill or global hook is required. Initial resolution may populate npm's cache.
-- Runtime: {{FILL: absolute private Marked/Mermaid renderer directory outside every checkout, containing the pinned renderer dependencies present-plan checks; no Lavish installation is needed}}.
-- Artifact root: {{FILL: absolute external directory allowed by the planning agent, owned by this user and writable by no one else; the default is /tmp/lavish}}.
-- Server state: {{FILL: absolute private external state directory, usually <runtime>/lavish-state}}.
-- Port: {{FILL: stable unprivileged local port, such as 4388 when free}}.
+- Presenter: `present-plan`'s viewer, plain JavaScript on Node.js 22+. It loads Marked, Mermaid and fonts from `cdn.jsdelivr.net` at pinned versions with integrity hashes, and installs nothing.
+- Artifact root: {{FILL: absolute external directory allowed by the planning agent, owned by this user and writable by no one else; the default is /tmp/present-plan}}.
+- Port: {{FILL: the stable unprivileged port every review shares, such as 4388 when free}}.
+- Listen: {{FILL: all to reach the viewer from other machines, loopback for this machine only, or one IP address}}.
 - Failure policy: return the complete canonical report in the terminal with `Not presented: <reason>`. Keep every review finding or `Not reviewed:` warning.
-- Approval: explicit approval in the agent conversation, tied to the current canonical plan. Browser feedback, closing a session and delivery receipts never approve or start implementation.
-- Privacy: local assets, telemetry off, loopback-only server, no hosted sharing. Preserve other sessions and private artifacts.
+- Approval: explicit approval in the agent conversation, or the viewer's Approve button on the current canonical revision and digest, which also starts `work-ticket`. Comments, a closed tab and an ended review never approve.
+- Privacy: each review link carries its own token, and the server answers only to it. With `Listen: all` the traffic is plain HTTP on the network. No hosted sharing. Preserve other reviews and private artifacts.

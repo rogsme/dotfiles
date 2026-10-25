@@ -1,5 +1,4 @@
-// Classic scripts work in Lavish's opaque-origin sandbox without CORS headers.
-// Without this script both views stay visible, one after the other.
+// Switches the Overview and Full plan tabs. Without this script both views stay visible, one after the other.
 (() => {
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   if (!tabs.length) return;

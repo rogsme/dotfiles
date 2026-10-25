@@ -115,9 +115,9 @@ Forge operations:
 | `## Client notes` | Only when client notes are on: where they live, what to read before planning, and how to cite them. |
 | `## Plan review` | Only when plan review is on: one row per planner vendor with the reviewer model and the command that runs it (`<brief>` marks where the brief's path goes), the time limit, the vendors that may receive the project's code and plans, and the reviewer's read-only access. |
 | `## Autonomous runs` | Only when autonomous runs are on: what an autonomous run is, the rules every lifecycle skill follows in it in place of asking the user, and this repository's hard stops. Autonomous runs need plan review and agent verification on. |
-| `## Plan presentation` | Only when plan presentation is on: the `present-plan` presenter using pinned npx execution for Lavish, checked external Marked/Mermaid renderer runtime, external artifact root permitted by the planning agent, private server state directory and port, terminal fallback policy, conversation-only approval and local-only data boundary. Lavish needs no local installation path. Presentation follows optional adversarial review and preserves its report or failure warning. |
+| `## Plan presentation` | Only when plan presentation is on: the `present-plan` viewer, the external artifact root permitted by the planning agent, the shared port and listen address, the terminal fallback policy, the approval rule (the conversation, or the viewer's Approve button on the current revision and digest) and the data boundary. Presentation follows optional adversarial review and preserves its report or failure warning. |
 
-Plan presentation is additive and optional under contract v1. It never changes the meaning of plan review or requires older projects to add a heading while the feature is absent or off. A presentation failure returns the complete report in the terminal; browser state and delivery receipts never authorize implementation. Planning may write private review artifacts outside every checkout, within the agent's allowed paths, while application files and tracker state stay unchanged.
+Plan presentation is additive and optional under contract v1. It never changes the meaning of plan review or requires older projects to add a heading while the feature is absent or off. A presentation failure returns the complete report in the terminal. Only the conversation or the viewer's Approve button on the current revision and digest authorizes implementation; comments and browser state never do. Planning may write private review artifacts outside every checkout, within the agent's allowed paths, while application files and tracker state stay unchanged.
 
 ## domain.md
 
@@ -209,7 +209,7 @@ An operation marked `Capability: Unsupported` still satisfies the heading check.
 | No threaded replies | Answer each thread with a conversation comment that quotes its `path:line` and links its first comment. |
 | Merges go through a queue or train | `finish-ticket` checks the packet, asks the user to merge through the queue or train, and completes the tickets on its next run, when it finds the pull request merged. |
 | No CI | Say so in the handoff and the review instead of linking checks. |
-| Plan presentation is unavailable or unsafe | Return `Not presented: <reason>` and the full canonical report in the terminal, preserving adversarial findings or `Not reviewed:`. Approval still happens in the conversation. |
+| Plan presentation is unavailable or unsafe | Return `Not presented: <reason>` and the full canonical report in the terminal, preserving adversarial findings or `Not reviewed:`. Approval then happens in the conversation. |
 
 ## Preflight (step 0 of every lifecycle skill)
 

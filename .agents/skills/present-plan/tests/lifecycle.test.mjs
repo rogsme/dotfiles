@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { VERSIONS } from "../scripts/common.mjs";
+import { PINS } from "../scripts/common.mjs";
 
 const root = fileURLToPath(new URL("../../..", import.meta.url));
 const start = await readFile(path.join(root, "lifecycle/start-ticket/SKILL.md"), "utf8");
@@ -102,21 +102,28 @@ test("every skill a runner starts follows workflow.md's autonomous runs section"
   }
 });
 
-test("lifecycle keeps review before presentation and approval outside browser state", async () => {
+test("lifecycle keeps review before presentation and approves only the current revision", async () => {
   const work = await readFile(path.join(root, "lifecycle/work-ticket/SKILL.md"), "utf8");
   assert.ok(start.indexOf('Skill tool with "review-plan"') < start.indexOf('Skill tool with "present-plan"'));
+  assert.ok(start.indexOf('Skill tool with "asd-ste100"') < start.indexOf("## 5. Review the plan"));
+  assert.match(start, /`Today ~~~ After`/);
   assert.match(start, /one round per human-requested candidate/);
   assert.match(start, /Not presented: <reason>/);
   assert.match(start, /Status: AWAITING_APPROVAL/);
-  assert.match(work, /delivery receipts are not approval/);
+  assert.match(start, /approval event with `"approval": true` for that exact revision and digest/);
+  assert.match(work, /approval event with `"approval": true` for that revision and digest/);
+  assert.match(work, /an approval of another revision are not approval/);
   assert.match(work, /Post the approved content.*never a temporary local link/);
 });
 
-test("recipes pin npx Lavish separately from the renderer packages", async () => {
-  const reference = await readFile(new URL("../references/lavish.md", import.meta.url), "utf8");
-  for (const [name, version] of Object.entries(VERSIONS)) assert.ok(reference.includes(`${name}@${version}`));
-  const install = reference.match(/^npm install .+$/m)?.[0];
-  assert.ok(install?.includes(`marked@${VERSIONS.marked}`));
-  assert.doesNotMatch(install, /lavish-axi/);
-  assert.match(reference, /npx --yes --ignore-scripts --package=lavish-axi@0\.1\.89 -- lavish-axi/);
+test("the Approve dialog says what the lifecycle promises", async () => {
+  const viewer = await readFile(new URL("../assets/viewer.js", import.meta.url), "utf8");
+  assert.ok(viewer.includes("`Approve revision ${revision} and start work-ticket?`"));
+  for (const text of [start, await readFile(new URL("../SKILL.md", import.meta.url), "utf8")]) assert.ok(text.includes('"Approve revision N and start work-ticket?"'));
+});
+
+test("the reference points at the pins, and every pin carries a SHA-384 hash", async () => {
+  const reference = await readFile(new URL("../references/viewer.md", import.meta.url), "utf8");
+  assert.match(reference, /`PINS` in `scripts\/common\.mjs`/);
+  for (const pin of [PINS.marked, PINS.mermaid, ...PINS.fonts]) assert.match(pin.integrity, /^sha384-[A-Za-z0-9+/]{64}$/);
 });

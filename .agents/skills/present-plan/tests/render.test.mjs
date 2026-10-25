@@ -1,15 +1,17 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { chmod, mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { defaultArtifactRoot } from "../scripts/common.mjs";
-import { parseArguments, renderMarkdown, renderPlan } from "../scripts/render_plan.mjs";
+import { CDN, PINS, defaultArtifactRoot } from "../scripts/common.mjs";
+import { loadMarked, parseArguments, renderMarkdown, renderPlan } from "../scripts/render_plan.mjs";
 
-const runtime = process.env.PRESENT_PLAN_RUNTIME;
-if (!runtime) throw new Error("Set PRESENT_PLAN_RUNTIME to the prepared runtime described in tests/README.md.");
+// One shared cache keeps the tests to a single CDN fetch; each fixture gets a copy of the checked file.
+const sharedRoot = path.join(os.tmpdir(), "present-plan-test-cache");
+const marked = await loadMarked(sharedRoot);
+const cachedMarked = path.join(sharedRoot, "cache", PINS.marked.file.replace(/[/@]/g, "_"));
 
 async function fixture(t, name = "project") {
   const root = await mkdtemp(path.join(os.tmpdir(), "present-plan-"));
@@ -19,7 +21,10 @@ async function fixture(t, name = "project") {
   execFileSync("git", ["init", "-q", "--initial-branch=ACM-123"], { cwd: repository });
   const source = path.join(root, "input.md");
   await writeFile(source, "# ACM-123: Add pagination\n\n## Goal\nKeep the existing response format.\n");
-  return { root, source, repository, worktree: repository, artifactRoot: path.join(root, "artifacts"), runtime, ticket: "ACM-123" };
+  const artifactRoot = path.join(root, "artifacts");
+  await mkdir(path.join(artifactRoot, "cache"), { recursive: true, mode: 0o700 });
+  await copyFile(cachedMarked, path.join(artifactRoot, "cache", path.basename(cachedMarked)));
+  return { root, source, repository, worktree: repository, artifactRoot, ticket: "ACM-123" };
 }
 
 test("renders the full plan and review table without replacing the verdict", async (t) => {
@@ -38,7 +43,8 @@ test("renders the full plan and review table without replacing the verdict", asy
   assert.match(html, /For you to decide/);
   assert.match(html, /verdict REVISE/);
   assert.doesNotMatch(html, /verdict SOUND/);
-  assert.match(html, /Approval stays in your agent conversation/);
+  assert.match(html, /data-session-kind="ticket"/);
+  assert.match(html, /id="pp-approve"/);
   assert.equal(result.revision, 1);
   assert.equal(result.sourceDigest.length, 64);
   assert.match(result.source, /revision-0001\.md$/);
@@ -50,7 +56,7 @@ test("keeps not-reviewed warnings visible and escapes executable content", async
     "# Review\n\nNot reviewed: reviewer timed out.\n\n" +
     "<script>globalThis.pwned = true</script>\n\n" +
     "[unsafe](javascript:alert(1)) ![remote](https://example.com/tracker.png)\n\n" +
-    "```js\nfetch('https://example.com/private')\n```\n", runtime,
+    "```js\nfetch('https://example.com/private')\n```\n", marked,
   );
   assert.match(result.html, /review-warning/);
   assert.match(result.html, /Not reviewed: reviewer timed out/);
@@ -63,7 +69,7 @@ test("keeps not-reviewed warnings visible and escapes executable content", async
 test("supports nested lists, quotes, tables, entities, and safe links", async () => {
   const result = await renderMarkdown(
     "# AT&T\n\nAT&T &amp; Acme &copy; &rarr;.\n\n1. First\n   - Child **bold** and *emphasis*.\n\n" +
-    "> Keep `API` stable.\n\n[reference](https://example.com/reference)\n\n---\n", runtime,
+    "> Keep `API` stable.\n\n[reference](https://example.com/reference)\n\n---\n", marked,
   );
   assert.match(result.html, /<ol/);
   assert.match(result.html, /<ul>/);
@@ -76,13 +82,13 @@ test("supports nested lists, quotes, tables, entities, and safe links", async ()
   assert.match(result.html, /<hr>/);
 });
 
-test("keeps network-capable Mermaid source as text without giving it to Lavish", async () => {
+test("keeps network-capable Mermaid source as text without giving it to Mermaid", async () => {
   for (const diagram of [
     'flowchart LR\n  api@{ img: "https://example.com/tracker.png" }',
     '%%{init: {"securityLevel": "loose"}}%%\nflowchart LR\n  A --> B',
     'flowchart LR\n  A[API]\n  click A "https://example.com"',
   ]) {
-    const result = await renderMarkdown("```mermaid\n" + diagram + "\n```\n", runtime);
+    const result = await renderMarkdown("```mermaid\n" + diagram + "\n```\n", marked);
     assert.equal(result.diagrams, 0);
     assert.doesNotMatch(result.html, /class="diagram"/);
     assert.match(result.html, /local-only/);
@@ -118,7 +124,7 @@ test("separates simultaneous reviews and repositories with the same basename", a
 
 test("refuses output inside any checkout of the repository", async (t) => {
   const options = await fixture(t);
-  await assert.rejects(renderPlan({ ...options, artifactRoot: path.join(options.repository, ".lavish") }), /outside.*checkout/i);
+  await assert.rejects(renderPlan({ ...options, artifactRoot: path.join(options.repository, ".plans") }), /outside.*checkout/i);
   execFileSync("git", ["-c", "user.name=Acme", "-c", "user.email=dev@example.com", "commit", "--allow-empty", "-qm", "Initial fixture"], { cwd: options.repository });
   const other = path.join(options.root, "ACM-124");
   execFileSync("git", ["worktree", "add", "-qb", "ACM-124", other], { cwd: options.repository });
@@ -140,7 +146,6 @@ test("refuses symlinked output roots and modified owned files", async (t) => {
 
 test("refuses to adopt an unrelated directory or a changed bundle", async (t) => {
   const options = await fixture(t);
-  await mkdir(options.artifactRoot);
   const unrelated = path.join(options.artifactRoot, "notes");
   await mkdir(unrelated);
   await writeFile(path.join(unrelated, "plan.html"), "Keep me");
@@ -149,32 +154,28 @@ test("refuses to adopt an unrelated directory or a changed bundle", async (t) =>
   await assert.rejects(renderPlan({ ...options, session: first.session, riders: ["ACM-125"] }), /identity|bundle/i);
 });
 
-test("copies a local classic Mermaid bundle for Lavish's opaque-origin sandbox", async (t) => {
+test("loads Mermaid from the CDN at its pinned version and hash", async (t) => {
   const options = await fixture(t);
   await writeFile(options.source, "# Architecture\n\n```mermaid\nflowchart LR\n  api[API] --> store[(Store)]\n```\n");
   const result = await renderPlan(options);
   const html = await readFile(result.html, "utf8");
-  assert.match(html, /class="diagram"/);
+  assert.match(html, /<figure data-diagram="1"><div class="diagram">/);
   assert.doesNotMatch(html, /class="mermaid"/);
   assert.match(html, /api\[API\] --&gt; store/);
-  assert.match(html, /src="assets\/diagrams\.js"/);
-  assert.match(html, /src="assets\/mermaid\/mermaid\.min\.js"/);
-  assert.doesNotMatch(html, /type="module"/);
-  assert.doesNotMatch(html, /src="https?:|href="https?:.*\.css/);
-  const files = await readdir(path.join(result.session, "assets", "mermaid"));
-  assert.ok(files.includes("mermaid.min.js"));
-  assert.ok(files.includes("LICENSE"));
-  const bundle = await readFile(path.join(result.session, "assets", "mermaid", "mermaid.min.js"), "utf8");
-  assert.doesNotMatch(bundle, /\bimport\s*\(/);
-  const loader = await readFile(path.join(result.session, "assets", "diagrams.js"), "utf8");
-  assert.match(loader, /securityLevel: "strict"/);
+  assert.ok(html.includes(`<script defer src="${CDN}${PINS.mermaid.file}" integrity="${PINS.mermaid.integrity}" crossorigin="anonymous"></script>`));
+  assert.match(html, /<script defer src="\/assets\/diagrams\.js"><\/script>\n  <script defer src="\/assets\/viewer\.js"><\/script>/);
+  assert.deepEqual((await readdir(result.session)).filter((name) => name === "assets"), []);
+  assert.match(await readFile(new URL("../assets/diagrams.js", import.meta.url), "utf8"), /securityLevel: "strict"/);
 });
 
-test("missing runtime and oversized sources fail before publication", async (t) => {
+test("a tampered Marked cache and oversized sources fail before publication", async (t) => {
   const options = await fixture(t);
-  await assert.rejects(renderPlan({ ...options, runtime: path.join(options.root, "missing") }), /runtime|marked|package/i);
   await writeFile(options.source, "x".repeat(1_048_577));
   await assert.rejects(renderPlan(options), /size|MiB|large/i);
+  await writeFile(options.source, "# ACM-123\n");
+  await writeFile(path.join(options.artifactRoot, "cache", path.basename(cachedMarked)), "export const marked = {};\n");
+  await assert.rejects(renderPlan(options), /pinned hash/);
+  assert.deepEqual((await readdir(options.artifactRoot)).sort(), ["cache"]);
 });
 
 test("rendering leaves the checkout and its index unchanged", async (t) => {
@@ -200,7 +201,7 @@ const overviewPlan = "# ACM-123: Pagination\n\nBundle of one: ACM-123.\n\n" +
 const panelOf = (html, name) => html.match(new RegExp(`<section id="panel-${name}"[^>]*>([\\s\\S]*?)</section>`))[1];
 
 test("splits a plan with an overview into an Overview tab and a Full plan tab", async () => {
-  const result = await renderMarkdown(overviewPlan, runtime);
+  const result = await renderMarkdown(overviewPlan, marked);
   assert.equal(result.tabs, true);
   assert.match(result.html, /role="tablist"/);
   const overview = panelOf(result.html, "overview");
@@ -221,53 +222,66 @@ test("splits a plan with an overview into an Overview tab and a Full plan tab", 
 });
 
 test("keeps a single page when the plan has no overview", async () => {
-  const result = await renderMarkdown("# ACM-123\n\n## Decision brief\nKeep the format.\n", runtime);
+  const result = await renderMarkdown("# ACM-123\n\n## Decision brief\nKeep the format.\n", marked);
   assert.equal(result.tabs, false);
   assert.doesNotMatch(result.html, /role="tab|data-panel/);
 });
 
 test("shows a Not reviewed warning on the Overview tab wherever the planner put it", async () => {
-  const result = await renderMarkdown("# ACM-123\n\nNot reviewed: reviewer timed out.\n\n## Overview\nShort.\n\n## Steps\n1. Do it.\n", runtime);
+  const result = await renderMarkdown("# ACM-123\n\nNot reviewed: reviewer timed out.\n\n## Overview\nShort.\n\n## Steps\n1. Do it.\n", marked);
   assert.match(panelOf(result.html, "overview"), /class="review-warning">Not reviewed: reviewer timed out/);
   assert.match(panelOf(result.html, "full"), /Not reviewed: reviewer timed out/);
 });
 
 test("styles review severities, decisions and the verdict without changing their text", async () => {
-  const result = await renderMarkdown(overviewPlan, runtime);
+  const result = await renderMarkdown(overviewPlan, marked);
   assert.match(result.html, /<p class="verdict verdict-revise">Plan review: reviewer \(another vendor\), verdict REVISE<\/p>/);
   assert.match(result.html, /<span class="badge sev-blocker">blocker<\/span>/);
   assert.match(result.html, /<span class="badge sev-nit">nit<\/span>/);
   assert.match(result.html, /<span class="badge dec-accept">Accept<\/span>/);
   assert.match(result.html, /<span class="badge dec-reject">Reject<\/span>/);
   assert.match(result.html, /<td>It fails today<\/td>/);
-  const other = await renderMarkdown("| Name | Decision |\n|---|---|\n| Old | Maybe |\n", runtime);
+  const other = await renderMarkdown("| Name | Decision |\n|---|---|\n| Old | Maybe |\n", marked);
   assert.doesNotMatch(other.html, /badge/);
 });
 
-test("renders a light page and copies the tab script once per session", async (t) => {
+test("pins the fonts, loads the tab script before Mermaid, and themes light and dark", async (t) => {
   const options = await fixture(t);
   await writeFile(options.source, overviewPlan);
   const first = await renderPlan(options);
   const html = await readFile(first.html, "utf8");
-  assert.match(html, /color-scheme: light;/);
-  assert.doesNotMatch(html, /prefers-color-scheme/);
-  assert.match(html, /<script src="assets\/tabs\.js"><\/script>\n  <script src="assets\/mermaid\/mermaid\.min\.js">/);
-  assert.match(await readFile(path.join(first.session, "assets", "diagrams.js"), "utf8"), /theme: "default"/);
-  assert.match(await readFile(path.join(first.session, "assets", "tabs.js"), "utf8"), /plan-tab-shown/);
+  for (const font of PINS.fonts) assert.ok(html.includes(`<link rel="stylesheet" href="${CDN}${font.file}" integrity="${font.integrity}" crossorigin="anonymous">`));
+  assert.match(html, /<script defer src="\/assets\/tabs\.js"><\/script>\n  <script defer src="https:\/\/cdn\.jsdelivr\.net\/npm\/mermaid@/);
+  assert.doesNotMatch(html, /data-theme=/);
+  const css = await readFile(new URL("../assets/viewer.css", import.meta.url), "utf8");
+  assert.match(css, /@media \(prefers-color-scheme: dark\) \{\n  :root:not\(\[data-theme="light"\]\)/);
+  assert.match(css, /:root\[data-theme="dark"\]/);
+  assert.match(css, /--green: #50fa7b/);
   await writeFile(options.source, overviewPlan + "\n## Verification\nRun the tests.\n");
   const second = await renderPlan({ ...options, session: first.session });
   assert.equal(second.revision, 2);
-  assert.equal(JSON.parse(await readFile(path.join(first.session, "session.json"), "utf8")).tabAssets, true);
+  const manifest = JSON.parse(await readFile(path.join(first.session, "session.json"), "utf8"));
+  assert.match(manifest.id, /^[0-9a-f]{32}$/);
+  assert.equal(JSON.parse(await readFile(path.join(first.session, "revision-0001.json"), "utf8")).id, manifest.id);
+  assert.equal(JSON.parse(await readFile(path.join(first.session, "revision-0001.json"), "utf8")).token, undefined);
 });
 
-test("defaults the artifact root to /tmp/lavish and refuses one others can write", async (t) => {
-  assert.equal(path.basename(defaultArtifactRoot()), "lavish");
+test("marks a standalone document and keeps riders off it", async (t) => {
+  const options = await fixture(t);
+  const result = await renderPlan({ ...options, ticket: "pagination-notes", standalone: true });
+  assert.match(await readFile(result.html, "utf8"), /data-session-kind="standalone"/);
+  await assert.rejects(renderPlan({ ...options, ticket: "pagination-notes", standalone: true, riders: ["ACM-124"] }), /standalone/);
+  await assert.rejects(renderPlan({ ...options, session: result.session }), /identity/);
+});
+
+test("defaults the artifact root to /tmp/present-plan and refuses one others can write", async (t) => {
+  assert.equal(path.basename(defaultArtifactRoot()), "present-plan");
   assert.equal(path.dirname(defaultArtifactRoot()), (await import("node:fs")).realpathSync("/tmp"));
   const options = await fixture(t);
   const { artifactRoot, ...rest } = options;
-  const args = Object.entries({ "--source": rest.source, "--repository": rest.repository, "--worktree": rest.worktree, "--ticket": rest.ticket, "--runtime": rest.runtime }).flat();
+  const args = Object.entries({ "--source": rest.source, "--repository": rest.repository, "--worktree": rest.worktree, "--ticket": rest.ticket }).flat();
   assert.equal(parseArguments(args).artifactRoot, undefined);
-  await mkdir(artifactRoot, { mode: 0o700 });
+  assert.equal(parseArguments([...args, "--standalone"]).standalone, true);
   await chmod(artifactRoot, 0o770);
   await assert.rejects(renderPlan(options), /no one else can write/);
   await chmod(artifactRoot, 0o755);

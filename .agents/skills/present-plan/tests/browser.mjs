@@ -1,33 +1,35 @@
 import assert from "node:assert/strict";
 import { execFile, execFileSync } from "node:child_process";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import http from "node:http";
 import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
+import { viewerDirectory } from "../scripts/common.mjs";
 import { renderPlan } from "../scripts/render_plan.mjs";
-import { checkServer, runLavish } from "../scripts/lavish.mjs";
+import { endReview, health, openReview, pollReview, replyReview } from "../scripts/viewer.mjs";
 
 const execute = promisify(execFile);
-const runtime = process.env.PRESENT_PLAN_RUNTIME;
-if (!runtime) throw new Error("Set PRESENT_PLAN_RUNTIME to the private prepared runtime.");
 const root = await mkdtemp(path.join(os.tmpdir(), "present-plan-browser-"));
 const browser = `present-plan-${process.pid}`;
 const opened = [];
 let browserOpened = false;
 let passed = false;
+let port;
+const artifactRoot = path.join(root, "plans");
 
 async function freePort() {
   const server = net.createServer();
   await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
-  const port = server.address().port;
+  const free = server.address().port;
   await new Promise((resolve) => server.close(resolve));
-  return port;
+  return free;
 }
 
 async function playwright(args) {
-  const result = await execute("playwright-cli", [`-s=${browser}`, ...args], { cwd: root, timeout: 90_000, maxBuffer: 2_097_152 });
+  const result = await execute("playwright-cli", [`-s=${browser}`, ...args], { cwd: root, timeout: 120_000, maxBuffer: 2_097_152 });
   if (/^### Error\b/m.test(result.stdout)) throw new Error(result.stdout);
   return result.stdout;
 }
@@ -44,6 +46,16 @@ async function browserCode(template, config) {
   return checks;
 }
 
+// The viewer outlives this script by design, so the test stops its own server through the owner's secret.
+async function stopServer() {
+  const { secret } = JSON.parse(await readFile(path.join(viewerDirectory(artifactRoot), "server.json"), "utf8"));
+  await new Promise((resolve, reject) => {
+    const call = http.request({ host: "127.0.0.1", port, method: "POST", path: "/shutdown", headers: { "Content-Type": "application/json" } }, (response) => { response.resume(); response.on("end", resolve); });
+    call.on("error", reject);
+    call.end(JSON.stringify({ secret }));
+  });
+}
+
 try {
   const repository = path.join(root, "Acme");
   await mkdir(repository);
@@ -52,55 +64,69 @@ try {
   const original = "# ACM-123: Pagination\n\n## Overview\nPreserve the current response format.\n\n" +
     "```mermaid\nflowchart LR\n  api[API] --> store[(Store)]\n```\n\n" +
     "Not reviewed: this is a synthetic browser fixture, not a real model review.\n\n" +
-    "## Implementation\n1. Validate the cursor.\n2. Read one page.\n\n" +
+    "## Implementation\n1. Validate the cursor.\n2. Read one page, as [the guide](https://example.com/guide) says.\n\n" +
     "## Data flow\n```mermaid\nflowchart LR\n  cursor[Cursor] --> page[Page]\n```\n\n" +
     "## Plan review\n| # | Severity | Finding | Decision |\n|---|---|---|---|\n| 1 | blocker | Empty page test | Accept |\n\n" +
-    "## Safety fixture\n<script>globalThis.presenterPwned = true</script>\n\n![remote](https://example.com/private.png)\n";
-  const networkDiagram = '\n## Network diagram fixture\n```mermaid\nflowchart LR\n  api@{ img: "https://example.com/tracker.png" }\n```\n';
-  await writeFile(source, original + networkDiagram);
-  const options = { source, repository, worktree: repository, runtime, artifactRoot: path.join(root, "plans"), stateDir: path.join(root, "state"), port: await freePort(), ticket: "ACM-123" };
+    "## Safety fixture\n<script>globalThis.presenterPwned = true</script>\n\n![remote](https://example.com/private.png)\n" +
+    '\n## Network diagram fixture\n```mermaid\nflowchart LR\n  api@{ img: "https://example.com/tracker.png" }\n```\n';
+  await writeFile(source, original);
+  const otherSource = path.join(root, "other.md");
+  await writeFile(otherSource, "# ACM-124: Export\n\n## Overview\nExport one page.\n");
+  port = await freePort();
+  const options = { source, repository, worktree: repository, artifactRoot, ticket: "ACM-123" };
   const plan = await renderPlan(options);
   opened.push(plan.session);
-  const open = await runLavish("open", { session: plan.session, noOpen: true });
-  assert.equal(open.complete, true);
-  const raw = await readFile(open.raw, "utf8");
-  const url = raw.match(/http:\/\/127\.0\.0\.1:\d+\/session\/[^\s"<>]+/)?.[0];
-  assert.ok(url, `Open did not return a session URL: ${raw}`);
-  const another = await renderPlan({ ...options, ticket: "ACM-124" });
+  const open = await openReview({ session: plan.session, port, listen: "loopback", noOpen: true });
+  assert.equal(open.server, "started");
+  const url = open.urls[0].url;
+  const another = await renderPlan({ ...options, source: otherSource, ticket: "ACM-124" });
   opened.push(another.session);
-  assert.equal((await runLavish("open", { session: another.session, noOpen: true })).complete, true);
+  const second = await openReview({ session: another.session, port, listen: "loopback", noOpen: true });
+  assert.equal(second.server, "reused");
   await playwright(["open", "about:blank"]);
   browserOpened = true;
-  const poll = runLavish("poll", { session: plan.session });
+
+  const poll = pollReview({ session: plan.session });
   const checks = await browserCode("browser_checks.js", { url });
   const feedback = await poll;
-  assert.equal(feedback.complete, true);
+  assert.equal(feedback.event.type, "feedback");
   assert.equal(feedback.approval, false);
-  const feedbackText = await readFile(feedback.raw, "utf8");
-  assert.match(feedbackText, /Keep the response format stable/);
-  assert.match(feedbackText, /Split the API box/);
-  assert.match(feedbackText, /mermaid-node/);
-  const reply = path.join(plan.session, "reply.md");
-  await writeFile(reply, "Recorded the compatibility constraint and diagram feedback. Waiting for approval in the conversation.\n");
-  assert.equal((await runLavish("reply", { session: plan.session, replyFile: reply })).complete, true);
-  await writeFile(source, original + networkDiagram + "\n## Revision check\nThe second revision preserves the response contract.\n");
+  const comments = feedback.event.comments;
+  assert.deepEqual(comments.map((comment) => comment.target.kind), ["word", "box", "diagram", "text"]);
+  assert.equal(comments[1].target.label, "API");
+  assert.equal(comments[3].target.quote.includes("Empty page test"), true);
+  assert.ok(comments.every((comment) => comment.revision === 1 && comment.tab === "overview"));
+  assert.deepEqual(comments[3].headings, ["ACM-123: Pagination", "Plan review"]);
+
+  const reply = path.join(plan.session, "reply.json");
+  await writeFile(reply, JSON.stringify({
+    batch: feedback.event.seq, message: "Updated the overview.",
+    answers: comments.map((comment, index) => ({ id: comment.id, outcome: index % 2 ? "kept" : "changed", text: index % 2 ? "The plan already covers it." : "Added to revision 2." })),
+  }));
+  await writeFile(source, original + "\n## Revision check\nThe second revision preserves the response contract.\n");
   const updated = await renderPlan({ ...options, session: plan.session });
   assert.equal(updated.revision, 2);
-  const finalPoll = runLavish("poll", { session: plan.session });
-  const finalChecks = await browserCode("browser_finish.js", { revision: 2 });
-  const ended = await finalPoll;
-  assert.equal(ended.complete, true);
-  assert.equal(ended.approval, false);
-  assert.match(await readFile(ended.raw, "utf8"), /session_ended: true/);
-  assert.ok(await checkServer(options), "Ending one review stopped the other review's server.");
+  assert.deepEqual((await replyReview({ session: plan.session, replyFile: reply })).pending, []);
+
+  const approval = pollReview({ session: plan.session });
+  const finalChecks = await browserCode("browser_finish.js", { revision: 2, otherUrl: second.urls[0].url });
+  const approved = await approval;
+  assert.equal(approved.event.type, "approval");
+  assert.equal(approved.approval, true);
+  assert.equal(approved.event.revision, 2);
+  assert.equal(approved.event.sourceDigest, updated.sourceDigest);
+
+  await endReview({ session: plan.session });
+  assert.equal((await health({ port, listen: "loopback" })).openSessions, 1, "Ending one review closed the other.");
   assert.equal(execFileSync("git", ["status", "--porcelain"], { cwd: repository, encoding: "utf8" }), "");
   console.log(checks);
   console.log(finalChecks);
-  console.log("PASS: real Lavish annotation, Overview and Full plan tabs, diagram box note, local assets, responsive layout, revision reload, and non-approval end; another session stayed available.");
+  console.log("PASS: comment targets, batch send, answers on live reload, theme memory across reviews, Approve, and a second review kept open.");
   passed = true;
 } finally {
   if (browserOpened) await playwright(["close"]).catch((error) => console.error(`Browser cleanup: ${error.message}`));
-  for (const session of opened) await runLavish("end", { session }).catch((error) => console.error(`Owned-session cleanup: ${error.message}`));
+  for (const session of opened) await endReview({ session }).catch((error) => console.error(`Owned-session cleanup: ${error.message}`));
+  if (port) await stopServer().catch((error) => console.error(`Server cleanup: ${error.message}`));
   if (passed) await rm(root, { recursive: true, force: true });
   else console.error(`Browser evidence retained at ${root}`);
 }

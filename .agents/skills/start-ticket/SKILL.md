@@ -113,6 +113,10 @@ Open the report with `## Overview`, written for a person who has not read the co
 
 Keep diagrams local-only: no URLs, images, icons or `%%{` directives, or the presenter shows them as source text. Every claim in the overview restates a detail below it.
 
+Draw a before-and-after diagram today first. Mermaid draws unlinked subgraphs in reverse order, so link them with an invisible link: a `flowchart TB` holding a `Today` subgraph, then an `After` subgraph, each with `direction LR`, and the line `Today ~~~ After` after both.
+
+Call the Skill tool with "asd-ste100" to write the overview's prose and its diagram box labels in Simplified Technical English, in every run. The rest of the report keeps its code references in plain technical prose.
+
 After the overview, report:
 
 - The title, current state, dependencies and acceptance criteria of the lead and of every rider, naming the bundle first.
@@ -134,11 +138,11 @@ When plan review is off, mark the report `Not reviewed: plan review is off in th
 
 When plan presentation is on, outside an unattended run, call the Skill tool with "present-plan" after step 5, handing over the complete settled report, the unchanged review section or warning, the main repository and worktree roots, the lead and riders, and `## Plan presentation` settings. A missing feature row means off. When off, return the report in the terminal as before.
 
-For browser feedback, verify each request against the ticket, code and recorded decisions before revising the canonical report. A substantive human-requested change creates a new finished candidate: when plan review is on, call the Skill tool with "review-plan" once for that candidate, settle its findings, then call the Skill tool with "present-plan" for the same owned session. This is one round per human-requested candidate, never an automatic review retry loop. Layout-only changes preserve the plan and review result without another model review. Ask about stale or ambiguous feedback instead of applying it to a newer revision.
+For each comment batch from the viewer, verify each request against the ticket, code and recorded decisions before revising the canonical report. A substantive human-requested change creates a new finished candidate: when plan review is on, call the Skill tool with "review-plan" once for that candidate, settle its findings, then call the Skill tool with "present-plan" for the same owned session. This is one round per human-requested candidate, never an automatic review retry loop. Layout-only changes preserve the plan and review result without another model review. Ask about stale or ambiguous feedback instead of applying it to a newer revision. Answer every comment of the batch through present-plan, including the ones that change nothing: the viewer keeps Approve disabled until each batch has its answer.
 
-When presentation succeeds, return a short handoff with the ticket/bundle, current canonical source path and revision/digest, browser URL and HTML path, adversarial-review outcome, and remaining questions. Keep rejected blockers or risks available in the browser and identify any still needing a decision. Do not repeat the full report unless requested. When presentation fails, return `Not presented: <reason>` and the complete report, retaining the review table or `Not reviewed:` line.
+When presentation succeeds, return a short handoff with the ticket/bundle, current canonical source path and revision/digest, review links and HTML path, adversarial-review outcome, and remaining questions. Keep rejected blockers or risks available in the browser and identify any still needing a decision. Do not repeat the full report unless requested. When presentation fails, return `Not presented: <reason>` and the complete report, retaining the review table or `Not reviewed:` line.
 
-Browser feedback, closing the review, `Send & End`, and delivery receipts do not approve a plan. Wait for explicit approval of the current canonical content in this conversation; the user still starts `work-ticket` separately. End every completed handoff with `Status: AWAITING_APPROVAL`.
+End every completed handoff with `Status: AWAITING_APPROVAL`, and keep polling the viewer as present-plan describes. The user approves the current canonical content in one of two ways: in this conversation, or with the viewer's Approve button, which present-plan returns as an approval event with `"approval": true` for that exact revision and digest. The button asks "Approve revision N and start work-ticket?", so treat that event as the user's message approving the revision and starting the work phase. Comments, a closed tab, an ended review and an approval of an older revision approve nothing.
 
 Never edit application files, create commits, push, or open a pull request in this phase, even when the session can write. Wait for the user to approve the plan and explicitly start the work phase.
 

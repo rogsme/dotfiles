@@ -1,64 +1,34 @@
 <!doctype html>
 <!-- rogs-skills present-plan: canonical Markdown, rendered locally -->
-<html lang="en" data-plan-revision="{{REVISION}}" data-plan-digest="{{DIGEST}}">
+<html lang="en" data-plan-revision="{{REVISION}}" data-plan-digest="{{DIGEST}}" data-session-kind="{{KIND}}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' http://127.0.0.1:*; style-src 'self' 'unsafe-inline' http://127.0.0.1:*; img-src 'self' data: blob: http://127.0.0.1:*; font-src 'self' data: http://127.0.0.1:*; connect-src http://127.0.0.1:* ws://127.0.0.1:*; frame-src http://127.0.0.1:*; worker-src blob:; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
   <title>{{TITLE}} | Plan review</title>
-  <style>
-    :root { color-scheme: light; --paper:#faf9f6; --ink:#202824; --muted:#59645e; --line:#d8dfd9; --accent:#17614b; --card:#fff; --code:#eff3ef; --warning:#fff3d2;
-      --red:#9b1c1c; --red-bg:#fde2e1; --amber:#7a4b00; --amber-bg:#fdedc8; --blue:#1f4f8a; --blue-bg:#e1ecfa; --green:#17614b; --green-bg:#dcf1e6; --grey:#4b5560; --grey-bg:#eceff1; }
-    * { box-sizing:border-box; min-width:0; }
-    html { scroll-behavior:smooth; scroll-padding-top:2rem; background:var(--paper); }
-    body { margin:0; color:var(--ink); background:var(--paper); font:17px/1.65 system-ui,sans-serif; overflow-wrap:anywhere; }
-    header { max-width:1400px; margin:auto; padding:3rem 2rem 1.5rem; border-bottom:1px solid var(--line); }
-    header p { margin:.5rem 0; }
-    .eyebrow { color:var(--accent); font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; }
-    .approval { padding:.8rem 1rem; background:var(--code); border-radius:8px; }
-    .layout { display:grid; grid-template-columns:230px minmax(0,900px); justify-content:center; gap:3rem; max-width:1400px; margin:auto; padding:2rem; }
-    nav { position:sticky; top:1.5rem; align-self:start; max-height:85vh; overflow:auto; font-size:.85rem; }
-    nav a { display:block; margin:.45rem 0; text-decoration:none; color:var(--muted); }
-    nav a:hover { color:var(--accent); }
-    nav .depth-1 { font-weight:600; } nav .depth-3,nav .depth-4 { padding-left:.7rem; }
-    article { padding-bottom:3rem; }
-    h1,h2,h3,h4 { line-height:1.25; letter-spacing:-.025em; } h1 { font-size:2rem; } h2 { margin:2.5rem 0 1rem; font-size:1.5rem; padding-top:1rem; border-top:1px solid var(--line); }
-    h3 { margin-top:2rem; } a { color:var(--accent); } li { margin:.4rem 0; } li p { margin:.25rem 0; }
-    code { font:.86em/1.6 ui-monospace,monospace; background:var(--code); padding:.15em .35em; border-radius:4px; }
-    pre { background:var(--code); padding:1.1rem; border-radius:8px; overflow:auto; white-space:pre-wrap; } pre code { padding:0; }
-    .table-scroll { overflow:auto; margin:1.4rem 0; border:1px solid var(--line); border-radius:8px; }
-    table { border-collapse:collapse; width:100%; font-size:.9rem; } th,td { text-align:left; vertical-align:top; padding:.8rem; border-bottom:1px solid var(--line); } th { background:var(--code); }
-    blockquote { margin-left:0; border-left:3px solid var(--accent); padding-left:1rem; color:var(--muted); }
-    .review-warning { padding:1rem; background:var(--warning); border-left:4px solid var(--accent); border-radius:4px; }
-    figure { margin:1.5rem 0; padding:1rem; border:1px solid var(--line); border-radius:8px; background:var(--card); overflow:auto; }
-    .diagram { white-space:pre-wrap; font:14px/1.5 ui-monospace,monospace; } .diagram svg { max-width:100%; height:auto; } .diagram g.node { cursor:pointer; }
-    .tabs { display:flex; gap:.25rem; margin:1.5rem 0 1rem; border-bottom:1px solid var(--line); }
-    .tabs button { font:inherit; font-size:.95rem; font-weight:600; color:var(--muted); background:none; border:0; border-bottom:3px solid transparent; padding:.6rem 1rem; cursor:pointer; }
-    .tabs button[aria-selected="true"] { color:var(--accent); border-bottom-color:var(--accent); }
-    .tabs button:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-    [role="tabpanel"] > h2:first-child { border-top:0; margin-top:1rem; }
-    .badge { display:inline-block; padding:.1rem .55rem; border-radius:999px; font-size:.8rem; font-weight:600; white-space:nowrap; }
-    .sev-blocker { color:var(--red); background:var(--red-bg); } .sev-risk { color:var(--amber); background:var(--amber-bg); } .sev-nit { color:var(--grey); background:var(--grey-bg); }
-    .dec-accept { color:var(--green); background:var(--green-bg); } .dec-refine { color:var(--blue); background:var(--blue-bg); } .dec-reject { color:var(--red); background:var(--red-bg); }
-    .verdict { padding:.8rem 1rem; border-radius:8px; border-left:5px solid; font-weight:600; }
-    .verdict-sound { color:var(--green); background:var(--green-bg); } .verdict-revise { color:var(--amber); background:var(--amber-bg); } .verdict-rethink { color:var(--red); background:var(--red-bg); }
-    figcaption,.image-reference,details { color:var(--muted); font-size:.85rem; } figcaption { margin-top:.75rem; }
-    details { margin-top:1rem; } summary { cursor:pointer; } hr { border:0; border-top:1px solid var(--line); margin:2rem 0; }
-    @media(max-width:850px) { header { padding:1.5rem 1rem; } .layout { display:block; padding:1rem; } nav { position:static; max-height:none; margin-bottom:2rem; } }
-    @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
-    @media print { nav { display:none; } .layout { display:block; } }
-  </style>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Crect width=%2716%27 height=%2716%27 rx=%273%27 fill=%27%23202124%27/%3E%3Ctext x=%278%27 y=%2712.5%27 font-family=%27monospace%27 font-size=%2712%27 font-weight=%27700%27 text-anchor=%27middle%27 fill=%27%2350fa7b%27%3E%23%3C/text%3E%3C/svg%3E">
+  {{FONTS}}
+  <link rel="stylesheet" href="/assets/viewer.css">
 </head>
 <body>
-  <header>
-    <p class="eyebrow">Implementation plan | {{TICKET}} | Revision {{REVISION}}</p>
-    <p class="approval">Approval stays in your agent conversation. Sending feedback or ending this review does not authorize implementation.</p>
-    <details><summary>Canonical source and revision</summary><p><a href="{{SOURCE}}">Read the exact Markdown source</a></p><p>SHA-256: <code>{{DIGEST}}</code></p><p>{{LOCATION}}</p></details>
+  <header class="topbar">
+    <div class="topbar-title"><span class="prompt">~/</span><strong>{{TITLE}}</strong><span class="chip">rev {{REVISION}}</span></div>
+    <div class="topbar-actions">
+      <span id="pp-hint" class="hint" role="status"></span>
+      <button type="button" id="pp-comment" aria-pressed="false" aria-keyshortcuts="c" disabled>Comment<span class="count" hidden></span></button>
+      <button type="button" id="pp-theme" aria-label="Switch between light and dark mode"></button>
+      <button type="button" id="pp-approve" class="primary" disabled>Approve</button>
+    </div>
   </header>
+  <div id="pp-banner" role="status" hidden></div>
   <div class="layout">
     <nav aria-label="Plan sections">{{TOC}}</nav>
-    <article>{{CONTENT}}</article>
+    <article>
+      <p class="eyebrow">Plan review | {{TICKET}} | Revision {{REVISION}}</p>
+      <details class="source-details"><summary>Canonical source and revision</summary><p><a href="source">Read the exact Markdown source</a></p><p>SHA-256: <code>{{DIGEST}}</code></p><p>{{LOCATION}}</p></details>
+      {{CONTENT}}
+    </article>
   </div>
   {{SCRIPTS}}
 </body>

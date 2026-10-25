@@ -57,7 +57,7 @@ Read only. Run every command from the repository root (`git rev-parse --show-top
 - Autonomous runs: the base branch's protection rules (a required approval keeps an autonomous run from merging), and agent docs or ticket conventions that keep a person in the loop. A missing feature row means off.
 - Agent verification: whether the `verify-pr` skill is installed, and whether `playwright-cli` and its skill are present for procedures that drive pages. A missing feature row means off.
 - Changelog: a `CHANGELOG.md` or release notes in the repository, a changelog tool's configuration, and `## Changelog` sections in recent pull request bodies. A missing feature row means off.
-- Plan presentation: an existing `## Plan presentation` section, `npx` availability, a separately prepared Marked/Mermaid renderer runtime, an external artifact root allowed by the planning agent, and the state directory/port of any existing presentation service. Lavish runs through pinned `npx`, not a local installation. A missing feature row means off. Call the Skill tool with "present-plan" for a check-only probe when paths are known; it owns the concrete commands and setup notes. Its version probe may populate npm's cache. Make no local installation, open no review, and preserve shared services and global agent settings.
+- Plan presentation: an existing `## Plan presentation` section, Node.js 22+, an external artifact root allowed by the planning agent, the port and listen address, and whatever already holds that port. A missing feature row means off. Call the Skill tool with "present-plan" for a check-only probe when paths are known; it owns the concrete commands. Open no review, and preserve other services on the port.
 
 ## Installed skills
 
