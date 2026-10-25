@@ -37,6 +37,7 @@ need workflow.md workflow "## Features" "## Worktrees" "## Verification" "## Com
 need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Browser pass" && { has issue-tracker.md "### attach"; has forge.md "### attach"; need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"; }
+on "Autonomous runs" && has workflow.md "## Autonomous runs"
 grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
 true'
 ```
@@ -55,6 +56,8 @@ When the check reports files missing here that exist in the main worktree (the f
 From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `reply`, `push`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
+When the request says the run is autonomous, follow [Autonomous runs](#autonomous-runs) in place of every question below.
 
 ## 1. Verify the branch and the pull request
 
@@ -80,7 +83,7 @@ Every run syncs before it collects feedback, including a run after a review or a
 
 1. Confirm the worktree is clean apart from explicitly unrelated pre-existing files.
 2. Fetch the base and read the pull request with `read-pr`. When `<remote>/<base>` is an ancestor of `HEAD` and the pull request does not conflict, the branch is up to date: continue with step 4.
-3. Otherwise sync per `## Sync`: merge the base. When the merge stops on conflicts, call the Skill tool with "resolving-merge-conflicts" with the constraints that it stays a merge, stages only resolved paths and asks about any hunk that decides product behavior; then conclude it with `git commit --no-edit`.
+3. Otherwise sync per `## Sync`: merge the base. When the merge stops on conflicts, resolve each conflict from what both sides meant, keeping it a merge, staging only resolved paths and asking about any hunk that decides product behavior; then conclude it with `git commit --no-edit`.
 4. Rerun the focused checks for the code the merge changed. Commit nothing beyond the merge.
 
 The merge stays local until step 6 pushes it with the round's fixes, or step 4 pushes it alone when no feedback is waiting.
@@ -89,7 +92,7 @@ The merge stays local until step 6 pushes it with the round's fixes, or step 4 p
 
 Refresh and record the pull request number and head commit, then collect every channel with `feedback`: each inline review comment and its replies, review-summary bodies (including requested changes outside the diff), conversation comments, and thread states. Keep the comment ids, so replies land in the original threads.
 
-A reply this skill posted starts with one of the four prefixes in step 7. Treat a comment as answered when such a reply follows it, unless the reviewer added new feedback after that reply. A conversation comment from `finish-ticket` recording a failed human verification step (`HUMAN_QA_FAILED`) is feedback like any other.
+A reply this skill posted starts with one of the four prefixes in step 7. Treat a comment as answered when such a reply follows it, unless the reviewer added new feedback after that reply. A conversation comment from `finish-ticket` recording a failed human verification step (`HUMAN_QA_FAILED`) is feedback like any other. So is a `verify-pr` report that says `Verification: FAILED`: each step it marks `FAILED` is one point, with the expected result and the observation as its evidence, and a step it marks `NOT RUN` is no point at all.
 
 When there is no unanswered feedback:
 
@@ -113,7 +116,7 @@ An accepted finding whose fix waits on a blocker, such as another ticket that ha
 
 ## 6. Implement the accepted fixes
 
-Fix each accepted issue at its shared root cause, with the smallest regression test; in the test-first areas `## Verification` lists, call the Skill tool with "tdd" for it. When an accepted bug's root cause is not evident from the comment and the code, as with a failed human verification step, call the Skill tool with "diagnosing-bugs" first. Preserve unrelated work, and follow `AGENTS.md` (or `CLAUDE.md`) and the rule files `## Project rules` lists for the touched areas.
+Fix each accepted issue at its shared root cause, with the smallest regression test; in the test-first areas `## Verification` lists, call the Skill tool with "tdd" for it. When an accepted bug's root cause is not evident from the comment and the code, as with a failed human verification step or a step `verify-pr` reports failed, call the Skill tool with "diagnosing-bugs" first. Preserve unrelated work, and follow `AGENTS.md` (or `CLAUDE.md`) and the rule files `## Project rules` lists for the touched areas.
 
 Commit each fix with its test as one unit: state the exact paths, the constraints (never amend; no AI attribution and no co-author trailers unless `## Commits` says otherwise; never bypass a hook; leave every other path untouched) and the intent, then call the Skill tool with "commit" and confirm the commit with `git log`. Create no commit for a rejected or no-code-change comment.
 
@@ -164,6 +167,14 @@ Two rounds is the hard cap for one run of this skill. An automated reviewer can 
 ## Report
 
 Return whether step 3 merged the base, the classifications, the commits, the push result, the verification performed, links to the replies, and any behavior intentionally left unchanged. When there was no feedback, return the new head and its CI result instead, or that the branch was already up to date. End with `Status: READY_FOR_REVIEW`, so a fresh review session can revalidate the head and resolve the threads.
+
+## Autonomous runs
+
+An autonomous run is one whose request says "This run is autonomous". Follow `## Autonomous runs` in `workflow.md` in place of every step that asks the user, and stop with `Status: BLOCKED` when the row for autonomous runs is off or that section is missing. In this skill:
+
+- Divergence, overlapping uncommitted work, or a member in an unexpected state ends the run with `Status: BLOCKED`.
+- A decision that needs product policy, and a merge-conflict hunk that decides product behavior, are settled as `## Autonomous runs` says: record the assumption in the reply that makes it and in the pull request's `## Assumptions` section.
+- A finding that names a hard stop, or a fix that would touch one, marks the ticket blocked as [Blocked tickets](#blocked-tickets) says, naming the hard stop.
 
 ## Blocked tickets
 

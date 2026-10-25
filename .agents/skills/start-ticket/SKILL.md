@@ -39,6 +39,7 @@ on "Client notes" && has workflow.md "## Client notes"
 on "Plan review" && has workflow.md "## Plan review"
 on "Plan presentation" && has workflow.md "## Plan presentation"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
+on "Autonomous runs" && has workflow.md "## Autonomous runs"
 true'
 ```
 
@@ -53,11 +54,11 @@ Status: SETUP_REQUIRED
 
 When the check reports files missing here that exist in the main worktree (the first entry of `git worktree list --porcelain`), the second line says instead: "The configuration exists in <path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch." When it reports a version, the second line says: "The configuration is version <n>; this skill expects version 1.", followed by "Run /setup-rogs here to update it." for an older version or "Run `npx skills update` to update the installed skills." for a newer one.
 
-From here on, "the tracker", "the forge" and every operation named in backticks (`load`, `list-in-flight`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill, apart from the state moves in step 2 and the comments [Blocked tickets](#blocked-tickets) asks for. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
+From here on, "the tracker", "the forge" and every operation named in backticks (`load`, `list-in-flight`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill, apart from the state moves in step 2, the comments [Blocked tickets](#blocked-tickets) asks for, and, in an autonomous run, the `## Autonomous run` comment. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
 ## 1. Verify the ticket worktree
 
-Extract the full ticket id from the request, in the format `## Tracker` gives. Ask when it is missing or ambiguous. When the request says the run is unattended, follow [Unattended runs](#unattended-runs) from here on.
+Extract the full ticket id from the request, in the format `## Tracker` gives. Ask when it is missing or ambiguous. When the request says the run is unattended, follow [Unattended runs](#unattended-runs) from here on; when it says the run is autonomous, follow [Autonomous runs](#autonomous-runs), which replaces Unattended runs when the request says both.
 
 Before reading the tracker:
 
@@ -148,6 +149,16 @@ An unattended run is one whose request says so. The runner that sent the request
 - Ask every question through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode): a pending question is what the runner watches for. Without such a tool, ask in plain text and end the turn there, with no status line.
 - Settle everything before the handoff. Every remaining question, open decision and review finding left for the user becomes a question asked that way, and its answer goes into the report. An answer that changes the plan substantively is a human-requested change: give it the single review round step 6 describes. `Status: AWAITING_APPROVAL` then means nothing is left to decide.
 - Skip plan presentation even when it is on, since nobody watches the browser. Return the complete report in the terminal, with its review section or `Not reviewed:` line, marked `Not presented: unattended run.`
+
+## Autonomous runs
+
+An autonomous run is one whose request says "This run is autonomous". Follow `## Autonomous runs` in `workflow.md` in place of every step that asks the user, and stop with `Status: BLOCKED` when the row for autonomous runs is off or that section is missing. The user starts nothing else and reads nothing before the merge, so:
+
+- Before any tracker write, require the `Plan review` and `Agent verification` rows on as well. Otherwise stop with `Status: BLOCKED` and a `Reason:` naming the row that is off.
+- Right after the step 2 move to `in-progress`, post an `## Autonomous run` comment on the lead with `comment`, with a pointer naming the lead on each rider. It records that the user started this ticket as an autonomous run, quotes the request, and gives the date. `finish-ticket` reads it as the user's merge authorization. Read it back.
+- Settle every remaining question, open decision and review finding left for the user as `## Autonomous runs` says, and list each in the plan under `## Assumptions`, with its evidence. A plan that would touch a hard stop marks the ticket blocked, as [Blocked tickets](#blocked-tickets) says, naming the hard stop.
+- Plan review must succeed: when `review-plan` hands the plan back with a `Not reviewed:` line, stop with `Status: BLOCKED` and that line as the `Reason:`. On `RETHINK`, rework the approach when the reviewer's case holds; otherwise keep it and record the reviewer's case as an assumption.
+- Skip plan presentation. Return the complete report in the terminal, marked `Not presented: autonomous run.`, and end with `Status: AWAITING_APPROVAL`: the runner approves the plan, and nothing is left to decide.
 
 ## Blocked tickets
 

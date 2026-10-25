@@ -10,7 +10,7 @@ metadata:
 
 TDD is the red-green loop. This skill is the reference that makes that loop produce tests worth keeping: what a good test is, where tests go, the anti-patterns, and the rules of the loop. Every section applies on every cycle: consult them before and during the loop, not after.
 
-When exploring the codebase, read the project's domain glossary and the ADRs in the area you're touching, so test names and interface vocabulary match the project's domain language and the tests respect recorded decisions. When the project has a `docs/agents/domain.md`, it says where those live; otherwise look for `CONTEXT.md` or `GLOSSARY.md` at the repository root and ADRs under `docs/adr/`.
+When exploring the codebase, read the project's domain glossary and the ADRs in the area you're touching, so test names and interface vocabulary match the project's domain language and the tests respect recorded decisions. When the project has a `docs/agents/domain.md`, it says where those live; otherwise look for `GLOSSARY.md` or `CONTEXT.md` at the repository root and ADRs under `docs/adr/`.
 
 ## What a good test is
 
@@ -28,7 +28,7 @@ When a plan the user already approved names the seams (a ticket's approved imple
 
 Ask: "What's the public interface, and which seams should we test?" Give each proposed seam a one-line note on what it catches and what it misses.
 
-When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), settle it with the user before writing the test. Inside an approved plan, that question is a change to the plan: stop and ask.
+When the shape of that interface is itself in question (how deep the module is, where the seam belongs, what the interface should expose), call the Skill tool with "codebase-design" for the vocabulary. It is the shared source of the module, interface, depth, seam, adapter, leverage and locality terms, and it is a reference to consult, not a session to run. Settle the shape with the user before writing the test; inside an approved plan, that question is a change to the plan: stop and ask.
 
 ## Anti-patterns
 

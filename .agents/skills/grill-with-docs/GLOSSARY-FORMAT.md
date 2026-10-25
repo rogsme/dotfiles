@@ -1,6 +1,6 @@
 # Glossary format
 
-The glossary is `CONTEXT.md` at the repository root unless the project already uses another name (`docs/agents/domain.md` says which, when it exists).
+The glossary is `GLOSSARY.md` at the repository root unless the project already uses another name, such as `CONTEXT.md` (`docs/agents/domain.md` says which, when it exists).
 
 ## Structure
 
@@ -35,16 +35,16 @@ _Avoid_: Client, buyer, account
 
 **Single context (most repos):** one glossary at the repository root.
 
-**Multiple contexts:** a map file at the root (`CONTEXT-MAP.md`, or `GLOSSARY-MAP.md` in a repository that names its glossaries `GLOSSARY.md`) lists the contexts, where they live, and how they relate to each other:
+**Multiple contexts:** a map file at the root (`GLOSSARY-MAP.md`, or `CONTEXT-MAP.md` in a repository that names its glossaries `CONTEXT.md`) lists the contexts, where they live, and how they relate to each other:
 
 ```md
-# Context Map
+# Glossary Map
 
 ## Contexts
 
-- [Ordering](./src/ordering/CONTEXT.md): receives and tracks customer orders
-- [Billing](./src/billing/CONTEXT.md): generates invoices and processes payments
-- [Fulfillment](./src/fulfillment/CONTEXT.md): manages warehouse picking and shipping
+- [Ordering](./src/ordering/GLOSSARY.md): receives and tracks customer orders
+- [Billing](./src/billing/GLOSSARY.md): generates invoices and processes payments
+- [Fulfillment](./src/fulfillment/GLOSSARY.md): manages warehouse picking and shipping
 
 ## Relationships
 
@@ -57,6 +57,6 @@ Infer which structure applies:
 
 - If a map file exists, read it to find the contexts.
 - If only a root glossary exists, the repository has a single context.
-- If neither exists, create a root `CONTEXT.md` lazily when the first term is resolved.
+- If neither exists, create a root `GLOSSARY.md` lazily when the first term is resolved.
 
 When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.

@@ -48,10 +48,11 @@ test("only enabled presentation requires its heading", async (t) => {
 });
 
 test("preflight helper functions remain identical across the lifecycle", async () => {
-  const names = ["create-ticket", "suggest-tickets", "start-ticket", "work-ticket", "review-pr", "address-pr-review", "finish-ticket"];
+  const names = ["create-ticket", "suggest-tickets", "start-ticket", "work-ticket", "review-pr", "address-pr-review", "verify-pr", "finish-ticket"];
   const helpers = await Promise.all(names.map(async (name) => {
     const text = await readFile(path.join(root, `lifecycle/${name}/SKILL.md`), "utf8");
-    return text.slice(text.indexOf("need() {"), text.indexOf("need issue-tracker.md"));
+    const begin = text.indexOf("need() {");
+    return text.slice(begin, text.indexOf("\nneed ", begin));
   }));
   for (const helper of helpers) assert.equal(helper, helpers[0]);
 });
@@ -89,6 +90,16 @@ test("start-ticket, work-ticket and address-pr-review share the blocked tickets 
   };
   const [first, ...rest] = await Promise.all(["start-ticket", "work-ticket", "address-pr-review"].map(section));
   for (const other of rest) assert.equal(other, first);
+});
+
+test("every skill a runner starts follows workflow.md's autonomous runs section", async () => {
+  for (const name of ["start-ticket", "work-ticket", "review-pr", "address-pr-review", "verify-pr", "finish-ticket"]) {
+    const text = await readFile(path.join(root, `lifecycle/${name}/SKILL.md`), "utf8");
+    assert.match(text, /^on "Autonomous runs" && has workflow\.md "## Autonomous runs"$/m, `${name} does not check the section`);
+    const begin = text.indexOf("\n## Autonomous runs\n");
+    assert.ok(begin >= 0, `${name} has no autonomous runs section`);
+    assert.match(text.slice(begin), /whose request says "This run is autonomous"\. Follow `## Autonomous runs` in `workflow\.md`/, name);
+  }
 });
 
 test("lifecycle keeps review before presentation and approval outside browser state", async () => {

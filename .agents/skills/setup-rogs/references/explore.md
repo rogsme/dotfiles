@@ -38,7 +38,7 @@ Read only. Run every command from the repository root (`git rev-parse --show-top
 
 ## Domain docs
 
-- `CONTEXT.md`, `GLOSSARY.md`, `CONTEXT-MAP.md` or `GLOSSARY-MAP.md` at the root, per-context glossaries, `docs/adr/` and any context-level ADR directories.
+- `GLOSSARY.md`, `CONTEXT.md`, `GLOSSARY-MAP.md` or `CONTEXT-MAP.md` at the root, per-context glossaries, `docs/adr/` and any context-level ADR directories. Note which name the glossaries use: a `CONTEXT.md` gets the rename offer in step I.
 - Monorepo signals (a `pnpm-workspace.yaml`, a `workspaces` field in `package.json`, several packages with their own source trees) suggest asking about several contexts.
 
 ## Commit style
@@ -54,6 +54,8 @@ Read only. Run every command from the repository root (`git rev-parse --show-top
 - Bundles: `Delivers with:` lines in existing tickets.
 - Plan review: which agent CLIs answer `--version` (`claude`, `opencode`), whether `opencode debug agents` lists a `plan-review` agent, the models plans are written with here, and data boundaries or client terms in the agent docs that limit which vendors may see the code. The guides are `../assets/reviewer-claude-code.md` and `../assets/reviewer-opencode.md`.
 - Taste pass: whether the `simplify-branch` skill is installed (`npx skills list`, or the harness's skill list). A missing feature row means off.
+- Autonomous runs: the base branch's protection rules (a required approval keeps an autonomous run from merging), and agent docs or ticket conventions that keep a person in the loop. A missing feature row means off.
+- Agent verification: whether the `verify-pr` skill is installed, and whether `playwright-cli` and its skill are present for procedures that drive pages. A missing feature row means off.
 - Changelog: a `CHANGELOG.md` or release notes in the repository, a changelog tool's configuration, and `## Changelog` sections in recent pull request bodies. A missing feature row means off.
 - Plan presentation: an existing `## Plan presentation` section, `npx` availability, a separately prepared Marked/Mermaid renderer runtime, an external artifact root allowed by the planning agent, and the state directory/port of any existing presentation service. Lavish runs through pinned `npx`, not a local installation. A missing feature row means off. Call the Skill tool with "present-plan" for a check-only probe when paths are known; it owns the concrete commands and setup notes. Its version probe may populate npm's cache. Make no local installation, open no review, and preserve shared services and global agent settings.
 

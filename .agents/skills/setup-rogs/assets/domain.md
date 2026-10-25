@@ -5,7 +5,7 @@ How skills read this project's domain language and recorded decisions. Written b
 
 ## Glossary
 
-{{FILL: "One context: `CONTEXT.md` at the repository root." or "Several contexts: `CONTEXT-MAP.md` at the repository root lists each context and where its glossary lives." Use the existing file names when the repository already has a glossary.}}
+{{FILL: "One context: `GLOSSARY.md` at the repository root." or "Several contexts: `GLOSSARY-MAP.md` at the repository root lists each context and where its glossary lives." Use the existing file names when the repository keeps its glossary under another name.}}
 
 ## ADRs
 

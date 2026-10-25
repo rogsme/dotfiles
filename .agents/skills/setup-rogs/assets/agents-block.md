@@ -17,7 +17,10 @@ review-pr           findings pinned to the exact head
      |   when changes were requested or the base moved
 address-pr-review   verify, fix or push back, reply; at most two rounds
                                                             Status: READY_FOR_REVIEW
-     |   the user runs the human verification steps
+     |   a fresh session, after a clean review, when agent verification is on
+verify-pr           run the human verification steps, post the evidence
+                                       Verification: PASSED | FAILED | INCOMPLETE
+     |   the user confirms the steps, from the evidence or by running them
 finish-ticket       merge, verify, complete the tickets     Status: DONE
 ```
 

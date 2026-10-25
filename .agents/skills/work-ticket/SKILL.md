@@ -40,6 +40,7 @@ need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording 
 on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
 on "Browser pass" && { has issue-tracker.md "### attach"; has forge.md "### attach"; need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"; }
+on "Autonomous runs" && has workflow.md "## Autonomous runs"
 grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
 true'
 ```
@@ -58,6 +59,8 @@ When the check reports files missing here that exist in the main worktree (the f
 From here on, "the tracker", "the forge" and every operation named in backticks (`comment`, `push`, `ci`, ...) mean what those files define, under their operating rules. When an operation says `Capability: Unsupported`, follow its fallback; stop with `Status: BLOCKED` and a `Reason:` line when no way forward exists. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
+When the request says the run is autonomous, follow [Autonomous runs](#autonomous-runs) in place of every question below.
 
 ## 1. Preconditions
 
@@ -106,7 +109,7 @@ When the taste pass is on, call the Skill tool with "simplify-branch" once the l
 1. Run the format command, inspect what it changed, and commit those changes with their logical change.
 2. Run the full check.
 3. Confirm every intended change is committed and nothing unrelated is staged. Stop before syncing when the worktree is not safely clean.
-4. Sync per `## Sync`: merge the base. When the merge stops on conflicts, call the Skill tool with "resolving-merge-conflicts" and state the constraints: this is a merge and stays one; stage only resolved paths; ask the user about any hunk that decides product behavior. Once it reports back, conclude the merge with `git commit --no-edit` and confirm it in `git log`.
+4. Sync per `## Sync`: merge the base. When the merge stops on conflicts, resolve each conflict from what both sides meant, under these constraints: this is a merge and stays one; stage only resolved paths; ask the user about any hunk that decides product behavior. Then conclude the merge with `git commit --no-edit` and confirm it in `git log`.
 5. When the sync changed the branch, rerun the complete verification.
 6. Immediately before pushing, fetch and require `<remote>/<base>` to be an ancestor of `HEAD`. When the base moved in the meantime (`## CI gate` names the automation that moves it), repeat item 4 first.
 7. `push`. Never force-push.
@@ -163,6 +166,17 @@ When a push, the pull request, a comment or a transition fails, report the exact
 ## 10. Completion report
 
 Return the commit subjects, the verification results, the browser-pass captures, the pull request URL, the tracker comment results, the final state of every member, the remaining limitations, and the review comments left for `address-pr-review`. End with `Status: READY_FOR_REVIEW`.
+
+## Autonomous runs
+
+An autonomous run is one whose request says "This run is autonomous". Follow `## Autonomous runs` in `workflow.md` in place of every step that asks the user, and stop with `Status: BLOCKED` when the row for autonomous runs is off or that section is missing. In this skill:
+
+- The runner's approval line approves the plan when the lead carries the `## Autonomous run` comment that start-ticket posted.
+- Where step 1 would ask, about a model other than the plan's, a blocker relation or overlapping changes, go on with this session's model and record it, report the unrecorded blocker in the `## Blocked` comment instead of adding it, and stop with `Status: BLOCKED` on overlapping changes.
+- A material unknown, a plan change or a merge-conflict hunk that decides product behavior is settled as `## Autonomous runs` says, when the approved plan's intent covers it. Otherwise stop with `Status: BLOCKED`.
+- A taste-pass finding that would change the plan stays unapplied and goes into the handoff.
+- Before the push in step 5, check the branch's diff against the hard stops. When it touches one, mark the ticket blocked as [Blocked tickets](#blocked-tickets) says, naming the hard stop, and push nothing.
+- The pull request body carries an `## Assumptions` section after `## Summary`: every assumption from the plan and from implementation, each with its evidence. The handoff repeats it.
 
 ## Blocked tickets
 

@@ -35,6 +35,7 @@ need workflow.md workflow "## Features" "## Project rules" "## Review" "## Human
 need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
+on "Autonomous runs" && has workflow.md "## Autonomous runs"
 grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
 true'
 ```
@@ -53,6 +54,8 @@ When the check reports files missing here that exist in the main worktree (the f
 From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `post-review`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
+
+When the request says the run is autonomous, follow [Autonomous runs](#autonomous-runs) in place of every question below.
 
 ## 1. Verify independence and resolve the pull request
 
@@ -160,6 +163,15 @@ On a re-review, load every earlier actionable thread and the fixer's replies. Fo
 A finding the fixer rejected by citing a decision record (an ADR or a contract) is settled, unless new evidence shows the record does not apply; cite the record instead of reopening the same edge case.
 
 Post a new summary for the current head and its included base. Use `Verdict: READY_FOR_HUMAN` only when no actionable thread and no new finding remains, and refresh the brief and the human verification procedure in that summary.
+
+## Autonomous runs
+
+An autonomous run is one whose request says "This run is autonomous". Follow `## Autonomous runs` in `workflow.md` in place of every step that asks the user, and stop with `Status: BLOCKED` when the row for autonomous runs is off or that section is missing. In this skill:
+
+- Never use draft-only mode; post the review.
+- Check the pull request's `## Assumptions` section as claims: an assumption that a ticket, a comment or a recorded decision contradicts is a finding, and one the code does not follow is a `BUG`.
+- A change that touches one of the hard stops is a `BLOCKING` finding naming the hard stop: no autonomous run merges it.
+- When step 1 finds this session wrote the change, stop with `Status: BLOCKED`.
 
 ## Gotchas
 

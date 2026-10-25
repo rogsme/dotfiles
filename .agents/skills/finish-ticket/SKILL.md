@@ -1,6 +1,6 @@
 ---
 name: finish-ticket
-description: "Merge the current branch's reviewed pull request and complete its ticket or bundle, only after explicit merge authorization and confirmed human verification: require exact-head CI, a final independent review verdict for the same head and base, and no open feedback; then verify the merge, move every ticket to done, and verify post-merge CI. Use only when the user explicitly says \"merge the PR\", \"finish the ticket\" or \"ship this\"."
+description: "Merge the current branch's reviewed pull request and complete its ticket or bundle, only after explicit merge authorization and confirmed human verification, or, in an autonomous run the user started, verify-pr's passing report: require exact-head CI, a final independent review verdict for the same head and base, and no open feedback; then verify the merge, move every ticket to done, and verify post-merge CI. Use only when the user explicitly says \"merge the PR\", \"finish the ticket\" or \"ship this\"."
 license: MIT
 metadata:
   rogs-skills/contract: "1"
@@ -34,6 +34,7 @@ need forge.md forge "## Forge" "## Operations" "### find-pr" "### read-pr" "### 
 need workflow.md workflow "## Features" "## Worktrees" "## Human verification"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
+on "Autonomous runs" && has workflow.md "## Autonomous runs"
 true'
 ```
 
@@ -52,9 +53,11 @@ From here on, "the tracker", "the forge" and every operation named in backticks 
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
 
+When the request says the run is autonomous, follow [Autonomous runs](#autonomous-runs) in place of every question below.
+
 ## 1. Verify authorization and context
 
-1. Require an explicit instruction from the user to merge this pull request. A green check or a reviewer's verdict is not merge authorization.
+1. Require an explicit instruction from the user to merge this pull request. A green check or a reviewer's verdict is not merge authorization. In an autonomous run, [Autonomous runs](#autonomous-runs) says what authorizes the merge.
 2. Read the current branch, the checkout root, the worktree registration and the status. Require the branch and the directory's basename to equal the lead ticket id (`## Worktrees`).
 3. Find the unique pull request for that exact branch across open and merged states with `find-pr`, and verify its base is the base `## Forge` names. Reject a closed, unmerged pull request.
 4. Derive the tickets (the lead from the branch; with bundles on, the riders from the title and the related-work lines, checked against `## Bundles`) and `load` every member: relations and every comment. Verify the team or project. Accept `in-review`, or `done` only when recovering an already merged pull request. A `done` ticket with an open, unmerged pull request is an inconsistent state: stop with `Status: BLOCKED` and report it for repair instead of merging.
@@ -71,6 +74,8 @@ For an open pull request, refresh it with `read-pr` immediately before merging a
 - An acceptance-evidence row for every criterion of every member, and, for a user-visible change with the browser pass on, the captures the review verdict accepted.
 - A concrete, numbered human verification procedure in that final review summary.
 - Every numbered human step explicitly confirmed as passed by the user, or explicitly waived by the user with a reason.
+
+The user may confirm steps from the evidence `verify-pr` posted instead of running them; that confirmation is the user's and counts like any other. When the merge instruction says so, require a `verify-pr` report for the confirmed head that marks each of those steps `PASSED`, and whose `Procedure:` line links that final review summary or whose step lines match that summary's steps by action and expected result: the user confirmed what the report shows. A step it marks otherwise, a report that ran another procedure, or a report that is missing leaves that step unconfirmed.
 
 When human steps remain and the merge instruction did not confirm them, ask one concise question that lists only those step numbers and actions. When any step failed, do not merge: post one conversation comment with `comment` that records the failed step, what the user observed, and the reviewed head SHA, so `address-pr-review` picks it up as feedback; leave the tracker unchanged; and end with `Status: HUMAN_QA_FAILED`. Never infer that a step passed, invent observations, or accept a verdict for an older head.
 
@@ -112,7 +117,7 @@ Post this on the lead with `comment`, reusing an equivalent existing completion 
 
 ### Human verification
 
-- Step {number}: {passed on `{the head it was confirmed on}`, and who confirmed it; or waived, with the reason}
+- Step {number}: {passed on `{the head it was confirmed on}`, and who confirmed it, adding "from verify-pr's evidence ({report link})" when the user confirmed it that way; or waived, with the reason}
 - Observed limitations: {any limitation the user reported, or None}
 ```
 
@@ -129,3 +134,14 @@ A ticket the merge unblocked can sit in `blocked`. When every blocker its `## Bl
 Return the pull request URL, the reviewed head, the merge commit, the verification evidence, the tracker result for every member, and any remaining cleanup. Then name the tickets the merge unblocked on one line, `Unblocked: ACM-15, ACM-16`, or `Unblocked: none`, and end with `Status: DONE`. When the tracker cannot answer for them after the merge, write `Unblocked: unknown` and the reason instead; the merge still ends with `Status: DONE`.
 
 Never delete branches, remove the active worktree, or switch checkouts. Report the worktree's path for the user to remove when they are ready.
+
+## Autonomous runs
+
+An autonomous run is one whose request says "This run is autonomous". Follow `## Autonomous runs` in `workflow.md` in place of every step that asks the user, and stop with `Status: BLOCKED` when the row for autonomous runs is off or that section is missing. The user authorized this merge up front, when they started the ticket as an autonomous run. In this skill:
+
+- The authorization is the request, and it holds only when the lead carries the `## Autonomous run` comment start-ticket posted. Without that comment, stop with `Status: BLOCKED`: a request alone cannot make a ticket autonomous.
+- In place of the user's confirmations, require a `verify-pr` report that says `Verification: PASSED` for the head the request names, or for an earlier head under the same carry-over rule a confirmation follows, and whose `Procedure:` line links that final review summary or whose step lines match that summary's steps by action and expected result. Each numbered step then counts as waived, with the reason "autonomous run: verify-pr passed it on `{head}`" and the report's link. A report that is missing, `FAILED` or `INCOMPLETE`, or that ran another procedure, ends the run with `Status: BLOCKED`.
+- Every other requirement of step 2 holds: the exact-head gate, review-pr's `READY_FOR_HUMAN` summary for the same head and base, no open feedback, and an unmoved base, which still ends with `Status: BLOCKED_FOR_SYNC`.
+- Before merging, check the diff from the base to the head against the hard stops. When it touches one, stop with `Status: BLOCKED`, naming it.
+- A merge queue or train hands the merge to a person: stop with `Status: BLOCKED` instead of telling the user to merge.
+- The completion comment's `### Human verification` adds a line: "Autonomous run: started by the user as an autonomous run ({link to the `## Autonomous run` comment}); no person verified this change."
