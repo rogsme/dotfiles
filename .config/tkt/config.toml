@@ -1,0 +1,29 @@
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+#
+# tkt configuration
+# Tangled from README.org
+#
+
+[presets.claude]
+harness = "claude"
+model = "opus#high"
+
+[presets.sol]
+harness = "opencode"
+model = "openai/gpt-6.1-sol#high"
+
+[stages]
+explain = "Explain what this branch changes for someone who has not read the code: what users see, and what could go wrong. Change nothing and post nothing."
+
+[auto]
+max_parallel = 0    # no cap on tkt auto agents at work at once
+
+[agent]
+extensions = ["~/.pi/agent/extensions/lazer.ts"]
+model = "openai/gpt-6.1-sol:high"  # a pi model pattern; :high is the thinking level

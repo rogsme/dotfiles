@@ -1,0 +1,196 @@
+#+TITLE: tkt Configuration
+#+AUTHOR: Roger González
+#+PROPERTY: header-args:conf :tangle config.toml :mkdirp yes
+#+STARTUP: overview
+#+OPTIONS: toc:3 num:nil
+#+auto_tangle: t
+
+* tkt Configuration
+:PROPERTIES:
+:ID:       9b22654c-d0d0-4403-a107-7b26a454af07
+:END:
+This is my personal configuration for [[https://git.rogs.me/rogs/tkt][tkt]], the command-line tool that runs the mechanical steps of
+my ticket lifecycle from a herdr pane. It's written using Org Mode's literate programming features,
+which allows embedding documentation directly alongside the code. This file is configured to
+automatically "tangle" the code blocks into the actual tkt configuration file (=config.toml= in the same
+directory) whenever this Org file is saved in Emacs (see the [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]] section). This
+approach keeps the configuration well-documented and easier to manage.
+
+The config lives at =~/.config/tkt/config.toml= (XDG-compliant). tkt works without a config file: it
+runs Claude Code and OpenCode on their default models, with the built-in stage lines. =tkt help config=
+documents every key.
+
+** Installation
+:PROPERTIES:
+:ID:       ede05543-5d15-430c-a492-d4a1eada583f
+:END:
+Steps to get this configuration up and running from scratch.
+
+*** Install tkt
+:PROPERTIES:
+:ID:       8b16845b-85d3-4042-9ce3-20f6ea0cc6a5
+:END:
+#+begin_example
+curl -fsSL https://git.rogs.me/rogs/tkt/releases/download/latest/install.sh | sh
+#+end_example
+
+*** Tangle the Config
+:PROPERTIES:
+:ID:       6bcc27ed-ea90-4e8a-9c4d-82a213489ad4
+:END:
+If you have auto-tangle set up (see [[*Setting Up Auto-Tangle][Setting Up Auto-Tangle]]), just save this file in Emacs and the
+=config.toml= will be generated automatically. Otherwise, open this file in Emacs and run:
+
+#+begin_example
+M-x org-babel-tangle
+#+end_example
+
+This produces =config.toml= in the same directory as this =README.org= file. Make sure both live inside
+=~/.config/tkt/=.
+
+*** Apply the Config
+:PROPERTIES:
+:ID:       56457e42-9739-46da-8c9b-a1fcfe860f5c
+:END:
+There is nothing to reload. Every tkt command reads the config when it starts, and a running =tkt watch=
+reads it again on its next pass. To check it, run this from a repository:
+
+#+begin_example
+tkt doctor
+#+end_example
+
+Its =config= line names the presets and the files they come from. An unknown key is an error, so a
+misspelling never passes silently.
+
+Don't commit =pi/=. It's the directory =tkt agent= keeps pi's settings, logins and sessions in, and
+=auth.json= holds the logins.
+
+** Philosophy
+:PROPERTIES:
+:ID:       fde160a4-fc36-4c86-a200-fffde349bd31
+:END:
+This file holds only what's mine everywhere. tkt reads each repository's own settings after it, from
+=.tkt/tkt.toml= (which the repository may commit) and =.tkt/tkt.local.toml= (mine, ignored by git), each
+winning key by key. So:
+
+- Anything a project decides goes in that project's =.tkt/=: its model routing presets, the status page
+  of its forge, its review bot wait, its chores. Madison and Wall's glm, deepseek and fast presets live
+  in its =.tkt/tkt.toml=, not here.
+- No setting that only repeats one of tkt's defaults. Run =tkt help config= to see the defaults.
+- Presets here serve any model, since a repository without model routing never names one.
+
+** Header
+:PROPERTIES:
+:ID:       a1b032a5-a8e3-461c-b328-cd7af712dcdc
+:END:
+Simple header block with personal information, which will appear at the top of the tangled =config.toml=.
+
+#+begin_src conf
+#
+# ██████╗  ██████╗  ██████╗ ███████╗
+# ██╔══██╗██╔═══██╗██╔════╝ ██╔════╝     Roger Gonzalez
+# ██████╔╝██║   ██║██║  ███╗███████╗     https://rogs.me
+# ██╔══██╗██║   ██║██║   ██║╚════██║
+# ██║  ██║╚██████╔╝╚██████╔╝███████║
+# ╚═╝  ╚═╝ ╚═════╝  ╚═════╝ ╚══════╝
+#
+# tkt configuration
+# Tangled from README.org
+#
+#+end_src
+
+** Presets
+:PROPERTIES:
+:ID:       f4538540-31be-488c-89ea-b0efd10fa1f2
+:END:
+Presets choose the agent a ticket runs on. Order matters: the first preset is the default, and a
+ticket's tab names its preset, such as =MAD-12 (claude)=. =--as NAME= picks another one.
+
+- =claude=: Claude Code on Opus at high effort. A Claude Code model reads =model#effort=.
+- =sol=: OpenCode on GPT-6.1 Sol at high effort. An OpenCode model reads =provider/model#variant=.
+
+Neither sets =serves=, so both serve any =Model:= line. A repository with model routing defines its own
+presets in =.tkt/tkt.toml=. Those go before these and replace the ones of the same name, so the first
+preset there is the default in that repository.
+
+#+begin_src conf
+[presets.claude]
+harness = "claude"
+model = "opus#high"
+
+[presets.sol]
+harness = "opencode"
+model = "openai/gpt-6.1-sol#high"
+#+end_src
+
+** Stages
+:PROPERTIES:
+:ID:       c7aa42bf-94ec-4f2a-8caa-7f1c7541cfff
+:END:
+Stages are the lines =tkt run= sends a fresh session. tkt ships the lifecycle ones (start, address,
+review, verify, ci, resolve); this adds my own. =explain= describes a branch for someone who hasn't read
+the code, and changes nothing:
+
+#+begin_example
+tkt run MAD-12 explain
+#+end_example
+
+A stage line can use placeholders: ={id}= becomes the ticket id, and ={remote}= and ={base}= the remote
+and base branch the repository's forge configuration names.
+
+#+begin_src conf
+[stages]
+explain = "Explain what this branch changes for someone who has not read the code: what users see, and what could go wrong. Change nothing and post nothing."
+#+end_src
+
+** Auto
+:PROPERTIES:
+:ID:       d85fe7ae-49bf-44c7-a0a9-0f0afa488dbb
+:END:
+=tkt auto= and =tkt watch= cap how many of their agents work at once in a repository. The default is 3;
+=0= removes the cap. The other =[auto]= keys (=max_rounds=, =poll=)
+keep their defaults.
+
+#+begin_src conf
+[auto]
+max_parallel = 0    # no cap on tkt auto agents at work at once
+#+end_src
+
+** Agent
+:PROPERTIES:
+:ID:       8a9a4b52-4722-4ae0-a853-df814ab4e7d2
+:END:
+=tkt agent= opens a chat with pi, the coding agent behind it, in my own pane.
+
+- =model=: a pi model pattern. =:high= is the thinking level.
+- =extensions=: more pi extension files to load. =tkt agent= loads none of pi's own extensions, so the
+  Lazer provider has to be listed here for its models to show up in pi's =/model=. Paths are absolute
+  or start with =~/=.
+
+#+begin_src conf
+[agent]
+extensions = ["~/.pi/agent/extensions/lazer.ts"]
+model = "openai/gpt-6.1-sol:high"  # a pi model pattern; :high is the thinking level
+#+end_src
+
+** Setting Up Auto-Tangle
+:PROPERTIES:
+:ID:       2e73d45f-fe1f-4aa8-b2e4-834b396d773c
+:END:
+To enable automatic tangling when this file is saved in Emacs, add the following to your Emacs
+configuration. This checks for the =#+auto_tangle: t= property and runs =org-babel-tangle= on save.
+If you already have this in your Emacs config from the tmux, i3 or herdr setup, you don't need to add it
+again.
+
+#+begin_src emacs-lisp :tangle no
+;; Auto-tangle configuration files
+(use-package org
+  :config
+  (defun org-babel-auto-tangle ()
+    "Automatically tangle org files when saved."
+    (when (eq major-mode 'org-mode)
+      (let ((auto-tangle (cdr (assoc "auto_tangle" (org-collect-keywords '("PROPERTY"))))))
+        (when (and auto-tangle (string= auto-tangle "t"))
+          (org-babel-tangle)))))
+  (add-hook 'after-save-hook #'org-babel-auto-tangle))
+#+end_src
