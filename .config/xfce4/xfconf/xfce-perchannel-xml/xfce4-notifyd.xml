@@ -6,6 +6,7 @@
     <property name="known_applications" type="array">
       <value type="string" value="balenaEtcher"/>
       <value type="string" value="blueman"/>
+      <value type="string" value="chromium-browser"/>
       <value type="string" value="Claude Usage"/>
       <value type="string" value="com.mitchellh.ghostty"/>
       <value type="string" value="com.slack.Slack"/>

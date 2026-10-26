@@ -35,6 +35,7 @@ need forge.md forge "## Forge" "## Operations" "### find-pr" "### read-pr" "### 
 need workflow.md workflow "## Features" "## Worktrees" "## Project rules" "## Human verification"
 on "Browser pass" && { has forge.md "### attach"; need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"; }
 on "Autonomous runs" && has workflow.md "## Autonomous runs"
+on "CI review" && has workflow.md "## CI review"
 true'
 ```
 
@@ -63,7 +64,7 @@ The `Agent verification` row in `## Features` tells a runner whether to start th
 2. Read the current branch and require the checkout directory's basename to match it (`## Worktrees`).
 3. Find the open pull request for that exact branch with `find-pr`, verify its base is the base `## Forge` names, and record its exact head SHA. Fetch, and require the local `HEAD` to equal that head; fast-forward a clean checkout that is behind, and stop when it differs otherwise.
 4. Require a passing gate for that exact head per `## CI gate`. When the checks are pending, failing or stale, post nothing and end with `Status: BLOCKED_FOR_SYNC`.
-5. Load the procedure with `feedback`: the newest review summary carrying `Verdict: READY_FOR_HUMAN` whose `Reviewed head:` is this exact head, and the numbered procedure under its `## Human verification` section. When no such summary exists and an automated reviewer that `## CI gate` names cleared this exact head, use the pull request body's `## Human verification` section instead. When neither exists, post nothing and end with `Status: BLOCKED_FOR_SYNC`: the head needs a clean review first.
+5. Load the procedure with `feedback`: the newest review summary carrying `Verdict: READY_FOR_HUMAN` whose `Reviewed head:` is this exact head, and the numbered procedure under its `## Human verification` section. When no such summary exists and the CI reviewer that `## CI review` names, or an automated reviewer that `## CI gate` names, cleared this exact head, use the pull request body's `## Human verification` section instead. When neither exists, post nothing and end with `Status: BLOCKED_FOR_SYNC`: the head needs a clean review first.
 
 The base may have moved since the review. Verify the head as it is: the review pinned its base, and the steps carry over clean merges of the base the way the user's confirmations do.
 

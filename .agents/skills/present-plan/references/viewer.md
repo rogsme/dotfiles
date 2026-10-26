@@ -36,7 +36,7 @@ node "<skill-dir>/scripts/render_plan.mjs" --source "<report.md>" --repository "
 
 Repeat `--rider "ACM-124"` for every rider. For a standalone document, pass `--standalone`, a short name as `--ticket`, and the same directory as repository and worktree outside Git. Use `--title` only for a display title. Revisions of this review pass `--session "<returned-directory>"` with the same identity. New source content creates an immutable Markdown snapshot; unchanged content keeps its revision. Never replace an unrelated file or remove a render lock: an interrupted render needs inspection, not an assumed successful retry.
 
-The renderer emits only its own safe HTML elements. Images are references, not loads. Diagrams sit in a `figure[data-diagram]`; Mermaid draws them in the browser with `securityLevel: "strict"` and SVG labels, so each box is an SVG node the human can comment on.
+The renderer emits only its own safe HTML elements. Images are references, not loads. Diagrams sit in a `figure[data-diagram]` whose `data-digest` is the first 16 hex characters of the source's SHA-256; Mermaid draws them in the browser with `securityLevel: "strict"` and SVG labels, so each box is an SVG node the human can comment on.
 
 ## Open, poll, reply, end
 
@@ -50,6 +50,26 @@ node "<skill-dir>/scripts/viewer.mjs" end --session "<session>"
 `open` starts the shared server when none runs on the port, reuses one that matches this viewer's version, artifact root and listen setting, and replaces an older one only when it has no open review. It never stops a server with open reviews or another service; it fails and names it. It registers the session, launches the browser on the first URL unless `--no-open`, and prints the URLs. An ended, approved or done review reopens only with `--reopen`.
 
 `poll` waits, without a time limit, for the next event the page sent, prints it, then moves it from `events/` to `delivered/`. An interruption between the two delivers the same event again; it never loses one. Use the agent's foreground or background-completion mechanism.
+
+A `feedback` event holds the batch's comments. Each target's `kind` is `word`, `text` (a selected range), `box`, `diagram` or `general`. A general comment is on the plan as a whole: the human types it in the comment panel with nothing selected, so its target carries no quote, diagram or label, and it has no tab or headings. A batch may hold only general comments.
+
+```json
+{
+  "seq": 1,
+  "type": "feedback",
+  "revision": 1,
+  "comments": [
+    {
+      "id": "c1", "text": "Name the format.", "tab": "overview", "headings": ["ACM-123: Pagination", "Overview"], "revision": 1,
+      "target": { "kind": "word", "quote": "format", "prefix": "Preserve the current response ", "suffix": ".", "diagram": null, "label": "" }
+    },
+    {
+      "id": "c2", "text": "Say how this ships.", "tab": null, "headings": [], "revision": 1,
+      "target": { "kind": "general", "quote": "", "prefix": "", "suffix": "", "diagram": null, "label": "" }
+    }
+  ]
+}
+```
 
 The reply file is JSON:
 
@@ -77,5 +97,9 @@ A session directory holds `session.json` (identity, revision, digest, and the re
 One server serves every review registered under its artifact root, each at `/r/<id>/`. The first request carries the token in the link; the server answers with an `HttpOnly`, `SameSite=Strict` cookie scoped to that review and drops the token from the address bar. Every write needs that cookie and an `X-Plan-Review` header, which other sites cannot send without a preflight the server never answers. Approve and Done check the current revision and digest, and refuse while a batch waits for its reply.
 
 The page follows the saved theme, which the server writes onto `<html>` before the first paint; without one it follows the system. A server-sent event stream tells the page when the revision, its state or the replies change: a new revision reloads the page, and drafts survive the reload.
+
+A page that loads on a revision newer than the last one this browser acknowledged, while the tab has no focus, puts `(new)` before its title until the tab gets focus. The first load of a review marks nothing, and neither does a batch answered without a new revision. A bell in the header asks the browser to allow notifications; once allowed, a hidden tab also shows "Revision N is ready" with the plan's title. Browsers allow notifications only in a secure context: the Local link (`127.0.0.1`) is one, and the Tailscale and Network links over plain HTTP are not, so the bell shows only on the Local link, and only until the browser has an answer. The title mark works on every link.
+
+The page also marks what changed since the last revision this browser showed of the review. It stores the text of every block, and each diagram's digest, of the last two revisions it showed in `localStorage`, for the 20 reviews opened most recently, so a reload keeps the marks. It compares the blocks of each tab in order: a new block similar to a removed one in the same place is that block changed, and its new words get an amber highlight; a new or moved block, and a diagram whose digest is new, get an amber mark. A block that only lost words is marked whole, and a removed block leaves no mark. The marks use the CSS Custom Highlight API and a class, so the plan's text and structure stay as rendered. The `Changes (N)` button in the header hides or shows them and remembers the choice; it appears only when the page has a revision to compare with and something changed. Another browser, or a cleared one, has nothing to compare with until the next revision.
 
 The server has no other authentication. With `Listen: all`, anyone on the network who has a review's link can comment on it and approve it, and the traffic is plain HTTP. The server stops itself a few minutes after no review is open, and `/health` reports its app, version, artifact root, listen setting and open reviews.

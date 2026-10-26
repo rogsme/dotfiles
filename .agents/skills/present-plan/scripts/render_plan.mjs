@@ -114,7 +114,8 @@ export function renderMarkdown(markdown, marked) {
             const unsafe = /%%\{|^\s*---|(?:https?|ftp|data|blob|file|javascript):|\/\/|@import|url\s*\(|(?:img|image|icon|href|src)\s*:|<(?:img|image|iframe|script|style|link|object|embed|foreignObject)\b|&(?:#|lt;|amp;)/im;
             if (unsafe.test(token.text)) return `<p class="review-warning">This diagram needs local-only source. Network resources and configuration directives stay as text for review.</p><pre><code>${escapeHTML(token.text)}</code></pre>`;
             diagrams++;
-            return `<figure data-diagram="${diagrams}"><div class="diagram">${escapeHTML(token.text)}</div><figcaption>Diagram ${diagrams}</figcaption></figure>`;
+            // Mermaid replaces the source in the browser, so the digest is how the page tells a changed diagram.
+            return `<figure data-diagram="${diagrams}" data-digest="${digest(token.text).slice(0, 16)}"><div class="diagram">${escapeHTML(token.text)}</div><figcaption>Diagram ${diagrams}</figcaption></figure>`;
           }
           return `<pre><code>${escapeHTML(token.text)}</code></pre>`;
         case "hr": return "<hr>";
@@ -209,6 +210,8 @@ export async function renderPlan(options) {
       SCRIPTS: [
         rendered.tabs && '<script defer src="/assets/tabs.js"></script>',
         rendered.diagrams && `<script defer src="${CDN}${PINS.mermaid.file}" ${pin(PINS.mermaid)}></script>\n  <script defer src="/assets/diagrams.js"></script>`,
+        '<script defer src="/assets/attention.js"></script>',
+        '<script defer src="/assets/changes.js"></script>',
         '<script defer src="/assets/viewer.js"></script>',
       ].filter(Boolean).join("\n  "),
     };

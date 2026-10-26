@@ -25,6 +25,11 @@ async (page) => {
   const node = overview.locator(".diagram svg g.node").filter({ hasText: "API" });
   await node.waitFor({ timeout: 30_000 });
   if (await page.locator("#pp-approve").textContent() !== "Approve") throw new Error("A ticket plan shows no Approve button.");
+  // The bell shows only where the browser can still be asked for notifications.
+  const bell = await page.evaluate(() => ({ hidden: document.querySelector("#pp-notify").hidden, permission: "Notification" in window ? Notification.permission : "unsupported", secure: isSecureContext }));
+  if (bell.hidden !== !(bell.secure && bell.permission === "default")) throw new Error(`The notification bell is wrong: ${JSON.stringify(bell)}`);
+  if (await page.title() !== "ACM-123 | Plan review") throw new Error(`The first load marked the title: ${await page.title()}`);
+  if (await page.locator("#pp-changes").isVisible()) throw new Error("The first load shows changes with nothing to compare.");
 
   // Theme: the toggle switches to dark, and the server keeps the choice.
   await page.locator("#pp-theme").click();
@@ -56,7 +61,12 @@ async (page) => {
   await page.mouse.move(box.x + box.width - 10, box.y + box.height / 2, { steps: 6 });
   await page.mouse.up();
   await comment("Name the test file.");
-  if (await page.locator("#pp-drafts .pp-card").count() !== 4) throw new Error("Four drafts did not reach the panel.");
+  // A general comment is on the whole plan, typed in the panel with no selection.
+  await page.getByRole("textbox", { name: "General comment" }).fill("Say how this ships.");
+  await page.getByRole("textbox", { name: "General comment" }).press("Control+Enter");
+  await page.locator("#pp-drafts .pp-card .pp-target-label").filter({ hasText: "General comment" }).waitFor();
+  if (await page.getByRole("textbox", { name: "General comment" }).inputValue()) throw new Error("The general comment field kept its text after Add.");
+  if (await page.locator("#pp-drafts .pp-card").count() !== 5) throw new Error("Five drafts did not reach the panel.");
   if (!(await page.locator("#pp-approve").isDisabled())) throw new Error("Approve stayed enabled with unsent drafts.");
 
   // A link does not navigate in comment mode, and tabs still switch.
@@ -76,5 +86,7 @@ async (page) => {
   if (geometry.content > geometry.width + 1) throw new Error(`Mobile page overflows: ${JSON.stringify(geometry)}`);
   await page.setViewportSize({ width: 1440, height: 1000 });
   if (external.length) throw new Error(`External requests: ${external.join(", ")}`);
-  return { passed: true, comments: 4, theme: "dark", mobile: geometry };
+  // The reload onto revision 2 happens while this tab looks unfocused, as a background tab would.
+  await page.addInitScript(() => { Document.prototype.hasFocus = () => false; });
+  return { passed: true, comments: 5, theme: "dark", bell, mobile: geometry };
 }

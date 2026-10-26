@@ -6,7 +6,7 @@
   --paper: #faf8f5; --ink: #232333; --heading: #232333; --muted: #737373; --line: #e2e0dd; --panel: #fff;
   --code: #e2e0dd; --pre: #ececec; --th: #e8fce8; --stripe: #f4fdf4; --row: #fff;
   --green: #50fa7b; --accent: #1a7a3a; --on-accent: #fff; --hover: #1a7a3a; --hover-ink: #fff;
-  --mark: rgba(80, 250, 123, .38); --mark-sent: rgba(26, 122, 58, .16); --hover-mark: rgba(80, 250, 123, .5); --hover-blend: multiply; --warning: #fff3d2; --shadow: 0 8px 28px rgba(35, 35, 51, .14);
+  --changed: rgba(255, 196, 0, .4); --changed-line: #b07d00; --mark: rgba(80, 250, 123, .38); --mark-sent: rgba(26, 122, 58, .16); --hover-mark: rgba(80, 250, 123, .5); --hover-blend: multiply; --warning: #fff3d2; --shadow: 0 8px 28px rgba(35, 35, 51, .14);
   --red: #9b1c1c; --red-bg: #fde2e1; --amber: #7a4b00; --amber-bg: #fdedc8; --blue: #1f4f8a; --blue-bg: #e1ecfa;
   --ok: #17614b; --ok-bg: #dcf1e6; --grey: #4b5560; --grey-bg: #eceff1;
 }
@@ -16,7 +16,7 @@
     --paper: #202124; --ink: #e8e8e8; --heading: #ddd; --muted: #9aa0a6; --line: #3a3d41; --panel: #2a2d30;
     --code: #333; --pre: #272822; --th: #2a2d30; --stripe: #2a2d30; --row: #202124;
     --accent: #50fa7b; --on-accent: #000; --hover: #50fa7b; --hover-ink: #000;
-    --mark: rgba(80, 250, 123, .3); --mark-sent: rgba(80, 250, 123, .12); --hover-mark: rgba(80, 250, 123, .32); --hover-blend: screen; --warning: #3d3420; --shadow: 0 8px 28px rgba(0, 0, 0, .5);
+    --changed: rgba(255, 212, 121, .3); --changed-line: #ffd479; --mark: rgba(80, 250, 123, .3); --mark-sent: rgba(80, 250, 123, .12); --hover-mark: rgba(80, 250, 123, .32); --hover-blend: screen; --warning: #3d3420; --shadow: 0 8px 28px rgba(0, 0, 0, .5);
     --red: #ffb4ab; --red-bg: #5c1a1a; --amber: #ffd479; --amber-bg: #4d3800; --blue: #a8c7fa; --blue-bg: #1c3a5e;
     --ok: #50fa7b; --ok-bg: #173d24; --grey: #c4c7c5; --grey-bg: #3c4043;
   }
@@ -26,7 +26,7 @@
   --paper: #202124; --ink: #e8e8e8; --heading: #ddd; --muted: #9aa0a6; --line: #3a3d41; --panel: #2a2d30;
   --code: #333; --pre: #272822; --th: #2a2d30; --stripe: #2a2d30; --row: #202124;
   --accent: #50fa7b; --on-accent: #000; --hover: #50fa7b; --hover-ink: #000;
-  --mark: rgba(80, 250, 123, .3); --mark-sent: rgba(80, 250, 123, .12); --hover-mark: rgba(80, 250, 123, .32); --hover-blend: screen; --warning: #3d3420; --shadow: 0 8px 28px rgba(0, 0, 0, .5);
+  --changed: rgba(255, 212, 121, .3); --changed-line: #ffd479; --mark: rgba(80, 250, 123, .3); --mark-sent: rgba(80, 250, 123, .12); --hover-mark: rgba(80, 250, 123, .32); --hover-blend: screen; --warning: #3d3420; --shadow: 0 8px 28px rgba(0, 0, 0, .5);
   --red: #ffb4ab; --red-bg: #5c1a1a; --amber: #ffd479; --amber-bg: #4d3800; --blue: #a8c7fa; --blue-bg: #1c3a5e;
   --ok: #50fa7b; --ok-bg: #173d24; --grey: #c4c7c5; --grey-bg: #3c4043;
 }
@@ -53,7 +53,7 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 button:disabled { opacity: .45; cursor: not-allowed; }
 .count { margin-left: .45rem; padding: 0 .4rem; border-radius: 999px; background: var(--green); color: #000; font-size: .75rem; font-weight: 700; }
 .hint { color: var(--muted); font-size: .78rem; max-width: 26rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#pp-theme { min-width: 2.4rem; }
+#pp-theme, #pp-notify { min-width: 2.4rem; }
 
 #pp-banner { padding: .7rem 1rem; text-align: center; font-size: .9rem; background: var(--th); border-bottom: 1px solid var(--line); }
 #pp-banner.approved { background: var(--ok-bg); color: var(--ok); font-weight: 700; }
@@ -119,6 +119,11 @@ body.comment-mode figure:hover { border-color: var(--accent); }
 ::highlight(pp-draft) { background-color: var(--mark); }
 ::highlight(pp-sent) { background-color: var(--mark-sent); }
 figure.pp-target { outline: 3px solid var(--green); outline-offset: 2px; }
+/* What changed since the revision this browser showed before: amber, apart from the green of comments. */
+::highlight(pp-changed) { background-color: var(--changed); }
+.pp-changed-block:not(figure) { background-color: var(--changed); box-shadow: 0 0 0 4px var(--changed); border-radius: 2px; }
+figure.pp-changed-block { border-color: var(--changed-line); box-shadow: inset 4px 0 0 var(--changed-line); }
+#pp-changes[aria-pressed="true"] { background: var(--changed); border-color: var(--changed-line); color: var(--ink); }
 /* The hover highlight sits over the text and blends into it, so the words stay crisp in both themes. */
 .pp-hover { position: absolute; top: 0; left: 0; z-index: 5; pointer-events: none; opacity: 0; border-radius: 4px;
   background: var(--hover-mark); mix-blend-mode: var(--hover-blend);
@@ -129,7 +134,7 @@ figure.pp-target { outline: 3px solid var(--green); outline-offset: 2px; }
 g.pp-target > :is(rect, polygon, circle, ellipse, path) { stroke: var(--green) !important; stroke-width: 3px !important; }
 
 .pp-composer { position: absolute; z-index: 30; width: min(360px, calc(100vw - 32px)); padding: .8rem; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); }
-.pp-composer textarea, .pp-card textarea { width: 100%; min-height: 5.5rem; padding: .5rem; font: 15px/1.5 var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
+.pp-composer textarea, .pp-card textarea, .pp-general textarea { width: 100%; min-height: 5.5rem; padding: .5rem; font: 15px/1.5 var(--sans); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 6px; resize: vertical; }
 .pp-row { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .5rem; }
 .pp-target-label { color: var(--muted); font-size: .76rem; margin-bottom: .45rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
@@ -142,6 +147,11 @@ body.panel-open .layout { margin-right: 380px; }
 .pp-panel-body h3 { font-size: .85rem; margin: 1rem 0 .5rem; color: var(--muted); }
 .pp-panel-body h3::before { content: "// "; content: "// " / ""; color: var(--green); }
 .pp-empty { color: var(--muted); font-size: .85rem; }
+.pp-general { padding-bottom: .8rem; border-bottom: 1px dotted var(--line); }
+.pp-general label { display: block; margin-bottom: .4rem; color: var(--muted); font-size: .85rem; font-weight: 700; }
+.pp-general label::before { content: "// "; content: "// " / ""; color: var(--green); }
+.pp-general textarea { min-height: 4rem; }
+.pp-general textarea:disabled { opacity: .45; }
 .pp-panel-foot { padding: .8rem 1rem; border-top: 1px solid var(--line); }
 .pp-panel-foot button { width: 100%; }
 .pp-card { padding: .6rem .7rem; margin-bottom: .6rem; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); }
@@ -162,8 +172,10 @@ dialog p { font-family: var(--sans); margin-top: 0; }
   body.panel-open .layout { margin-right: 0; }
   nav { position: static; max-height: none; margin-bottom: 2rem; }
   .hint, .prompt, .chip { display: none; }
+  .topbar { padding: 0 .6rem; gap: .5rem; }
   .topbar-actions { gap: .3rem; }
-  .topbar-actions button { padding: .3rem .55rem; }
+  .topbar-actions button { padding: .3rem .45rem; font-size: .78rem; white-space: nowrap; }
+  #pp-theme, #pp-notify { min-width: 0; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .layout, #pp-panel, .pp-hover { transition: none; } }
 @media print { .topbar, #pp-banner, #pp-panel, nav { display: none; } .layout { display: block; } }

@@ -10,6 +10,8 @@
   const $ = (selector) => document.querySelector(selector);
   const commentButton = $("#pp-comment");
   const themeButton = $("#pp-theme");
+  const notifyButton = $("#pp-notify");
+  const changesButton = $("#pp-changes");
   const approveButton = $("#pp-approve");
   const hint = $("#pp-hint");
   const banner = $("#pp-banner");
@@ -90,7 +92,8 @@
     return stack.map((item) => item.text);
   }
 
-  const blockOf = (node) => (node.nodeType === 1 ? node : node.parentElement).closest("p, li, td, th, pre, blockquote, h1, h2, h3, h4, h5, h6, figcaption, summary") || article;
+  const BLOCKS = "p, li, td, th, pre, blockquote, h1, h2, h3, h4, h5, h6, figcaption, summary";
+  const blockOf = (node) => (node.nodeType === 1 ? node : node.parentElement).closest(BLOCKS) || article;
 
   function textTarget(range, kindOfTarget) {
     const block = blockOf(range.startContainer);
@@ -142,6 +145,7 @@
   }
 
   function describe(target) {
+    if (target.kind === "general") return "General comment";
     if (target.kind === "box") return `Diagram ${target.diagram}, box "${target.label}"`;
     if (target.kind === "diagram") return `Diagram ${target.diagram}`;
     if (target.kind === "word") return `Word "${target.quote}"`;
@@ -272,13 +276,32 @@
   }, true);
 
   // Panel
+  // A general comment is on the plan as a whole, so it has no target to highlight.
+  const generalField = element("textarea", { id: "pp-general-text", "aria-label": "General comment", placeholder: "A comment on the whole plan" });
+  const addGeneral = () => {
+    const text = generalField.value.trim();
+    if (!text) return generalField.focus();
+    drafts.push({
+      id: `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, text, tab: null, headings: [], revision, sourceDigest,
+      target: { kind: "general", quote: "", prefix: "", suffix: "", diagram: null, label: "" },
+    });
+    generalField.value = "";
+    saveDrafts();
+    render();
+  };
+  generalField.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) { event.preventDefault(); addGeneral(); }
+  });
+  const generalButton = element("button", { type: "button", id: "pp-general-add", class: "pp-button", text: "Add", onclick: addGeneral });
+  const general = element("div", { class: "pp-general" },
+    element("label", { for: "pp-general-text", text: "General comment" }), generalField, element("div", { class: "pp-row" }, generalButton));
   const draftList = element("div", { id: "pp-drafts" });
   const sentList = element("div", { id: "pp-sent" });
   const sendButton = element("button", { type: "button", id: "pp-send", class: "pp-button primary", text: "Send comments", disabled: "" });
   const panel = element("aside", { id: "pp-panel", "aria-label": "Comments" },
     element("div", { class: "pp-panel-head" }, element("span", { text: "Comments" }),
       element("button", { type: "button", class: "pp-button", text: "Close", onclick: () => setCommentMode(false) })),
-    element("div", { class: "pp-panel-body" }, element("h3", { text: "Drafts" }), draftList, element("h3", { text: "Sent" }), sentList),
+    element("div", { class: "pp-panel-body" }, general, element("h3", { text: "Drafts" }), draftList, element("h3", { text: "Sent" }), sentList),
     element("div", { class: "pp-panel-foot" }, sendButton));
   document.body.append(panel);
 
@@ -405,8 +428,9 @@
     count.hidden = !drafts.length;
     hint.textContent = commentMode ? "Select text, or click a word, box or diagram." : reason && !closed() ? reason : "";
     sendButton.disabled = !drafts.length || locked();
+    generalField.disabled = generalButton.disabled = locked();
     sendButton.textContent = drafts.length ? `Send ${drafts.length} comment${drafts.length === 1 ? "" : "s"}` : "Send comments";
-    draftList.replaceChildren(...(drafts.length ? drafts.map(draftCard) : [element("p", { class: "pp-empty", text: "Turn on comment mode, then select text or click a word, a box or a diagram." })]));
+    draftList.replaceChildren(...(drafts.length ? drafts.map(draftCard) : [element("p", { class: "pp-empty", text: "Select text or click a word, a box or a diagram, or write a general comment above." })]));
     sentList.replaceChildren(...sentCards());
     if (!live) showBanner("offline", "Open this page through the link the agent printed to comment or approve.");
     else if (offline) showBanner("offline", "The viewer is not reachable. Your drafts stay in this tab.");
@@ -424,6 +448,169 @@
     } catch { offline = true; }
     if (locked() && commentMode) setCommentMode(false);
     render();
+  }
+
+  // Attention: a page that reloads onto a revision while nobody looks marks its tab title,
+  // and shows a notification when the tab is hidden and the browser allows them.
+  const seenKey = `present-plan:${base}:seen`;
+  const title = document.title;
+  function readSeen() {
+    try { const value = localStorage.getItem(seenKey); return value === null ? null : Number(value); } catch { return null; }
+  }
+  function storeSeen(value) {
+    try { localStorage.setItem(seenKey, String(value)); } catch { /* the next load then counts as a first load */ }
+  }
+  function acknowledge() {
+    if (document.visibilityState !== "visible") return;
+    document.title = title;
+    if (!(readSeen() >= revision)) storeSeen(revision);
+  }
+  const canAsk = () => live && "Notification" in globalThis && isSecureContext && Notification.permission === "default";
+  notifyButton.textContent = "\u{1F514}";
+  notifyButton.hidden = !canAsk();
+  notifyButton.addEventListener("click", async () => {
+    try { await Notification.requestPermission(); } catch { /* the title mark still works */ }
+    notifyButton.hidden = !canAsk();
+  });
+  if (live && globalThis.PlanAttention) {
+    const decision = PlanAttention.decide({
+      seen: readSeen(), revision, focused: document.hasFocus(), visibility: document.visibilityState,
+      permission: "Notification" in globalThis ? Notification.permission : "unsupported",
+    });
+    if (decision.store !== null) storeSeen(decision.store);
+    if (decision.mark) document.title = `(new) ${title}`;
+    if (decision.notify) {
+      try {
+        const notice = new Notification(`Revision ${revision} is ready`, { body: article.querySelector("h1")?.textContent.trim() || title, tag: seenKey });
+        notice.addEventListener("click", () => { focus(); notice.close(); });
+      } catch { /* the title mark still shows */ }
+    }
+    addEventListener("focus", acknowledge);
+    document.addEventListener("visibilitychange", acknowledge);
+  }
+
+  // Changes: this browser keeps the blocks of the last two revisions it showed of each review, and marks
+  // what changed since the earlier one. Changed words get a highlight and new blocks a class, so the
+  // plan's text and structure never change.
+  const revisionsKey = `present-plan:${base}:revisions`;
+  const showChangesKey = "present-plan:changes";
+
+  // Each block's own text, with whitespace collapsed, and where each of its characters sits in the DOM.
+  function pageBlocks() {
+    const found = new Map();
+    const walker = document.createTreeWalker(article, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const block = blockOf(node);
+      if (block === article || block.closest(".eyebrow, .source-details, figure[data-diagram]")) continue;
+      let entry = found.get(block);
+      if (!entry) found.set(block, entry = { element: block, characters: [], positions: [] });
+      for (let offset = 0; offset < node.data.length; offset++) {
+        const space = /\s/.test(node.data[offset]);
+        if (space && (!entry.characters.length || entry.characters.at(-1) === " ")) continue;
+        entry.characters.push(space ? " " : node.data[offset]);
+        entry.positions.push([node, offset]);
+      }
+    }
+    const blocks = [];
+    for (const entry of found.values()) {
+      if (entry.characters.at(-1) === " ") { entry.characters.pop(); entry.positions.pop(); }
+      if (entry.characters.length) blocks.push({ element: entry.element, positions: entry.positions, tab: tabOf(entry.element), tag: entry.element.tagName.toLowerCase(), text: entry.characters.join("") });
+    }
+    const diagrams = [...article.querySelectorAll("figure[data-diagram]")].map((figure) => ({ element: figure, tab: tabOf(figure), digest: figure.dataset.digest || "" }));
+    return { blocks, diagrams };
+  }
+
+  // Keeps only the reviews this browser opened most recently.
+  function pruneRevisions(keep = 20) {
+    const records = [];
+    for (let index = 0; index < localStorage.length; index++) {
+      const key = localStorage.key(index);
+      if (!/^present-plan:.*:revisions$/.test(key)) continue;
+      let at = 0;
+      try { at = JSON.parse(localStorage.getItem(key)).at || 0; } catch { /* a broken record goes first */ }
+      records.push({ key, at });
+    }
+    records.sort((a, b) => b.at - a.at);
+    for (const { key } of records.slice(keep)) localStorage.removeItem(key);
+  }
+
+  // Stores this revision and returns the one to compare it with: the previous revision when this one is
+  // already stored, so a reload keeps the marks, or the stored one when this revision is newer.
+  function rememberRevision(page) {
+    const record = () => ({
+      revision,
+      blocks: page.blocks.map(({ tab, tag, text }) => ({ tab, tag, text })),
+      diagrams: page.diagrams.map(({ tab, digest }) => ({ tab, digest })),
+    });
+    let stored = null;
+    try { stored = JSON.parse(localStorage.getItem(revisionsKey) || "null"); } catch { /* a broken record starts over */ }
+    let baseline = null;
+    let next = null;
+    if (stored?.current?.revision === revision) { baseline = stored.previous || null; next = { ...stored, at: Date.now() }; }
+    else if (stored?.current?.revision < revision) { baseline = stored.current; next = { current: record(), previous: stored.current, at: Date.now() }; }
+    else if (!stored?.current) next = { current: record(), previous: null, at: Date.now() };
+    // A newer revision already stored means this page is out of date: it compares with nothing.
+    if (next) {
+      try { localStorage.setItem(revisionsKey, JSON.stringify(next)); pruneRevisions(); } catch { /* the marks then last only for this load */ }
+    }
+    return baseline;
+  }
+
+  function changesSince(page, baseline) {
+    if (!baseline || !globalThis.PlanChanges) return null;
+    const oldBlocks = Array.isArray(baseline.blocks) ? baseline.blocks : [];
+    const ranges = [];
+    const elements = [];
+    let count = 0;
+    for (const [index, item] of PlanChanges.align(oldBlocks, page.blocks).entries()) {
+      if (item.status === "same") continue;
+      count++;
+      const block = page.blocks[index];
+      const spans = item.status === "changed" ? PlanChanges.wordDiff(oldBlocks[item.from].text, block.text) : [];
+      // A change that only removed words leaves nothing to highlight, so the block shows it.
+      if (!spans.length) { elements.push(block.element); continue; }
+      for (const [start, end] of spans) {
+        const range = document.createRange();
+        range.setStart(...block.positions[start]);
+        const [node, offset] = block.positions[end - 1];
+        range.setEnd(node, offset + 1);
+        ranges.push(range);
+      }
+    }
+    const digests = new Set((Array.isArray(baseline.diagrams) ? baseline.diagrams : []).map((diagram) => `${diagram.tab}:${diagram.digest}`));
+    for (const diagram of page.diagrams) {
+      if (digests.has(`${diagram.tab}:${diagram.digest}`)) continue;
+      count++;
+      elements.push(diagram.element);
+    }
+    return { ranges, elements, count, since: baseline.revision };
+  }
+
+  function paintChanges(changes, show) {
+    for (const item of changes.elements) item.classList.toggle("pp-changed-block", show);
+    if (globalThis.CSS?.highlights) {
+      if (show) CSS.highlights.set("pp-changed", new Highlight(...changes.ranges));
+      else CSS.highlights.delete("pp-changed");
+    }
+    changesButton.setAttribute("aria-pressed", String(show));
+  }
+
+  if (live) {
+    const page = pageBlocks();
+    const changes = changesSince(page, rememberRevision(page));
+    if (changes?.count) {
+      let show = true;
+      try { show = localStorage.getItem(showChangesKey) !== "hidden"; } catch { /* marks show by default */ }
+      changesButton.textContent = `Changes (${changes.count})`;
+      changesButton.title = `Mark what changed since revision ${changes.since}`;
+      changesButton.hidden = false;
+      changesButton.addEventListener("click", () => {
+        const next = changesButton.getAttribute("aria-pressed") !== "true";
+        try { localStorage.setItem(showChangesKey, next ? "shown" : "hidden"); } catch { /* the choice then lasts only for this load */ }
+        paintChanges(changes, next);
+      });
+      paintChanges(changes, show);
+    }
   }
 
   render();

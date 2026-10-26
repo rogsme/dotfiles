@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { chmod, copyFile, mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
@@ -159,11 +160,13 @@ test("loads Mermaid from the CDN at its pinned version and hash", async (t) => {
   await writeFile(options.source, "# Architecture\n\n```mermaid\nflowchart LR\n  api[API] --> store[(Store)]\n```\n");
   const result = await renderPlan(options);
   const html = await readFile(result.html, "utf8");
-  assert.match(html, /<figure data-diagram="1"><div class="diagram">/);
+  assert.match(html, /<figure data-diagram="1" data-digest="[0-9a-f]{16}"><div class="diagram">/);
+  const [, digest] = html.match(/data-digest="([0-9a-f]{16})"/);
+  assert.equal(digest, createHash("sha256").update("flowchart LR\n  api[API] --> store[(Store)]").digest("hex").slice(0, 16));
   assert.doesNotMatch(html, /class="mermaid"/);
   assert.match(html, /api\[API\] --&gt; store/);
   assert.ok(html.includes(`<script defer src="${CDN}${PINS.mermaid.file}" integrity="${PINS.mermaid.integrity}" crossorigin="anonymous"></script>`));
-  assert.match(html, /<script defer src="\/assets\/diagrams\.js"><\/script>\n  <script defer src="\/assets\/viewer\.js"><\/script>/);
+  assert.match(html, /<script defer src="\/assets\/diagrams\.js"><\/script>\n  <script defer src="\/assets\/attention\.js"><\/script>\n  <script defer src="\/assets\/changes\.js"><\/script>\n  <script defer src="\/assets\/viewer\.js"><\/script>/);
   assert.deepEqual((await readdir(result.session)).filter((name) => name === "assets"), []);
   assert.match(await readFile(new URL("../assets/diagrams.js", import.meta.url), "utf8"), /securityLevel: "strict"/);
 });

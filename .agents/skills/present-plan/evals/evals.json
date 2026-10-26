@@ -96,6 +96,17 @@
         "Keeps presentation off and reports that the check printed no result.",
         "Installs nothing and opens no browser or review."
       ]
+    },
+    {
+      "id": 12,
+      "prompt": "A poll for ACM-123 returned a feedback batch on the current revision with two comments. Both have target kind general, no tab and no headings: one asks to add a rollback step, the other asks why the plan keeps the old endpoint. Handle this feedback.",
+      "expected_output": "Treat both as comments on the plan as a whole. Hand the batch to start-ticket with the polled revision and digest, which verifies the rollback request against the ticket before revising the plan. After the caller handles it, reply to both comments, changed or kept, so Approve unlocks. Do not ask the user to point at a section or type the comments again in the terminal.",
+      "files": [],
+      "expectations": [
+        "Accepts general comments as valid feedback without a quote, tab or heading.",
+        "Hands the batch back with the polled revision and digest, and answers every comment with changed or kept.",
+        "Does not ask the user to repeat the comments in the terminal or to anchor them to a section."
+      ]
     }
   ]
 }

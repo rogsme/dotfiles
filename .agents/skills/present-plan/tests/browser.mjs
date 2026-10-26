@@ -92,10 +92,13 @@ try {
   assert.equal(feedback.event.type, "feedback");
   assert.equal(feedback.approval, false);
   const comments = feedback.event.comments;
-  assert.deepEqual(comments.map((comment) => comment.target.kind), ["word", "box", "diagram", "text"]);
+  assert.deepEqual(comments.map((comment) => comment.target.kind), ["word", "box", "diagram", "text", "general"]);
   assert.equal(comments[1].target.label, "API");
   assert.equal(comments[3].target.quote.includes("Empty page test"), true);
-  assert.ok(comments.every((comment) => comment.revision === 1 && comment.tab === "overview"));
+  assert.ok(comments.slice(0, 4).every((comment) => comment.revision === 1 && comment.tab === "overview"));
+  assert.equal(comments[4].text, "Say how this ships.");
+  assert.equal(comments[4].tab, null);
+  assert.deepEqual(comments[4].headings, []);
   assert.deepEqual(comments[3].headings, ["ACM-123: Pagination", "Plan review"]);
 
   const reply = path.join(plan.session, "reply.json");
@@ -103,7 +106,8 @@ try {
     batch: feedback.event.seq, message: "Updated the overview.",
     answers: comments.map((comment, index) => ({ id: comment.id, outcome: index % 2 ? "kept" : "changed", text: index % 2 ? "The plan already covers it." : "Added to revision 2." })),
   }));
-  await writeFile(source, original + "\n## Revision check\nThe second revision preserves the response contract.\n");
+  await writeFile(source, original.replace("format.", "format and its headers.").replace("cursor[Cursor] --> page[Page]", "cursor[Cursor] --> page[Page] --> next[Next cursor]") +
+    "\n## Revision check\nThe second revision preserves the response contract.\n");
   const updated = await renderPlan({ ...options, session: plan.session });
   assert.equal(updated.revision, 2);
   assert.deepEqual((await replyReview({ session: plan.session, replyFile: reply })).pending, []);

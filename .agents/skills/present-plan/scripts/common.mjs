@@ -33,7 +33,7 @@ export const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) =>
 export const inside = (parent, child) => child === parent || child.startsWith(parent + path.sep);
 
 const skillDirectory = fileURLToPath(new URL("..", import.meta.url));
-const VIEWER_FILES = ["scripts/common.mjs", "scripts/server.mjs", "assets/plan.html", "assets/viewer.css", "assets/viewer.js", "assets/tabs.js", "assets/diagrams.js"];
+const VIEWER_FILES = ["scripts/common.mjs", "scripts/server.mjs", "assets/plan.html", "assets/viewer.css", "assets/viewer.js", "assets/tabs.js", "assets/diagrams.js", "assets/attention.js", "assets/changes.js"];
 
 // A running server reports this, so open can tell a server started from older skill files.
 export async function viewerVersion() {

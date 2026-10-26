@@ -17,6 +17,7 @@ How this project runs the ticket lifecycle. Written by `/setup-rogs`; edit it fr
 | Changelog | {{FILL: on or off; missing in older configurations means off}} |
 | Agent verification | {{FILL: on or off; missing in older configurations means off}} |
 | Autonomous runs | {{FILL: on or off; missing in older configurations means off}} |
+| CI review | {{FILL: on or off; missing in older configurations means off}} |
 
 ## Worktrees
 
@@ -79,4 +80,4 @@ Every pull request and handoff carries one concrete human verification procedure
 - Cleanup that restores settings or removes test data.
 - The environments or surfaces the procedure cannot verify.
 
-Generic steps ("open the app and verify it works") fail this standard, and so do manual repeats of assertions that automation already proves. A change with no user-visible surface keeps the section, says why, and gives the closest exact check through an API, logs, a database or a CLI. The agent that writes the procedure never claims to have run it. When agent verification is on, `verify-pr` runs the steps in a fresh session after a clean review and posts what it saw as agent evidence; the user still confirms each step, from that evidence or by running it.
+Generic steps ("open the app and verify it works") fail this standard, and so do manual repeats of assertions that automation already proves. A change with no user-visible surface keeps the section, says why, and gives the closest exact check through an API, logs, a database or a CLI. The agent that writes the procedure never claims to have run it. When agent verification is on, `verify-pr` runs the steps in a fresh session after a clean review and posts what it saw as agent evidence; the user still confirms each step, from that evidence or by running it. When CI review is on, the procedure that counts after the CI reviewer's CLEAR is the one in the pull request body.

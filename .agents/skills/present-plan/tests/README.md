@@ -8,7 +8,7 @@ From the repository root:
 node --test skills/engineering/present-plan/tests/*.test.mjs
 ```
 
-The render tests exercise the real pinned Markdown lexer, the safety rules, tabs, badges, CDN pins and session revisions. The server tests run the viewer in-process on a free loopback port: tokens and cookies, asset and route limits, the file channel from page to poll, reply validation, the Approve and Done guards, stale comments, theme memory across reviews, idle shutdown, and the refusal to stop another viewer or service. The CLI test runs every script through a symlink to the skill folder, the layout a symlinked install creates. None of these prove real browser interaction.
+The render tests exercise the real pinned Markdown lexer, the safety rules, tabs, badges, CDN pins, diagram digests and session revisions. The server tests run the viewer in-process on a free loopback port: tokens and cookies, asset and route limits, the file channel from page to poll, general comments, reply validation, the Approve and Done guards, stale comments, theme memory across reviews, idle shutdown, and the refusal to stop another viewer or service. The changes test runs the page's block alignment and word diff, and the attention test the page's decision on when to mark the title or notify, without a browser. The CLI test runs every script through a symlink to the skill folder, the layout a symlinked install creates. None of these prove real browser interaction.
 
 ## Browser integration
 
@@ -18,7 +18,7 @@ With `playwright-cli` available:
 node skills/engineering/present-plan/tests/browser.mjs
 ```
 
-The integration test creates its own artifact root, free port, scratch repository and named browser session, and opens no personal browser profile. It renders two reviews on one server and checks that only the viewer and the CDN are contacted. It checks the rendered sections and safety, the Overview and Full plan tabs, and that comment mode is off by default. It switches to dark mode, then comments on a word, a diagram box, a whole diagram and a selected range, and sends the batch. It polls the batch, answers it, and renders revision 2, then checks the live reload with the answers and that the second review opens in the saved theme. Finally it approves through the confirmation dialog and polls the approval. It stops its own server at the end. A failed browser or missing dependency is a failure, never an inferred pass.
+The integration test creates its own artifact root, free port, scratch repository and named browser session, and opens no personal browser profile. It renders two reviews on one server and checks that only the viewer and the CDN are contacted. It checks the rendered sections and safety, the Overview and Full plan tabs, that comment mode is off by default, and that the notification bell shows only where the browser can still ask. It switches to dark mode, then comments on a word, a diagram box, a whole diagram and a selected range, adds a general comment from the panel, and sends the batch. It polls the batch, answers it, and renders revision 2, then checks the live reload with the answers, the changes marked since revision 1 and their toggle across reloads, the `(new)` title mark on a tab without focus until it gets focus, and that the second review opens in the saved theme. Finally it approves through the confirmation dialog and polls the approval. It stops its own server at the end. A failed browser or missing dependency is a failure, never an inferred pass.
 
 ## Agent scenarios and human acceptance
 

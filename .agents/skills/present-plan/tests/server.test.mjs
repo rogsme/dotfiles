@@ -68,7 +68,7 @@ test("a review link needs its own token, then works from a cookie", async (t) =>
 test("serves only its own assets and known routes", async (t) => {
   const { origin, review } = await viewer(t);
   const a = await review();
-  assert.equal((await fetch(`${origin}/assets/viewer.js`)).status, 200);
+  for (const asset of ["viewer.js", "attention.js", "changes.js"]) assert.equal((await fetch(`${origin}/assets/${asset}`)).status, 200, asset);
   for (const route of ["/assets/server.mjs", "/assets/../scripts/common.mjs", "/assets/%2e%2e/scripts/common.mjs", "/r/0123/", `/r/${"0".repeat(32)}/`, "/"]) {
     assert.equal((await fetch(origin + route)).status, 404, route);
   }
@@ -107,6 +107,26 @@ test("feedback travels as files: poll delivers it once, and reply answers every 
   assert.equal(after.pending, false);
   assert.equal(after.batches[0].reply.answers[1].outcome, "kept");
   await assert.rejects(replyReview({ session: a.session, replyFile: path.join(os.tmpdir(), "reply.json") }), /session directory/);
+});
+
+test("a general comment needs only its text, and a batch may hold nothing else", async (t) => {
+  const { review } = await viewer(t);
+  const a = await review();
+  const general = (id) => ({ id, text: `General ${id}`, tab: null, headings: [], revision: 1, target: { kind: "general" } });
+  assert.deepEqual(await (await a.call("api/feedback", { comments: [general("g1"), general("g2")] })).json(), { seq: 1 });
+  const delivered = await pollReview({ session: a.session });
+  assert.deepEqual(delivered.event.comments.map((item) => item.target), [
+    { kind: "general", quote: "", prefix: "", suffix: "", diagram: null, label: "" },
+    { kind: "general", quote: "", prefix: "", suffix: "", diagram: null, label: "" },
+  ]);
+  assert.equal(delivered.event.comments[0].tab, null);
+  assert.deepEqual(delivered.event.comments[0].headings, []);
+  const refused = await a.call("api/feedback", { comments: [{ ...general("g3"), target: { kind: "general", quote: "page" } }] });
+  assert.equal(refused.status, 400);
+  assert.match((await refused.json()).error, /general comment has no quote/);
+  assert.equal((await a.call("api/feedback", { comments: [{ ...general("g4"), target: { kind: "paragraph" } }] })).status, 400);
+  assert.equal((await a.call("api/feedback", { comments: [{ ...general("g5"), text: " " }] })).status, 400);
+  assert.equal((await a.call("api/feedback", { comments: [general("g6"), comment("c1")] })).status, 200);
 });
 
 test("Approve needs the current revision and no batch waiting on the agent", async (t) => {

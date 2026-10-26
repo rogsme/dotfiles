@@ -36,6 +36,7 @@ need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording 
 on Bundles && has issue-tracker.md "## Bundles"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
 on "Autonomous runs" && has workflow.md "## Autonomous runs"
+on "CI review" && has workflow.md "## CI review"
 grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
 true'
 ```
@@ -56,6 +57,8 @@ From here on, "the tracker", "the forge" and every operation named in backticks 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
 
 When the request says the run is autonomous, follow [Autonomous runs](#autonomous-runs) in place of every question below.
+
+When CI review is on, the reviewer `## CI review` names reviews every push, and a runner never starts this skill. Review only when the user asks for it.
 
 ## 1. Verify independence and resolve the pull request
 

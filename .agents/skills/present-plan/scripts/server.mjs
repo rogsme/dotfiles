@@ -8,9 +8,9 @@ import { fileURLToPath } from "node:url";
 import { APP, SCHEMA, SESSION_ID, atomicWrite, inside, invokedDirectly, makePrivateDirectory, readJSON, registryDirectory, revisionFile, safePath, viewerDirectory, viewerVersion } from "./common.mjs";
 
 const assets = fileURLToPath(new URL("../assets/", import.meta.url));
-const ASSETS = { "viewer.js": "text/javascript", "viewer.css": "text/css", "tabs.js": "text/javascript", "diagrams.js": "text/javascript" };
+const ASSETS = { "viewer.js": "text/javascript", "viewer.css": "text/css", "tabs.js": "text/javascript", "diagrams.js": "text/javascript", "attention.js": "text/javascript", "changes.js": "text/javascript" };
 const POLICY = "default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
-const TARGETS = new Set(["text", "word", "box", "diagram"]);
+const TARGETS = new Set(["text", "word", "box", "diagram", "general"]);
 
 export function bindAddress(listen) {
   if (listen === "all") return "0.0.0.0";
@@ -77,6 +77,8 @@ export function cleanComment(comment) {
   const target = comment?.target || {};
   const body = text(comment?.text, 10_000).trim();
   if (!TARGETS.has(target.kind) || !body) throw new Error("Every comment needs text and a target.");
+  // A general comment is on the plan as a whole, so it points at nothing inside it.
+  if (target.kind === "general" && (target.quote || target.label || target.diagram != null)) throw new Error("A general comment has no quote, diagram or label.");
   return {
     id: text(comment.id, 64), text: body, tab: text(comment.tab, 20) || null,
     headings: (Array.isArray(comment.headings) ? comment.headings : []).slice(0, 8).map((heading) => text(heading, 300)),

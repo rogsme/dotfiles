@@ -110,6 +110,7 @@ test("lifecycle keeps review before presentation and approves only the current r
   assert.match(start, /one round per human-requested candidate/);
   assert.match(start, /Not presented: <reason>/);
   assert.match(start, /Status: AWAITING_APPROVAL/);
+  assert.match(start, /print `Status: PLAN_APPROVED` on a line of its own before the work phase begins/);
   assert.match(start, /approval event with `"approval": true` for that exact revision and digest/);
   assert.match(work, /approval event with `"approval": true` for that revision and digest/);
   assert.match(work, /an approval of another revision are not approval/);
