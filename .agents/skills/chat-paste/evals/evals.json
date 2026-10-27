@@ -3,25 +3,38 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "Make this Slack/Teams pastable. Use announcement.md exactly as written. Give me a local HTML page with separate copy buttons; do not open a browser or send it.",
-      "expected_output": "Self-contained local HTML with Slack-native and Teams-HTML clipboard paths, preserving the nested list and release link.",
+      "prompt": "Make this Slack/Teams pastable. Use announcement.md exactly as written. Give me the viewer links with separate copy buttons; do not open a browser or send it.",
+      "expected_output": "A rendered chat-paste session opened with --no-open, with Slack-native and Teams-HTML copy buttons, preserving the nested list and release link.",
       "files": ["evals/files/announcement.md"],
       "expectations": [
-        "The output is a self-contained HTML page with separate Slack and Teams copy buttons.",
+        "The message is rendered with render_message.mjs and opened with viewer.mjs open --no-open; no browser is launched.",
+        "The response gives the viewer links and says each carries a token to keep private.",
         "The message wording, nested lists, and release link are preserved.",
-        "The response provides a preview path and does not claim destination rendering has been verified.",
-        "Slack copy supplies native slack/texty with three list levels rather than relying on HTML or plain-text markup."
+        "The page's Slack copy data includes native slack/texty with three list levels rather than relying on HTML or plain-text markup.",
+        "The response does not claim destination rendering has been verified, and nothing is sent."
       ]
     },
     {
       "id": 2,
-      "prompt": "Format notes.md for Teams. The Internal notes section and Before you send checklist are part of my actual message, so keep them. Preserve the words. Give me a local copy-ready page without sending or opening anything.",
-      "expected_output": "A local Teams-ready preview that preserves the supplied notes and review labels without caller-specific filtering.",
+      "prompt": "Format notes.md for Teams. The Internal notes section and Before you send checklist are part of my actual message, so keep them. Preserve the words. Give me the copy-ready page without sending or opening anything.",
+      "expected_output": "A Teams-only chat-paste session that preserves the supplied notes and review labels without caller-specific filtering.",
       "files": ["evals/files/notes.md"],
       "expectations": [
-        "Internal notes, Before you send, Reviewer: Pat, and the checklist URL are retained.",
-        "The output is a local HTML page with a rich-HTML Teams copy button.",
+        "Internal notes, Before you send, Reviewer: Pat, and the checklist URL are retained in the rendered revision.",
+        "The message is rendered with --destination teams and opened with --no-open.",
         "No caller-specific filtering or inferred styles change the supplied message."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Here's my EOD, make it Slack-ready and let me comment on it: '## Today\\n* Finished the import fix.\\n* Reviewed two PRs.' After you open it, the user comments 'Say which PRs: 12 and 14.' on the word 'two'.",
+      "expected_output": "The agent polls the batch, revises the source, renders revision 2 in the same session, answers the comment with reply, and polls again.",
+      "files": [],
+      "expectations": [
+        "The agent runs poll through a background or completion path and receives the feedback batch.",
+        "The source changes only as the comment asks, and render_message.mjs runs again with the same --name and --session, giving revision 2.",
+        "A reply file in the session directory answers the comment as changed, and viewer.mjs reply accepts it.",
+        "The agent polls again after replying and stops on done or ended."
       ]
     }
   ]

@@ -95,19 +95,24 @@
   const BLOCKS = "p, li, td, th, pre, blockquote, h1, h2, h3, h4, h5, h6, figcaption, summary";
   const blockOf = (node) => (node.nodeType === 1 ? node : node.parentElement).closest(BLOCKS) || article;
 
+  // The context is the block's own text around the range. A nested list is its own block,
+  // so a bullet's context never runs into the bullets under it.
   function textTarget(range, kindOfTarget) {
     const block = blockOf(range.startContainer);
     let prefix = "";
     let suffix = "";
     try {
-      const before = document.createRange();
-      before.selectNodeContents(block);
-      before.setEnd(range.startContainer, range.startOffset);
-      prefix = before.toString().slice(-60);
-      const after = document.createRange();
-      after.selectNodeContents(block);
-      after.setStart(range.endContainer, range.endOffset);
-      suffix = after.toString().slice(0, 60);
+      const walker = document.createTreeWalker(block, NodeFilter.SHOW_TEXT);
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        if (blockOf(node) !== block) continue;
+        if (node === range.startContainer) prefix += node.data.slice(0, range.startOffset);
+        if (node === range.endContainer) suffix += node.data.slice(range.endOffset);
+        if (node === range.startContainer || node === range.endContainer) continue;
+        if (range.comparePoint(node, node.length) < 0) prefix += node.data;
+        else if (range.comparePoint(node, 0) > 0) suffix += node.data;
+      }
+      prefix = prefix.slice(-60);
+      suffix = suffix.slice(0, 60);
     } catch { /* a range that leaves its block keeps no context */ }
     return { kind: kindOfTarget, quote: range.toString().replace(/\s+/g, " ").trim(), prefix, suffix, node: range.startContainer, range };
   }
@@ -441,11 +446,15 @@
     paintTargets();
   }
 
+  // A failed check retries on its own, so the offline banner clears as soon as the viewer answers.
+  let retryTimer = 0;
+  const retrySoon = () => { clearTimeout(retryTimer); retryTimer = setTimeout(refresh, 2000); };
   async function refresh() {
+    clearTimeout(retryTimer);
     try {
       state = await api("api/state");
       offline = false;
-    } catch { offline = true; }
+    } catch { offline = true; retrySoon(); }
     if (locked() && commentMode) setCommentMode(false);
     render();
   }
@@ -615,12 +624,21 @@
 
   render();
   if (!live) return;
-  const events = new EventSource(base + "events");
-  events.addEventListener("state", (event) => {
-    if (Number(JSON.parse(event.data).split(":")[0]) !== revision) return location.reload();
-    void refresh();
-  });
-  events.addEventListener("error", () => { offline = true; render(); });
-  events.addEventListener("open", () => { void refresh(); });
+  function connect() {
+    const events = new EventSource(base + "events");
+    events.addEventListener("state", (event) => {
+      if (Number(JSON.parse(event.data).split(":")[0]) !== revision) return location.reload();
+      void refresh();
+    });
+    events.addEventListener("open", () => { void refresh(); });
+    events.addEventListener("error", () => {
+      offline = true;
+      render();
+      retrySoon();
+      // The browser reconnects a dropped stream itself; one it has closed needs a new EventSource.
+      if (events.readyState === EventSource.CLOSED) setTimeout(connect, 2000);
+    });
+  }
+  connect();
   void refresh();
 })();

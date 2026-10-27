@@ -2,10 +2,28 @@
 // again each time it runs; change tkt, not this file. In a ticket's
 // worktree it gives each shell the ticket's own TMPDIR, moves the new /tmp
 // paths an agent types into that directory, and tells the agent so. tkt
-// hook tmp decides each call; elsewhere it does nothing.
-import { spawnSync } from "node:child_process"
+// hook tmp decides each call; elsewhere it does nothing. It also tells tkt
+// hook event about each new prompt, each status line and each skill started
+// in a session, in order, so tkt need not read a long session back.
+import { spawn, spawnSync } from "node:child_process"
 
 const tkt = "/home/roger/.local/bin/tkt"
+
+// tell hands tkt hook event one event, after the ones before it, without
+// holding up the service while tkt runs.
+let told = Promise.resolve()
+function tell(ev) {
+	told = told.then(() => new Promise((resolve) => {
+		try {
+			const p = spawn(tkt, ["hook", "event", "--json"], { stdio: ["pipe", "ignore", "ignore"], timeout: 5000 })
+			p.on("error", resolve)
+			p.on("close", resolve)
+			p.stdin.end(JSON.stringify(ev))
+		} catch {
+			resolve()
+		}
+	}))
+}
 
 function ask(req) {
 	try {
@@ -37,6 +55,11 @@ export default {
 				if (!event.input || typeof event.input !== "object") return
 				const dir = await dirOf(event.sessionID)
 				if (!dir) return
+				// A skill's start, such as work-ticket's after the plan viewer's
+				// approval, tells tkt the stage moved on.
+				if (event.tool === "skill" && typeof event.input.name === "string") {
+					tell({ directories: [dir], session: event.sessionID, skill: event.input.name })
+				}
 				const r = ask({ directories: [dir], tool: event.tool, input: event.input })
 				// In place, as OpenCode may hold on to the object it passed.
 				if (r?.input) Object.assign(event.input, r.input)
@@ -57,5 +80,22 @@ export default {
 				if (r?.system && Array.isArray(event.system)) event.system.push({ type: "text", text: r.system })
 			})
 		}
+		if (!ctx.event?.subscribe) return
+		const controller = new AbortController()
+		void (async () => {
+			for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+				const data = event.data ?? {}
+				let ev
+				if (event.type === "session.inbox.delivered") ev = { turn: "new" }
+				else if (event.type === "session.text.ended") {
+					const statuses = [...String(data.text ?? "").matchAll(/Status: ([A-Z_]+)/g)].map((m) => m[1])
+					if (statuses.length > 0) ev = { statuses }
+				}
+				if (!ev || !data.sessionID) continue
+				const dir = await dirOf(data.sessionID)
+				if (dir) tell({ directories: [dir], session: data.sessionID, ...ev })
+			}
+		})().catch(() => {})
+		return () => controller.abort()
 	},
 }

@@ -8,7 +8,7 @@ From the repository root:
 node --test skills/engineering/present-plan/tests/*.test.mjs
 ```
 
-The render tests exercise the real pinned Markdown lexer, the safety rules, tabs, badges, CDN pins, diagram digests and session revisions. The server tests run the viewer in-process on a free loopback port: tokens and cookies, asset and route limits, the file channel from page to poll, general comments, reply validation, the Approve and Done guards, stale comments, theme memory across reviews, idle shutdown, and the refusal to stop another viewer or service. The changes test runs the page's block alignment and word diff, and the attention test the page's decision on when to mark the title or notify, without a browser. The CLI test runs every script through a symlink to the skill folder, the layout a symlinked install creates. None of these prove real browser interaction.
+The render tests exercise the real pinned Markdown lexer, the safety rules, tabs, badges, CDN pins, diagram digests and session revisions. The server tests run the viewer in-process on a free loopback port: tokens and cookies, asset and route limits, the file channel from page to poll, general comments, reply validation, the Approve and Done guards, stale comments, theme memory across reviews, idle shutdown, the refusal to stop another viewer or service, and the move to the next port when the configured one is held. The changes test runs the page's block alignment and word diff, and the attention test the page's decision on when to mark the title or notify, without a browser. The CLI test runs every script through a symlink to the skill folder, the layout a symlinked install creates. None of these prove real browser interaction.
 
 ## Browser integration
 

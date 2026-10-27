@@ -1,49 +1,43 @@
 # Chat-paste tests
 
-Run every command from the skill folder (the directory holding `SKILL.md`). Runtime needs Python 3 and Node.js 20+. The browser assets are bundled; no npm install is needed. Tests use synthetic messages and do not open Slack, Teams, or Ferdium.
+Tests need Node.js 22+ and use synthetic messages. They never open Slack, Teams or Ferdium, and they create their own artifact roots and free ports, so they never touch a message the user has open.
 
 ## Automated checks
 
-```sh
-node --test tests/*.test.cjs
-python3 -m unittest discover -s tests -p 'test_*.py' -v
-python3 scripts/render_message.py tests/demo.md --output tests/demo.html --no-open
-```
-
-The last command writes `tests/demo.html`, a generated file that stays out of version control. `--no-open` keeps automated tests from launching the user's browser; ordinary delivery opens it by default. For browser tests, serve only this test directory in a separate terminal:
+From the repository root:
 
 ```sh
-python3 -m http.server 8766 --bind 127.0.0.1 --directory tests
+node --test skills/writing/chat-paste/tests/*.test.cjs skills/writing/chat-paste/tests/*.test.mjs
 ```
 
-Then run:
+The formatter and copy tests run the formatter and the copy buttons without a browser: routing for Chromium, Firefox-like and unknown browsers, and failures that never fall back to plain text. The render tests cover formatting into a session, escaping, failures that write nothing, revisions, and a run from a copied skill folder. The server tests run the viewer in-process on a free loopback port: tokens and cookies, asset and route limits, the file channel from page to poll, general comments, reply validation, the Done guards, stale comments, theme memory, the end of an abandoned message, idle shutdown, the refusal to stop another viewer or service, and the move to the next port. The CLI test runs every script through a symlink to the skill folder. `viewer-copies.test.mjs` checks that `assets/attention.js` and `assets/changes.js` still match present-plan's, and skips outside this repository.
+
+## Browser integration
+
+With `playwright-cli` available:
 
 ```sh
-playwright-cli -s=chat-paste-test open http://127.0.0.1:8766/demo.html
-playwright-cli -s=chat-paste-test run-code --filename="$PWD/tests/browser.js"
-playwright-cli -s=chat-paste-test close
+node skills/writing/chat-paste/tests/browser.mjs
 ```
 
-Use a fresh headless profile. These tests replace only that browser's clipboard with synthetic messages. They check real copy/paste, native Slack MIME in another tab, semantic HTML, typing, failure handling, and absence of external requests. They also verify that supplied "Internal notes" sections and review labels remain part of the message. Tests run with this skill alone, without another workflow installed.
+It renders `demo.md`, opens it on its own server and named browser session, and checks that only the viewer is contacted. It copies for Slack, Teams and plain text and pastes each into another tab to inspect the real clipboard, including Slack's native Delta, checks a failed copy, and repeats the Slack copy with a Firefox-like user agent. Then it comments on a word, a selected range and the whole message, sends the batch, polls it, answers it and renders revision 2. It checks the live reload, the `(new)` title mark, the change marks and their toggle, the answers, a copy of revision 2, and Done. A failed browser or missing dependency is a failure, never an inferred pass.
 
-The Chromium test also exercises the HTML route with a Firefox-like user agent. That is a routing test, not a real Firefox test. To test actual Firefox, use Node 22+ and the installed `firefox` binary:
+To test real Firefox, with the installed `firefox` binary (or `FIREFOX_BINARY`):
 
 ```sh
-node tests/firefox.cjs
+node skills/writing/chat-paste/tests/firefox.cjs
 ```
 
-This uses WebDriver BiDi, creates a fresh headless profile in the system temp directory, opens the generated `file://` demo, and checks real Firefox copy/paste and cross-tab HTML structure. No Playwright Firefox download is needed. Set `FIREFOX_BINARY` to another Firefox-compatible executable if needed. It closes its own browser and removes only its disposable profile. It never reads the user's browser profile or opens a destination app.
-
-Stop the test server afterward. The HTTP server is only for test tooling that blocks `file://` URLs; ordinary use opens the generated file directly.
+It uses WebDriver BiDi with a fresh headless profile in the system temp directory, starts its own viewer, and checks real Firefox copy and paste across tabs and theme memory. It never reads the user's browser profile.
 
 ## Destination acceptance
 
-Open `demo.html` in your normal browser, including Firefox/Zen, and test both copy buttons in private Slack and Teams/Ferdium destinations. Chromium supplies native Slack rich text; Firefox/Zen supplies semantic HTML. A successful HTML clipboard check does not prove that Slack interprets every feature the same way as its native format. Check the composer and, with approval, a final private test message:
+Open a real message in your normal browser, including Firefox/Zen, and test both copy buttons in private Slack and Teams/Ferdium destinations. Chromium supplies native Slack rich text; Firefox/Zen supplies semantic HTML. A successful HTML clipboard check does not prove that Slack interprets every feature the same way as its native format. Check the composer and, with approval, a final private test message:
 
 - Intended heading emphasis and all paragraph/blank-line breaks match.
 - Native lists preserve both child and grandchild nesting.
 - Words, punctuation, emoji, link labels, and link targets match.
 - Plain ALL CAPS text remains plain unless explicitly marked as a heading.
-- A supplied "Internal notes" section remains present for standalone use.
+- A supplied "Internal notes" section remains present.
 
-Clipboard inspection stays in the automated tests; there is no verification pane in the preview. The tests also check a collapsed editor, light/dark switching, remembered preferences, and absence of browser-protocol warnings. Firefox tests verify theme persistence across different `file://` previews. Record the source and app/version for any destination mismatch and fix the conversion. Real mentions need selecting in the destination app. Fonts and app-controlled visual spacing are not copied from the preview's stylesheet.
+Record the source and app/version for any destination mismatch and fix the conversion. Real mentions need selecting in the destination app. Fonts and app-controlled visual spacing are not copied from the page's stylesheet.

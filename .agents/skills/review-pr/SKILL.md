@@ -163,7 +163,7 @@ On a re-review, load every earlier actionable thread and the fixer's replies. Fo
 4. `resolve-thread` only when the original finding is fixed or conclusively disproved, and never a thread a human opened or rejected with evidence. When the forge cannot resolve threads, list the ones to resolve by hand.
 5. `reply` on each thread that stays open, with the remaining evidence, concisely.
 
-A finding the fixer rejected by citing a decision record (an ADR or a contract) is settled, unless new evidence shows the record does not apply; cite the record instead of reopening the same edge case.
+A finding the fixer rejected by citing a decision record (an ADR or a contract) is settled, unless new evidence shows the record does not apply; cite the record instead of reopening the same edge case. So is a finding of a review the user accepted as it is, in a conversation comment headed `## Review accepted` with a `Reason:` line: raise it again only when a commit after the accepted head changed the code it names.
 
 Post a new summary for the current head and its included base. Use `Verdict: READY_FOR_HUMAN` only when no actionable thread and no new finding remains, and refresh the brief and the human verification procedure in that summary.
 

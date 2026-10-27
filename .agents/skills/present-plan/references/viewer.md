@@ -17,7 +17,7 @@ The page's content policy allows scripts, styles and fonts from `cdn.jsdelivr.ne
 | Setting | Default | Meaning |
 |---|---|---|
 | Artifact root | `/tmp/present-plan` | Sessions, the Marked cache and the viewer's own files. Outside every checkout, owned by this user, writable by no one else. `/tmp` is cleared at reboot, and a session stored there cannot resume afterward. |
-| Port | `4388` | The one port every review shares. |
+| Port | `4388` | The first port `open` tries. Reviews share the viewer on it; when it is held by a viewer `open` cannot reuse or replace, or by another service, `open` takes the next usable one of the 20 ports from it up. |
 | Listen | `all` | `all` binds `0.0.0.0`, so other machines reach it, including over Tailscale. `loopback` binds `127.0.0.1` only. An IP address binds only that address. |
 
 Check without opening anything:
@@ -26,7 +26,7 @@ Check without opening anything:
 node "<skill-dir>/scripts/viewer.mjs" check --artifacts "<artifact-root>" --port 4388 --listen all
 ```
 
-It checks Node, the artifact root's ownership, that Marked is cached or reachable, and what holds the port. `"server"` reports `not running`, `running`, or an older viewer that `open` will replace once its open reviews end. A port held by another service, or by a viewer serving another artifact root, fails the check.
+It checks Node, the artifact root's ownership, that Marked is cached or reachable, and what holds the port. `"openPort"` is the port `open` would use now, `"skippedPorts"` names each held port before it and why, and `"server"` reports `not running`, `running`, or an older idle viewer that `open` will replace on that port. The check fails only when every port in the range is held.
 
 ## Render
 
@@ -47,7 +47,7 @@ node "<skill-dir>/scripts/viewer.mjs" reply --session "<session>" --reply-file "
 node "<skill-dir>/scripts/viewer.mjs" end --session "<session>"
 ```
 
-`open` starts the shared server when none runs on the port, reuses one that matches this viewer's version, artifact root and listen setting, and replaces an older one only when it has no open review. It never stops a server with open reviews or another service; it fails and names it. It registers the session, launches the browser on the first URL unless `--no-open`, and prints the URLs. An ended, approved or done review reopens only with `--reopen`.
+`open` starts the shared server when none runs on the port, reuses one that matches this viewer's version, artifact root and listen setting, and replaces an older one only when it has no open review. It never stops a server with open reviews or another service: it leaves that port to it and tries the next one, up to 20 ports from the configured one. The result's `port` is the port the review runs on, and `skippedPorts` lists each port it passed over with the reason. When every port is held, it fails and names what holds the first. It registers the session, launches the browser on the first URL unless `--no-open`, and prints the URLs. An ended, approved or done review reopens only with `--reopen`.
 
 `poll` waits, without a time limit, for the next event the page sent, prints it, then moves it from `events/` to `delivered/`. An interruption between the two delivers the same event again; it never loses one. Use the agent's foreground or background-completion mechanism.
 
@@ -90,7 +90,7 @@ The reply file is JSON:
 
 ## Session files
 
-A session directory holds `session.json` (identity, revision, digest, and the review's id and token), `revision-NNNN.md` and `.json` snapshots, `plan.html`, `state.json` (`open`, `approved`, `done` or `ended`), and the channel: `events/`, `delivered/` and `replies/`. The viewer keeps `viewer/sessions/` (the registry), `viewer/preferences.json` (the theme) and `viewer/server.log` under the artifact root. Treat the whole artifact root as sensitive: plans, comments and tokens are private, and they stay until the user asks for cleanup.
+A session directory holds `session.json` (identity, revision, digest, and the review's id and token), `revision-NNNN.md` and `.json` snapshots, `plan.html`, `state.json` (`open`, `approved`, `done` or `ended`), and the channel: `events/`, `delivered/` and `replies/`. The viewer keeps `viewer/sessions/` (the registry), `viewer/preferences.json` (the theme), `viewer/server-<port>.json` (each running server's stop secret) and `viewer/server.log` under the artifact root. Treat the whole artifact root as sensitive: plans, comments and tokens are private, and they stay until the user asks for cleanup.
 
 ## The server
 

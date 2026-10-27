@@ -170,3 +170,5 @@ export async function makePrivateDirectory(directory) {
 // The viewer's own files under the artifact root: the session registry, preferences and the server log.
 export const viewerDirectory = (root) => path.join(root, "viewer");
 export const registryDirectory = (root) => path.join(viewerDirectory(root), "sessions");
+// Each viewer keeps its own file, so viewers on two ports under one artifact root never share a secret.
+export const serverFile = (root, port) => path.join(viewerDirectory(root), `server-${port}.json`);

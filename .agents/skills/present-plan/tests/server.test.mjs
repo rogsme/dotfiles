@@ -6,10 +6,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { APP, PINS, readJSON } from "../scripts/common.mjs";
+import { APP, PINS, readJSON, serverFile } from "../scripts/common.mjs";
 import { loadMarked, renderPlan } from "../scripts/render_plan.mjs";
 import { startServer } from "../scripts/server.mjs";
-import { endReview, ensureServer, pollReview, registerSession, replyReview, reviewURLs } from "../scripts/viewer.mjs";
+import { endReview, ensureServer, pollReview, registerSession, replyReview, reviewURLs, startViewer } from "../scripts/viewer.mjs";
 
 const sharedRoot = path.join(os.tmpdir(), "present-plan-test-cache");
 await loadMarked(sharedRoot);
@@ -225,6 +225,24 @@ test("open never stops a viewer with open reviews or another service", async (t)
   await assert.rejects(ensureServer({ root, port: elsewhere, listen: "loopback" }), /serves the artifact root \/srv\/other/);
   const unrelated = await fakeService(t, "<html>not a viewer</html>");
   await assert.rejects(ensureServer({ root, port: unrelated, listen: "loopback" }), /another service/);
+});
+
+test("open moves to the next port when the configured one is held", async (t) => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "present-plan-ports-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const held = await fakeService(t, "<html>not a viewer</html>");
+  const viewer = await startViewer({ root, port: held, listen: "loopback" });
+  try {
+    assert.equal(viewer.started, true);
+    assert.ok(viewer.port > held);
+    assert.equal(viewer.skippedPorts[0].port, held);
+    assert.match(viewer.skippedPorts[0].reason, /another service; it was left running/);
+    const again = await startViewer({ root, port: held, listen: "loopback" });
+    assert.deepEqual([again.started, again.port], [false, viewer.port]);
+  } finally {
+    const { secret } = await readJSON(serverFile(root, viewer.port));
+    await fetch(`http://127.0.0.1:${viewer.port}/shutdown`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ secret }) });
+  }
 });
 
 test("review links list local, Tailscale and network addresses", () => {

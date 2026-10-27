@@ -5,7 +5,7 @@ import net from "node:net";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { APP, SCHEMA, SESSION_ID, atomicWrite, inside, invokedDirectly, makePrivateDirectory, readJSON, registryDirectory, revisionFile, safePath, viewerDirectory, viewerVersion } from "./common.mjs";
+import { APP, SCHEMA, SESSION_ID, atomicWrite, inside, invokedDirectly, makePrivateDirectory, readJSON, registryDirectory, revisionFile, safePath, serverFile, viewerDirectory, viewerVersion } from "./common.mjs";
 
 const assets = fileURLToPath(new URL("../assets/", import.meta.url));
 const ASSETS = { "viewer.js": "text/javascript", "viewer.css": "text/css", "tabs.js": "text/javascript", "diagrams.js": "text/javascript", "attention.js": "text/javascript", "changes.js": "text/javascript" };
@@ -287,6 +287,7 @@ export async function startServer({ root, port, listen, idleMinutes = 5, onIdle 
     });
   });
   await new Promise((resolve, reject) => { server.once("error", reject); server.listen(port, host, resolve); });
+  const info = serverFile(root, server.address().port);
 
   const idle = setInterval(async () => {
     const open = (await registered().catch(() => [])).some((item) => item.state.status === "open");
@@ -302,11 +303,11 @@ export async function startServer({ root, port, listen, idleMinutes = 5, onIdle 
       for (const stream of streams) { clearInterval(stream.timer); stream.response.end(); }
       server.close(resolve);
       server.closeAllConnections();
-    }).then(() => unlink(path.join(viewerDirectory(root), "server.json")).catch(() => {})).then(onIdle);
+    }).then(() => unlink(info).catch(() => {})).then(onIdle);
     return stopping;
   }
 
-  await atomicWrite(path.join(viewerDirectory(root), "server.json"), JSON.stringify({ pid: process.pid, port: server.address().port, listen, version, secret }, null, 2) + "\n");
+  await atomicWrite(info, JSON.stringify({ pid: process.pid, port: server.address().port, listen, version, secret }, null, 2) + "\n");
   return { server, port: server.address().port, version, stop };
 }
 

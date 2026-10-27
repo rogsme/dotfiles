@@ -50,11 +50,11 @@
     {
       "id": 7,
       "prompt": "setup-rogs requests a check-only presentation probe on port 4388. That port belongs to an older present-plan viewer that still has two open reviews. The browser must remain closed.",
-      "expected_output": "Report that the older viewer has open reviews and leave it running. Suggest waiting for those reviews to end or choosing another port. Install nothing, open no browser and create no review.",
+      "expected_output": "Report that the older viewer on 4388 has open reviews and was left running, and that the check passed with the next usable port as openPort, where open would put a new review. Install nothing, open no browser and create no review.",
       "files": [],
       "expectations": [
         "Reports the older viewer and its open reviews without stopping it.",
-        "Suggests another port or ending those reviews first.",
+        "Reports the openPort the check chose and the skipped port with its reason.",
         "Opens no browser, installs nothing and creates no review artifact or setting."
       ]
     },

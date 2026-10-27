@@ -2,15 +2,23 @@ import { spawn } from "node:child_process";
 import { watch } from "node:fs";
 import { lstat, open, readFile, rename, unlink } from "node:fs/promises";
 import http from "node:http";
+import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { APP, DEFAULT_LISTEN, DEFAULT_PORT, PINS, atomicWrite, checkNode, checkOwnedDirectory, defaultArtifactRoot, externalDirectory, inside, integrityOf, invokedDirectly, loadSession, makePrivateDirectory, readJSON, registryDirectory, safePath, viewerDirectory, viewerVersion } from "./common.mjs";
+import { APP, DEFAULT_LISTEN, DEFAULT_PORT, PINS, atomicWrite, checkNode, checkOwnedDirectory, defaultArtifactRoot, externalDirectory, inside, integrityOf, invokedDirectly, loadSession, makePrivateDirectory, readJSON, registryDirectory, safePath, serverFile, viewerDirectory, viewerVersion } from "./common.mjs";
 import { fetchPinned } from "./render_plan.mjs";
 import { bindAddress, listEvents, pendingBatches, readState, writeState } from "./server.mjs";
 
 const serverScript = fileURLToPath(new URL("server.mjs", import.meta.url));
+
+// How many ports, from the configured one up, open tries before it gives up.
+export const PORT_TRIES = 20;
+
+// A port that something open cannot reuse or replace holds; open moves on to the next one.
+const taken = (message) => Object.assign(new Error(message), { portTaken: true });
+const pause = () => new Promise((resolve) => setTimeout(resolve, 100));
 
 function request(host, port, method, route, body) {
   return new Promise((resolve, reject) => {
@@ -21,10 +29,10 @@ function request(host, port, method, route, body) {
       response.on("data", (chunk) => { text += chunk; if (text.length > 65_536) call.destroy(new Error("Unexpected viewer response.")); });
       response.on("end", () => {
         try { resolve({ status: response.statusCode, body: JSON.parse(text) }); }
-        catch { reject(new Error(`Port ${port} belongs to another service; choose another port, without stopping it.`)); }
+        catch { reject(taken(`Port ${port} belongs to another service; it was left running.`)); }
       });
     });
-    call.on("timeout", () => call.destroy(new Error(`Cannot tell what holds port ${port}; leave it untouched and choose another port.`)));
+    call.on("timeout", () => call.destroy(taken(`Cannot tell what holds port ${port}; it was left untouched.`)));
     call.on("error", (error) => error.code === "ECONNREFUSED" ? resolve(null) : reject(error));
     if (payload) call.write(payload);
     call.end();
@@ -37,7 +45,7 @@ const probeHost = (listen) => listen === "all" || listen === "loopback" ? "127.0
 export async function health({ port, listen }) {
   const result = await request(probeHost(listen), port, "GET", "/health");
   if (result === null) return null;
-  if (result.status !== 200 || result.body?.app !== APP) throw new Error(`Port ${port} belongs to another service; choose another port, without stopping it.`);
+  if (result.status !== 200 || result.body?.app !== APP) throw taken(`Port ${port} belongs to another service; it was left running.`);
   return result.body;
 }
 
@@ -49,32 +57,79 @@ function settings(options) {
   return { port, listen };
 }
 
-// Starts the shared viewer, reuses a matching one, and replaces an older one only when it has no open review.
+// A process can hold the port without answering HTTP on the probe address, so a free port is one this viewer can bind.
+function bindable(port, listen) {
+  return new Promise((resolve) => {
+    const probe = net.createServer();
+    probe.once("error", () => resolve(false));
+    probe.listen(port, bindAddress(listen), () => probe.close(() => resolve(true)));
+  });
+}
+
+// Viewers older than per-port server files kept one server.json per artifact root.
+async function serverInfo(root, port) {
+  for (const file of [serverFile(root, port), path.join(viewerDirectory(root), "server.json")]) {
+    const info = await readJSON(file).catch(() => null);
+    if (info?.secret && info.port === port) return info;
+  }
+  return null;
+}
+
+// What open would do on this port: start a viewer, reuse the matching one, or replace an older one with no open review.
+async function inspectPort({ root, port, listen, version }) {
+  const running = await health({ port, listen });
+  if (!running) {
+    if (!(await bindable(port, listen))) throw taken(`Port ${port} is held by a process that does not answer as a viewer; it was left running.`);
+    return { plan: "start" };
+  }
+  if (running.version === version && running.root === root && running.listen === listen) return { plan: "reuse" };
+  const difference = running.root !== root ? `serves the artifact root ${running.root}` : running.listen !== listen ? `listens on ${running.listen}` : `runs viewer version ${running.version}`;
+  if (running.openSessions > 0) throw taken(`The viewer on port ${port} ${difference} and still has ${running.openSessions} open review(s); it was left running.`);
+  const info = running.root === root ? await serverInfo(root, port) : null;
+  if (!info) throw taken(`The viewer on port ${port} ${difference}, and it can only be stopped from its own artifact root; it was left running.`);
+  return { plan: "replace", secret: info.secret, difference };
+}
+
+// Starts the viewer on this one port, reuses a matching one, and replaces an older one only when it has no open review.
 export async function ensureServer({ root, port, listen }) {
   const version = await viewerVersion();
-  let running = await health({ port, listen });
-  if (running && (running.version !== version || running.root !== root || running.listen !== listen)) {
-    const difference = running.root !== root ? `serves the artifact root ${running.root}` : running.listen !== listen ? `listens on ${running.listen}` : `runs viewer version ${running.version}`;
-    if (running.openSessions > 0) throw new Error(`The viewer on port ${port} ${difference} and still has ${running.openSessions} open review(s); it was left running. End those reviews or choose another port.`);
-    const info = running.root === root ? await readJSON(path.join(viewerDirectory(root), "server.json")).catch(() => null) : null;
-    if (!info?.secret || (await request(probeHost(listen), port, "POST", "/shutdown", { secret: info.secret }))?.status !== 200) throw new Error(`The viewer on port ${port} ${difference}, and it can only be stopped from its own artifact root; choose another port.`);
-    for (let i = 0; i < 50 && running; i++) { await new Promise((resolve) => setTimeout(resolve, 100)); running = await health({ port, listen }).catch(() => null); }
-    if (running) throw new Error(`The older viewer on port ${port} did not stop; it was left running.`);
+  const found = await inspectPort({ root, port, listen, version });
+  if (found.plan === "reuse") return { started: false, version };
+  if (found.plan === "replace") {
+    if ((await request(probeHost(listen), port, "POST", "/shutdown", { secret: found.secret }))?.status !== 200) throw taken(`The viewer on port ${port} ${found.difference} and refused to stop; it was left running.`);
+    let running = true;
+    for (let i = 0; i < 50 && running; i++) { await pause(); running = await health({ port, listen }).catch(() => null); }
+    if (running) throw taken(`The older viewer on port ${port} did not stop; it was left running.`);
   }
-  if (running) return { started: false, version };
   await makePrivateDirectory(viewerDirectory(root));
   const log = await open(path.join(viewerDirectory(root), "server.log"), "a", 0o600);
   const child = spawn(process.execPath, [serverScript, "--root", root, "--port", String(port), "--listen", listen], { detached: true, stdio: ["ignore", log.fd, log.fd] });
   child.unref();
   await log.close();
   for (let i = 0; i < 50; i++) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await pause();
     const started = await health({ port, listen }).catch(() => null);
-    if (started?.version === version) return { started: true, version };
+    if (started?.version === version && started.root === root && started.listen === listen) return { started: true, version };
     if (child.exitCode !== null) break;
   }
+  // Another open can win a free port first: reuse its viewer when it matches, and leave the port to it when it does not.
+  const after = await inspectPort({ root, port, listen, version });
+  if (after.plan === "reuse") return { started: false, version };
+  if (after.plan === "replace") throw taken(`Another viewer took port ${port} while this one started; it was left running.`);
   throw new Error(`The viewer did not start on port ${port}; see ${path.join(viewerDirectory(root), "server.log")}.`);
 }
+
+// Tries the configured port first, then the ports above it, and skips each one a viewer or service holds that open cannot use.
+async function eachPort({ port }, attempt) {
+  const skipped = [];
+  for (let next = port; next < port + PORT_TRIES && next <= 65535; next++) {
+    try { return { ...(await attempt(next)), port: next, skippedPorts: skipped }; }
+    catch (error) { if (!error.portTaken) throw error; skipped.push({ port: next, reason: error.message }); }
+  }
+  throw new Error(`No usable port from ${port} to ${port + skipped.length - 1}. Port ${port}: ${skipped[0].reason}`);
+}
+
+export const startViewer = ({ root, port, listen }) => eachPort({ port }, (next) => ensureServer({ root, port: next, listen }));
 
 // Tailscale addresses come first: that is how another of the user's machines reaches this one.
 export function reviewURLs({ id, token }, { port, listen }) {
@@ -115,11 +170,10 @@ export async function checkViewer(options = {}) {
   const code = await readFile(cached).catch(() => null);
   if (code && integrityOf(code) === PINS.marked.integrity) marked = "cached";
   else { await fetchPinned(PINS.marked); marked = "reachable"; }
-  const running = await health({ port, listen });
-  if (running && running.root !== root) throw new Error(`The viewer on port ${port} serves another artifact root (${running.root}); choose another port.`);
   const version = await viewerVersion();
-  const server = running ? (running.version === version && running.listen === listen ? "running" : `running an older viewer or listen setting; open replaces it once its ${running.openSessions} open review(s) end`) : "not running";
-  return { status: "ready", node: process.versions.node, artifactRoot: root, port, listen, marked, server, version, browserOpened: false };
+  const found = await eachPort({ port }, (next) => inspectPort({ root, port: next, listen, version }));
+  const server = { start: "not running", reuse: "running", replace: "running an older viewer or listen setting; open replaces it" }[found.plan];
+  return { status: "ready", node: process.versions.node, artifactRoot: root, port, listen, openPort: found.port, skippedPorts: found.skippedPorts, marked, server, version, browserOpened: false };
 }
 
 // The server finds a review through its registry entry and serves it while its state is open.
@@ -134,11 +188,11 @@ export async function openReview(options) {
   const { port, listen } = settings(options);
   const state = await readState(manifest.session);
   if (["ended", "approved", "done"].includes(state.status) && !options.reopen) throw new Error(`This review is ${state.status}. Pass --reopen only when the user asks to reopen it.`);
-  const server = await ensureServer({ root: manifest.artifactRoot, port, listen });
-  await registerSession(manifest, { port, listen });
-  const urls = reviewURLs(manifest, { port, listen });
+  const server = await startViewer({ root: manifest.artifactRoot, port, listen });
+  await registerSession(manifest, { port: server.port, listen });
+  const urls = reviewURLs(manifest, { port: server.port, listen });
   const browser = options.noOpen ? { opened: false, reason: "--no-open" } : await launch(urls[0].url);
-  return { action: "open", session: manifest.session, urls, browserOpened: browser.opened, browserReason: browser.reason || null, server: server.started ? "started" : "reused", revision: manifest.revision, sourceDigest: manifest.sourceDigest };
+  return { action: "open", session: manifest.session, urls, browserOpened: browser.opened, browserReason: browser.reason || null, server: server.started ? "started" : "reused", port: server.port, skippedPorts: server.skippedPorts, revision: manifest.revision, sourceDigest: manifest.sourceDigest };
 }
 
 // Waits for the next thing the browser sent, prints it, then marks it delivered.

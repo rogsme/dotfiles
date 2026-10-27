@@ -7,7 +7,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 
-import { viewerDirectory } from "../scripts/common.mjs";
+import { serverFile } from "../scripts/common.mjs";
 import { renderPlan } from "../scripts/render_plan.mjs";
 import { endReview, health, openReview, pollReview, replyReview } from "../scripts/viewer.mjs";
 
@@ -48,7 +48,7 @@ async function browserCode(template, config) {
 
 // The viewer outlives this script by design, so the test stops its own server through the owner's secret.
 async function stopServer() {
-  const { secret } = JSON.parse(await readFile(path.join(viewerDirectory(artifactRoot), "server.json"), "utf8"));
+  const { secret } = JSON.parse(await readFile(serverFile(artifactRoot, port), "utf8"));
   await new Promise((resolve, reject) => {
     const call = http.request({ host: "127.0.0.1", port, method: "POST", path: "/shutdown", headers: { "Content-Type": "application/json" } }, (response) => { response.resume(); response.on("end", resolve); });
     call.on("error", reject);
@@ -78,6 +78,7 @@ try {
   opened.push(plan.session);
   const open = await openReview({ session: plan.session, port, listen: "loopback", noOpen: true });
   assert.equal(open.server, "started");
+  assert.equal(open.port, port);
   const url = open.urls[0].url;
   const another = await renderPlan({ ...options, source: otherSource, ticket: "ACM-124" });
   opened.push(another.session);

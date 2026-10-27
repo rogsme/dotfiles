@@ -1,16 +1,29 @@
 // Real Firefox smoke test via WebDriver BiDi, without an installed automation
-// package. Requires Node 22+ and Firefox. Uses only a fresh headless profile.
+// package. Requires Node 22+ and Firefox. Uses only a fresh headless profile,
+// and a viewer of its own on a free loopback port.
 const assert = require("node:assert/strict");
 const fs = require("node:fs/promises");
 const os = require("node:os");
 const path = require("node:path");
-const { pathToFileURL } = require("node:url");
+const net = require("node:net");
 const { spawn } = require("node:child_process");
 const { once } = require("node:events");
 
+async function freePort() {
+  const server = net.createServer();
+  await new Promise(resolve => server.listen(0, "127.0.0.1", resolve));
+  const port = server.address().port;
+  await new Promise(resolve => server.close(resolve));
+  return port;
+}
+
 async function main() {
   const profile = await fs.mkdtemp(path.join(os.tmpdir(), "chat-paste-firefox-"));
-  let child, socket;
+  const { renderMessage } = await import("../scripts/render_message.mjs");
+  const { endMessage, openMessage } = await import("../scripts/viewer.mjs");
+  const { serverFile } = await import("../scripts/common.mjs");
+  const artifactRoot = path.join(profile, "messages");
+  let child, socket, session, port;
   let id = 0;
   const pending = new Map();
   const checks = [];
@@ -68,25 +81,23 @@ async function main() {
       else request.resolve(response.result);
     });
     await command("session.new", { capabilities: { alwaysMatch: { acceptInsecureCerts: false } } });
+    port = await freePort();
+    session = (await renderMessage({ source: path.join(__dirname, "demo.md"), name: "firefox-demo", artifactRoot })).session;
+    const url = (await openMessage({ session, port, listen: "loopback", noOpen: true })).urls[0].url;
     const sender = (await command("browsingContext.create", { type: "tab" })).context;
-    const url = pathToFileURL(path.join(__dirname, "demo.html")).href;
     await command("browsingContext.navigate", { context: sender, url, wait: "complete" });
     check((await evaluate(sender, "navigator.userAgent")).includes("Firefox/"), "Running actual Firefox, not a spoofed Chromium UA");
-    check(await evaluate(sender, "document.querySelector('#preview ul ul ul') !== null"), "Firefox renders all three list levels");
+    check(await evaluate(sender, "document.querySelector('article ul ul ul') !== null"), "Firefox renders all three list levels");
+    check((await evaluate(sender, "document.querySelector('#status').textContent")) === "Ready to copy.", "The copy buttons are ready");
+    await evaluate(sender, "new Promise(resolve => setTimeout(resolve, 2500))");
+    check(await evaluate(sender, "document.querySelector('#cp-banner').hidden && !document.querySelector('#cp-comment').disabled"), `The page reaches the viewer: ${await evaluate(sender, "document.querySelector('#cp-banner').textContent")}`);
     check((await evaluate(sender, "document.querySelector('#warning').textContent")) === "", "No browser-protocol warning is shown");
-    check(await evaluate(sender, "document.querySelector('#verify') === null"), "Verification section is absent");
-    check(await evaluate(sender, "!document.querySelector('#source-panel').open"), "Source editor is collapsed by default");
-    await evaluate(sender, "document.querySelector('#theme-toggle').click()");
+    await evaluate(sender, "document.querySelector('#cp-theme').click()");
     const theme = await evaluate(sender, "document.documentElement.dataset.theme");
     check(["dark", "light"].includes(theme), "Theme toggle sets an explicit appearance");
+    await evaluate(sender, `new Promise(resolve => { const wait = () => fetch('api/state', { headers: { 'X-Chat-Paste': '1' } }).then(r => r.json()).then(state => state.theme === ${JSON.stringify(theme)} ? resolve() : setTimeout(wait, 100)); wait(); })`);
     await command("browsingContext.reload", { context: sender, wait: "complete" });
-    check(await evaluate(sender, "document.documentElement.dataset.theme") === theme, "Firefox remembers the theme after reload");
-    const secondFile = path.join(profile, "another-preview.html");
-    await fs.copyFile(path.join(__dirname, "demo.html"), secondFile);
-    const second = (await command("browsingContext.create", { type: "tab" })).context;
-    await command("browsingContext.navigate", { context: second, url: pathToFileURL(secondFile).href, wait: "complete" });
-    check(await evaluate(second, "document.documentElement.dataset.theme") === theme, "Firefox remembers the theme across different local preview files");
-    check(await evaluate(sender, "localStorage.length") === 1, "Only the theme preference is stored, never message content");
+    check(await evaluate(sender, "document.documentElement.dataset.theme") === theme, "The viewer remembers the theme after reload");
     const receiver = (await command("browsingContext.create", { type: "tab" })).context;
     await command("browsingContext.navigate", { context: receiver, url, wait: "complete" });
     await evaluate(receiver, `(() => {
@@ -111,12 +122,12 @@ async function main() {
       check((await evaluate(sender, "document.querySelector('#status').textContent")).startsWith("Copied"), `${target} copies in Firefox`);
       await paste(receiver, "#receiver");
       const received = JSON.parse(await evaluate(receiver, "JSON.stringify(window.received)"));
-      const expected = JSON.parse(await evaluate(sender, "JSON.stringify(ChatPasteFormatter.format(document.querySelector('#source').value))"));
+      const expected = JSON.parse(await evaluate(sender, "document.getElementById('chat-paste-data').textContent"));
       check(received['text/plain'] === expected.plain, `${target} exact plain text reaches a separate Firefox tab`);
       check(!received['slack/texty'], `${target} Firefox path does not leave Chromium-native data`);
       if (target !== 'plain') {
         const structure = await evaluate(receiver, `JSON.stringify((${signature})(window.received['text/html']))`);
-        const expectedHTML = await evaluate(sender, `JSON.stringify((${signature})(ChatPasteFormatter.format(document.querySelector('#source').value).html))`);
+        const expectedHTML = await evaluate(sender, `JSON.stringify((${signature})(JSON.parse(document.getElementById('chat-paste-data').textContent).html))`);
         check(structure === expectedHTML, `${target} complete HTML structure and text survive Firefox's actual clipboard`);
       } else check(!received['text/html'], "Plain copy clears rich HTML");
     }
@@ -131,6 +142,11 @@ async function main() {
       const timer = setTimeout(() => child.kill("SIGKILL"), 3000);
       await exited;
       clearTimeout(timer);
+    }
+    if (session) await endMessage({ session }).catch(error => console.error(`Session cleanup: ${error.message}`));
+    if (port) {
+      const { secret } = JSON.parse(await fs.readFile(serverFile(artifactRoot, port), "utf8"));
+      await fetch(`http://127.0.0.1:${port}/shutdown`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ secret }) }).catch(error => console.error(`Server cleanup: ${error.message}`));
     }
     // Remove only the disposable profile created by this test, never a user's.
     await fs.rm(profile, { recursive: true });

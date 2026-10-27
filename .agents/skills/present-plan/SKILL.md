@@ -35,7 +35,7 @@ Resume only the exact owned session. A changed bundle, different checkout, modif
 
 ## 3. Open and receive feedback
 
-Run the `open` action. Give the human every URL it prints: `Local` for this machine, `Tailscale` and `Network` for reaching it from another one. Each link carries the review's token, so share it only with the user. A launch attempt alone does not prove the browser opened; when automatic launch fails, report it and give the links for manual opening.
+Run the `open` action. When something else holds the configured port, `open` moves to the next port it can use and names each port it skipped in `skippedPorts`; the links carry the port it chose, so a review on another port needs no other action. Give the human every URL it prints: `Local` for this machine, `Tailscale` and `Network` for reaching it from another one. Each link carries the review's token, so share it only with the user. A launch attempt alone does not prove the browser opened; when automatic launch fails, report it and give the links for manual opening.
 
 Run `poll` through an agent-supported wait or completion-notification path. Before saying feedback is monitored, establish that completion resumes this agent. Where no wake path exists, give the links and ask the human to return here after sending comments or approving; poll on that next turn. A nonzero exit or interrupted output is incomplete, never an empty review or approval.
 
@@ -64,4 +64,4 @@ Hand back the current source path, HTML path, review links, revision/digest, fee
 
 ## Fallback
 
-On no network for a first Marked fetch, a hash mismatch, a script run with no JSON result (even with exit code 0), an unavailable browser, a port held by another service or by a viewer with open reviews, a corrupt session, or a tool/permission limit, preserve the source and artifacts. Return `Not presented: <specific failure>` and the complete canonical report, including the review section or `Not reviewed:` line. The caller can deliver it in the terminal and still ask for approval there. Leave other services and their reviews running, and preserve every review finding and report detail.
+On no network for a first Marked fetch, a hash mismatch, a script run with no JSON result (even with exit code 0), an unavailable browser, no usable port in the range `open` tries, a corrupt session, or a tool/permission limit, preserve the source and artifacts. Return `Not presented: <specific failure>` and the complete canonical report, including the review section or `Not reviewed:` line. The caller can deliver it in the terminal and still ask for approval there. Leave other services and their reviews running, and preserve every review finding and report detail.
