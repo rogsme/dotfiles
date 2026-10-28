@@ -1,4 +1,7 @@
 import importlib.util
+import io
+import json
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 import subprocess
 import tempfile
@@ -15,11 +18,42 @@ spec.loader.exec_module(renderer)
 
 
 class RenderTests(unittest.TestCase):
+    def setUp(self):
+        self.stdout = self.enterContext(redirect_stdout(io.StringIO()))
+        self.stderr = self.enterContext(redirect_stderr(io.StringIO()))
+        self.temporary = tempfile.TemporaryDirectory(prefix="eod-cli-")
+        self.addCleanup(self.temporary.cleanup)
+        self.session = Path(self.temporary.name)
+        self.source = self.session / "revision-0001.md"
+        self.page = self.session / "message.html"
+        self.source.touch()
+        self.page.touch()
+        self.cli = self.session / "render_message.mjs"
+        self.cli.touch()
+        self.cli.with_name("viewer.mjs").touch()
+        self.prepared_source = None
+
+    def fake_cli(self, command):
+        if "--source" in command:
+            source = Path(command[command.index("--source") + 1])
+            self.prepared_source = source.read_text()
+            self.assertEqual(source.stat().st_mode & 0o777, 0o600)
+            return {
+                "session": str(self.session),
+                "source": str(self.source),
+                "html": str(self.page),
+                "warnings": [],
+            }
+        return {
+            "browserOpened": True,
+            "urls": [{"label": "Local", "url": "http://127.0.0.1:4410/r/test/"}],
+        }
+
     def test_formatter_uses_shared_skill_before_legacy_install(self):
         with tempfile.TemporaryDirectory(prefix="eod-formatter-") as root:
             home = Path(root)
-            shared = home / ".agents/skills/chat-paste/scripts/render_message.py"
-            legacy = home / ".claude/skills/chat-paste/scripts/render_message.py"
+            shared = home / ".agents/skills/chat-paste/scripts/render_message.mjs"
+            legacy = home / ".claude/skills/chat-paste/scripts/render_message.mjs"
             for cli in [shared, legacy]:
                 cli.parent.mkdir(parents=True)
                 cli.touch()
@@ -34,7 +68,7 @@ class RenderTests(unittest.TestCase):
             source = Path(root) / "internal.md"
             source.write_text("Team update\n\n## Internal notes\nPRIVATE_SENTINEL")
             with (
-                patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
+                patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
                 patch.object(
                     renderer.sys,
                     "argv",
@@ -48,17 +82,15 @@ class RenderTests(unittest.TestCase):
                     ],
                 ),
                 patch.object(
-                    renderer.subprocess,
-                    "run",
-                    return_value=subprocess.CompletedProcess(
-                        [], 0, stdout="", stderr=""
-                    ),
+                    renderer,
+                    "run_cli",
+                    side_effect=self.fake_cli,
                 ) as call,
             ):
                 self.assertEqual(renderer.main(), 0)
                 command = call.call_args.args[0]
                 self.assertEqual(command[command.index("--destination") + 1], "both")
-                self.assertEqual(call.call_args.kwargs["input"], "Team update")
+                self.assertEqual(self.prepared_source, "Team update")
 
     def output_path(self, draft):
         output = Path("/tmp/opencode") / f"{draft.stem}.html"
@@ -70,17 +102,28 @@ class RenderTests(unittest.TestCase):
             self.skipTest("Optional formatter is not installed")
         with tempfile.TemporaryDirectory(prefix="eod-export-") as root:
             draft = Path(root) / f"{Path(root).name}.md"
-            output = self.output_path(draft)
             draft.write_text(text, encoding="utf-8")
             result = subprocess.run(
-                [sys.executable, str(SCRIPT), str(draft), "--mode", mode, "--no-open"],
+                [
+                    sys.executable,
+                    str(SCRIPT),
+                    str(draft),
+                    "--mode",
+                    mode,
+                    "--no-open",
+                    "--artifacts",
+                    str(Path(root) / "artifacts"),
+                ],
                 capture_output=True,
                 text=True,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(draft.read_text(encoding="utf-8"), text)
             self.assertFalse(draft.with_suffix(".html").exists())
-            return output.read_text(encoding="utf-8")
+            payload = json.loads(result.stdout)
+            self.assertFalse(payload["browserOpened"])
+            self.assertNotIn("PRIVATE_SENTINEL", Path(payload["source"]).read_text())
+            return Path(payload["html"]).read_text(encoding="utf-8")
 
     def test_private_notes_never_enter_the_export(self):
         page = self.export_page(
@@ -88,8 +131,7 @@ class RenderTests(unittest.TestCase):
         )
         self.assertNotIn("PRIVATE_SENTINEL", page)
         self.assertNotIn("## Internal notes", page)
-        self.assertNotRegex(page, r"<script[^>]+src=")
-        self.assertIn("default-src &#x27;none&#x27;", page)
+        self.assertIn("/assets/viewer.js", page)
 
     @unittest.skipUnless(
         renderer.CHAT_PASTE_CLI.is_file(), "Optional formatter is not installed"
@@ -97,18 +139,35 @@ class RenderTests(unittest.TestCase):
     def test_cli_generates_private_page_and_regenerates_after_revisions(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
             draft = Path(root) / f"{Path(root).name}.md"
-            output = self.output_path(draft)
             draft.write_text("Hey team!\n\nTODAY 🙂\n* First", encoding="utf-8")
-            command = ["python3", str(SCRIPT), str(draft), "--no-open"]
+            command = [
+                "python3",
+                str(SCRIPT),
+                str(draft),
+                "--no-open",
+                "--artifacts",
+                str(Path(root) / "artifacts"),
+            ]
             first = subprocess.run(command, capture_output=True, text=True)
             self.assertEqual(first.returncode, 0, first.stderr)
+            first_result = json.loads(first.stdout)
+            output = Path(first_result["html"])
             self.assertEqual(output.stat().st_mode & 0o777, 0o600)
-            self.assertIn(output.as_uri(), first.stdout)
+            self.assertEqual(Path(first_result["source"]).stat().st_mode & 0o777, 0o600)
+            self.assertIn("* First", Path(first_result["source"]).read_text())
             draft.write_text("Hey team!\n\nTODAY 🙂\n* Revised", encoding="utf-8")
-            second = subprocess.run(command, capture_output=True, text=True)
+            second = subprocess.run(
+                command + ["--session", first_result["session"]],
+                capture_output=True,
+                text=True,
+            )
             self.assertEqual(second.returncode, 0, second.stderr)
             self.assertIn("Revised", output.read_text())
             self.assertNotIn('"* First"', output.read_text())
+            second_result = json.loads(second.stdout)
+            self.assertEqual(second_result["session"], first_result["session"])
+            self.assertEqual(second_result["revision"], 2)
+            self.assertIn("* First", Path(first_result["source"]).read_text())
 
     @unittest.skipUnless(
         renderer.CHAT_PASTE_CLI.is_file(), "Optional formatter is not installed"
@@ -119,12 +178,20 @@ class RenderTests(unittest.TestCase):
             output = self.output_path(draft)
             draft.write_text("![image](https://example.com/a.png)")
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(draft),
+                    "--no-open",
+                    "--artifacts",
+                    str(Path(root) / "artifacts"),
+                ],
                 capture_output=True,
                 text=True,
             )
             self.assertEqual(result.returncode, 1)
             self.assertFalse(output.exists())
+            self.assertFalse((Path(root) / "artifacts").exists())
 
     @unittest.skipUnless(
         renderer.CHAT_PASTE_CLI.is_file(), "Optional formatter is not installed"
@@ -137,11 +204,18 @@ class RenderTests(unittest.TestCase):
             output.parent.mkdir(parents=True, exist_ok=True)
             output.write_text("User-owned page")
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(draft),
+                    "--no-open",
+                    "--artifacts",
+                    str(Path(root) / "artifacts"),
+                ],
                 capture_output=True,
                 text=True,
             )
-            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(output.read_text(), "User-owned page")
 
     @unittest.skipUnless(
@@ -157,12 +231,20 @@ class RenderTests(unittest.TestCase):
             output.parent.mkdir(parents=True, exist_ok=True)
             output.symlink_to(target)
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(draft),
+                    "--no-open",
+                    "--artifacts",
+                    str(Path(root) / "artifacts"),
+                ],
                 capture_output=True,
                 text=True,
             )
-            self.assertEqual(result.returncode, 1)
+            self.assertEqual(result.returncode, 0, result.stderr)
             self.assertEqual(target.read_text(), "User-owned page")
+            self.assertTrue(output.is_symlink())
 
     def test_notes_and_client_files_are_rejected(self):
         with tempfile.TemporaryDirectory(prefix="eod-render-") as root:
@@ -182,6 +264,8 @@ class RenderTests(unittest.TestCase):
             config = Path(root) / "client.md"
             config.write_text("---\nchannel: Microsoft Teams chat\n---\n")
             self.assertEqual(renderer.channel(config), "teams")
+            config.write_text("---\nchannel: Slack and Microsoft Teams chat\n---\n")
+            self.assertEqual(renderer.channel(config), "both")
 
     def test_heading_policy_stays_in_the_eod_adapter(self):
         self.assertEqual(
@@ -221,7 +305,7 @@ class RenderTests(unittest.TestCase):
     @unittest.skipUnless(
         renderer.CHAT_PASTE_CLI.is_file(), "Optional formatter is not installed"
     )
-    def test_old_owned_eod_preview_migrates_to_shared_renderer(self):
+    def test_old_preview_is_preserved_beside_new_session(self):
         with tempfile.TemporaryDirectory(prefix="eod-migrate-") as root:
             draft = Path(root) / f"{Path(root).name}.md"
             draft.write_text("Hey team!\n\nTODAY 🙂\n* Works")
@@ -231,12 +315,20 @@ class RenderTests(unittest.TestCase):
                 "<!doctype html>\n<!-- Generated by EOD formatter v1. -->\nOld generated preview"
             )
             result = subprocess.run(
-                ["python3", str(SCRIPT), str(draft), "--no-open"],
+                [
+                    "python3",
+                    str(SCRIPT),
+                    str(draft),
+                    "--no-open",
+                    "--artifacts",
+                    str(Path(root) / "artifacts"),
+                ],
                 capture_output=True,
                 text=True,
             )
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertIn("<!-- Generated by chat-paste v1. -->", output.read_text())
+            self.assertIn("Old generated preview", output.read_text())
+            self.assertNotEqual(str(output), json.loads(result.stdout)["html"])
 
     def test_handoff_uses_only_public_cli_and_prepared_message(self):
         self.assertFalse((SKILL / "assets" / "formatter.js").exists())
@@ -245,29 +337,27 @@ class RenderTests(unittest.TestCase):
             source.write_text(
                 "Hey team!\n\nSHIPPED\n• Works\n\n## Internal notes\nPRIVATE_SENTINEL"
             )
-            result = subprocess.CompletedProcess([], 0, stdout="", stderr="")
             with (
-                patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
+                patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
                 patch.object(
                     renderer.sys,
                     "argv",
                     [str(SCRIPT), str(source), "--mode", "internal"],
                 ),
-                patch.object(renderer.subprocess, "run", return_value=result) as call,
+                patch.object(renderer, "run_cli", side_effect=self.fake_cli) as call,
             ):
                 self.assertEqual(renderer.main(), 0)
                 command = call.call_args.args[0]
-                self.assertEqual(command[1], str(SCRIPT))
-                self.assertIn("--stdin", command)
-                self.assertEqual(
-                    command[command.index("--output") + 1],
-                    str(Path("/tmp/opencode") / f"{source.stem}.html"),
-                )
+                self.assertEqual(command[:2], ["node", str(self.cli)])
+                self.assertIn("--source", command)
+                self.assertNotIn("--stdin", command)
+                self.assertNotIn("--output", command)
                 self.assertEqual(command[command.index("--destination") + 1], "slack")
                 self.assertEqual(
-                    call.call_args.kwargs["input"], "Hey team!\n\n## SHIPPED\n• Works"
+                    self.prepared_source, "Hey team!\n\n## SHIPPED\n• Works"
                 )
                 self.assertNotIn("PRIVATE_SENTINEL", str(call.call_args))
+                self.assertFalse(Path(command[command.index("--source") + 1]).exists())
 
     def test_adapter_opens_only_with_explicit_flag(self):
         with tempfile.TemporaryDirectory(prefix="eod-open-") as root:
@@ -277,26 +367,33 @@ class RenderTests(unittest.TestCase):
                 for flags in [[], ["--no-open"], ["--open"]]:
                     with (
                         self.subTest(mode=mode, flags=flags),
-                        patch.object(renderer, "CHAT_PASTE_CLI", SCRIPT),
+                        patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
                         patch.object(
                             renderer.sys,
                             "argv",
                             [str(SCRIPT), str(source), "--mode", mode, *flags],
                         ),
                         patch.object(
-                            renderer.subprocess,
-                            "run",
-                            return_value=subprocess.CompletedProcess(
-                                [], 0, stdout="", stderr=""
-                            ),
+                            renderer,
+                            "run_cli",
+                            side_effect=self.fake_cli,
                         ) as call,
                     ):
                         self.assertEqual(renderer.main(), 0)
-                        command = call.call_args.args[0]
                         self.assertEqual(
-                            [arg for arg in command if arg in ("--open", "--no-open")],
-                            flags or ["--no-open"],
+                            call.call_count, 2 if flags == ["--open"] else 1
                         )
+                        if flags == ["--open"]:
+                            self.assertEqual(
+                                call.call_args.args[0],
+                                [
+                                    "node",
+                                    str(self.cli.with_name("viewer.mjs")),
+                                    "open",
+                                    "--session",
+                                    str(self.session),
+                                ],
+                            )
 
     def test_eod_delivery_and_checker_work_without_formatter_or_node(self):
         with tempfile.TemporaryDirectory(prefix="eod-standalone-") as root:
@@ -335,6 +432,87 @@ class RenderTests(unittest.TestCase):
             "Public body",
         )
         self.assertNotIn("importlib", SCRIPT.read_text())
+
+    def test_cli_failures_and_invalid_json_are_errors(self):
+        cases = [
+            subprocess.CompletedProcess([], 1, stdout="", stderr="Unsupported format"),
+            subprocess.CompletedProcess([], 0, stdout="", stderr=""),
+            subprocess.CompletedProcess([], 0, stdout="[]", stderr=""),
+        ]
+        for result in cases:
+            with (
+                self.subTest(result=result),
+                patch.object(renderer.subprocess, "run", return_value=result),
+            ):
+                with self.assertRaises(ValueError):
+                    renderer.run_cli(["node", str(self.cli)])
+
+    def test_missing_node_is_an_error_not_a_missing_skill(self):
+        draft = self.session / "draft.md"
+        draft.write_text("Public body")
+        with (
+            patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
+            patch.object(renderer.sys, "argv", [str(SCRIPT), str(draft)]),
+            patch.object(
+                renderer.subprocess, "run", side_effect=FileNotFoundError("node")
+            ),
+        ):
+            self.assertEqual(renderer.main(), 1)
+        self.assertIn("Formatting failed", self.stderr.getvalue())
+        self.assertNotIn("not installed", self.stdout.getvalue())
+
+    def test_no_preview_is_claimed_without_existing_paths(self):
+        draft = self.session / "draft.md"
+        draft.write_text("Public body")
+        with (
+            patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
+            patch.object(renderer.sys, "argv", [str(SCRIPT), str(draft), "--open"]),
+            patch.object(
+                renderer, "run_cli", return_value={"session": "/missing/session"}
+            ) as call,
+        ):
+            self.assertEqual(renderer.main(), 1)
+            self.assertEqual(call.call_count, 1)
+        self.assertEqual(self.stdout.getvalue(), "")
+
+    def test_browser_failure_preserves_the_render_result(self):
+        draft = self.session / "draft.md"
+        draft.write_text("Public body")
+
+        def fail_open(command):
+            if "open" in command:
+                raise ValueError("No usable viewer port")
+            return self.fake_cli(command)
+
+        with (
+            patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
+            patch.object(renderer.sys, "argv", [str(SCRIPT), str(draft), "--open"]),
+            patch.object(renderer, "run_cli", side_effect=fail_open),
+        ):
+            self.assertEqual(renderer.main(), 1)
+        self.assertEqual(json.loads(self.stdout.getvalue())["html"], str(self.page))
+        self.assertIn("No usable viewer port", self.stderr.getvalue())
+
+    def test_unsuccessful_browser_launch_is_not_reported_as_open(self):
+        draft = self.session / "draft.md"
+        draft.write_text("Public body")
+
+        def unopened(command):
+            if "open" in command:
+                return {
+                    "browserOpened": False,
+                    "browserReason": "xdg-open: ENOENT",
+                    "urls": [],
+                }
+            return self.fake_cli(command)
+
+        with (
+            patch.object(renderer, "CHAT_PASTE_CLI", self.cli),
+            patch.object(renderer.sys, "argv", [str(SCRIPT), str(draft), "--open"]),
+            patch.object(renderer, "run_cli", side_effect=unopened),
+        ):
+            self.assertEqual(renderer.main(), 0)
+        self.assertFalse(json.loads(self.stdout.getvalue())["browserOpened"])
 
 
 if __name__ == "__main__":

@@ -74,18 +74,34 @@ permission:
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     # Standalone chat-paste exports accept saved EODs or temporary messages.
-    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
-    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
-    "python3 /home/roger/.agents/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
-    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
-    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
-    "python3 ~/.agents/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
-    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
-    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
-    "python3 /home/roger/.claude/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
-    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py /home/roger/.eod/*": allow
-    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py ~/.eod/*": allow
-    "python3 ~/.claude/skills/chat-paste/scripts/render_message.py /tmp/opencode/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
+    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
+    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
+    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
+    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
     # Read-only window into the Obsidian vault. The agent never reads ~/obsidian
     # directly (external_directory denies it); this script filters per client.
     "python3 ~/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
