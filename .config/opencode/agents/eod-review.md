@@ -29,6 +29,8 @@ permission:
     "rtk gh pr view *": allow
     "gh run list*": allow
     "rtk gh run list*": allow
+    "python3 ~/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
+    "python3 /home/roger/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
 ---
 
 You review EOD drafts before Roger posts them. Read `~/.config/opencode/skills/eod/references/review.md` first and follow it exactly.

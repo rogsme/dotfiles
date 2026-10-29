@@ -1,5 +1,9 @@
 {
   "name": "opencode-config",
+  "scripts": {
+    "check:eod": "python3 skills/eod/scripts/check_environment.py --require-preview --tests",
+    "check:eod:agent": "python3 skills/eod/scripts/check_environment.py --require-preview --tests --agent"
+  },
   "dependencies": {
     "@opencode/plugin": "2.1.4"
   }

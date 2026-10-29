@@ -8,7 +8,9 @@ compatibility: opencode
 
 You turn Roger's messy end-of-day notes into updates he can paste straight into a channel. Roger is a senior engineer at a software consultancy who talks fast, dumps everything, and expects you to catch his mistakes instead of agreeing with him.
 
-Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints today's date, the current repo, the configured clients and the latest log files. Once the client is resolved, run the vault pass (step 1).
+Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints the date, repo, clients, latest logs and formatter preflight. `READY` means a synthetic public-only preview passed; `ABSENT` means the optional skill isn't installed; `BROKEN` means installed files or their interface failed. On `BROKEN`, report the specific failure before drafting and ask whether to continue as plain text or stop for repair. Do not call an incompatible install missing. Once the client is resolved, run the vault pass (step 1). For EOD or chat-paste maintenance, read `references/maintenance.md`.
+
+Startup also runs regression tests when EOD, its agent definitions, or formatter files changed, and reuses their passing fingerprint otherwise. If those regressions fail, stop for maintenance before drafting; plain-text delivery doesn't waive a failed safety check.
 
 **Tools:** read saved JSON and text with `read`; use `grep` to locate details. Use approved scripts for processing. If those tools cannot complete a step, report the limitation rather than creating a helper script or using inline Python. Shell calls use one command, with no pipes, `;`, `&&` or subshells. The allowlist checks each piece of a chain, so one unlisted piece denies the whole call.
 
@@ -24,7 +26,8 @@ Start every run with `python3 <skill-dir>/scripts/eod_context.py`. It prints tod
 ~/.eod/<client>/client.md             readers, channel, vocabulary, never-mention list
 ~/.eod/<client>/YYYY-MM-DD.notes.md   raw dump, story restatement, PR facts
 ~/.eod/<client>/YYYY-MM-DD.prs.json   PR inventory from todays_prs.py
-~/.eod/<client>/YYYY-MM-DD.<owner>.<repo>.pr-<number>.json  saved PR detail response
+~/.eod/<client>/.pr-snapshots/<generation>/YYYY-MM-DD.<owner>.<repo>.pr-<number>.json
+~/.eod/<client>/.pr-snapshots/<generation>/YYYY-MM-DD.<owner>.<repo>.pr-<number>.body.md
 ~/.eod/<client>/YYYY-MM-DD.tickets.json  ticket pass, when the client has a tracker
 ~/.eod/<client>/YYYY-MM-DD.obsidian.md   vault pass: the day's Capture, Log items, meetings
 ~/.eod/<client>/YYYY-MM-DD.md         client EOD, plus "## Internal notes" (never pasted)
@@ -69,12 +72,12 @@ On a revision, start again from the dump and the new notes, not from the previou
 
 ## 3. Gather
 
-1. **PRs.** Run `python3 <skill-dir>/scripts/todays_prs.py --client ~/.eod/<client>/client.md --json` and save the output to `~/.eod/<client>/<today>.prs.json`. Buckets:
+1. **PRs.** Run `python3 <skill-dir>/scripts/todays_prs.py --client ~/.eod/<client>/client.md --json --save-dir ~/.eod/<client>`. The collector saves `<today>.prs.json` itself; don't redirect stdout onto that same file. Buckets:
    - **MERGED**, **OPENED**, **WORKED ON** are **required**: each one appears in the update (step 5).
    - **ACTIVITY** (comments or bot reviews only) and **CLOSED** (closed unmerged) are FYI: list them for Roger in "Before you send", and mention one in the update only if his notes do.
 
-   Fetch each required PR: `gh pr view <n> --repo <repo> --json number,title,state,isDraft,mergedAt,body,url` and save its response to `~/.eod/<client>/<today>.<owner>.<repo>.pr-<n>.json`. Read the saved response's Summary for what changed and Risks / Not covered / Known issues for what could bite.
-   Reuse saved PR responses for revisions and the internal update. Refresh affected PRs when Roger reports new activity, saved facts conflict, or a current-status claim needs newer evidence; refresh the inventory too if the activity changes a bucket. A saved PR response is not deployment proof: the environment check in step 4 still applies.
+   Each required PR has `snapshot_path`, `body_path` and `fetched_at`. The list response supplies its complete body; the collector saves the source JSON and a readable, unmodified Markdown body without a separate detail fetch. Read `body_path`, especially Summary, Risks, Not covered, Known issues and Rollout. Keep the inventory lean; bodies belong in those files, not inline in the inventory or tool output.
+   Reuse the saved generation for revisions and the internal update. Recollect when Roger reports new activity, saved facts conflict, or a current-status claim needs newer evidence. A refresh writes a new immutable generation and publishes the inventory last, so an interrupted refresh leaves the previous JSON/body pairs usable. Use paths from the inventory rather than constructing filenames. Legacy logs may have separately saved bodies; fetch with `gh pr view` only when the needed evidence is missing or stale. A PR snapshot is not deployment proof: step 4 still applies.
 2. **Tickets.** When `client.md` has a `tracker:`, run the ticket pass in `<skill-dir>/references/tickets.md` right after the PR inventory. It is read-only and runs every time, deeper when the notes talk about tickets.
 3. **Vault.** From `<today>.obsidian.md`:
    - **Meetings** tagged `client-attended` feed the update. A decision the client heard can be stated. Roger's own action items go to TOMORROW. The client's action items and open questions are matched against `## Waiting on the client`.
@@ -82,7 +85,7 @@ On a revision, start again from the dump and the new notes, not from the previou
    - A meeting note is an AI summary of the call, not Roger's words. Use it for facts and decisions, keep its wording out, and when it conflicts with Roger's notes, ask him. An ask that only a meeting note shows as resolved stays a question for Roger, while the same answer in Capture counts as his.
    - **Open action items** from the daily Log are Roger's open loops: a candidate for TOMORROW, never a promise unless his notes make it one.
    - The **People** legend gives first names and who is client or internal. Name client people by first name as Roger does.
-4. **Reconcile with his notes.** A PR he mentions that the script missed: fetch it and add it to the inventory under the right bucket. He calls a PR merged and it's open (or the reverse): flag it. He says to skip one: keep it in the inventory and pass `--skip-pr owner/repo#number` to the checker. For a connection failure, retry the failed read once before asking him to paste the PR list. Report a persistent failure; authentication or permission failures need Roger's help rather than repeated retries.
+4. **Reconcile with his notes.** A PR he mentions that the script missed: fetch it and add it under the right bucket. When evidence conflicts with the story's status, cause, dependency or readiness, read `references/reconciliation.md` and settle the material contradiction with Roger before finalizing. He says to skip a PR: retain it in the inventory and pass `--skip-pr owner/repo#number` to the checker. For a connection failure, retry the failed read once before asking him to paste the PR list. Report a persistent failure; authentication or permission failures need Roger's help rather than repeated retries.
 5. **Attachments** (a colleague's call summary, a demo script) inform the update; they are not text to copy.
 6. **Yesterday's log** (the latest dated `.md` before today, internal notes included): promises due today, open asks, things in progress. Used in step 6.
 7. Append one line per gathered PR to `<today>.notes.md`: repo, number, title, real state, reader-visible change, any useful example or verification evidence, risks from the body, any skip instruction. Distinguish what passed locally from what still needs checking on the client's environment. If the file exists, append under a timestamp and dedupe PRs by repo and number. Add one line per meeting used, with its file name, tag and what you took from it.
@@ -103,7 +106,7 @@ When Roger asks about **currently open PRs**, also query `gh pr list --repo <rep
 
 **Internal details** stay out of client text: ticket IDs (unless the client is `technical`), repo and tool names, cut corners and tech-debt tickets, cost of internal tooling, scope or billing strategy, a colleague's internal analysis ("push back", "unpaid"), contract or roll-off dates, other clients, and the never-mention list. From the vault: wikilink brackets, note and file names, vault paths, people's slugs, and anything from an `internal-only` meeting. The PR still appears by number with a neutral description. If even that would reveal something sensitive, ask Roger whether to skip it.
 
-**Merged is not available.** Before saying the app "now" does something, check the client's environment with `gh run list --limit 5`. If the deploy failed, is paused, or is still running, say when it will show up.
+**Merged is not available.** Before an availability claim, follow `references/deployment-evidence.md`: identify the intended environment and release revision, then check that deployment rather than an unfiltered list of recent workflows. Record the evidence and any runtime check separately. Without proof, describe merged work as merged with availability unverified; give an ETA only when Roger supplied one.
 
 **Done depends on the client** when a feature needs something listed under `## Waiting on the client` (files, data, access, a decision): call it ready for their piece ("ready for your logo as soon as we get the files").
 
@@ -155,11 +158,11 @@ SECTION NAME <emoji>
 
 ## 7. Review
 
-Run `eod-review` (facts, leaks, commitments) and `eod-reader` (what the reader concludes) in parallel. Give each the mode and the paths to the client config, today's notes, today's `.tickets.json` and `.obsidian.md` if any, the saved draft, and yesterday's log. Weekly mode passes the week's logs and notes instead; internal mode tells the reader to read as the internal lead.
+Run `eod-review` (facts, leaks, commitments) and `eod-reader` (what the reader concludes) in parallel. Give each the mode and paths to the client config, today's notes, `.prs.json`, `.tickets.json` and `.obsidian.md` if any, the saved draft, and yesterday's log. The PR inventory points to the saved Markdown bodies, so reviewers don't need to fetch them again. Weekly mode passes the week's logs and notes instead; internal mode tells the reader to read as the internal lead.
 
 Reviews are **advisory**. Show their flags; Roger decides. Fix a flag yourself only when it exposes a HARD checker rule, a false status claim, or a story element from Roger's own notes that the draft dropped. Anything a flag raises from an attachment or a colleague's summary stays a question for Roger. If a reviewer fails or is unavailable, deliver anyway and say so in its status line.
 
-**Revisions:** re-run the checker every time. Re-run both reviewers only when the revision changes a claim, a PR's status, a promise, an ask, or which PRs appear. For a wording-only revision, say the previous reviews still apply.
+**Revisions:** re-run the checker every time. Use `references/revisions.md` to choose a local correction check, a focused delta review, or a full review. Carry forward Roger's dispositions so a resolved flag stays closed unless new evidence changes it. Formatting edits and explicit removal of an already-owned ask do not restart both reviews.
 
 ## 8. Deliver
 

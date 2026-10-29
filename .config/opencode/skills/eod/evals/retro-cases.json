@@ -1,0 +1,35 @@
+{
+  "skill_name": "eod",
+  "evals": [
+    {
+      "id": 1,
+      "name": "owned-ask-local-correction",
+      "prompt": "Internal EOD. Roger's notes say: Good progress today. Morgan already owns the discussion with the client about Monday release timing. I have no new decision to ask for. The first draft nevertheless ends with an ask to Morgan. Roger comments: Morgan is already handling this, no need to send it again. Return JSON with closing, edit, review_scope, and what you would report back. Do not execute tools beyond reading the skill and references.",
+      "assertions": [
+        "Does not add or repeat an ask to Morgan",
+        "Removes the duplicate ask without inventing a release decision",
+        "Uses a local correction check and the EOD checker rather than rerunning both reviewers"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "material-import-contradiction",
+      "prompt": "Client EOD. Roger says: I promised the archive import today, but it is blocked by the open three-tier support PR 84. Saved authoritative evidence says PR 71 already merged three-tier archive support yesterday; open PR 84 only stores subscription metadata and leaves access unchanged. There is no newer clarification from Roger. Return JSON with next_action, question_if_any, draft_ready, and proposed_public_wording_if_any. Do not execute services; read only the skill and relevant references.",
+      "assertions": [
+        "Asks one focused question about the actual dependency or choice to wait",
+        "Pauses final drafting or rendering until clarification",
+        "Does not preserve the disputed causal link by rephrasing it as a temporal hold"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "environment-specific-availability",
+      "prompt": "Client EOD. A feature PR merged at revision aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa. Roger has not said it deployed. The latest five GitHub workflow runs are green review-bot and documentation jobs. The intended client environment is staging. Return JSON with availability_claim, next_evidence_check, evidence_to_save, and whether workflow success verifies runtime behavior. Read the skill and relevant references, but do not call GitHub or other services.",
+      "assertions": [
+        "Does not claim the feature is available from merge or unrelated green jobs",
+        "Checks staging and the expected release revision, using deployment records or a targeted deployment workflow",
+        "Separates deployment reports from runtime verification"
+      ]
+    }
+  ]
+}

@@ -4,9 +4,11 @@ Used by the `eod-review` subagent, and by the eod agent itself when an eval asks
 
 ## Inputs
 
-A mode (`client`, `internal`, or `weekly`) and file paths: the client config, today's notes (Roger's dump, story restatement, one line per PR and ticket), today's `.tickets.json` when the client has a tracker, today's `.obsidian.md` (the vault pass: Roger's Capture notes, the client's meetings tagged `client-attended` or `internal-only`), the draft, yesterday's log if any (internal notes included), and for weekly the week's logs instead.
+A mode (`client`, `internal`, or `weekly`) and file paths: the client config, today's notes (including clarifications and review dispositions), PR inventory with snapshot paths, ticket and vault passes, the draft, yesterday's log if any, and for weekly the week's logs. A delta review also supplies the old/new passage, affected evidence and surrounding text.
 
-Read the dump and story restatement first, then everything else, before judging. For every PR in the notes, read the parts of its description that hold bad news: Risks, Not covered, Known issues, Human verification, Rollout. Use `gh pr view <n> --repo <repo> --json body` when the notes line doesn't carry them. For a deploy or "it's live" claim, run `gh run list --limit 10` and say what you saw.
+Read the dump and story restatement first. In a full review, read each PR's Risks, Not covered, Known issues, Human verification and Rollout from its inventory `body_path`. That Markdown is the full source body; the snapshot JSON preserves metadata. Reuse it instead of fetching again. For legacy logs without body paths, use a separately saved body or `gh pr view` only when required evidence is missing or stale. For availability claims, read `deployment-evidence.md` beside this file and inspect the saved evidence for the exact target and release, not an unfiltered list of workflows. Missing evidence is a flag, not authorization to guess a target.
+
+In a delta review, assess the changed passage and its affected sources. Report new or changed risks only; expand scope only for a named cross-section consequence. Honor Roger's recorded dispositions. Reopen a closed flag only with new contradictory evidence. An already-owned discussion does not need another ask, and the lack of an invented deadline is not a factual error.
 
 The checker already confirms that every required PR number appears, and handles dashes, emojis, ticket IDs and AI phrasing. Spend your attention on what it can't see.
 
@@ -20,7 +22,7 @@ The checker already confirms that every required PR number appears, and handles 
    - Each promise, slip, trade, pride, annoyance, mood and cited number is visible in the draft, not only in the notes.
    - A link in the dump ("I owe you the video, but I finished X") is a link in the draft, not two unrelated facts.
    - A PR's status in the draft matches reality: open is in progress, shipped is shipped.
-6. **Decisions that belong with the internal lead.** Scope, billing, or product calls Roger made alone that the client may question. In internal mode, check they are in NEEDS A DECISION.
+6. **Decisions that belong with the internal lead.** Scope, billing, or product calls Roger made alone that the client may question. In internal mode, flag a missing new intervention; an existing owner handling it is not a reason to add NEEDS A DECISION again.
 7. **Facts.** Weekday versus date, numbers versus the PR or ticket, a ticket's status versus what the draft says about it, names, which AI provider or system is involved (check the client's standing decisions).
 8. **Placeholders and links** that are unfilled or won't open for the reader.
 9. **Deliberate cuts** Roger should know about (a health detail trimmed, an attachment left out), so he can put them back.

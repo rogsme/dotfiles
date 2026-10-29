@@ -63,6 +63,14 @@ class AgentPermissionTests(unittest.TestCase):
                     permission("bash", f"{cli} /tmp/private/session"), "deny"
                 )
 
+    def test_deployment_evidence_uses_only_its_pinned_helper(self):
+        command = f"python3 {Path.home()}/.config/opencode/skills/eod/scripts/deployment_evidence.py --repo example/app --environment staging --sha {'a' * 40}"
+        self.assertEqual(permission("bash", command), "allow")
+        self.assertEqual(
+            permission("bash", "gh api --method POST repos/example/app/deployments"),
+            "deny",
+        )
+
     def test_unrelated_paths_and_inline_python_stay_denied(self):
         home = Path.home()
         for resource in [f"{home}/obsidian/*", "/tmp/private/*"]:

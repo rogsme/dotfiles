@@ -73,6 +73,8 @@ permission:
     "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
     "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
     "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
+    "python3 ~/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
+    "python3 /home/roger/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
     # Standalone chat-paste exports accept saved EODs or temporary messages.
     "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
     "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow

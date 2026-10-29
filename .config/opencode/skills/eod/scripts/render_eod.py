@@ -134,6 +134,11 @@ def main():
         "--session", help="Reuse the printed session directory for a revision"
     )
     parser.add_argument("--artifacts", type=Path, default=ARTIFACT_ROOT)
+    parser.add_argument(
+        "--require-preview",
+        action="store_true",
+        help="Fail instead of skipping when chat-paste is unavailable",
+    )
     browser = parser.add_mutually_exclusive_group()
     browser.add_argument(
         "--open",
@@ -163,6 +168,10 @@ def main():
         if not public_message:
             raise ValueError("The public message is empty.")
         if not CHAT_PASTE_CLI.is_file():
+            if args.require_preview:
+                raise ValueError(
+                    "chat-paste's render_message.mjs entry point is unavailable"
+                )
             print(
                 "Clipboard preview skipped: chat-paste is not installed. Deliver the checked EOD as plain text; no preview was generated."
             )

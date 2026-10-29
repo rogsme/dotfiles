@@ -494,7 +494,19 @@ After an upgrade, check the integrations you use:
 - Switching sessions updates Moshi's pane binding.
 - Goal controls and their TUI component still load.
 
-There are no test scripts in `package.json`; these are manual smoke checks.
+The integrations above still use manual smoke checks. EOD has automated checks:
+
+```sh
+bun run check:eod
+bun run check:eod:agent
+```
+
+The first checks the installed chat-paste interface and runs the EOD regression
+suite. The second also makes a synthetic model call under the real EOD agent's
+permissions, without client data or browser opening. Run it after changing EOD
+commands or permissions. EOD startup independently probes the formatter and runs
+regressions whenever its installed files change. See
+[EOD maintenance](skills/eod/references/maintenance.md).
 
 ### Diagnosing Problems
 

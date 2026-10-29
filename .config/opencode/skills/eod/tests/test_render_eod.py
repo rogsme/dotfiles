@@ -461,6 +461,19 @@ class RenderTests(unittest.TestCase):
         self.assertIn("Formatting failed", self.stderr.getvalue())
         self.assertNotIn("not installed", self.stdout.getvalue())
 
+    def test_strict_render_does_not_silently_skip_missing_formatter(self):
+        draft = self.session / "draft.md"
+        draft.write_text("Public body")
+        with (
+            patch.object(renderer, "CHAT_PASTE_CLI", self.session / "missing.mjs"),
+            patch.object(
+                renderer.sys, "argv", [str(SCRIPT), str(draft), "--require-preview"]
+            ),
+        ):
+            self.assertEqual(renderer.main(), 1)
+        self.assertEqual(self.stdout.getvalue(), "")
+        self.assertIn("entry point is unavailable", self.stderr.getvalue())
+
     def test_no_preview_is_claimed_without_existing_paths(self):
         draft = self.session / "draft.md"
         draft.write_text("Public body")

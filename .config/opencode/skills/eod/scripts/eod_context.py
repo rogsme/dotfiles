@@ -5,8 +5,10 @@
 
 Replaces a chain like `date; git remote get-url origin; grep ...; ls | head`,
 which OpenCode's shell allowlist rejects because it checks every command in a
-chain or pipe separately. Read-only.
+chain or pipe separately. Client data stays read-only; the formatter preflight
+creates and removes a synthetic temporary preview without opening a browser.
 """
+
 import argparse
 import glob
 import os
@@ -14,13 +16,19 @@ import re
 import subprocess
 from datetime import datetime
 
+from check_environment import check_environment, check_regressions_if_changed
+
 EOD = os.path.expanduser("~/.eod")
 
 
 def git_remote():
     try:
-        out = subprocess.run(["git", "remote", "get-url", "origin"],
-                             capture_output=True, text=True, timeout=5)
+        out = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
         return out.stdout.strip() or "not in a git repo"
     except (OSError, subprocess.SubprocessError):
         return "not in a git repo"
@@ -38,12 +46,16 @@ def clients(root):
                 kv = re.match(r"^(status|repos):\s*(.*?)\s*$", line)
                 if kv:
                     fields[kv.group(1)] = kv.group(2)
-        rows.append(f"{name}  status={fields.get('status', '?')}  repos={fields.get('repos', '?')}")
+        rows.append(
+            f"{name}  status={fields.get('status', '?')}  repos={fields.get('repos', '?')}"
+        )
     return rows
 
 
 def latest_logs(root, n):
-    files = [p for p in glob.glob(os.path.join(root, "*", "2*.md")) if os.path.isfile(p)]
+    files = [
+        p for p in glob.glob(os.path.join(root, "*", "2*.md")) if os.path.isfile(p)
+    ]
     files.sort(key=os.path.getmtime, reverse=True)
     return files[:n]
 
@@ -62,7 +74,14 @@ def main():
     print("Latest log files:")
     for p in latest_logs(a.root, a.logs) or ["no log yet"]:
         print(f"  {p}")
+    formatter = check_environment()
+    print(f"Chat-paste: {formatter['status'].upper()} ({formatter['reason']})")
+    if formatter["status"] == "broken":
+        return 1
+    regressions = check_regressions_if_changed()
+    print(f"EOD regressions: {regressions['status'].upper()} ({regressions['reason']})")
+    return 1 if regressions["status"] == "broken" else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

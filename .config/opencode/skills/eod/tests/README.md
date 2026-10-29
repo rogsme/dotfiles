@@ -1,16 +1,24 @@
 # EOD tests
 
-These tests cover PR inclusion, EOD preparation, and standalone plain-text delivery. Optional clipboard export is tested through a public CLI when a formatter is installed; formatter-specific browser tests belong to that formatter.
+These tests cover PR inclusion, EOD preparation, deployment evidence and standalone plain-text delivery. Optional clipboard export is tested through its public CLI; formatter-specific browser tests belong to that formatter.
 
 Agent permission tests check the configured allowlist for preview edits, external formatter directories and pinned formatter commands, while retaining denials for unrelated paths and inline Python. They inspect the frontmatter policy, not a running OpenCode session. Renderer tests cover shared-skill discovery with legacy fallback and destination overrides with private-note filtering.
 
 From `~/.config/opencode`, run:
 
 ```sh
+bun run check:eod
+bun run check:eod:agent
 python3 -m unittest discover -s skills/eod/tests -p 'test_*.py' -v
 python3 skills/eod/scripts/check_eod.py skills/eod/tests/demo.md
 python3 skills/eod/scripts/render_eod.py skills/eod/tests/demo.md --no-open
 ```
+
+`check:eod` first requires a working installed formatter, so a discovery bug cannot silently skip all integration coverage. `check:eod:agent` also runs a synthetic model call through the real EOD agent, verifies a completed renderer tool event, and checks the generated public-only source and HTML. Neither opens a browser or reads client data. Ordinary startup re-runs regressions after installed source/instruction/permission changes and reuses a passing fingerprint otherwise. Failed or empty test runs are never cached as passing. See `references/maintenance.md` for repair workflow and logs.
+
+Deployment tests reject unrelated green workflows, wrong environments, wrong revisions and older successes superseded by newer releases. A reported successful deployment remains distinct from runtime verification. The helper performs GET requests only and its pinned EOD permission does not grant raw GitHub API writes.
+
+PR snapshot tests use synthetic list responses. `todays_prs.py --save-dir <client-dir>` requests bodies in its existing list query, saves raw JSON and exact Markdown under a private immutable `.pr-snapshots/<generation>/`, and atomically publishes `<date>.prs.json` last. Tests cover Unicode/multiline preservation, cross-repository number collisions, unchanged commit classification, refreshes, missing bodies, API failures and interrupted publication. An old inventory keeps pointing to its complete original pair after a failed refresh. The default without `--save-dir` still writes nothing. Never redirect collector stdout onto its own inventory path.
 
 With the optional formatter installed, the adapter creates a chat-paste session under `/tmp/opencode/eod-chat-paste/` and prints its paths as JSON. Its public Markdown snapshots and HTML contain synthetic client text only; `PRIVATE_DEMO_SENTINEL` must be absent. Pass the printed session back with `--session` for revisions. With `--open`, the adapter also opens the viewer and reports its URLs and browser-launch status. Without the formatter, it reports that export was skipped and leaves the checked draft ready for plain-text delivery. The saved `demo.md` remains unchanged in both cases. Tests cover privacy, review-label rejection, heading preparation, channel choice, preservation of old previews, the file-based Node CLI handoff, revision reuse, and opening only with explicit `--open`. Integration tests use isolated artifact roots and remove only their own output. Automated exports use `--no-open`.
 

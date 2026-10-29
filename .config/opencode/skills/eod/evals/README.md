@@ -28,6 +28,14 @@ Cases contain real client notes, so they never live in this folder. Keep them in
 
 ## Running
 
+`retro-cases.json` contains three synthetic policy replays with no client data:
+an already-owned ask and local correction, a material import-dependency
+contradiction, and an environment-specific availability claim. For instruction
+changes, compare the installed skill against a frozen pre-change copy using the
+same prompts. Read the skill and its relevant references, return each prompt's
+requested JSON, and grade the listed assertions. These short policy replays do
+not replace a full client-day replay or the actual-agent permission smoke.
+
 ```
 ~/.config/opencode/skills/eod/evals/run.sh <client repo checkout> solo
 ~/.config/opencode/skills/eod/evals/run.sh <client repo checkout> review

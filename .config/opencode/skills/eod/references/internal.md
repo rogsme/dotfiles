@@ -2,7 +2,7 @@
 
 The frank version for the internal team (the client's `internal_lead`, usually in Slack). Its job is to give the lead the real picture so they can manage the client: what actually shipped, what's at risk, which corners got cut, where the client version differs from reality, and what decision Roger needs from them.
 
-Modeled on how Roger writes these himself: friendly opener, says up front it's the internal version, then the honest status, ending with a direct question to the lead.
+Use Roger's friendly opener, identify this as the internal version, and give the honest status. End with his closing. Add a question to the lead only when Roger needs a new decision or intervention.
 
 ## Inputs
 
@@ -51,6 +51,7 @@ NEEDS A DECISION @<internal_lead>
 - Every required PR (MERGED, OPENED, WORKED ON) gets a line: `TICKET-ID short title (url)`.
 - NEW TICKETS lists every CREATED ticket from the ticket pass; ticket status mismatches go under RISKS AND CORNERS CUT.
 - Tag `@<internal_lead>` only on the line with a real ask or decision.
+- An already-owned discussion is status, not a fresh ask. Check today's notes, client decisions and Roger's latest corrections before adding NEEDS A DECISION. Drop that section when there is nothing new to ask; don't manufacture a question to fit the shape.
 - "What the client heard" lists every place the client EOD softened, delayed, or left out something the lead should know. The lead can't get this anywhere else, so be precise.
 
 ## Check and deliver
