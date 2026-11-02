@@ -69,7 +69,6 @@
       "effect": "allow"
     }
   ],
-  // Lazer's model inventory is managed by plugins/lazer-models, refreshed every 15 minutes.
   "providers": {
     "lazer": {
       "name": "Lazer",

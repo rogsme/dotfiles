@@ -8,6 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { APP, DEFAULT_LISTEN, DEFAULT_PORT, PINS, atomicWrite, checkNode, checkOwnedDirectory, defaultArtifactRoot, externalDirectory, inside, integrityOf, invokedDirectly, loadSession, makePrivateDirectory, readJSON, registryDirectory, safePath, serverFile, viewerDirectory, viewerVersion } from "./common.mjs";
+import { launch } from "./launch.mjs";
 import { fetchPinned } from "./render_plan.mjs";
 import { bindAddress, listEvents, pendingBatches, readState, writeState } from "./server.mjs";
 
@@ -148,15 +149,6 @@ export function reviewURLs({ id, token }, { port, listen }) {
     urls.push({ label: tailscale(address) ? "Tailscale" : "Network", url: `http://${host}:${port}${route}` });
   }
   return urls;
-}
-
-function launch(url) {
-  const [command, args] = process.platform === "darwin" ? ["open", [url]] : process.platform === "win32" ? ["cmd", ["/c", "start", "", url]] : ["xdg-open", [url]];
-  return new Promise((resolve) => {
-    const child = spawn(command, args, { detached: true, stdio: "ignore" });
-    child.once("error", (error) => resolve({ opened: false, reason: `${command}: ${error.code || error.message}` }));
-    child.once("spawn", () => { child.unref(); resolve({ opened: true }); });
-  });
 }
 
 export async function checkViewer(options = {}) {

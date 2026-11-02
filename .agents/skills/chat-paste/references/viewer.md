@@ -31,6 +31,8 @@ node "<skill-dir>/scripts/viewer.mjs" end --session "<session>"
 
 `open` starts the shared server or reuses a matching one, registers the message, launches the browser on the first URL unless `--no-open`, and prints the URLs, the `port` it chose and any `skippedPorts`. A done or ended message reopens only with `--reopen`.
 
+`browserOpened` is false, with the cause in `browserReason`, when the opener cannot run or exits nonzero. `open` waits up to 2 seconds for the opener, and one still running then counts as launched, since `xdg-open` can run as long as the browser it starts. On Linux, when neither `DISPLAY` nor `WAYLAND_DISPLAY` is set, as under a service that started before the desktop, the opener gets `DISPLAY`, `WAYLAND_DISPLAY` and `XAUTHORITY` from `systemctl --user show-environment`.
+
 `poll` waits, without a time limit, for the next event the page sent, prints it, then moves it from `events/` to `delivered/`. An interruption between the two delivers the same event again; it never loses one.
 
 A `feedback` event holds the batch's comments. Each target's `kind` is `word`, `text` (a selected range) or `general` (the whole message, with no quote):

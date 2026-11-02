@@ -105,70 +105,70 @@
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/address-pr-review/SKILL.md",
-      "skillFolderHash": "71e47d9debc11564ff4e505aaf89ba185ba7668b37c90773057d4171ba44e89c",
+      "skillFolderHash": "d75377c633179d44b3361163b56cc71c7424b9aad4c9b198d7f4f56dd853e110",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.110Z",
-      "updatedAt": "2026-10-27T20:56:38.782Z"
+      "updatedAt": "2026-10-30T18:28:50.003Z"
     },
     "create-ticket": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/create-ticket/SKILL.md",
-      "skillFolderHash": "5aa90a4b0534ab99049a96f4f4c5c5367f17e08e121e94f04005d5dd3d5da112",
+      "skillFolderHash": "37a82cedfb409610524d63418c6c70eaa957685f7c234b142c37a7e18b76fcca",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.110Z",
-      "updatedAt": "2026-10-25T13:02:12.203Z"
+      "updatedAt": "2026-10-30T18:28:51.252Z"
     },
     "finish-ticket": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/finish-ticket/SKILL.md",
-      "skillFolderHash": "2b88141fc1b6258e42d5da1bad23bf045e233e8c75952f4feb0e40105599c068",
+      "skillFolderHash": "3344b1a1f81694dbb557ef80a91a051e45ad31473807bd9ffbea90873d385457",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.110Z",
-      "updatedAt": "2026-10-27T20:56:40.903Z"
+      "updatedAt": "2026-10-30T18:28:52.674Z"
     },
     "review-pr": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/review-pr/SKILL.md",
-      "skillFolderHash": "1b17af7f52656138718f07b3cbd30630120736a5491c1e6b1b3be8b3ca155b36",
+      "skillFolderHash": "38e021569a7213b38135f1354d3de73b45bf474f8f97c5ad2d04246cd7bbc442",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.110Z",
-      "updatedAt": "2026-10-27T20:56:42.283Z"
+      "updatedAt": "2026-10-30T18:28:53.763Z"
     },
     "setup-rogs": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/setup-rogs/SKILL.md",
-      "skillFolderHash": "cdb4b4e11ce4f572215149879cc932e31b55f686ebe2eebd69ec77acb11331bf",
+      "skillFolderHash": "aac1c31dbe016c26bf5b3f0c4fbee138a2eeb5fc7d4d325f0eabc0e39ee26873",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.111Z",
-      "updatedAt": "2026-10-26T23:13:36.398Z"
+      "updatedAt": "2026-10-30T18:28:55.488Z"
     },
     "start-ticket": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/start-ticket/SKILL.md",
-      "skillFolderHash": "039c40c2756bb779eff46665d4dd38e9daf794093d90e98a246422d92174a77e",
+      "skillFolderHash": "faa72a4d28809b928a308cef4d359844d87098cfbddfaaae20b974e8332e7f6a",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.111Z",
-      "updatedAt": "2026-10-26T21:53:08.483Z"
+      "updatedAt": "2026-10-30T18:28:56.542Z"
     },
     "work-ticket": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/work-ticket/SKILL.md",
-      "skillFolderHash": "f38ddc3e349ec4ac81b765625d7e683b0d68fdf2a29b6faec60327a043bc91cb",
+      "skillFolderHash": "3ebebe16cc484a6540fda74124b4b1d9b9f6893e85272bf19b55f216769afab2",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-13T18:00:20.111Z",
-      "updatedAt": "2026-10-25T14:46:16.293Z"
+      "updatedAt": "2026-10-30T18:28:58.186Z"
     },
     "asd-ste100": {
       "source": "https://gitlab.com/rogs/skills.git",
@@ -195,30 +195,30 @@
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/writing/chat-paste/SKILL.md",
-      "skillFolderHash": "cbe795e92a23697e8776fcd20f7a94d8ff7ddaa84df3571b629f2e9b09e09639",
+      "skillFolderHash": "b15d6049076eff8a5b7e02b20195abd1f4d9e42906bf0eb52455b3bad6dcb37c",
       "pluginName": "writing",
       "installedAt": "2026-10-13T18:00:20.112Z",
-      "updatedAt": "2026-10-27T21:16:35.852Z"
+      "updatedAt": "2026-11-02T13:08:55.380Z"
     },
     "review-plan": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/engineering/review-plan/SKILL.md",
-      "skillFolderHash": "2228687017c05ba3d3d70f598cec23606cb05ff97b4283eedd210f560a8bd125",
+      "skillFolderHash": "ba00436798eb6520a45719be3c903704aff6b935ec0e0978594be38e5b4851c8",
       "pluginName": "engineering",
       "installedAt": "2026-10-17T16:39:08.144Z",
-      "updatedAt": "2026-10-25T13:02:12.202Z"
+      "updatedAt": "2026-10-30T18:28:59.590Z"
     },
     "present-plan": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/engineering/present-plan/SKILL.md",
-      "skillFolderHash": "7e5adabca78a772a1b34b920220875a9c3f440e249dbb86187b22d26e8a0bb3a",
+      "skillFolderHash": "f0ac362aa42ef44cf62e8c4a4a07184c5ad6aa47e91ad0fbf1302f13aa932221",
       "pluginName": "engineering",
       "installedAt": "2026-10-17T18:25:22.211Z",
-      "updatedAt": "2026-10-27T21:16:37.543Z"
+      "updatedAt": "2026-11-02T13:08:56.548Z"
     },
     "simplify-branch": {
       "source": "https://gitlab.com/rogs/skills.git",
@@ -235,10 +235,10 @@
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/suggest-tickets/SKILL.md",
-      "skillFolderHash": "8d8ea5ffde4fa9e6958e02d42d8b783f89d8c27aa1382eafb0f5da9a833dcf77",
+      "skillFolderHash": "a38219a72c22c4494cd8287dad6b8447c0b40908982a447ba0c39472dd737683",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-23T21:47:01.412Z",
-      "updatedAt": "2026-10-25T13:02:12.204Z"
+      "updatedAt": "2026-10-30T18:29:01.290Z"
     },
     "codebase-design": {
       "source": "https://gitlab.com/rogs/skills.git",
@@ -265,20 +265,20 @@
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/engineering/retro/SKILL.md",
-      "skillFolderHash": "fe868e6df7c11746205b15f442ed252a9c06032c34e69c773efa7a32e1456df1",
+      "skillFolderHash": "e073d1ccc76657a309d86abba5cfe8465a2c14a73b246d8f28a8b06143987511",
       "pluginName": "engineering",
       "installedAt": "2026-10-24T21:13:20.529Z",
-      "updatedAt": "2026-10-25T13:02:12.202Z"
+      "updatedAt": "2026-11-02T21:05:00.060Z"
     },
     "verify-pr": {
       "source": "https://gitlab.com/rogs/skills.git",
       "sourceType": "gitlab",
       "sourceUrl": "https://gitlab.com/rogs/skills.git",
       "skillPath": "skills/lifecycle/verify-pr/SKILL.md",
-      "skillFolderHash": "4b38cffdd00d40b6635fd4a9993374189880b42c2b89bbe453f61f15a297d592",
+      "skillFolderHash": "84853a88f939381b9085ceeb22b0c32aa715f8e1eadee6793053e2c5433f48bc",
       "pluginName": "lifecycle",
       "installedAt": "2026-10-24T21:13:20.532Z",
-      "updatedAt": "2026-10-27T20:56:43.923Z"
+      "updatedAt": "2026-10-30T18:29:02.934Z"
     },
     "to-questionnaire": {
       "source": "https://gitlab.com/rogs/skills.git",

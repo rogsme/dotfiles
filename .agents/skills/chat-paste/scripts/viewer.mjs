@@ -8,6 +8,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { APP, DEFAULT_LISTEN, DEFAULT_PORT, artifactDirectory, atomicWrite, checkNode, checkOwnedDirectory, defaultArtifactRoot, inside, invokedDirectly, loadSession, makePrivateDirectory, readJSON, registryDirectory, safePath, serverFile, viewerDirectory, viewerVersion } from "./common.mjs";
+import { launch } from "./launch.mjs";
 import { bindAddress, endSession, listEvents, pendingBatches, readState, writeState } from "./server.mjs";
 
 const serverScript = fileURLToPath(new URL("server.mjs", import.meta.url));
@@ -143,15 +144,6 @@ export function messageURLs({ id, token }, { port, listen }) {
     urls.push({ label: tailscale(address) ? "Tailscale" : "Network", url: `http://${host}:${port}${route}` });
   }
   return urls;
-}
-
-function launch(url) {
-  const [command, args] = process.platform === "darwin" ? ["open", [url]] : process.platform === "win32" ? ["cmd", ["/c", "start", "", url]] : ["xdg-open", [url]];
-  return new Promise((resolve) => {
-    const child = spawn(command, args, { detached: true, stdio: "ignore" });
-    child.once("error", (error) => resolve({ opened: false, reason: `${command}: ${error.code || error.message}` }));
-    child.once("spawn", () => { child.unref(); resolve({ opened: true }); });
-  });
 }
 
 export async function checkViewer(options = {}) {

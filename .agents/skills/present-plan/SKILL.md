@@ -35,7 +35,7 @@ Resume only the exact owned session. A changed bundle, different checkout, modif
 
 ## 3. Open and receive feedback
 
-Run the `open` action. When something else holds the configured port, `open` moves to the next port it can use and names each port it skipped in `skippedPorts`; the links carry the port it chose, so a review on another port needs no other action. Give the human every URL it prints: `Local` for this machine, `Tailscale` and `Network` for reaching it from another one. Each link carries the review's token, so share it only with the user. A launch attempt alone does not prove the browser opened; when automatic launch fails, report it and give the links for manual opening.
+Run the `open` action. When something else holds the configured port, `open` moves to the next port it can use and names each port it skipped in `skippedPorts`; the links carry the port it chose, so a review on another port needs no other action. Give the human every URL it prints: `Local` for this machine, `Tailscale` and `Network` for reaching it from another one. Each link carries the review's token, so share it only with the user. When `browserOpened` is false, report `browserReason` and tell the human to open a link by hand. When it is true, the opener ran without an error, which still does not prove a page loaded.
 
 Run `poll` through an agent-supported wait or completion-notification path. Before saying feedback is monitored, establish that completion resumes this agent. Where no wake path exists, give the links and ask the human to return here after sending comments or approving; poll on that next turn. A nonzero exit or interrupted output is incomplete, never an empty review or approval.
 

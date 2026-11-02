@@ -19,7 +19,7 @@ Read only, before any git, tracker or forge action. Run this check; it prints on
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/$1"; id="$2"; shift 2
+need() { f="docs/agents/${1}"; id="${2}"; shift 2
   [ -f "$f" ] || { echo "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
@@ -28,9 +28,9 @@ need() { f="docs/agents/$1"; id="$2"; shift 2
   esac
   grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
   for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
-has() { f="docs/agents/$1"; shift; [ -f "$f" ] || return 0
+has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
   for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
-on() { grep -qiE "^[|] *$1 *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
+on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
 need forge.md forge "## Forge" "## Operations" "### find-pr" "### read-pr" "### ci" "### feedback" "### post-review" "## CI gate" "## Pull requests"
 need workflow.md workflow "## Features" "## Worktrees" "## Project rules" "## Human verification"
 on "Browser pass" && { has forge.md "### attach"; need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"; }

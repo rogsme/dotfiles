@@ -46,7 +46,9 @@ The brief carries the tickets and the plan, never your investigation notes or re
 
 ## 4. Run the reviewer
 
-Run the row's command once from the worktree root, with `<brief>` replaced by the brief's absolute path and the configured time limit as the shell call's timeout. Run the command exactly as configured: its flags are what keep the reviewer read-only.
+Run the row's command once from the worktree root, with `<brief>` replaced by the brief's absolute path. Run the command exactly as configured: its flags are what keep the reviewer read-only.
+
+A review can outlast one shell call. Start the command in the background with its output redirected to `review.md` beside the brief, and note when it started. Wait until it exits or the configured time limit has passed since the start. A wait that ends while the reviewer still runs is not a result: wait again. A reviewer still running at the limit has timed out; stop it.
 
 ## 5. Read the review
 

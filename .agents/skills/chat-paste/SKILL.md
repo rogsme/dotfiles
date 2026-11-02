@@ -35,7 +35,7 @@ It passes only with exit code 0 and a JSON result. Keep its `session` directory 
 node <skill-dir>/scripts/viewer.mjs open --session <session>
 ```
 
-Give the user every URL it prints: `Local` for this machine, `Tailscale` and `Network` for another one. Each link carries the message's token, so share it only with the user. Pass `--no-open` when the user asks not to open a browser. A launch attempt alone does not prove the browser opened; when it fails, report it and give the links. Tell the user to copy and paste normally into the destination's rich-text editor, to comment if anything should change, and to click **Done** when finished.
+Give the user every URL it prints: `Local` for this machine, `Tailscale` and `Network` for another one. Each link carries the message's token, so share it only with the user. Pass `--no-open` when the user asks not to open a browser. When `browserOpened` is false, report `browserReason` and tell the user to open a link by hand. When it is true, the opener ran without an error, which still does not prove a page loaded. Tell the user to copy and paste normally into the destination's rich-text editor, to comment if anything should change, and to click **Done** when finished.
 
 ## 4. Poll and answer
 
