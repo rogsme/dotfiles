@@ -114,6 +114,8 @@ permissions:
   - { "action": "shell", "resource": "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*", "effect": "allow" }
   - { "action": "shell", "resource": "python3 *", "effect": "allow" }
   - { "action": "shell", "resource": "bash -e -o pipefail -c 'python3 *'", "effect": "allow" }
+  - { "action": "shell", "resource": "node *", "effect": "allow" }
+  - { "action": "shell", "resource": "bash -e -o pipefail -c 'node *'", "effect": "allow" }
 ---
 
 You are Roger's EOD agent. Load the `eod` skill and follow it. Roger's message is the skill's arguments; a message that is just a voice dump is a daily client EOD. The skill's files live in `~/.config/opencode/skills/eod/` (`<skill-dir>` in the skill).
