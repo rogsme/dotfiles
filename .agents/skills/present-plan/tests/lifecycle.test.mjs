@@ -18,7 +18,7 @@ async function configuration(t, { review = false, presentation, heading = true }
   execFileSync("git", ["init", "-q"], { cwd: directory });
   await mkdir(path.join(directory, "docs/agents"), { recursive: true });
   const documents = {
-    "issue-tracker": "## Tracker\n## Operating rules\n## Operations\n### resolve\n### load\n### list-in-flight\n### comment\n### transition\n## States\n",
+    "issue-tracker": "## Tracker\n## Operating rules\n## Operations\n### resolve\n### load\n### list-in-flight\n### relate\n### comment\n### transition\n## States\n",
     forge: "## Forge\n",
     domain: "## Glossary\n## ADRs\n## Consumer rules\n## Recording decisions\n",
     workflow: "## Features\n| Feature | State |\n|---|---|\n" +
@@ -32,29 +32,64 @@ async function configuration(t, { review = false, presentation, heading = true }
   return execFileSync("sh", ["-c", preflight], { cwd: directory, encoding: "utf8" });
 }
 
+// A complete configuration prints its sections, each file under a "==> <file> <==" line; problems print alone.
+const problems = (output) => output.split("\n").filter((line) => line.startsWith("docs/agents/"));
+
 test("an older v1 configuration without the feature still passes", async (t) => {
-  assert.equal(await configuration(t), "");
+  const output = await configuration(t);
+  assert.deepEqual(problems(output), []);
+  assert.match(output, /^==> docs\/agents\/issue-tracker\.md <==$/m);
 });
 
 for (const review of [false, true]) for (const presentation of [false, true]) {
   test(`preflight: review=${review}, presentation=${presentation}`, async (t) => {
-    assert.equal(await configuration(t, { review, presentation }), "");
+    assert.deepEqual(problems(await configuration(t, { review, presentation })), []);
   });
 }
 
 test("only enabled presentation requires its heading", async (t) => {
-  assert.match(await configuration(t, { presentation: true, heading: false }), /workflow\.md: ## Plan presentation/);
-  assert.equal(await configuration(t, { presentation: false, heading: false }), "");
+  const output = await configuration(t, { presentation: true, heading: false });
+  assert.deepEqual(problems(output), ["docs/agents/workflow.md: ## Plan presentation"]);
+  assert.doesNotMatch(output, /==>/);
+  assert.deepEqual(problems(await configuration(t, { presentation: false, heading: false })), []);
 });
 
-test("preflight helper functions remain identical across the lifecycle", async () => {
+test("a complete configuration prints only the sections the skill checks", async (t) => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "preflight-sections-"));
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  execFileSync("git", ["init", "-q"], { cwd: directory });
+  await mkdir(path.join(directory, "docs/agents"), { recursive: true });
+  const operations = ["resolve", "load", "list-in-flight", "relate", "comment", "transition"].map((name) => `### ${name}\n\n${name} body\n\n`).join("");
+  const documents = {
+    "issue-tracker": "# Issue tracker\n\nFile intro.\n\n## Tracker\n\nTracker body\n\n## Operating rules\n\nRules body\n\n" +
+      "## Operations\n\nOperations note\n\n" + operations + "### metadata\n\nUnused operation\n\n## States\n\nStates body\n\n## Labels and priority\n\nUnused section\n\n## Bundles\n\nBundles body\n",
+    forge: "## Forge\n\nForge body\n\n## Operations\n\n### merge\n\nUnused operation\n",
+    domain: "## Glossary\n\nGlossary body\n\n## ADRs\n\n```markdown\n# {Short title}\n\n## Context\n```\n\nAfter the fence\n\n" +
+      "## Consumer rules\n\nConsumer body\n\n## Recording decisions\n\nUnused section\n",
+    workflow: "## Features\n\n| Feature | State |\n|---|---|\n| Plan review | off |\n| Bundles | on |\n\n## Worktrees\n\nWorktrees body\n\n" +
+      "## Verification\n\nVerification body\n\n### Backend\n\nNested body\n\n## Project rules\n\nRules body\n\n## Review\n\nUnused section\n",
+  };
+  for (const [id, content] of Object.entries(documents)) await writeFile(path.join(directory, `docs/agents/${id}.md`), `<!-- rogs-skills config v1: ${id} -->\n${content}`);
+  const output = execFileSync("sh", ["-c", preflight], { cwd: directory, encoding: "utf8" });
+  assert.deepEqual(problems(output), []);
+  for (const shown of ["Tracker body", "Rules body", "Operations note", "transition body", "States body", "Forge body", "After the fence", "Nested body", "Verification body", "Bundles body"]) {
+    assert.ok(output.includes(shown), `missing: ${shown}`);
+  }
+  for (const hidden of ["File intro", "Unused operation", "Unused section", "<!-- rogs-skills"]) assert.ok(!output.includes(hidden), `printed: ${hidden}`);
+  assert.deepEqual(output.match(/^==> .* <==$/gm), ["docs/agents/issue-tracker.md", "docs/agents/forge.md", "docs/agents/workflow.md", "docs/agents/domain.md"].map((file) => `==> ${file} <==`));
+});
+
+test("preflight helpers and their instructions remain identical across the lifecycle", async () => {
   const names = ["create-ticket", "suggest-tickets", "start-ticket", "work-ticket", "review-pr", "address-pr-review", "verify-pr", "finish-ticket"];
-  const helpers = await Promise.all(names.map(async (name) => {
+  const shared = await Promise.all(names.map(async (name) => {
     const text = await readFile(path.join(root, `lifecycle/${name}/SKILL.md`), "utf8");
     const begin = text.indexOf("need() {");
-    return text.slice(begin, text.indexOf("\nneed ", begin));
+    const script = text.match(/```sh\n(sh -c '[\s\S]*?')\n```/)[1];
+    assert.ok(script.endsWith(`\n[ -n "$bad" ] || show'`), `${name} does not print its sections`);
+    const paragraph = (start) => text.slice(text.indexOf(start), text.indexOf("\n", text.indexOf(start)));
+    return [text.slice(begin, text.indexOf("\nneed ", begin)), paragraph("Read only, before any git"), paragraph("When it prints sections")];
   }));
-  for (const helper of helpers) assert.equal(helper, helpers[0]);
+  for (const copy of shared) assert.deepEqual(copy, shared[0]);
 });
 
 test("review-pr and finish-ticket define a clean merge of the base in the same words", async () => {

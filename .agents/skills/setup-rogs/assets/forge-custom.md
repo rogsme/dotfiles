@@ -70,7 +70,7 @@ Capability: {{FILL: Supported, Fallback: <what to do instead>, or Unsupported}}
 
 ### ci
 
-{{FILL: how to list the checks of one exact head SHA, with each check's name, result and link; how to wait for them (a watch command or a polling interval) in a way that survives a tool timeout; which results mean pending, passed and failed; what the forge shows when no check ran}}
+{{FILL: how to list the checks of one exact head SHA, with each check's name, result and link; how to wait for them (a watch command or a polling interval) in a way that survives a tool timeout or a wait the harness stops; which results mean pending, passed and failed; what the forge shows when no check ran}}
 
 Capability: {{FILL: Supported, Fallback: <what to do instead>, or Unsupported}}
 

@@ -12,33 +12,41 @@ Prepare accurate, independently implementable tickets from verified product and 
 
 ## 0. Configuration preflight
 
-Read only, before any git, tracker or forge action. Run this check; it prints one line per problem, and nothing when the configuration is complete:
+Read only, before any git, tracker or forge action. Run this check. When the configuration is incomplete, it prints one line per problem. When it is complete, it prints the sections of the configuration this skill reads instead, each file's sections under a `==> docs/agents/<file> <==` line:
 
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/${1}"; id="${2}"; shift 2
-  [ -f "$f" ] || { echo "$f: file missing"; return; }
+need() { f="docs/agents/${1}"; id="${2}"; n="${1}"; shift 2
+  [ -f "$f" ] || { miss "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
-    *"rogs-skills config v"*) echo "$f: version: $(head -n 1 "$f")" ;;
-    *) echo "$f: marker missing" ;;
+    *"rogs-skills config v"*) miss "$f: version: $(head -n 1 "$f")" ;;
+    *) miss "$f: marker missing" ;;
   esac
-  grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  grep -qF "{{FILL:" "$f" && miss "$f: unfilled {{FILL: text"
+  has "$n" "$@"; }
 has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  for h in "$@"; do if grep -qxF -- "$h" "$f"; then got="$got$f|$h
+"; else miss "$f: $h"; fi; done; }
+miss() { echo "${1}"; bad=1; }
 on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
+show() { for f in $(printf %s "$got" | cut -d "|" -f 1 | awk "!s[\$(0)]++"); do echo "==> $f <=="
+  printf %s "$got" | while IFS="|" read -r g h; do [ "$g" = "$f" ] || continue
+  awk -v h="$h" "/^(\`\`\`|~~~)/ { q = !q }
+    !q && /^#+ / { n = index(\$(0), \" \") - 1; if (p && (n <= d || o)) exit
+      if (\$(0) == h) { p = 1; d = n; o = h == \"## Operations\" } }
+    p" "$f"; done; done; }
 need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### search" "### metadata" "### create" "### update" "### relate" "### comment" "## States" "## Labels and priority" "## Ticket conventions"
 need workflow.md workflow "## Features" "## Project rules"
-need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
+need domain.md domain "## Glossary" "## ADRs" "## Consumer rules"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
 on "Client notes" && has workflow.md "## Client notes"
-true'
+[ -n "$bad" ] || show'
 ```
 
-When it prints nothing, read the files it checked and continue. When it prints anything, change nothing and reply with exactly:
+When it prints sections, they are this skill's configuration: read them and continue. When the harness shortens a long output or saves it to a file, read the whole output once, from the file it names or from a rerun of the check into a temporary file. A printed section or a later step can send you elsewhere in the configuration, such as an operation the section says to use or a section of another file: read that part too. When it prints problem lines, change nothing and reply with exactly:
 
 ```
 rogs-skills is not configured for create-ticket in this repository.
@@ -90,6 +98,7 @@ Create the smallest coherent vertical tickets that can each run in an independen
 - Name genuine prerequisites in the description, then add real blocked-by relations once ids exist.
 - Keep coordination notes separate from functional dependencies.
 - Apply the splitting rules in `## Ticket conventions`.
+- Size every ticket from the audit: count the modules whose behavior changes, the migrations and the documents to update. When its changes fall into groups that could each merge alone and leave the base working, such as moving the readers of something before removing it, split along those groups, each blocked by the one before. A ticket that is itself the product of a split gets the same count.
 
 ## 6. Assign priority and labels
 
@@ -105,7 +114,7 @@ Title each ticket per `## Ticket conventions`, never with an id: the tracker ass
 
 ## 8. Preview and gate creation
 
-Present the breakdown as a numbered list. For each ticket show the title, priority, labels, project, assignee or `Unassigned`, the tickets that block it, the state it starts in, what it delivers, whether it is conditional, and its model routing when that is on. Never invent ids.
+Present the breakdown as a numbered list. For each ticket show the title, priority, labels, project, assignee or `Unassigned`, the tickets that block it, the state it starts in, what it delivers, its size from the audit, whether it is conditional, and its model routing when that is on. Never invent ids.
 
 Ask whether the granularity is right, whether each blocking edge is real, and whether any ticket should merge or split. Iterate until the user approves. While waiting, end with `Status: AWAITING_CREATE_APPROVAL`.
 

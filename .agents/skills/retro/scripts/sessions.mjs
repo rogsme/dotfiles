@@ -72,7 +72,7 @@ function claudeUserText(raw) {
   return `${command[1].trim()} ${args?.[1].trim() ?? ""}`.trim();
 }
 
-function claudeToolError(content) {
+function toolText(content) {
   if (typeof content === "string") return content;
   return (content ?? []).map((block) => block.text ?? "").join(" ");
 }
@@ -108,7 +108,7 @@ function parseClaudeTranscript(file) {
         toolNames.set(block.id, block.name);
         session.events.push({ tool: toolLine(block.name, block.input) });
       } else if (block.type === "tool_result" && block.is_error) {
-        session.events.push({ tool: failureLine(toolNames.get(block.tool_use_id) ?? "tool", claudeToolError(block.content)) });
+        session.events.push({ tool: failureLine(toolNames.get(block.tool_use_id) ?? "tool", toolText(block.content)) });
       } else if (block.type === "text") {
         const text = record.type === "user" ? claudeUserText(block.text ?? "") : (block.text ?? "").trim();
         if (text) session.events.push({ role: record.type, text });
@@ -187,6 +187,10 @@ function parseOpencodeExport(exported, listed) {
         } else if (part.type === "tool") {
           session.events.push({ tool: toolLine(part.name, part.state?.input) });
           if (part.state?.status === "error") session.events.push({ tool: failureLine(part.name, part.state.error?.message ?? JSON.stringify(part.state.error)) });
+          else if (Number.isInteger(part.state?.metadata?.exit) && part.state.metadata.exit !== 0) {
+            const output = toolText(part.state.content);
+            session.events.push({ tool: failureLine(part.name, `exit ${part.state.metadata.exit}${output ? `: ${output}` : ""}`) });
+          }
         }
       }
     }

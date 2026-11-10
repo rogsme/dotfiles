@@ -14,7 +14,7 @@ The lifecycle skills are general. Everything they need to know about one project
 | `docs/agents/pull-request.md` | `pull-request` | the repository has no pull request template of its own |
 | A `## Ticket lifecycle` block in `AGENTS.md` or `CLAUDE.md` | `block` | always |
 
-The files are prose for agents and people. Extra sections, notes and tables are welcome anywhere; the skills look up only the headings below and ignore the rest.
+The files are prose for agents and people. Extra sections, notes and tables are welcome anywhere. The skills read only the sections their preflight names, so an extra section or file reaches them only when one of those sends them to it, as an operation that says to use another one does. A note above a file's first section reaches no skill.
 
 ## Markers and versions
 
@@ -76,7 +76,7 @@ Tracker operations:
 |---|---|
 | `## Forge` | Kind, host, repository, remote name, CLI with the flags that pin host and repository, base branch and how to re-read it, merge style (`merge` or `squash`) and how to re-read it, and the rules for running the CLI non-interactively. |
 | `## Operations` | The H3 operations below. |
-| `## CI gate` | Which checks gate a head and which are advisory (automated reviewers, documentation jobs); the path filters that decide whether checks run at all; what "no CI" means here; any automation that moves the base branch on its own. |
+| `## CI gate` | Which checks gate a head and which are advisory (automated reviewers, documentation jobs); the path filters that decide whether checks run at all; what "no CI" means here; any automation that moves the base branch on its own; the generated paths only that automation writes, under which a base change still leaves a head containing the base (a `## CI gate` without the `Generated paths:` line has none). |
 | `## Pull requests` | Where the body format lives (the repository's template on the base branch, or `docs/agents/pull-request.md`), the headings every body must contain, the title format, the related-work line format, the closing-keyword policy, the draft policy, and `Assignee:` (a login, or `none`). |
 | `## Identity limits` | What the account the skills run as cannot do, such as approving its own pull request. |
 
@@ -108,7 +108,7 @@ Forge operations:
 | `## Worktrees` | The rule (branch name equals the worktree directory name equals the lead ticket id), where worktrees usually live, and who creates them (the user, never a skill). |
 | `## Verification` | The format command, the full check, focused checks per area, the areas that are test-first, hook behavior, and any environment notes. A command the project lacks is written as `not configured`. |
 | `## Commits` | Paths never committed, commit rules beyond the defaults, and the attribution policy. |
-| `## Sync` | How a branch takes the base (a merge), the ancestor check before every push, and project notes about syncing. |
+| `## Sync` | How a branch takes the base (a merge), the check that `HEAD` contains the base before every push, and project notes about syncing. |
 | `## Project rules` | Rule files per area, reference implementations and the terms for using them, and data boundaries. |
 | `## Review` | Project invariants a review checks, house review standards, and the commands for focused reproduction. |
 | `## Human verification` | The standard every human verification procedure meets. |
@@ -150,14 +150,15 @@ A `## Ticket lifecycle` section between the block markers, in the file both harn
 
 ## Which skill needs what
 
-R is required. F is required only when the feature it belongs to is on. A dash means the skill does not read it.
+R is required. F is required only when the feature it belongs to is on. A dash means the skill does not read it. Each skill's preflight checks its column, and prints exactly those sections for the skill to read.
 
 | Section | create-ticket | suggest-tickets | start-ticket | work-ticket | review-pr | address-pr-review | verify-pr | finish-ticket |
 |---|---|---|---|---|---|---|---|---|
 | issue-tracker `## Tracker`, `## Operating rules`, `## States` | R | R | R | R | R | R | - | R |
 | issue-tracker `resolve`, `load` | R | R | R | R | R | R | - | R |
 | issue-tracker `search` | R | - | - | - | - | - | - | R |
-| issue-tracker `metadata`, `create`, `update`, `relate` | R | - | - | - | - | - | - | - |
+| issue-tracker `metadata`, `create`, `update` | R | - | - | - | - | - | - | - |
+| issue-tracker `relate` | R | - | R | R | - | R | - | - |
 | issue-tracker `## Labels and priority`, `## Ticket conventions` | R | R | - | - | - | - | - | - |
 | issue-tracker `list-in-flight` | - | R | R | R | - | - | - | - |
 | issue-tracker `list-ready` | - | R | - | - | - | - | - | - |
@@ -188,10 +189,15 @@ R is required. F is required only when the feature it belongs to is on. A dash m
 | workflow `## Plan review` | - | - | F | - | - | - | - | - |
 | workflow `## Plan presentation` | - | - | F | - | - | - | - | - |
 | workflow `## Autonomous runs` | - | - | F | F | F | F | F | F |
-| workflow `## CI review` | - | - | - | - | F | - | F | F |
-| domain (all four headings) | R | - | R | R | R | R | - | - |
-| browser-pass (all four headings) | - | - | F | F | F | F | F | F |
-| pull-request (when `## Pull requests` points at it) | - | - | - | R | R | R | - | - |
+| workflow `## CI review` | - | - | - | - | F | F | F | F |
+| domain `## Glossary`, `## ADRs`, `## Consumer rules` | R | - | R | R | R | R | - | - |
+| domain `## Recording decisions` | - | - | - | R | - | - | - | - |
+| browser-pass `## When it applies` | - | - | F | F | F | F | - | F |
+| browser-pass `## Instances` | - | - | F | F | - | F | F | - |
+| browser-pass `## Procedure` | - | - | F | F | F | F | - | - |
+| browser-pass `## Captures` | - | - | F | F | F | F | F | - |
+| pull-request `## Review brief` (when `## Pull requests` points at it) | - | - | - | R | R | R | - | - |
+| pull-request `## Changelog` (when `## Pull requests` points at it) | - | - | - | - | F | F | - | - |
 
 An operation marked `Capability: Unsupported` still satisfies the heading check. The skill then follows the gap rules below, and stops with `Status: BLOCKED` when a required operation has no way forward.
 
@@ -202,7 +208,7 @@ An operation marked `Capability: Unsupported` still satisfies the heading check.
 | The tracker cannot attach files | Upload captures to the forge only; the tracker comment links the forge URLs. |
 | The forge cannot attach files | Upload captures to the tracker only, and link them from the pull request when the tracker's URLs are permanent; otherwise treat it as neither side being able to attach. |
 | Neither can attach | Keep captures in a temporary directory outside the repository, list their paths, and mark every visible criterion as needing human confirmation. |
-| No relations | Use the `Blocked by:` and `Delivers with:` lines in ticket descriptions alone. |
+| No relations | Use the `Blocked by:` and `Delivers with:` lines in ticket descriptions alone. A skill that marks a ticket blocked records the blocker in its `## Blocked` comment only. |
 | No native states | Use whatever `## States` maps the roles to (labels, a project field, open and closed). |
 | Comments cannot be edited | Post a new comment that links the one it supersedes. |
 | Search cannot see archived tickets | Search what is visible and state the limit in the duplicate report. |
@@ -215,9 +221,9 @@ An operation marked `Capability: Unsupported` still satisfies the heading check.
 
 ## Preflight (step 0 of every lifecycle skill)
 
-Each lifecycle skill runs this before any git, tracker or forge action. Its step 0 embeds a short `sh -c` check built from its column of the table above. For every file the skill needs, the check confirms that the file exists, that line 1 is the marker with version 1, that no `{{FILL:` text remains, and that every required heading exists as a whole line. Feature headings are checked only when `## Features` turns the feature on, and `pull-request.md` only when `## Pull requests` points at it. The check prints one line per problem and nothing when the configuration is complete. It is a script rather than an instruction to read the files, because a model reading prose can call an incomplete file complete.
+Each lifecycle skill runs this before any git, tracker or forge action. Its step 0 embeds a short `sh -c` check built from its column of the table above. For every file the skill needs, the check confirms that the file exists, that line 1 is the marker with version 1, that no `{{FILL:` text remains, and that every required heading exists as a whole line. Feature headings are checked only when `## Features` turns the feature on, and `pull-request.md` only when `## Pull requests` points at it. The check prints one line per problem. When there is none, it prints the sections it checked instead, grouped under a `==> docs/agents/<file> <==` line per file: each runs from its heading to the next heading of the same or a higher level outside code fences, and `## Operations` prints only its note, since the skill names each operation it uses. The skill reads those sections, and any other part of the configuration that one of them or a later step sends it to, such as the full `pull-request.md` when work-ticket writes a body. It is a script rather than an instruction to read the files, because a model reading prose can call an incomplete file complete, and because the whole configuration runs to about twice what one skill uses.
 
-When the check prints anything, the skill changes nothing and replies with exactly:
+When the check prints problem lines, the skill changes nothing and replies with exactly:
 
 ```
 rogs-skills is not configured for <skill> in this repository.

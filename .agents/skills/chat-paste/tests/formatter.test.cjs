@@ -116,3 +116,25 @@ const rejected = [
   ["x".repeat(100001), /100,000/],
 ];
 for (const [source, expected] of rejected) test(`fail closed: ${source.slice(0, 60)}`, () => assert.throws(() => format(source), expected));
+
+// Slack's composer pastes text/plain as Markdown, dropping the HTML and the
+// Delta, when the plain text looks like Markdown. formatter.js copies Slack's
+// detectors; these cases pin what reaches it.
+test("Slack's plain text never looks like Markdown, so Slack reads the rich formats", () => {
+  const result = format("## Conflicts\n\n1. First `code` point\n2. Second point\n\n## Missing\n\n- A bullet\n  - Nested\n\n> Quoted line\n\n```\n# install deps\n---\n```");
+  assert.match(result.plain, /^1\. First code point$/m);
+  assert.match(result.plain, /^> Quoted line$/m);
+  assert.match(result.plain, /^# install deps$/m);
+  for (const line of ["1. First code point", "2. Second point", "> Quoted line", "# install deps", "---"]) {
+    assert(result.slackPlain.split("\n").includes("⁠" + line), line);
+  }
+  assert.equal(result.slackPlain.replaceAll("⁠", ""), result.plain);
+  assert(!result.warnings.some(w => w.includes("Markdown")));
+});
+
+test("plain text that Slack would still read as Markdown gets a warning", () => {
+  const result = format("Use the \\*\\*real\\*\\* thing");
+  assert.equal(result.plain, "Use the **real** thing");
+  assert(result.warnings.some(w => w.includes("Markdown")));
+  assert(!format("Ship *it* today").warnings.some(w => w.includes("Markdown")));
+});

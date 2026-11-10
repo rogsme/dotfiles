@@ -7,7 +7,7 @@ A reviewer in CI reviews every pull request on each push, a clean merge of the b
 
 Rules:
 
-- The reviewer's summary with `Automated review: CLEAR` for a head counts as `review-pr`'s summary with `Verdict: READY_FOR_HUMAN` for that head, wherever a lifecycle skill or a runner requires one. It names no base: the base it includes is the one that is an ancestor of that head.
+- The reviewer's summary with `Automated review: CLEAR` for a head counts as `review-pr`'s summary with `Verdict: READY_FOR_HUMAN` for that head, wherever a lifecycle skill or a runner requires one. It names no base: the base it includes is the newest base SHA that head contains, as the `Generated paths:` line of `forge.md` `## CI gate` defines.
 - After that CLEAR, the human verification procedure is the pull request body's `## Human verification` section at that head.
 - `Automated review: FINDINGS` is review feedback, which `address-pr-review` answers.
 - A runner never starts `review-pr` here. `review-pr` runs only when the user asks for it.

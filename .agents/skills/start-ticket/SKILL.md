@@ -12,27 +12,35 @@ Load and investigate an existing ticket from its isolated worktree and return a 
 
 ## 0. Configuration preflight
 
-Read only, before any git, tracker or forge action. Run this check; it prints one line per problem, and nothing when the configuration is complete:
+Read only, before any git, tracker or forge action. Run this check. When the configuration is incomplete, it prints one line per problem. When it is complete, it prints the sections of the configuration this skill reads instead, each file's sections under a `==> docs/agents/<file> <==` line:
 
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/${1}"; id="${2}"; shift 2
-  [ -f "$f" ] || { echo "$f: file missing"; return; }
+need() { f="docs/agents/${1}"; id="${2}"; n="${1}"; shift 2
+  [ -f "$f" ] || { miss "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
-    *"rogs-skills config v"*) echo "$f: version: $(head -n 1 "$f")" ;;
-    *) echo "$f: marker missing" ;;
+    *"rogs-skills config v"*) miss "$f: version: $(head -n 1 "$f")" ;;
+    *) miss "$f: marker missing" ;;
   esac
-  grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  grep -qF "{{FILL:" "$f" && miss "$f: unfilled {{FILL: text"
+  has "$n" "$@"; }
 has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  for h in "$@"; do if grep -qxF -- "$h" "$f"; then got="$got$f|$h
+"; else miss "$f: $h"; fi; done; }
+miss() { echo "${1}"; bad=1; }
 on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
-need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### list-in-flight" "### comment" "### transition" "## States"
+show() { for f in $(printf %s "$got" | cut -d "|" -f 1 | awk "!s[\$(0)]++"); do echo "==> $f <=="
+  printf %s "$got" | while IFS="|" read -r g h; do [ "$g" = "$f" ] || continue
+  awk -v h="$h" "/^(\`\`\`|~~~)/ { q = !q }
+    !q && /^#+ / { n = index(\$(0), \" \") - 1; if (p && (n <= d || o)) exit
+      if (\$(0) == h) { p = 1; d = n; o = h == \"## Operations\" } }
+    p" "$f"; done; done; }
+need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### list-in-flight" "### relate" "### comment" "### transition" "## States"
 need forge.md forge "## Forge"
 need workflow.md workflow "## Features" "## Worktrees" "## Verification" "## Project rules"
-need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
+need domain.md domain "## Glossary" "## ADRs" "## Consumer rules"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
 on "Client notes" && has workflow.md "## Client notes"
@@ -40,10 +48,10 @@ on "Plan review" && has workflow.md "## Plan review"
 on "Plan presentation" && has workflow.md "## Plan presentation"
 on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
 on "Autonomous runs" && has workflow.md "## Autonomous runs"
-true'
+[ -n "$bad" ] || show'
 ```
 
-When it prints nothing, read the files it checked and continue. When it prints anything, change nothing and reply with exactly:
+When it prints sections, they are this skill's configuration: read them and continue. When the harness shortens a long output or saves it to a file, read the whole output once, from the file it names or from a rerun of the check into a temporary file. A printed section or a later step can send you elsewhere in the configuration, such as an operation the section says to use or a section of another file: read that part too. When it prints problem lines, change nothing and reply with exactly:
 
 ```
 rogs-skills is not configured for start-ticket in this repository.
@@ -54,7 +62,7 @@ Status: SETUP_REQUIRED
 
 When the check reports files missing here that exist in the main worktree (the first entry of `git worktree list --porcelain`), the second line says instead: "The configuration exists in <path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch." When it reports a version, the second line says: "The configuration is version <n>; this skill expects version 1.", followed by "Run /setup-rogs here to update it." for an older version or "Run `npx skills update` to update the installed skills." for a newer one.
 
-From here on, "the tracker", "the forge" and every operation named in backticks (`load`, `list-in-flight`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill, apart from the state moves in step 2, the comments [Blocked tickets](#blocked-tickets) asks for, and, in an autonomous run, the `## Autonomous run` comment. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
+From here on, "the tracker", "the forge" and every operation named in backticks (`load`, `list-in-flight`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill, apart from the state moves in step 2, the comments and relations [Blocked tickets](#blocked-tickets) asks for, and, in an autonomous run, the `## Autonomous run` comment. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`. Ending a turn to wait for a background task this run started, such as a CI watch, is not a stop: write no status line, and go on when the task reports back.
 
 ## 1. Verify the ticket worktree
 
@@ -83,7 +91,7 @@ Read every declared blocker and its current state. A blocked-by relation between
 
 Treat another ticket as a blocker only on concrete evidence: an unresolved prerequisite, a conditional discovery gate, a superseding decision, a contradictory requirement, or an in-flight implementation conflict that makes independent work unsafe. Similar topics or shared files alone are not blockers. A blocker stays unresolved until it reaches the `done` role, unless its ticket or an explicit decision says this ticket may proceed sooner. A canceled blocker is an open question, not a satisfied prerequisite.
 
-When the scan finds an unrecorded blocker, report the evidence in the plan; never add a relation while planning. When an unresolved blocker makes independent work unsafe, mark the ticket blocked as [Blocked tickets](#blocked-tickets) says. Ask before planning a ticket that is already `in-review`, `done`, `canceled`, or in a state `## States` does not list. Never change the assignee.
+When the scan finds an unrecorded blocker, report the evidence in the plan. When an unresolved blocker makes independent work unsafe, or the user names one, mark the ticket blocked as [Blocked tickets](#blocked-tickets) says; that is the only time this skill adds a relation. Ask before planning a ticket that is already `in-review`, `done`, `canceled`, or in a state `## States` does not list. Never change the assignee.
 
 Once the checks above pass, and before the investigation, `transition` every member that is `new`, `ready` or `blocked` to `in-progress` and read the states back, so the board shows the ticket started as soon as work on it does; [Blocked tickets](#blocked-tickets) says when a blocked one comes back. When the user drops the ticket instead of approving a plan, `transition` each member this run moved back to the state it had, or, for one that was blocked, to the state its `## Blocked` comment records.
 
@@ -123,8 +131,9 @@ After the overview, report:
 - The cross-ticket scan: the tickets inspected as possible blockers, and whether this ticket is safe to start independently.
 - The current behavior and the root-cause findings, with code references.
 - Remaining questions, blockers and explicitly unverified surfaces.
+- Tracker follow-ups: every tracker change beyond the bundle's own transitions that the plan or the user's decisions call for, such as a relation to change, a ticket to create or another ticket's scope to widen, one line each, or "None". Keep them out of the ordered plan: work-ticket posts the ones that are only a comment on an existing ticket, carries every one in its handoff, and finish-ticket reports the ones still open.
 - An ordered implementation plan naming the affected areas, coupled contracts, tests and required verification, using the commands in `## Verification` and saying so plainly where one is `not configured`. Every acceptance criterion of every member maps to a plan step.
-- The seams under test, each with one line on what it catches and what it misses. In the test-first areas `## Verification` lists, these are the agreement `tdd` works from during implementation.
+- The seams under test, each with one line on what it catches and what it misses. In the test-first areas `## Verification` lists, these are the agreement `tdd` works from during implementation. When the change walks input whose size the product caps (rows, files, items), one seam runs at that cap with a time budget, so a quadratic pass fails a test rather than a review.
 - When the browser pass is on, the pass the work phase will run per `browser-pass.md`: which instance, which criteria it walks, the negative check, and which flows get a video; or the one-line reason the change has no user-visible surface.
 - When model routing is on, a `Model:` line naming the model the work should run on, and whether this session runs on it.
 
@@ -168,9 +177,9 @@ An autonomous run is one whose request says "This run is autonomous". Follow `##
 
 ## Blocked tickets
 
-A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket.
+A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket. Waiting on CI is neither: keep waiting.
 
-To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
+To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. When a blocker is another ticket, give each member a blocked-by relation to it with `relate`, replacing a related relation the pair already has when the tracker keeps one relation per pair, and read the relations back; when `relate` is not `Supported`, the comment stands alone. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
 
 A member in `blocked` comes back once every blocker its `## Blocked` comment names is cleared: `transition` it to the state this run works in (`in-progress` in start-ticket and work-ticket, `in-review` in address-pr-review), and post an `## Unblocked` comment beside the `## Blocked` one that says what cleared each blocker. When a blocker is still open, refresh the `## Blocked` comment and stop as above. Ask before working on a member in `blocked` that has no `## Blocked` comment.
 

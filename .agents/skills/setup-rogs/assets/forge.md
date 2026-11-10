@@ -26,7 +26,8 @@ Rules for every forge call:
 - Advisory checks: {{FILL: automated reviewers, documentation jobs and other checks that never count as the gate, or "none"}}. Their comments are review feedback; their status is not the gate.
 - Path filters: {{FILL: the paths that make the gate checks run, or "none: every change runs them"}}. A head whose diff touches none of these paths legitimately reports no gate checks; treat that as a pass only after confirming it from the changed files, and say so wherever CI evidence would go.
 - No CI: {{FILL: "not applicable", or "this repository has no CI; write 'no CI configured' wherever CI evidence would go"}}.
-- Automation that moves the base branch: {{FILL: for example "a bot commits generated docs to the base after every merge", or "none"}}. Re-check that the base is an ancestor of the head immediately before every push.
+- Automation that moves the base branch: {{FILL: for example "a bot commits generated docs to the base after every merge", or "none"}}.
+- Generated paths: {{FILL: paths that only such automation writes and no gate check or review reads, for example `docs/wiki/`, or "none"}}. A head contains the base when the base is an ancestor of it, or when every change the base made since their merge base is under these paths. Re-check that the head contains the base immediately before every push.
 
 ## Pull requests
 

@@ -70,7 +70,7 @@ async (page) => {
     await receiver.locator("#receiver").click();
     await receiver.keyboard.press("Control+V");
     const received = await receiver.evaluate(() => window.received);
-    check(received["text/plain"] === expected.plain, `${target} plain text reaches another tab exactly`);
+    check(received["text/plain"] === (target === "slack" ? expected.slackPlain : expected.plain), `${target} plain text reaches another tab exactly`);
     if (target !== "plain") check(await sameStructure(received["text/html"] || "", expected.html), `${target} HTML structure and text survive real copy and paste`);
     else check(!received["text/html"], "Plain copy carries no HTML");
     if (target === "slack") check(JSON.stringify(JSON.parse(received["slack/texty"] || "{}")) === JSON.stringify(expected.delta), "Native Slack Delta reaches another tab exactly");

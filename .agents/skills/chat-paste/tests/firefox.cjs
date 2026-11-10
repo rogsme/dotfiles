@@ -123,7 +123,7 @@ async function main() {
       await paste(receiver, "#receiver");
       const received = JSON.parse(await evaluate(receiver, "JSON.stringify(window.received)"));
       const expected = JSON.parse(await evaluate(sender, "document.getElementById('chat-paste-data').textContent"));
-      check(received['text/plain'] === expected.plain, `${target} exact plain text reaches a separate Firefox tab`);
+      check(received['text/plain'] === (target === 'slack' ? expected.slackPlain : expected.plain), `${target} exact plain text reaches a separate Firefox tab`);
       check(!received['slack/texty'], `${target} Firefox path does not leave Chromium-native data`);
       if (target !== 'plain') {
         const structure = await evaluate(receiver, `JSON.stringify((${signature})(window.received['text/html']))`);

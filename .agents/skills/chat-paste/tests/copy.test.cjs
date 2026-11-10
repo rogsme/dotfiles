@@ -7,7 +7,7 @@ const { format } = require("../assets/formatter.js");
 // Run the real button handlers with a deterministic clipboard-event double.
 // Real browser clipboard round-trips remain in browser_checks.js and firefox.cjs.
 function page(userAgent, { rejectHTML = false, copyResult = true, destination = "both" } = {}) {
-  const input = "## Update 🚀\n* Parent\n  * Child\n    * Grandchild\n\n[Notes](https://example.com/notes)";
+  const input = "## Update 🚀\n* Parent\n  * Child\n    * Grandchild\n\n1. First\n2. Second\n\n[Notes](https://example.com/notes)";
   const expected = format(input);
   const elements = new Map();
   const listeners = new Map();
@@ -21,7 +21,7 @@ function page(userAgent, { rejectHTML = false, copyResult = true, destination = 
     });
     return elements.get(id);
   }
-  element("chat-paste-data").textContent = JSON.stringify({ title: "Test", destination, plain: expected.plain, html: expected.html, delta: expected.delta });
+  element("chat-paste-data").textContent = JSON.stringify({ title: "Test", destination, plain: expected.plain, slackPlain: expected.slackPlain, html: expected.html, delta: expected.delta });
   const document = {
     getElementById: element,
     createElement: () => element("helper"),
@@ -61,7 +61,8 @@ test("Firefox/Zen Slack copy writes rich HTML instead of refusing the browser", 
   assert.equal(element("toast").textContent, "Copied for Slack");
   assert.equal(element("toast").className, "show");
   assert.equal(clipboard.get("text/html"), expected.html);
-  assert.equal(clipboard.get("text/plain"), expected.plain);
+  assert.equal(clipboard.get("text/plain"), expected.slackPlain);
+  assert.notEqual(expected.slackPlain, expected.plain, "The numbered list would make Slack paste the plain text as Markdown");
   assert(!clipboard.has("slack/texty"), "Do not claim Firefox's custom MIME is Chromium-native");
 });
 

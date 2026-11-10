@@ -230,9 +230,30 @@
       const prefix = line.kind === "list" ? "  ".repeat(line.indent) + (line.list === "ordered" ? `${line.number}. ` : "• ") : line.kind === "quote" ? "> " : "";
       return prefix + line.runs.map(r => r.text).join("");
     }).join("\n");
+    const slackPlain = slackSafe(plain);
     const warnings = /(^|[\s(])@[\p{L}\p{N}_]/u.test(plain) ? ["Select real @mentions in Slack or Teams after pasting; copied names do not notify anyone."] : [];
-    return { source, lines, html: toHTML(lines), plain, delta: toDelta(lines), warnings };
+    if (slackMarkdown(slackPlain)) warnings.push("Slack may paste this message as Markdown text when copied from Firefox or Zen, because its text contains literal Markdown characters. Copy from a Chromium browser or reword those characters.");
+    return { source, lines, html: toHTML(lines), plain, slackPlain, delta: toDelta(lines), warnings };
   }
+
+  // Slack's composer pastes text/plain as Markdown, discarding the HTML and the
+  // Delta, when the plain text looks like Markdown: any Markdown without
+  // slack/texty (Firefox), complex Markdown even with it (Chromium). These are
+  // Slack's own detectors, copied from its web client; see references/clipboard.md.
+  const slackComplex = text => /^`{3,}\S+\s*$/m.test(text) || /^\|.+?\|[ \t]*\n\|[\s|:-]+?\|/m.test(text) ||
+    /^#{2,6}\s+?\S/m.test(text) || (/^#\s+\S/m.test(text) && !/^#\s+\d+\s*$/m.test(text)) || /^---\s*$/m.test(text);
+  function slackMarkdown(text) {
+    if (slackComplex(text)) return true;
+    const prose = text.replace(/\b(?:https?:\/\/|mailto:)\S+/gi, " ");
+    return /(?<!\w)\*\*(?!\s)(.{2,}?)(?<!\s)\*\*/.test(prose) || /(?<=\s)__(?!\s)(.{2,}?)(?<!\s)__(?=\s|$|[.,;:!?)])/.test(prose) ||
+      /(?<!\w|\*)\*(?!\*|\s)(.{2,}?)(?<!\s|\*)\*(?!\*)/.test(prose) || /(?<=\s)_(?!_|\s)(.{2,}?)(?<!\s|_)_(?=\s|$|[.,;:!?)])/.test(prose) ||
+      /(?<=\s|^)~~(?!\s)(.{2,}?)(?<!\s)~~/.test(prose) || /`[^\s`]/.test(text) || /(?<![\w'"\])])\[.+?\]\(.+?\)/.test(text) ||
+      /^[-*] [^\s]/m.test(text) || /^\d+?\. [^\s]/m.test(text) || /^> [^\s]/m.test(text);
+  }
+  // A word joiner (U+2060) is invisible and not whitespace, so a line that
+  // starts with one no longer matches any of Slack's line-start patterns.
+  const slackSafe = plain => plain.split("\n").map(line =>
+    /^(?:\d+\. |[-*] |> |#|---|```|\|)/.test(line) ? "⁠" + line : line).join("\n");
 
   return { format, escape };
 });

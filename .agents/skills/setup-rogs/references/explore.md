@@ -14,7 +14,7 @@ Read only. Run every command from the repository root (`git rev-parse --show-top
 - `git remote -v`: remote names and hosts.
 - The built-in guide that matches the host: a GitHub host (github.com or a GitHub Enterprise host) means `../assets/forge-github.md`; a GitLab host means `../assets/forge-gitlab.md`; a Gitea or Forgejo host (it answers `/api/v1/version`, or a `tea` login exists for it) means `../assets/forge-gitea.md`. Anything else uses `../assets/forge-custom.md`.
 - Authentication, the base branch, the merge styles and the pull request template, each as the chosen guide's setup notes describe.
-- CI definitions, read only: workflow files, job names, path filters, scheduled jobs that commit to the base branch, and bots that review pull requests.
+- CI definitions, read only: workflow files, job names, path filters, scheduled jobs that commit to the base branch and the paths they write, and bots that review pull requests.
 
 ## Tracker
 

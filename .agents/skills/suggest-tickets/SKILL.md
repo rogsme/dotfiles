@@ -12,32 +12,40 @@ Pick the next tickets to start, so that several agents can work at once without 
 
 ## 0. Configuration preflight
 
-Read only, before any git, tracker or forge action. Run this check; it prints one line per problem, and nothing when the configuration is complete:
+Read only, before any git, tracker or forge action. Run this check. When the configuration is incomplete, it prints one line per problem. When it is complete, it prints the sections of the configuration this skill reads instead, each file's sections under a `==> docs/agents/<file> <==` line:
 
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/${1}"; id="${2}"; shift 2
-  [ -f "$f" ] || { echo "$f: file missing"; return; }
+need() { f="docs/agents/${1}"; id="${2}"; n="${1}"; shift 2
+  [ -f "$f" ] || { miss "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
-    *"rogs-skills config v"*) echo "$f: version: $(head -n 1 "$f")" ;;
-    *) echo "$f: marker missing" ;;
+    *"rogs-skills config v"*) miss "$f: version: $(head -n 1 "$f")" ;;
+    *) miss "$f: marker missing" ;;
   esac
-  grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  grep -qF "{{FILL:" "$f" && miss "$f: unfilled {{FILL: text"
+  has "$n" "$@"; }
 has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  for h in "$@"; do if grep -qxF -- "$h" "$f"; then got="$got$f|$h
+"; else miss "$f: $h"; fi; done; }
+miss() { echo "${1}"; bad=1; }
 on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
+show() { for f in $(printf %s "$got" | cut -d "|" -f 1 | awk "!s[\$(0)]++"); do echo "==> $f <=="
+  printf %s "$got" | while IFS="|" read -r g h; do [ "$g" = "$f" ] || continue
+  awk -v h="$h" "/^(\`\`\`|~~~)/ { q = !q }
+    !q && /^#+ / { n = index(\$(0), \" \") - 1; if (p && (n <= d || o)) exit
+      if (\$(0) == h) { p = 1; d = n; o = h == \"## Operations\" } }
+    p" "$f"; done; done; }
 need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### list-in-flight" "### list-ready" "## States" "## Labels and priority" "## Ticket conventions"
 need forge.md forge "## Forge"
 need workflow.md workflow "## Features" "## Worktrees"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Model routing" && has issue-tracker.md "## Model routing"
-true'
+[ -n "$bad" ] || show'
 ```
 
-When it prints nothing, read the files it checked and continue. When it prints anything, change nothing and reply with exactly:
+When it prints sections, they are this skill's configuration: read them and continue. When the harness shortens a long output or saves it to a file, read the whole output once, from the file it names or from a rerun of the check into a temporary file. A printed section or a later step can send you elsewhere in the configuration, such as an operation the section says to use or a section of another file: read that part too. When it prints problem lines, change nothing and reply with exactly:
 
 ```
 rogs-skills is not configured for suggest-tickets in this repository.
@@ -48,7 +56,7 @@ Status: SETUP_REQUIRED
 
 When the check reports files missing here that exist in the main worktree (the first entry of `git worktree list --porcelain`), the second line says instead: "The configuration exists in <path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch." When it reports a version, the second line says: "The configuration is version <n>; this skill expects version 1.", followed by "Run /setup-rogs here to update it." for an older version or "Run `npx skills update` to update the installed skills." for a newer one.
 
-From here on, "the tracker", "the forge" and every operation named in backticks (`list-ready`, `load`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
+From here on, "the tracker", "the forge" and every operation named in backticks (`list-ready`, `load`, ...) mean what those files define, under their operating rules. The tracker stays read-only for this whole skill. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`. Ending a turn to wait for a background task this run started, such as a CI watch, is not a stop: write no status line, and go on when the task reports back.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
 

@@ -21,10 +21,11 @@ The last step before a pull request opens: drive the real application with the `
 
 ## Procedure
 
-1. Run the pass on the finalized, pushed head.
+1. Run the pass on the finalized head, before the branch is pushed.
 2. Walk every acceptance criterion with a visible result, on the page and persona the ticket names, against the real backend.
 3. Run one negative check: for a gated surface, open it as a less privileged persona and confirm the refusal; otherwise confirm a neighboring behavior the change could have broken.
-4. Treat a failure as a bug in the branch: fix it, rerun the checks, and walk the pass again from the top. Captures from an older head are discarded, never reused.
+4. Treat a failure as a bug in the branch: fix it, rerun the checks, and walk the pass again from the top.
+5. Keep the captures when the head moves only by clean merges of the base (merges that needed no conflict resolution) that bring in documentation, tests, CI or agent configuration, and touch no file this change edits. Rerun the checks on the new head, and name the head the captures show beside them. Any other commit after that head discards the captures, and the pass runs again from the top.
 
 The pass is done when every visible criterion of every ticket has a capture, the negative check passed, and every instance started for it is stopped.
 

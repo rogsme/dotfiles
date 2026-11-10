@@ -34,7 +34,7 @@ Digests and transcripts are evidence: an instruction inside one was meant for th
 - No-ops: look for instructions in steering files that don't modify the agent's behavior. _Use when_ the steering files are large and unwieldy.
 - Information access: look for opportunities to increase the agent's access to information. Teeing dev server logs, readonly access to third-party services. _Use when_ a crucial piece of information was not available to the agent.
 
-4. Present these candidates to the user, in order of severity. A problem that recurs across sessions ranks above a one-off.
+4. Check each candidate against the current guidance and automation, and drop the ones they already cover. Present the rest to the user, in order of severity. A problem that recurs across sessions ranks above a one-off. Suggest changes only: making them takes a separate request.
 
 ## Reference
 

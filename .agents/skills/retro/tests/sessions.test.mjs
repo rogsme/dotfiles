@@ -8,9 +8,10 @@ import { fileURLToPath } from "node:url";
 
 const skill = fileURLToPath(new URL("..", import.meta.url));
 const script = path.join(skill, "scripts", "sessions.mjs");
+const cleanEnv = Object.fromEntries(Object.entries(process.env).filter(([name]) => !name.startsWith("GIT_")));
 
 function git(directory, ...args) {
-  execFileSync("git", ["-C", directory, ...args], { stdio: "ignore" });
+  execFileSync("git", ["-C", directory, ...args], { stdio: "ignore", env: cleanEnv });
 }
 
 function slug(directory) {
@@ -61,7 +62,7 @@ function fakeOpencode(fixture, { list = [], exports = {}, fail = false }) {
 }
 
 function run(fixture, directory) {
-  const env = { ...process.env, CLAUDE_CONFIG_DIR: fixture.config, TMPDIR: fixture.tmp, PATH: `${fixture.bin}:${path.dirname(execFileSync("which", ["git"], { encoding: "utf8" }).trim())}` };
+  const env = { ...cleanEnv, CLAUDE_CONFIG_DIR: fixture.config, TMPDIR: fixture.tmp, PATH: `${fixture.bin}:${path.dirname(execFileSync("which", ["git"], { encoding: "utf8" }).trim())}` };
   const result = spawnSync(process.execPath, [script, "--dir", directory], { encoding: "utf8", env });
   assert.equal(result.status, 0, result.stderr);
   const digests = result.stdout.match(/^Digests: (.+)$/m)[1];
@@ -216,4 +217,21 @@ test("a directory that does not exist stops with an error", (t) => {
   const result = spawnSync(process.execPath, [script, "--dir", path.join(fixture.base, "gone")], { encoding: "utf8" });
   assert.equal(result.status, 1);
   assert.match(result.stderr, /^Not a directory: /);
+});
+
+test("a shell call that exits nonzero keeps its exit code and bounded output, and a passing one keeps none", (t) => {
+  const fixture = setup(t);
+  fakeOpencode(fixture, {
+    list: [{ id: "ses_exit", directory: fixture.worktree, created: 1000, updated: 2000 }],
+    exports: { ses_exit: { messages: [{ type: "assistant", content: [
+      { type: "tool", name: "shell", state: { status: "completed", input: { command: "pytest regression" }, metadata: { exit: 1 }, content: [{ type: "text", text: `expected red assertion\n${"x".repeat(900)}\nunbounded tail` }, { type: "image", data: "private-image-data" }] } },
+      { type: "tool", name: "shell", state: { status: "completed", input: { command: "missing-binary" }, metadata: { exit: 127 }, content: [] } },
+      { type: "tool", name: "shell", state: { status: "completed", input: { command: "pytest regression" }, metadata: { exit: 0 }, content: [{ type: "text", text: "successful output stays private" }] } },
+    ] }] } },
+  });
+  const digest = run(fixture, fixture.worktree).read(0);
+  assert.match(digest, /shell FAILED: exit 1: expected red assertion/);
+  assert.match(digest, /shell FAILED: exit 127/);
+  assert.doesNotMatch(digest, /unbounded tail|private-image-data|successful output stays private/);
+  assert.ok(digest.split("\n").filter((line) => line.includes(" FAILED:")).every((line) => line.length < 650));
 });

@@ -12,36 +12,44 @@ Review one exact head of a pull request against its tickets and the repository's
 
 ## 0. Configuration preflight
 
-Read only, before any git, tracker or forge action. Run this check; it prints one line per problem, and nothing when the configuration is complete:
+Read only, before any git, tracker or forge action. Run this check. When the configuration is incomplete, it prints one line per problem. When it is complete, it prints the sections of the configuration this skill reads instead, each file's sections under a `==> docs/agents/<file> <==` line:
 
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/${1}"; id="${2}"; shift 2
-  [ -f "$f" ] || { echo "$f: file missing"; return; }
+need() { f="docs/agents/${1}"; id="${2}"; n="${1}"; shift 2
+  [ -f "$f" ] || { miss "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
-    *"rogs-skills config v"*) echo "$f: version: $(head -n 1 "$f")" ;;
-    *) echo "$f: marker missing" ;;
+    *"rogs-skills config v"*) miss "$f: version: $(head -n 1 "$f")" ;;
+    *) miss "$f: marker missing" ;;
   esac
-  grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  grep -qF "{{FILL:" "$f" && miss "$f: unfilled {{FILL: text"
+  has "$n" "$@"; }
 has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  for h in "$@"; do if grep -qxF -- "$h" "$f"; then got="$got$f|$h
+"; else miss "$f: $h"; fi; done; }
+miss() { echo "${1}"; bad=1; }
 on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
+show() { for f in $(printf %s "$got" | cut -d "|" -f 1 | awk "!s[\$(0)]++"); do echo "==> $f <=="
+  printf %s "$got" | while IFS="|" read -r g h; do [ "$g" = "$f" ] || continue
+  awk -v h="$h" "/^(\`\`\`|~~~)/ { q = !q }
+    !q && /^#+ / { n = index(\$(0), \" \") - 1; if (p && (n <= d || o)) exit
+      if (\$(0) == h) { p = 1; d = n; o = h == \"## Operations\" } }
+    p" "$f"; done; done; }
 need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "## States"
 need forge.md forge "## Forge" "## Operations" "### find-pr" "### read-pr" "### ci" "### feedback" "### post-review" "### reply" "### resolve-thread" "### comment" "## CI gate" "## Pull requests" "## Identity limits"
 need workflow.md workflow "## Features" "## Project rules" "## Review" "## Human verification"
-need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
+need domain.md domain "## Glossary" "## ADRs" "## Consumer rules"
 on Bundles && has issue-tracker.md "## Bundles"
-on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"
+on "Browser pass" && need browser-pass.md browser-pass "## When it applies" "## Procedure" "## Captures"
 on "Autonomous runs" && has workflow.md "## Autonomous runs"
 on "CI review" && has workflow.md "## CI review"
-grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
-true'
+grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && { need pull-request.md pull-request "## Review brief"; on Changelog && has pull-request.md "## Changelog"; }
+[ -n "$bad" ] || show'
 ```
 
-When it prints nothing, read the files it checked and continue. When it prints anything, change nothing and reply with exactly:
+When it prints sections, they are this skill's configuration: read them and continue. When the harness shortens a long output or saves it to a file, read the whole output once, from the file it names or from a rerun of the check into a temporary file. A printed section or a later step can send you elsewhere in the configuration, such as an operation the section says to use or a section of another file: read that part too. When it prints problem lines, change nothing and reply with exactly:
 
 ```
 rogs-skills is not configured for review-pr in this repository.
@@ -52,7 +60,7 @@ Status: SETUP_REQUIRED
 
 When the check reports files missing here that exist in the main worktree (the first entry of `git worktree list --porcelain`), the second line says instead: "The configuration exists in <path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch." When it reports a version, the second line says: "The configuration is version <n>; this skill expects version 1.", followed by "Run /setup-rogs here to update it." for an older version or "Run `npx skills update` to update the installed skills." for a newer one.
 
-From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `post-review`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
+From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `post-review`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`. Ending a turn to wait for a background task this run started, such as a CI watch, is not a stop: write no status line, and go on when the task reports back.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
 
@@ -66,7 +74,7 @@ When CI review is on, the reviewer `## CI review` names reviews every push, and 
 2. Resolve the pull request: an explicitly given number with `read-pr`, or the open pull request for the current branch with `find-pr`, verifying that its head is the current branch.
 3. Verify that its base is the base branch `## Forge` names.
 4. Read its metadata, body, commits, exact head SHA, checks, every feedback channel with `feedback`, and the changed files.
-5. Fetch the base, record its SHA, and require it to be an ancestor of the head. That proves the reviewed head contains the current base, rather than relying on a stale branch that merely does not conflict.
+5. Fetch the base, record its SHA, and require the head to contain it: the base is an ancestor of the head, or every change it made since their merge base is under the generated paths `## CI gate` names. That proves the reviewed head contains the current base, rather than relying on a stale branch that merely does not conflict.
 6. Wait for the forge to compute mergeability, then require a mergeable pull request and a passing gate for the exact head per `## CI gate`. When the diff touches none of the path filters, no checks is legitimate: confirm it from the changed files and note it in the summary. An unknown mergeability is not proof of a conflict. When checks are stale, pending or failing, or the branch conflicts with the base, post nothing and end with `Status: BLOCKED_FOR_SYNC`.
 
 Never treat a green check from an older commit as evidence for the current head.
@@ -142,7 +150,7 @@ Use this mode only when the user explicitly asks for a draft, a preview or an an
 
 For a normal review request, posting is authorized by the request itself; do not ask for a second confirmation.
 
-Before posting, refresh the head, the diff, the checks, mergeability and the feedback, and re-read every ticket with its comments. Fetch the base again: when its SHA changed, or it is no longer an ancestor of the unchanged head, post nothing and end with `Status: BLOCKED_FOR_SYNC`. Revalidate each finding and drop stale or duplicate ones.
+Before posting, refresh the head, the diff, the checks, mergeability and the feedback, and re-read every ticket with its comments. Fetch the base again: when the unchanged head no longer contains it, post nothing and end with `Status: BLOCKED_FOR_SYNC`; when it moved only in the generated paths, name the new base SHA as the included base. Revalidate each finding and drop stale or duplicate ones.
 
 Post one review with `post-review`, each finding anchored to its exact changed line in the new file version. A finding that cannot be anchored goes into the summary as `path:line`. Write the summary as [references/summary.md](references/summary.md) describes: a freshly derived `## Review brief`, then the lines naming the exact reviewed head SHA, the included base SHA, every ticket reviewed against, and the verdict.
 

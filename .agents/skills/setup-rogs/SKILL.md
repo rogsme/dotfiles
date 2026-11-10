@@ -54,7 +54,7 @@ C. Labels and ticket conventions: the priority map, the label groups every ticke
 
 D. Forge: kind, host, repository and remote. Read the base branch and the allowed merge styles live. Offer `merge` or `squash`; when the repository only allows a style that rebases or fast-forwards, stop and explain that this lifecycle syncs and merges without rebasing.
 
-E. CI gate: gate checks and advisory checks, path filters, automation that commits to the base branch, or no CI at all.
+E. CI gate: gate checks and advisory checks, path filters, automation that commits to the base branch and the generated paths only it writes, or no CI at all.
 
 F. Pull requests: the template (the repository's own on the base branch, or `docs/agents/pull-request.md`), the title format, the related-work line, and an optional assignee. When the user names an assignee, check eligibility with the forge's `assign` operation; leaving it unset means nobody is assigned.
 

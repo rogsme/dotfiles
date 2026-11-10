@@ -8,41 +8,50 @@ metadata:
 
 # Address review feedback
 
-Treat review comments as claims to verify, not instructions to apply blindly. Make the smallest justified fixes, push them before replying, and answer every feedback channel. The tracker stays read-only, apart from replacement captures and the moves [Blocked tickets](#blocked-tickets) describes.
+Treat review comments as claims to verify, not instructions to apply blindly. Make the smallest justified fixes, push them before replying, and answer every feedback channel. The tracker stays read-only, apart from replacement captures and the moves and relations [Blocked tickets](#blocked-tickets) describes.
 
 Every run first syncs the branch with its base (step 3), then performs at most two address rounds and stops. A request to address the review and a request to sync the pull request start the same run. A round is steps 4 to 8 against one head: collect the unanswered feedback, classify it, fix the accepted findings, push, wait for the exact-head CI, and reply. Step 9 decides whether a second round happens and enforces the cap.
 
 ## 0. Configuration preflight
 
-Read only, before any git, tracker or forge action. Run this check; it prints one line per problem, and nothing when the configuration is complete:
+Read only, before any git, tracker or forge action. Run this check. When the configuration is incomplete, it prints one line per problem. When it is complete, it prints the sections of the configuration this skill reads instead, each file's sections under a `==> docs/agents/<file> <==` line:
 
 ```sh
 sh -c '
 cd "$(git rev-parse --show-toplevel)" || exit 1
-need() { f="docs/agents/${1}"; id="${2}"; shift 2
-  [ -f "$f" ] || { echo "$f: file missing"; return; }
+need() { f="docs/agents/${1}"; id="${2}"; n="${1}"; shift 2
+  [ -f "$f" ] || { miss "$f: file missing"; return; }
   case "$(head -n 1 "$f")" in
     "<!-- rogs-skills config v1: $id -->") ;;
-    *"rogs-skills config v"*) echo "$f: version: $(head -n 1 "$f")" ;;
-    *) echo "$f: marker missing" ;;
+    *"rogs-skills config v"*) miss "$f: version: $(head -n 1 "$f")" ;;
+    *) miss "$f: marker missing" ;;
   esac
-  grep -qF "{{FILL:" "$f" && echo "$f: unfilled {{FILL: text"
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  grep -qF "{{FILL:" "$f" && miss "$f: unfilled {{FILL: text"
+  has "$n" "$@"; }
 has() { f="docs/agents/${1}"; shift; [ -f "$f" ] || return 0
-  for h in "$@"; do grep -qxF -- "$h" "$f" || echo "$f: $h"; done; }
+  for h in "$@"; do if grep -qxF -- "$h" "$f"; then got="$got$f|$h
+"; else miss "$f: $h"; fi; done; }
+miss() { echo "${1}"; bad=1; }
 on() { grep -qiE "^[|] *${1} *[|] *on *[|]" docs/agents/workflow.md 2>/dev/null; }
-need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### comment" "### transition" "## States"
+show() { for f in $(printf %s "$got" | cut -d "|" -f 1 | awk "!s[\$(0)]++"); do echo "==> $f <=="
+  printf %s "$got" | while IFS="|" read -r g h; do [ "$g" = "$f" ] || continue
+  awk -v h="$h" "/^(\`\`\`|~~~)/ { q = !q }
+    !q && /^#+ / { n = index(\$(0), \" \") - 1; if (p && (n <= d || o)) exit
+      if (\$(0) == h) { p = 1; d = n; o = h == \"## Operations\" } }
+    p" "$f"; done; done; }
+need issue-tracker.md issue-tracker "## Tracker" "## Operating rules" "## Operations" "### resolve" "### load" "### relate" "### comment" "### transition" "## States"
 need forge.md forge "## Forge" "## Operations" "### find-pr" "### push" "### read-pr" "### edit-pr" "### ci" "### feedback" "### reply" "### comment" "## CI gate" "## Pull requests"
 need workflow.md workflow "## Features" "## Worktrees" "## Verification" "## Commits" "## Sync" "## Project rules" "## Human verification"
-need domain.md domain "## Glossary" "## ADRs" "## Consumer rules" "## Recording decisions"
+need domain.md domain "## Glossary" "## ADRs" "## Consumer rules"
 on Bundles && has issue-tracker.md "## Bundles"
 on "Browser pass" && { has issue-tracker.md "### attach"; has forge.md "### attach"; need browser-pass.md browser-pass "## When it applies" "## Instances" "## Procedure" "## Captures"; }
 on "Autonomous runs" && has workflow.md "## Autonomous runs"
-grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && need pull-request.md pull-request "## Review brief"
-true'
+on "CI review" && has workflow.md "## CI review"
+grep -qF "docs/agents/pull-request.md" docs/agents/forge.md 2>/dev/null && { need pull-request.md pull-request "## Review brief"; on Changelog && has pull-request.md "## Changelog"; }
+[ -n "$bad" ] || show'
 ```
 
-When it prints nothing, read the files it checked and continue. When it prints anything, change nothing and reply with exactly:
+When it prints sections, they are this skill's configuration: read them and continue. When the harness shortens a long output or saves it to a file, read the whole output once, from the file it names or from a rerun of the check into a temporary file. A printed section or a later step can send you elsewhere in the configuration, such as an operation the section says to use or a section of another file: read that part too. When it prints problem lines, change nothing and reply with exactly:
 
 ```
 rogs-skills is not configured for address-pr-review in this repository.
@@ -53,7 +62,7 @@ Status: SETUP_REQUIRED
 
 When the check reports files missing here that exist in the main worktree (the first entry of `git worktree list --porcelain`), the second line says instead: "The configuration exists in <path> but not on this branch. Commit `docs/agents/` to the base branch, then merge the base into this branch." When it reports a version, the second line says: "The configuration is version <n>; this skill expects version 1.", followed by "Run /setup-rogs here to update it." for an older version or "Run `npx skills update` to update the installed skills." for a newer one.
 
-From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `reply`, `push`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`.
+From here on, "the tracker", "the forge" and every operation named in backticks (`feedback`, `reply`, `push`, ...) mean what those files define, under their operating rules. Any stop below that names no status of its own ends with `Status: BLOCKED` and a one-line `Reason:`. Ending a turn to wait for a background task this run started, such as a CI watch, is not a stop: write no status line, and go on when the task reports back.
 
 Ask the user through the harness's structured question tool (`AskUserQuestion` in Claude Code, `question` in OpenCode) when it has one, and again when an answer leaves the decision open. A turn that ends in plain text while the run waits for the user is a stop, even one that only answers the user's reply to an earlier question: its `Reason:` names the decision. After the report, a reply to a later message from the user ends with the status line that applies then. A runner that watches the session reads a turn with neither a pending question nor a status line as a finished run.
 
@@ -82,7 +91,7 @@ Build a requirements ledger from the acceptance criteria, the scope, the approve
 Every run syncs before it collects feedback, including a run after a review or a merge attempt that stopped with `Status: BLOCKED_FOR_SYNC`.
 
 1. Confirm the worktree is clean apart from explicitly unrelated pre-existing files.
-2. Fetch the base and read the pull request with `read-pr`. When `<remote>/<base>` is an ancestor of `HEAD` and the pull request does not conflict, the branch is up to date: continue with step 4.
+2. Fetch the base and read the pull request with `read-pr`. When `HEAD` contains `<remote>/<base>` (the base is an ancestor of `HEAD`, or every change it made since their merge base is under the generated paths `## CI gate` names) and the pull request does not conflict, the branch is up to date: continue with step 4.
 3. Otherwise sync per `## Sync`: merge the base. When the merge stops on conflicts, resolve each conflict from what both sides meant, keeping it a merge, staging only resolved paths and asking about any hunk that decides product behavior; then conclude it with `git commit --no-edit`.
 4. Rerun the focused checks for the code the merge changed. Commit nothing beyond the merge.
 
@@ -96,7 +105,7 @@ A reply this skill posted starts with one of the four prefixes in step 7. Treat 
 
 When there is no unanswered feedback:
 
-- If step 3 merged the base, finish the sync. Fetch and require the base to still be an ancestor of `HEAD`, syncing again as in step 3 when it moved, then `push` and wait with `ci` for the new head. Require green gate checks and a mergeable pull request. Refresh the `## Review brief` in the body with `edit-pr`, pinned to the new head and base SHAs. Post one conversation comment only when the merge changed what the human verification covers. End with `Status: READY_FOR_REVIEW`.
+- If step 3 merged the base, finish the sync. Fetch and require `HEAD` to still contain the base, syncing again as in step 3 when it does not, then `push` and wait with `ci` for the new head. Require green gate checks and a mergeable pull request. Refresh the `## Review brief` in the body with `edit-pr`, pinned to the new head and base SHAs. Post one conversation comment only when the merge changed what the human verification covers. End with `Status: READY_FOR_REVIEW`.
 - Otherwise report that the branch already contains the base and no feedback is waiting, and stop without creating commits or comments, ending with `Status: READY_FOR_REVIEW`: the pull request is still waiting for review.
 
 ## 5. Validate each comment
@@ -120,13 +129,13 @@ Fix each accepted issue at its shared root cause, with the smallest regression t
 
 Commit each fix with its test as one unit: state the exact paths, the constraints (never amend; no AI attribution and no co-author trailers unless `## Commits` says otherwise; never bypass a hook; leave every other path untouched) and the intent, then call the Skill tool with "commit" and confirm the commit with `git log`. Create no commit for a rejected or no-code-change comment.
 
-When the browser pass is on and an accepted fix changes what a page shows, rerun the affected part of the pass per `browser-pass.md` after the push below, upload the new captures to the lead ticket and to the forge with their `attach` operations, and point the pull request's screenshot links at them. Replacement captures and the moves into and out of `blocked` are the only tracker writes this skill makes.
+When the browser pass is on and an accepted fix changes what a page shows, rerun the affected part of the pass per `browser-pass.md` after the push below, upload the new captures to the lead ticket and to the forge with their `attach` operations, and point the pull request's screenshot links at them. Replacement captures and the moves into and out of `blocked`, with their relations, are the only tracker writes this skill makes.
 
 After the fixes, run the format command and commit any intended changes it makes, then run the focused checks that prove the fixes. Reuse the pull request's CI gate instead of rerunning the full check locally.
 
-Confirm the worktree is clean apart from explicitly unrelated pre-existing files. Immediately before pushing, fetch and require `<remote>/<base>` to still be an ancestor of `HEAD`; when the base moved (`## CI gate` names the automation that moves it), sync again as in step 3 first.
+Confirm the worktree is clean apart from explicitly unrelated pre-existing files. Immediately before pushing, fetch and require `HEAD` to still contain `<remote>/<base>`; when it does not (`## CI gate` names the automation that moves the base), sync again as in step 3 first.
 
-`push` before replying, so the round's fixes and any merge from step 3 reach the pull request together. Never force-push. Record the new head SHA and wait with `ci`, always through that operation rather than an invented alternative. Require successful gate checks for that exact SHA and a mergeable pull request, applying the path-filter rule in `## CI gate`. Fix deterministic failures inside the round and repeat; report infrastructure, permission or unavailable-service failures with `Status: BLOCKED`, the check URL and the exact partial state.
+`push` before replying, so the round's fixes and any merge from step 3 reach the pull request together. Never force-push. Record the new head SHA and wait with `ci`, always through that operation rather than an invented alternative. Require successful gate checks for that exact SHA and a mergeable pull request, applying the path-filter rule in `## CI gate`. Fix deterministic failures inside the round, as one batch per head: read every failing gate check of the head, commit the fixes for all of them, then push once and wait again; report infrastructure, permission or unavailable-service failures with `Status: BLOCKED`, the check URL and the exact partial state.
 
 ## 7. Reply to every unanswered comment
 
@@ -178,9 +187,9 @@ An autonomous run is one whose request says "This run is autonomous". Follow `##
 
 ## Blocked tickets
 
-A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket.
+A ticket is blocked while something outside this session has to happen before its work can go on: another ticket landing, a decision being made, or work in flight that would conflict. A question the user can answer here, or a problem with the run itself, does not block the ticket. Waiting on CI is neither: keep waiting.
 
-To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
+To mark the ticket blocked, `transition` every member to `blocked`, or keep the states when `## States` maps none, and post a `## Blocked` comment on the lead with `comment`, with a pointer naming the lead on each rider. The comment names each blocker with its evidence, what would clear it, and the state each member had. When a blocker is another ticket, give each member a blocked-by relation to it with `relate`, replacing a related relation the pair already has when the tracker keeps one relation per pair, and read the relations back; when `relate` is not `Supported`, the comment stands alone. Then stop with `Status: BLOCKED` and a `Reason:` that names the blockers.
 
 A member in `blocked` comes back once every blocker its `## Blocked` comment names is cleared: `transition` it to the state this run works in (`in-progress` in start-ticket and work-ticket, `in-review` in address-pr-review), and post an `## Unblocked` comment beside the `## Blocked` one that says what cleared each blocker. When a blocker is still open, refresh the `## Blocked` comment and stop as above. Ask before working on a member in `blocked` that has no `## Blocked` comment.
 

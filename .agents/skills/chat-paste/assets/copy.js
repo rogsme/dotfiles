@@ -32,7 +32,8 @@
       event.preventDefault();
       try {
         if (!event.clipboardData) throw new Error("The browser did not provide a clipboard writer.");
-        event.clipboardData.setData("text/plain", data.plain);
+        // Slack pastes Markdown-looking plain text instead of the rich formats.
+        event.clipboardData.setData("text/plain", target === "slack" ? data.slackPlain ?? data.plain : data.plain);
         if (target !== "plain") event.clipboardData.setData("text/html", data.html);
         if (useNativeSlack) event.clipboardData.setData("slack/texty", JSON.stringify(data.delta));
         const required = ["text/plain", ...(target !== "plain" ? ["text/html"] : []), ...(useNativeSlack ? ["slack/texty"] : [])];

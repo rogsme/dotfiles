@@ -54,7 +54,7 @@ export async function renderMessage(options) {
     const values = {
       TITLE: escapeHTML(title), REVISION: String(revision), DIGEST: sourceDigest, DESTINATION: destination,
       CONTENT: formatted.html, WARNINGS: escapeHTML(formatted.warnings.join(" ")),
-      DATA: scriptJSON({ title, destination, plain: formatted.plain, html: formatted.html, delta: formatted.delta }),
+      DATA: scriptJSON({ title, destination, plain: formatted.plain, slackPlain: formatted.slackPlain, html: formatted.html, delta: formatted.delta }),
     };
     const template = await readFile(new URL("message.html", assets), "utf8");
     const html = template.replace(/\{\{([A-Z_]+)\}\}/g, (_, key) => values[key]);

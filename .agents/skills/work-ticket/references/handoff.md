@@ -36,6 +36,10 @@ Model: {exact model and variant, or Unknown}
 - CI: {URL and result; "no checks: the diff touches no CI-filtered path"; or "no CI configured"}
 - Local checks: {commands and results, or "not configured" with the gap}
 
+### Tracker follow-ups
+
+- {each follow-up from the approved plan or a later decision of the user, as written, with the link to the comment this run posted for it, or "None"}
+
 ### Potential issues and limitations
 
 - {known gap, unverified surface, operational risk, review comments left for address-pr-review, or "None known"}
