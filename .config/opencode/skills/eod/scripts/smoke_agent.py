@@ -23,11 +23,17 @@ def verify_smoke(transcript, root, renderer):
     events = [json.loads(line) for line in transcript.splitlines() if line.strip()]
     calls = [call for event in events for call in tool_calls(event)]
     executed = False
+    startup_executed = False
+    startup = f"python3 {renderer.with_name('eod_context.py')}"
     for call in calls:
         state = call.get("state", {})
         command = state.get("input", {}).get("command", "")
         if str(renderer) in command and state.get("status") == "completed":
             executed = True
+        if (command == startup or command.startswith(f"{startup} ")) and state.get(
+            "status"
+        ) == "completed":
+            startup_executed = True
         if state.get("status") == "error":
             raise ValueError(
                 "The EOD agent had a failed tool call; inspect its synthetic transcript"
@@ -35,6 +41,10 @@ def verify_smoke(transcript, root, renderer):
     if not executed:
         raise ValueError(
             "No completed renderer shell call in the actual EOD agent transcript"
+        )
+    if not startup_executed:
+        raise ValueError(
+            "No completed startup shell call in the actual EOD agent transcript"
         )
     proof = json.loads((root / "render-result.json").read_text())
     for key in ("source", "html"):
@@ -60,6 +70,7 @@ def main():
     parent.mkdir(parents=True, exist_ok=True)
     root = Path(tempfile.mkdtemp(prefix="eod-agent-smoke-", dir=parent))
     renderer = Path(__file__).with_name("render_eod.py").resolve()
+    startup = renderer.with_name("eod_context.py")
     draft = root / "synthetic.md"
     draft.write_text(
         "Synthetic public fixture\n\n## Internal notes\nEOD_AGENT_PRIVATE_SENTINEL\n"
@@ -69,7 +80,9 @@ def main():
         "EVAL MODE: synthetic EOD integration smoke, not a client update.\n"
         "Skip the vault, tracker, PR inventory, drafting, reviews and browser. "
         "Do not read real client logs. Use only the synthetic files in this directory.\n"
-        "Run this one shell command exactly, including its output redirection:\n"
+        "Run startup with this synthetic log root, not the real client root:\n"
+        f"python3 {startup} --root {root / 'clients'} --logs 0\n"
+        "Then run this shell command exactly, including its output redirection:\n"
         f"python3 {renderer} {draft} --no-open --require-preview "
         f"--artifacts {root / 'artifacts'} > {root / 'render-result.json'}\n"
         "Read the JSON result and its public Markdown snapshot. "

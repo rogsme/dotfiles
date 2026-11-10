@@ -16,6 +16,9 @@ permissions:
   - action: read
     resource: "*.env.*"
     effect: deny
+  - action: read
+    resource: "*.env.example"
+    effect: allow
   - action: glob
     resource: "*"
     effect: allow

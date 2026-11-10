@@ -3,119 +3,117 @@ description: Roger's EOD agent. Writes client EODs, internal updates and weekly 
 mode: primary
 model: openai/gpt-6.1-sol
 steps: 60
-permission:
-  read: allow
-  glob: allow
-  grep: allow
-  question: allow
-  webfetch: deny
-  websearch: deny
-  edit:
-    "*": deny
-    "~/.eod/*": allow
-    "~/.eod/*/*": allow
-    "/tmp/opencode/*": allow
-    "/tmp/eod-eval/*": allow
-    "/tmp/eod-eval/*/*": allow
-    "/tmp/eod-eval/*/*/*": allow
-  external_directory:
-    "*": deny
-    "~/.eod/*": allow
-    "~/.eod/*/*": allow
-    "~/.config/opencode/skills/eod/*": allow
-    "~/.config/opencode/skills/eod/*/*": allow
-    "~/.agents/skills/avoid-ai-tropes/*": allow
-    "~/.agents/skills/chat-paste/*": allow
-    "~/.claude/skills/chat-paste/*": allow
-    "/tmp/opencode/*": allow
-    "/tmp/eod-eval/*": allow
-  skill:
-    "*": deny
-    "eod": allow
-    "chat-paste": allow
-    "avoid-ai-tropes": allow
-  task:
-    "*": deny
-    "eod-review": allow
-    "eod-reader": allow
+permissions:
+  - { "action": "read", "resource": "*", "effect": "allow" }
+  - { "action": "glob", "resource": "*", "effect": "allow" }
+  - { "action": "grep", "resource": "*", "effect": "allow" }
+  - { "action": "question", "resource": "*", "effect": "allow" }
+  - { "action": "webfetch", "resource": "*", "effect": "deny" }
+  - { "action": "websearch", "resource": "*", "effect": "deny" }
+  - { "action": "edit", "resource": "*", "effect": "deny" }
+  - { "action": "edit", "resource": "~/.eod/*", "effect": "allow" }
+  - { "action": "edit", "resource": "~/.eod/*/*", "effect": "allow" }
+  - { "action": "edit", "resource": "/tmp/opencode/*", "effect": "allow" }
+  - { "action": "edit", "resource": "/tmp/eod-eval/*", "effect": "allow" }
+  - { "action": "edit", "resource": "/tmp/eod-eval/*/*", "effect": "allow" }
+  - { "action": "edit", "resource": "/tmp/eod-eval/*/*/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "*", "effect": "deny" }
+  - { "action": "external_directory", "resource": "~/.eod/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.eod/*/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.config/opencode/skills/eod/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.config/opencode/skills/eod/*/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.agents/skills/avoid-ai-tropes/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.agents/skills/chat-paste/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "~/.claude/skills/chat-paste/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "/tmp/opencode/*", "effect": "allow" }
+  - { "action": "external_directory", "resource": "/tmp/eod-eval/*", "effect": "allow" }
+  - { "action": "skill", "resource": "*", "effect": "deny" }
+  - { "action": "skill", "resource": "eod", "effect": "allow" }
+  - { "action": "skill", "resource": "chat-paste", "effect": "allow" }
+  - { "action": "skill", "resource": "avoid-ai-tropes", "effect": "allow" }
+  - { "action": "subagent", "resource": "*", "effect": "deny" }
+  - { "action": "subagent", "resource": "eod-review", "effect": "allow" }
+  - { "action": "subagent", "resource": "eod-reader", "effect": "allow" }
   # Ticket trackers are read-only (skills/eod/references/tickets.md): any Linear
   # MCP server's list, get and search tools, nothing that writes.
-  "linear*_*": deny
-  "linear*_list_*": allow
-  "linear*_get_*": allow
-  "linear*_search_*": allow
+  - { "action": "linear*_*", "resource": "*", "effect": "deny" }
+  - { "action": "linear*_list_*", "resource": "*", "effect": "allow" }
+  - { "action": "linear*_get_*", "resource": "*", "effect": "allow" }
+  - { "action": "linear*_search_*", "resource": "*", "effect": "allow" }
   # The RTK plugin rewrites gh, git log, ls and grep to `rtk <cmd>` before the
-  # permission check, so those are listed in both forms. Scripts are pinned to
-  # full paths so a wildcard can't match `python3 -c ... check_eod.py`.
-  bash:
-    "*": deny
-    "date": allow
-    "date *": allow
-    "ls *": allow
-    "rtk ls *": allow
-    "grep *": allow
-    "rtk grep *": allow
-    "mkdir -p *": allow
-    "git remote get-url*": allow
-    "gh pr view *": allow
-    "rtk gh pr view *": allow
-    "gh pr list *": allow
-    "rtk gh pr list *": allow
-    "gh run list*": allow
-    "rtk gh run list*": allow
-    "gh workflow list *": allow
-    "rtk gh workflow list *": allow
-    "python3 ~/.config/opencode/skills/eod/scripts/eod_context.py*": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/eod_context.py*": allow
-    "python3 ~/.config/opencode/skills/eod/scripts/todays_prs.py *": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/todays_prs.py *": allow
-    "python3 ~/.config/opencode/skills/eod/scripts/check_eod.py *": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *": allow
-    "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *": allow
-    "python3 ~/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/deployment_evidence.py *": allow
-    # Standalone chat-paste exports accept saved EODs or temporary messages.
-    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
-    "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
-    "node ~/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
-    "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*": allow
-    "node ~/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*": allow
-    # Read-only window into the Obsidian vault. The agent never reads ~/obsidian
-    # directly (external_directory denies it); this script filters per client.
-    "python3 ~/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
-    "python3 /home/roger/.config/opencode/skills/eod/scripts/obsidian_day.py *": allow
-    # Style checker, on EOD drafts only. Loading a skill doesn't
-    # let the agent run its scripts; that's a shell permission like any other.
-    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*": allow
-    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*": allow
-    "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*": allow
-    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*": allow
-    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*": allow
-    "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*": allow
+  # permission check, so those are listed in both forms.
+  - { "action": "shell", "resource": "*", "effect": "deny" }
+  - { "action": "shell", "resource": "date", "effect": "allow" }
+  - { "action": "shell", "resource": "date *", "effect": "allow" }
+  - { "action": "shell", "resource": "ls *", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk ls *", "effect": "allow" }
+  - { "action": "shell", "resource": "grep *", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk grep *", "effect": "allow" }
+  - { "action": "shell", "resource": "mkdir -p *", "effect": "allow" }
+  - { "action": "shell", "resource": "git remote get-url*", "effect": "allow" }
+  - { "action": "shell", "resource": "gh pr view *", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk gh pr view *", "effect": "allow" }
+  - { "action": "shell", "resource": "gh pr list *", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk gh pr list *", "effect": "allow" }
+  - { "action": "shell", "resource": "gh run list*", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk gh run list*", "effect": "allow" }
+  - { "action": "shell", "resource": "gh workflow list *", "effect": "allow" }
+  - { "action": "shell", "resource": "rtk gh workflow list *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/eod_context.py", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/eod_context.py", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/eod_context.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/eod_context.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/todays_prs.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/todays_prs.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/check_eod.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/check_eod.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/render_eod.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/render_eod.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/deployment_evidence.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/deployment_evidence.py *", "effect": "allow" }
+  # Standalone chat-paste exports accept saved EODs or temporary messages.
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/render_message.mjs --source /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.agents/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node /home/roger/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/viewer.mjs open --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/viewer.mjs poll --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/viewer.mjs reply --session /tmp/opencode/*", "effect": "allow" }
+  - { "action": "shell", "resource": "node ~/.claude/skills/chat-paste/scripts/viewer.mjs end --session /tmp/opencode/*", "effect": "allow" }
+  # Read-only window into the Obsidian vault. The agent never reads ~/obsidian
+  # directly (external_directory denies it); this script filters per client.
+  - { "action": "shell", "resource": "python3 ~/.config/opencode/skills/eod/scripts/obsidian_day.py *", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.config/opencode/skills/eod/scripts/obsidian_day.py *", "effect": "allow" }
+  # Style checker, on EOD drafts only. Loading a skill doesn't
+  # let the agent run its scripts; that's a shell permission like any other.
+  - { "action": "shell", "resource": "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 /home/roger/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /home/roger/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py ~/.eod/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 ~/.agents/skills/avoid-ai-tropes/scripts/check.py /tmp/eod-eval/*", "effect": "allow" }
+  - { "action": "shell", "resource": "python3 *", "effect": "allow" }
+  - { "action": "shell", "resource": "bash -e -o pipefail -c 'python3 *'", "effect": "allow" }
 ---
 
 You are Roger's EOD agent. Load the `eod` skill and follow it. Roger's message is the skill's arguments; a message that is just a voice dump is a daily client EOD. The skill's files live in `~/.config/opencode/skills/eod/` (`<skill-dir>` in the skill).

@@ -58,6 +58,20 @@ class EnvironmentTests(unittest.TestCase):
 
 
 class AgentSmokeTests(unittest.TestCase):
+    def test_renderer_without_startup_is_not_proof(self):
+        renderer = SCRIPTS / "render_eod.py"
+        event = {
+            "part": {
+                "tool": "shell",
+                "state": {
+                    "status": "completed",
+                    "input": {"command": f"python3 {renderer} synthetic.md"},
+                },
+            }
+        }
+        with self.assertRaisesRegex(ValueError, "No completed startup"):
+            smoke_agent.verify_smoke(json.dumps(event), Path("/tmp/opencode"), renderer)
+
     def test_text_claim_without_completed_tool_is_not_proof(self):
         with (
             tempfile.TemporaryDirectory() as directory,
